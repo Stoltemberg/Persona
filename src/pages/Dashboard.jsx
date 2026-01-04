@@ -69,69 +69,73 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="container">
+        <div className="container fade-in">
             <header style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '3rem',
+                marginBottom: '4rem',
                 paddingTop: '2rem'
             }}>
                 <div>
-                    <h1>Dashboard</h1>
-                    <p>Bem-vindo de volta, {profile?.full_name || user?.email}</p>
+                    <h1 className="text-gradient">Dashboard</h1>
+                    <p style={{ fontSize: '1.1rem', marginTop: '0.5rem' }}>Bem-vindo de volta, {profile?.full_name || user?.email}</p>
                 </div>
                 <Button variant="ghost" onClick={signOut} icon={LogOut}>
                     Sair
                 </Button>
             </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                <Card>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                        <div style={{ padding: '0.5rem', background: 'rgba(18, 194, 233, 0.2)', borderRadius: '12px', color: 'var(--secondary)' }}>
-                            <Wallet size={24} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
+                <Card className="stagger-1" hover>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                        <div style={{ padding: '0.8rem', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '14px', color: '#12c2e9' }}>
+                            <Wallet size={28} />
                         </div>
                         <h3>Saldo Total</h3>
                     </div>
-                    <h2 style={{ fontSize: '2.5rem' }}>
+                    <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>
                         R$ {loading ? '...' : balance.toFixed(2).replace('.', ',')}
                     </h2>
-                    <p style={{ color: 'var(--secondary)' }}>Atualizado agora</p>
+                    <p style={{ color: '#12c2e9', fontWeight: 500 }}>Atualizado agora</p>
                 </Card>
 
-                <Card>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                        <div style={{ padding: '0.5rem', background: 'rgba(246, 79, 89, 0.2)', borderRadius: '12px', color: 'var(--accent)' }}>
-                            <TrendingUp size={24} />
+                <Card className="stagger-2" hover>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                        <div style={{ padding: '0.8rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '14px', color: '#f64f59' }}>
+                            <TrendingUp size={28} />
                         </div>
                         <h3>Despesas (Mês)</h3>
                     </div>
-                    <h2 style={{ fontSize: '2.5rem' }}>
+                    <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>
                         R$ {loading ? '...' : expenses.toFixed(2).replace('.', ',')}
                     </h2>
-                    <p style={{ color: 'var(--accent)' }}>Este mês</p>
+                    <p style={{ color: '#f64f59', fontWeight: 500 }}>Este mês</p>
                 </Card>
 
                 <Link to="/goals" style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <Card className="glass-card-hover">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                            <div style={{ padding: '0.5rem', background: 'rgba(196, 113, 237, 0.2)', borderRadius: '12px', color: 'var(--primary)' }}>
-                                <PiggyBank size={24} />
+                    <Card className="stagger-3" hover style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                                <div style={{ padding: '0.8rem', background: 'rgba(196, 113, 237, 0.15)', borderRadius: '14px', color: '#c471ed' }}>
+                                    <PiggyBank size={28} />
+                                </div>
+                                <h3>Meta de Economia</h3>
                             </div>
-                            <h3>Meta de Economia</h3>
+                            <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>
+                                R$ {loading ? '...' : savings.toFixed(2).replace('.', ',')}
+                            </h2>
                         </div>
-                        <h2 style={{ fontSize: '2.5rem' }}>
-                            R$ {loading ? '...' : savings.toFixed(2).replace('.', ',')}
-                        </h2>
-                        <p style={{ color: 'var(--primary)' }}>Ver Metas &rarr;</p>
+                        <p style={{ color: '#c471ed', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            Ver Metas <span style={{ fontSize: '1.2rem' }}>&rarr;</span>
+                        </p>
                     </Card>
                 </Link>
             </div>
 
-            <div style={{ marginTop: '3rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h2>Transações Recentes</h2>
+            <div className="fade-in" style={{ animationDelay: '0.4s' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                    <h2 style={{ fontSize: '2rem' }}>Transações Recentes</h2>
                     <Link to="/transactions">
                         <Button variant="ghost">Ver Todas</Button>
                     </Link>
@@ -141,30 +145,41 @@ export default function Dashboard() {
                     {loading ? (
                         <p>Carregando...</p>
                     ) : recentTransactions.length === 0 ? (
-                        <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                            Nenhuma transação encontrada. Adicione a primeira!
+                        <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                            <p style={{ fontSize: '1.1rem' }}>Nenhuma transação encontrada</p>
+                            <Button style={{ marginTop: '1rem' }} onClick={() => window.location.href = '/transactions'}>
+                                Adicionar primeira
+                            </Button>
                         </div>
                     ) : (
-                        recentTransactions.map((tx) => (
-                            <Card key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        recentTransactions.map((tx, index) => (
+                            <Card key={tx.id} hover style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                padding: '1.25rem 2rem',
+                                animationDelay: `${0.1 * index}s`
+                            }} className="fade-in">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                                     <div style={{
-                                        padding: '0.75rem',
+                                        padding: '1rem',
                                         borderRadius: '50%',
-                                        background: tx.type === 'income' ? 'rgba(18, 194, 233, 0.2)' : 'rgba(246, 79, 89, 0.2)',
-                                        color: tx.type === 'income' ? 'var(--secondary)' : 'var(--accent)'
+                                        background: tx.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
+                                        color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
+                                        display: 'flex'
                                     }}>
-                                        {tx.type === 'income' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
+                                        {tx.type === 'income' ? <ArrowDownLeft size={24} /> : <ArrowUpRight size={24} />}
                                     </div>
                                     <div>
-                                        <h4 style={{ marginBottom: '0.2rem' }}>{tx.description}</h4>
-                                        <p style={{ fontSize: '0.85rem' }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
+                                        <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>{tx.description}</h4>
+                                        <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
                                     </div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <h3 style={{
-                                        color: tx.type === 'income' ? 'var(--secondary)' : 'var(--text-main)',
-                                        fontWeight: 600
+                                        color: tx.type === 'income' ? '#12c2e9' : 'white',
+                                        fontWeight: 700,
+                                        fontSize: '1.25rem'
                                     }}>
                                         {tx.type === 'income' ? '+ ' : '- '}R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
                                     </h3>

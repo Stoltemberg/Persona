@@ -75,9 +75,9 @@ export default function Transactions() {
     };
 
     return (
-        <div className="container">
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1>Transações</h1>
+        <div className="container fade-in">
+            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+                <h1 className="text-gradient">Transações</h1>
                 <Button onClick={() => setIsModalOpen(true)} icon={Plus}>
                     Nova Transação
                 </Button>
@@ -88,30 +88,38 @@ export default function Transactions() {
                 {loading ? (
                     <p>Carregando...</p>
                 ) : transactions.length === 0 ? (
-                    <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                        Nenhuma transação encontrada. Adicione a primeira!
+                    <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                        <p style={{ fontSize: '1.2rem' }}>Nenhuma transação encontrada</p>
                     </div>
                 ) : (
-                    transactions.map((tx) => (
-                        <Card key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    transactions.map((tx, index) => (
+                        <Card key={tx.id} hover className="fade-in" style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '1.5rem 2rem',
+                            animationDelay: `${index * 0.05}s`
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                                 <div style={{
-                                    padding: '0.75rem',
+                                    padding: '1rem',
                                     borderRadius: '50%',
-                                    background: tx.type === 'income' ? 'rgba(18, 194, 233, 0.2)' : 'rgba(246, 79, 89, 0.2)',
-                                    color: tx.type === 'income' ? 'var(--secondary)' : 'var(--accent)'
+                                    background: tx.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
+                                    color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
+                                    display: 'flex', alignItems: 'center', justifyItems: 'center'
                                 }}>
-                                    {tx.type === 'income' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
+                                    {tx.type === 'income' ? <ArrowDownLeft size={24} /> : <ArrowUpRight size={24} />}
                                 </div>
                                 <div>
-                                    <h4 style={{ marginBottom: '0.2rem' }}>{tx.description}</h4>
-                                    <p style={{ fontSize: '0.85rem' }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
+                                    <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>{tx.description}</h4>
+                                    <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
                                 </div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
                                 <h3 style={{
-                                    color: tx.type === 'income' ? 'var(--secondary)' : 'var(--text-main)',
-                                    fontWeight: 600
+                                    color: tx.type === 'income' ? '#12c2e9' : 'white',
+                                    fontWeight: 700,
+                                    fontSize: '1.25rem'
                                 }}>
                                     {tx.type === 'income' ? '+ ' : '- '}R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
                                 </h3>
@@ -124,11 +132,11 @@ export default function Transactions() {
             {/* Add Transaction Modal */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Nova Transação">
                 <form onSubmit={handleAddTransaction}>
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                         <Button
                             type="button"
                             className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--accent)' : undefined }}
+                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--color-3)' : undefined, border: type === 'expense' ? 'none' : undefined }}
                             onClick={() => setType('expense')}
                         >
                             Despesa
@@ -136,7 +144,7 @@ export default function Transactions() {
                         <Button
                             type="button"
                             className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--secondary)' : undefined }}
+                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--color-4)' : undefined, border: type === 'income' ? 'none' : undefined }}
                             onClick={() => setType('income')}
                         >
                             Receita
@@ -144,7 +152,8 @@ export default function Transactions() {
                     </div>
 
                     <Input
-                        placeholder="Valor"
+                        label="Valor"
+                        placeholder="0,00"
                         type="number"
                         step="0.01"
                         value={amount}
@@ -152,13 +161,15 @@ export default function Transactions() {
                         required
                     />
                     <Input
-                        placeholder="Descrição (ex: Supermercado)"
+                        label="Descrição"
+                        placeholder="Ex: Supermercado"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         required
                     />
                     <Input
-                        placeholder="Categoria (ex: Alimentação, Transporte)"
+                        label="Categoria"
+                        placeholder="Ex: Alimentação"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                     />

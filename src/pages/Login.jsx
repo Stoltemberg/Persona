@@ -36,65 +36,97 @@ export default function Login() {
     };
 
     return (
-        <div className="flex-center" style={{ minHeight: '100vh', padding: '1rem', flexDirection: 'column' }}>
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '3rem', background: 'var(--primary-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+        <div className="flex-center" style={{ minHeight: '100vh', padding: '1rem', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+
+            {/* Background Decor - Optional additional blobs if desired, but body has them */}
+
+            <div style={{ textAlign: 'center', marginBottom: '3rem', position: 'relative', zIndex: 10 }} className="fade-in">
+                <h1 style={{
+                    fontSize: '4rem',
+                    background: 'linear-gradient(135deg, #fff 0%, #c471ed 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter: 'drop-shadow(0 0 20px rgba(196, 113, 237, 0.3))'
+                }}>
                     Persona
                 </h1>
-                <p>Seu futuro financeiro compartilhado começa aqui.</p>
+                <p style={{ fontSize: '1.2rem', letterSpacing: '0.05em', color: 'rgba(255,255,255,0.8)' }}>
+                    Finanças a dois, simplificadas.
+                </p>
             </div>
 
-            <Card style={{ width: '100%', maxWidth: '400px' }}>
-                <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+            <Card style={{ width: '100%', maxWidth: '420px', padding: '2.5rem' }} className="fade-in stagger-1">
+                <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.75rem' }}>
                     {isSignUp ? 'Criar Conta' : 'Bem-vindo(a)'}
                 </h2>
 
                 <form onSubmit={handleSubmit}>
                     {isSignUp && (
                         <Input
-                            placeholder="Nome Completo"
+                            label="Nome Completo"
+                            placeholder="Seu nome"
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             required
                         />
                     )}
                     <Input
+                        label="Email"
                         type="email"
-                        placeholder="Endereço de E-mail"
+                        placeholder="exemplo@email.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
                     />
                     <Input
+                        label="Senha"
                         type="password"
-                        placeholder="Senha"
+                        placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         minLength={6}
                     />
 
-                    {error && <p style={{ color: 'var(--accent)', marginBottom: '1rem', fontSize: '0.9rem' }}>{error}</p>}
+                    {error && <div style={{
+                        padding: '0.75rem',
+                        background: 'rgba(246, 79, 89, 0.1)',
+                        border: '1px solid rgba(246, 79, 89, 0.2)',
+                        borderRadius: '8px',
+                        color: '#f64f59',
+                        marginBottom: '1.5rem',
+                        fontSize: '0.9rem',
+                        textAlign: 'center'
+                    }}>{error}</div>}
 
                     <Button
                         type="submit"
                         className="btn-primary"
-                        style={{ width: '100%', justifyContent: 'center', marginBottom: '1rem' }}
+                        style={{ width: '100%', justifyContent: 'center', marginBottom: '1.5rem', marginTop: '0.5rem' }}
                         loading={loading}
                     >
-                        {isSignUp ? 'Cadastrar' : 'Entrar'}
+                        {isSignUp ? 'Começar Agora' : 'Acessar Conta'}
                     </Button>
                 </form>
 
-                <div style={{ textAlign: 'center' }}>
+                <div style={{ textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1.5rem' }}>
                     <p style={{ fontSize: '0.9rem' }}>
-                        {isSignUp ? 'Já tem uma conta?' : "Não tem uma conta?"}{' '}
+                        {isSignUp ? 'Já tem cadastro?' : "Novo por aqui?"}{' '}
                         <button
-                            className="btn-ghost"
-                            style={{ padding: '0.2rem 0.5rem', fontSize: '0.9rem', color: 'var(--secondary)' }}
+                            className=""
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#c471ed',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                textDecoration: 'underline',
+                                marginLeft: '0.5rem',
+                                fontSize: '0.9rem'
+                            }}
                             onClick={() => setIsSignUp(!isSignUp)}
                         >
-                            {isSignUp ? 'Entrar' : 'Cadastrar'}
+                            {isSignUp ? 'Fazer Login' : 'Criar Conta'}
                         </button>
                     </p>
                 </div>

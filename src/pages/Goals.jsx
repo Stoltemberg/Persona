@@ -85,19 +85,20 @@ export default function Goals() {
         setDeadline('');
     };
 
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#c471ed', '#f64f59'];
+    // Matches new CSS variables
+    const COLORS = ['#00ebc7', 'rgba(255,255,255,0.05)'];
 
     return (
-        <div className="container">
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1>Metas Financeiras</h1>
+        <div className="container fade-in">
+            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+                <h1 className="text-gradient">Metas Financeiras</h1>
                 <Button onClick={() => setIsModalOpen(true)} icon={Plus}>
                     Nova Meta
                 </Button>
             </header>
 
             {/* Goals Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
                 {loading ? (
                     <p>Carregando...</p>
                 ) : goals.length === 0 ? (
@@ -105,7 +106,7 @@ export default function Goals() {
                         Nenhuma meta encontrada. Defina seu primeiro objetivo!
                     </div>
                 ) : (
-                    goals.map((goal) => {
+                    goals.map((goal, index) => {
                         const progress = (goal.current_amount / goal.target_amount) * 100;
                         const remaining = goal.target_amount - goal.current_amount;
 
@@ -115,51 +116,64 @@ export default function Goals() {
                         ];
 
                         return (
-                            <Card key={goal.id} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <Card key={goal.id} hover className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', animationDelay: `${index * 0.1}s` }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <div>
-                                        <h3 style={{ marginBottom: '0.2rem' }}>{goal.title}</h3>
+                                        <h3 style={{ marginBottom: '0.2rem', color: 'white', fontWeight: 600 }}>{goal.title}</h3>
                                         {goal.deadline && (
                                             <p style={{ fontSize: '0.85rem' }}>Meta: {new Date(goal.deadline).toLocaleDateString('pt-BR')}</p>
                                         )}
                                     </div>
-                                    <button onClick={() => handleDeleteGoal(goal.id)} className="btn-ghost" style={{ padding: '0.25rem', color: 'var(--accent)' }}>
-                                        <Trash2 size={18} />
+                                    <button onClick={() => handleDeleteGoal(goal.id)} className="btn-ghost" style={{ padding: '0.5rem', color: '#f64f59' }}>
+                                        <Trash2 size={20} />
                                     </button>
                                 </div>
 
-                                <div style={{ height: '200px', width: '100%' }}>
+                                <div style={{ height: '220px', width: '100%', margin: '1rem 0' }}>
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie
                                                 data={data}
                                                 cx="50%"
                                                 cy="50%"
-                                                innerRadius={60}
-                                                outerRadius={80}
-                                                fill="#8884d8"
-                                                paddingAngle={5}
+                                                innerRadius={65}
+                                                outerRadius={85}
+                                                startAngle={90}
+                                                endAngle={-270}
                                                 dataKey="value"
+                                                stroke="none"
                                             >
-                                                <Cell key="cell-0" fill={COLORS[1]} /> {/* Green for achieved */}
-                                                <Cell key="cell-1" fill="rgba(255,255,255,0.1)" /> {/* Empty for remaining */}
+                                                <Cell key="cell-0" fill="url(#colorGradient)" />
+                                                <Cell key="cell-1" fill="rgba(255,255,255,0.05)" />
                                             </Pie>
+                                            <defs>
+                                                <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="1">
+                                                    <stop offset="0%" stopColor="#4f29f0" />
+                                                    <stop offset="100%" stopColor="#c471ed" />
+                                                </linearGradient>
+                                            </defs>
                                             <Tooltip
-                                                contentStyle={{ background: 'var(--bg-dark)', border: '1px solid var(--glass-border)', borderRadius: '8px' }}
+                                                contentStyle={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}
                                                 itemStyle={{ color: 'white' }}
                                                 formatter={(value) => `R$ ${value.toFixed(2)}`}
                                             />
-                                            <Legend verticalAlign="bottom" height={36} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 </div>
 
                                 <div style={{ textAlign: 'center' }}>
-                                    <h2 style={{ color: 'var(--secondary)' }}>
+                                    <h2 style={{
+                                        fontSize: '3rem',
+                                        fontWeight: 800,
+                                        background: 'linear-gradient(135deg, #c471ed 0%, #f64f59 100%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        marginBottom: '0.5rem'
+                                    }}>
                                         {progress.toFixed(0)}%
                                     </h2>
-                                    <p style={{ fontSize: '0.9rem' }}>
-                                        R$ {goal.current_amount} de R$ {goal.target_amount}
+                                    <p style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>
+                                        R$ {goal.current_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} de R$ {goal.target_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                     </p>
                                 </div>
                             </Card>
@@ -172,13 +186,15 @@ export default function Goals() {
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Nova Meta">
                 <form onSubmit={handleAddGoal}>
                     <Input
-                        placeholder="Título (ex: Viagem, Carro Novo)"
+                        label="Título"
+                        placeholder="Ex: Viagem, Carro Novo"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         required
                     />
                     <Input
-                        placeholder="Valor Alvo (R$)"
+                        label="Valor Alvo"
+                        placeholder="R$ 0,00"
                         type="number"
                         step="0.01"
                         value={targetAmount}
@@ -186,7 +202,8 @@ export default function Goals() {
                         required
                     />
                     <Input
-                        placeholder="Valor Inicial (R$)"
+                        label="Valor Inicial"
+                        placeholder="R$ 0,00"
                         type="number"
                         step="0.01"
                         value={currentAmount}

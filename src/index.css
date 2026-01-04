@@ -359,6 +359,29 @@ p {
   .main-content {
     padding: 2rem;
   }
+
+  .mobile-header {
+    display: none;
+  }
+
+  .mobile-nav-container {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .main-content {
+    padding-bottom: 6rem;
+    /* Space for bottom nav */
+  }
+
+  .mobile-header {
+    display: block;
+  }
+
+  .mobile-nav-container {
+    display: block;
+  }
 }
 
 /* Mobile Nav Toggles would go here */

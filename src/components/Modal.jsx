@@ -16,13 +16,17 @@ export function Modal({ isOpen, onClose, title, children }) {
 
     return (
         <div
-            className="flex-center"
             style={{
                 position: 'fixed',
                 inset: 0,
                 zIndex: 50,
                 background: 'rgba(0,0,0,0.6)',
-                backdropFilter: 'blur(4px)'
+                backdropFilter: 'blur(4px)',
+                display: 'flex',
+                alignItems: 'flex-start', // Use flex-start to avoid top cutoff, margin-auto handles centering
+                justifyContent: 'center',
+                overflowY: 'auto', // Allow scrolling
+                padding: '1rem'
             }}
             onClick={onClose}
         >
@@ -31,7 +35,7 @@ export function Modal({ isOpen, onClose, title, children }) {
                 style={{
                     width: '100%',
                     maxWidth: '500px',
-                    margin: '1rem',
+                    margin: 'auto', // Centers vertically and horizontally when space permits
                     padding: '1.5rem',
                     position: 'relative'
                 }}

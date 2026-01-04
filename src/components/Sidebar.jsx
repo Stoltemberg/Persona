@@ -15,13 +15,12 @@ export function Sidebar() {
 
     return (
         <aside className="glass-panel" style={{
-            width: '280px',
-            height: '95vh',
-            margin: '1rem',
+            width: '100%',
+            height: '92vh', /* slightly less than full height for visual balance */
+            margin: '2vh 0',
             display: 'flex',
             flexDirection: 'column',
             padding: '2rem',
-            position: 'fixed' // Simple fixed sidebar for now
         }}>
             <div style={{ marginBottom: '3rem', paddingLeft: '0.5rem' }}>
                 <h1 style={{ fontSize: '2rem' }} className="text-gradient">Persona</h1>
@@ -37,17 +36,6 @@ export function Sidebar() {
                             'nav-item',
                             isActive ? 'active' : ''
                         )}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '1rem',
-                            padding: '1rem',
-                            borderRadius: '12px',
-                            textDecoration: 'none',
-                            color: 'var(--text-secondary)',
-                            transition: 'all 0.3s ease',
-                            fontWeight: 500
-                        }}
                     >
                         {({ isActive }) => (
                             <>
@@ -91,7 +79,8 @@ export function Sidebar() {
                     cursor: 'pointer',
                     marginTop: 'auto',
                     borderRadius: '12px',
-                    transition: 'background 0.3s'
+                    transition: 'background 0.3s',
+                    fontSize: '0.95rem'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(246, 79, 89, 0.1)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
@@ -99,17 +88,6 @@ export function Sidebar() {
                 <LogOut size={22} />
                 <span style={{ fontWeight: 600 }}>Sair da Conta</span>
             </button>
-
-            <style jsx>{`
-        .nav-item:hover {
-          background: rgba(255, 255, 255, 0.05);
-          color: white !important;
-        }
-        .nav-item.active {
-          background: rgba(255, 255, 255, 0.08); /* Or a gradient */
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-      `}</style>
         </aside>
     );
 }

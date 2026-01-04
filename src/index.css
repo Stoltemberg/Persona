@@ -221,6 +221,7 @@ h1 {
   font-weight: 800;
   background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.7));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   line-height: 1.1;
   letter-spacing: -0.03em;
@@ -254,6 +255,7 @@ p {
 .text-gradient {
   background: linear-gradient(to right, var(--color-3), var(--color-2));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -304,3 +306,59 @@ p {
 .stagger-3 {
   animation-delay: 0.3s;
 }
+
+/* Layout Styles */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.sidebar-container {
+  width: 280px;
+  flex-shrink: 0;
+  display: none;
+  /* Hidden by default on mobile */
+}
+
+.main-content {
+  flex: 1;
+  padding: 1rem;
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white !important;
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 1024px) {
+  .sidebar-container {
+    display: block;
+  }
+
+  .main-content {
+    padding: 2rem;
+  }
+}
+
+/* Mobile Nav Toggles would go here */

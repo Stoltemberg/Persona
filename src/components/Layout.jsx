@@ -1,35 +1,42 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 
 export function Layout() {
+    const location = useLocation();
+
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', maxWidth: '1600px', margin: '0 auto' }}>
-            {/* Sidebar Area */}
-            <div style={{ width: '300px', flexShrink: 0, display: 'none', '@media(min-width: 768px)': { display: 'block' } }}>
-                {/* Desktop Sidebar */}
-                <div className="desktop-sidebar" style={{ position: 'fixed', width: '300px' }}>
+        <div className="app-layout">
+            {/* Sidebar Area - Desktop */}
+            <div className="sidebar-container">
+                <div style={{ position: 'fixed', width: '280px', height: '100vh', padding: '0 0 0 1rem' }}>
                     <Sidebar />
                 </div>
             </div>
 
+            {/* Mobile Top Bar (Visible only when sidebar is hidden via CSS) */}
+            <div style={{
+                display: 'none', // Overridden by media query if needed
+                padding: '1rem',
+                borderBottom: '1px solid var(--glass-border)',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem'
+            }} className="mobile-header">
+                <h1 className="text-gradient" style={{ fontSize: '1.5rem' }}>Persona</h1>
+            </div>
+
+            <style>{`
+        @media (max-width: 1023px) {
+           .mobile-header { display: flex !important; }
+        }
+      `}</style>
+
             {/* Main Content Area */}
-            <main style={{ flex: 1, padding: '1rem', overflowX: 'hidden' }}>
-                <style>{`
-          @media (min-width: 1024px) {
-            main { padding: 2rem; }
-            .desktop-sidebar { display: block; }
-          }
-          @media (max-width: 1023px) {
-            .desktop-sidebar { display: none; }
-            /* We will need a mobile menu later, for now we assume desktop focus for "professional" */
-          }
-        `}</style>
+            <main className="main-content">
                 <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                     <Outlet />
                 </div>
             </main>
-
-            {/* Mobile Nav could be added here later */}
         </div>
     );
 }

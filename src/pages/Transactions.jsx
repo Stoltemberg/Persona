@@ -5,7 +5,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
-import { Plus, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownLeft, Trash2 } from 'lucide-react';
 
 export default function Transactions() {
     const { user } = useAuth();
@@ -74,6 +74,18 @@ export default function Transactions() {
         setCategory('');
     };
 
+    const handleDeleteTransaction = async (id) => {
+        if (!confirm('Tem certeza que deseja excluir esta transação?')) return;
+        try {
+            const { error } = await supabase.from('transactions').delete().eq('id', id);
+            if (error) throw error;
+            setTransactions(transactions.filter(t => t.id !== id));
+        } catch (error) {
+            console.error('Erro ao excluir:', error);
+            alert('Erro ao excluir transação.');
+        }
+    };
+
     return (
         <div className="container fade-in">
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
@@ -115,14 +127,25 @@ export default function Transactions() {
                                     <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
                                 </div>
                             </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <h3 style={{
-                                    color: tx.type === 'income' ? '#12c2e9' : 'white',
-                                    fontWeight: 700,
-                                    fontSize: '1.25rem'
-                                }}>
-                                    {tx.type === 'income' ? '+ ' : '- '}R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
-                                </h3>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                                <div style={{ textAlign: 'right' }}>
+                                    <h3 style={{
+                                        color: tx.type === 'income' ? '#12c2e9' : 'white',
+                                        fontWeight: 700,
+                                        fontSize: '1.25rem'
+                                    }}>
+                                        {tx.type === 'income' ? '+ ' : '- '}R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
+                                    </h3>
+                                </div>
+                                <button
+                                    onClick={() => handleDeleteTransaction(tx.id)}
+                                    className="btn-ghost"
+                                    style={{ color: '#f64f59', padding: '0.5rem' }}
+                                    title="Excluir Transação"
+                                >
+                                    <Trash2 size={20} />
+                                </button>
                             </div>
                         </Card>
                     ))

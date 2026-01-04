@@ -108,18 +108,20 @@ export default function Dashboard() {
                     <p style={{ color: 'var(--accent)' }}>Este mês</p>
                 </Card>
 
-                <Card>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                        <div style={{ padding: '0.5rem', background: 'rgba(196, 113, 237, 0.2)', borderRadius: '12px', color: 'var(--primary)' }}>
-                            <PiggyBank size={24} />
+                <Link to="/goals" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Card className="glass-card-hover">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                            <div style={{ padding: '0.5rem', background: 'rgba(196, 113, 237, 0.2)', borderRadius: '12px', color: 'var(--primary)' }}>
+                                <PiggyBank size={24} />
+                            </div>
+                            <h3>Meta de Economia</h3>
                         </div>
-                        <h3>Meta de Economia</h3>
-                    </div>
-                    <h2 style={{ fontSize: '2.5rem' }}>
-                        R$ {loading ? '...' : savings.toFixed(2).replace('.', ',')}
-                    </h2>
-                    <p style={{ color: 'var(--primary)' }}>Em breve</p>
-                </Card>
+                        <h2 style={{ fontSize: '2.5rem' }}>
+                            R$ {loading ? '...' : savings.toFixed(2).replace('.', ',')}
+                        </h2>
+                        <p style={{ color: 'var(--primary)' }}>Ver Metas &rarr;</p>
+                    </Card>
+                </Link>
             </div>
 
             <div style={{ marginTop: '3rem' }}>

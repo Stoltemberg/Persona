@@ -75,15 +75,12 @@ export default function Dashboard() {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 marginBottom: '4rem',
-                paddingTop: '2rem'
+                paddingTop: '0.5rem'
             }}>
                 <div>
                     <h1 className="text-gradient">Dashboard</h1>
                     <p style={{ fontSize: '1.1rem', marginTop: '0.5rem' }}>Bem-vindo de volta, {profile?.full_name || user?.email}</p>
                 </div>
-                <Button variant="ghost" onClick={signOut} icon={LogOut}>
-                    Sair
-                </Button>
             </header>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>

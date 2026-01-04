@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { LogOut, Wallet, TrendingUp, PiggyBank } from 'lucide-react';
+import { LogOut, Wallet, TrendingUp, PiggyBank, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
@@ -11,6 +11,7 @@ export default function Dashboard() {
     const [balance, setBalance] = useState(0);
     const [expenses, setExpenses] = useState(0);
     const [savings, setSavings] = useState(0);
+    const [recentTransactions, setRecentTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -22,10 +23,12 @@ export default function Dashboard() {
     const fetchFinancialData = async () => {
         try {
             // Fetch all transactions for the user
+            // We need more fields now for the list
             const { data, error } = await supabase
                 .from('transactions')
-                .select('amount, type, date')
-                .eq('profile_id', user.id); // For MVP, only showing personal data
+                .select('*')
+                .eq('profile_id', user.id)
+                .order('date', { ascending: false }); // Latest first
 
             if (error) throw error;
 
@@ -53,8 +56,10 @@ export default function Dashboard() {
 
             setBalance(totalIncome - totalExpense);
             setExpenses(monthlyExpense);
-            // Savings logic can be added later, for now 0 or static
-            setSavings(0);
+            setSavings(0); // Future feature
+
+            // Set the first 5 for the recent list
+            setRecentTransactions(data.slice(0, 5));
 
         } catch (error) {
             console.error('Error fetching financial data:', error);
@@ -132,10 +137,41 @@ export default function Dashboard() {
                     </Link>
                 </div>
 
-                <div className="glass-panel" style={{ padding: '1rem' }}>
-                    <p style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                        Suas transações recentes aparecerão aqui.
-                    </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {loading ? (
+                        <p>Carregando...</p>
+                    ) : recentTransactions.length === 0 ? (
+                        <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                            Nenhuma transação encontrada. Adicione a primeira!
+                        </div>
+                    ) : (
+                        recentTransactions.map((tx) => (
+                            <Card key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <div style={{
+                                        padding: '0.75rem',
+                                        borderRadius: '50%',
+                                        background: tx.type === 'income' ? 'rgba(18, 194, 233, 0.2)' : 'rgba(246, 79, 89, 0.2)',
+                                        color: tx.type === 'income' ? 'var(--secondary)' : 'var(--accent)'
+                                    }}>
+                                        {tx.type === 'income' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
+                                    </div>
+                                    <div>
+                                        <h4 style={{ marginBottom: '0.2rem' }}>{tx.description}</h4>
+                                        <p style={{ fontSize: '0.85rem' }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
+                                    </div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <h3 style={{
+                                        color: tx.type === 'income' ? 'var(--secondary)' : 'var(--text-main)',
+                                        fontWeight: 600
+                                    }}>
+                                        {tx.type === 'income' ? '+ ' : '- '}R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
+                                    </h3>
+                                </div>
+                            </Card>
+                        ))
+                    )}
                 </div>
             </div>
         </div>

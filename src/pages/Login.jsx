@@ -24,7 +24,7 @@ export default function Login() {
         try {
             if (isSignUp) {
                 await signUp(email, password, fullName);
-                alert('Check your email for the confirmation link!');
+                alert('Verifique seu e-mail para confirmar o cadastro!');
             } else {
                 await signIn(email, password);
             }
@@ -41,18 +41,18 @@ export default function Login() {
                 <h1 style={{ fontSize: '3rem', background: 'var(--primary-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                     Persona
                 </h1>
-                <p>Your shared financial future starts here.</p>
+                <p>Seu futuro financeiro compartilhado começa aqui.</p>
             </div>
 
             <Card style={{ width: '100%', maxWidth: '400px' }}>
                 <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                    {isSignUp ? 'Create Account' : 'Welcome Back'}
+                    {isSignUp ? 'Criar Conta' : 'Bem-vindo(a)'}
                 </h2>
 
                 <form onSubmit={handleSubmit}>
                     {isSignUp && (
                         <Input
-                            placeholder="Full Name"
+                            placeholder="Nome Completo"
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             required
@@ -60,14 +60,14 @@ export default function Login() {
                     )}
                     <Input
                         type="email"
-                        placeholder="Email Address"
+                        placeholder="Endereço de E-mail"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
                     />
                     <Input
                         type="password"
-                        placeholder="Password"
+                        placeholder="Senha"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -82,19 +82,19 @@ export default function Login() {
                         style={{ width: '100%', justifyContent: 'center', marginBottom: '1rem' }}
                         loading={loading}
                     >
-                        {isSignUp ? 'Sign Up' : 'Log In'}
+                        {isSignUp ? 'Cadastrar' : 'Entrar'}
                     </Button>
                 </form>
 
                 <div style={{ textAlign: 'center' }}>
                     <p style={{ fontSize: '0.9rem' }}>
-                        {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+                        {isSignUp ? 'Já tem uma conta?' : "Não tem uma conta?"}{' '}
                         <button
                             className="btn-ghost"
                             style={{ padding: '0.2rem 0.5rem', fontSize: '0.9rem', color: 'var(--secondary)' }}
                             onClick={() => setIsSignUp(!isSignUp)}
                         >
-                            {isSignUp ? 'Log In' : 'Sign Up'}
+                            {isSignUp ? 'Entrar' : 'Cadastrar'}
                         </button>
                     </p>
                 </div>

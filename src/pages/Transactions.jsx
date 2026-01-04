@@ -34,7 +34,7 @@ export default function Transactions() {
             if (error) throw error;
             setTransactions(data || []);
         } catch (error) {
-            console.error('Error fetching transactions:', error);
+            console.error('Erro ao buscar transações:', error);
         } finally {
             setLoading(false);
         }
@@ -77,19 +77,19 @@ export default function Transactions() {
     return (
         <div className="container">
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1>Transactions</h1>
+                <h1>Transações</h1>
                 <Button onClick={() => setIsModalOpen(true)} icon={Plus}>
-                    Add New
+                    Nova Transação
                 </Button>
             </header>
 
             {/* Transaction List */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {loading ? (
-                    <p>Loading...</p>
+                    <p>Carregando...</p>
                 ) : transactions.length === 0 ? (
                     <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                        No transactions found. Add your first one!
+                        Nenhuma transação encontrada. Adicione a primeira!
                     </div>
                 ) : (
                     transactions.map((tx) => (
@@ -105,7 +105,7 @@ export default function Transactions() {
                                 </div>
                                 <div>
                                     <h4 style={{ marginBottom: '0.2rem' }}>{tx.description}</h4>
-                                    <p style={{ fontSize: '0.85rem' }}>{tx.category} • {new Date(tx.date).toLocaleDateString()}</p>
+                                    <p style={{ fontSize: '0.85rem' }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
                                 </div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
@@ -113,7 +113,7 @@ export default function Transactions() {
                                     color: tx.type === 'income' ? 'var(--secondary)' : 'var(--text-main)',
                                     fontWeight: 600
                                 }}>
-                                    {tx.type === 'income' ? '+ ' : '- '}${parseFloat(tx.amount).toFixed(2)}
+                                    {tx.type === 'income' ? '+ ' : '- '}R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
                                 </h3>
                             </div>
                         </Card>
@@ -122,7 +122,7 @@ export default function Transactions() {
             </div>
 
             {/* Add Transaction Modal */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add Transaction">
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Nova Transação">
                 <form onSubmit={handleAddTransaction}>
                     <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                         <Button
@@ -131,7 +131,7 @@ export default function Transactions() {
                             style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--accent)' : undefined }}
                             onClick={() => setType('expense')}
                         >
-                            Expense
+                            Despesa
                         </Button>
                         <Button
                             type="button"
@@ -139,12 +139,12 @@ export default function Transactions() {
                             style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--secondary)' : undefined }}
                             onClick={() => setType('income')}
                         >
-                            Income
+                            Receita
                         </Button>
                     </div>
 
                     <Input
-                        placeholder="Amount"
+                        placeholder="Valor"
                         type="number"
                         step="0.01"
                         value={amount}
@@ -152,19 +152,19 @@ export default function Transactions() {
                         required
                     />
                     <Input
-                        placeholder="Description (e.g., Grocery)"
+                        placeholder="Descrição (ex: Supermercado)"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         required
                     />
                     <Input
-                        placeholder="Category (e.g., Food, Transport)"
+                        placeholder="Categoria (ex: Alimentação, Transporte)"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                     />
 
                     <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} loading={submitting}>
-                        Save Transaction
+                        Salvar
                     </Button>
                 </form>
             </Modal>

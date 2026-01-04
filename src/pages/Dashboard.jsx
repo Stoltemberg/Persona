@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { LogOut, Wallet, TrendingUp, PiggyBank } from 'lucide-react';
@@ -6,6 +8,60 @@ import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
     const { user, profile, signOut } = useAuth();
+    const [balance, setBalance] = useState(0);
+    const [expenses, setExpenses] = useState(0);
+    const [savings, setSavings] = useState(0);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (user) {
+            fetchFinancialData();
+        }
+    }, [user]);
+
+    const fetchFinancialData = async () => {
+        try {
+            // Fetch all transactions for the user
+            const { data, error } = await supabase
+                .from('transactions')
+                .select('amount, type, date')
+                .eq('profile_id', user.id); // For MVP, only showing personal data
+
+            if (error) throw error;
+
+            let totalIncome = 0;
+            let totalExpense = 0;
+            let monthlyExpense = 0;
+
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            data.forEach(tx => {
+                const amount = parseFloat(tx.amount);
+                const date = new Date(tx.date);
+
+                if (tx.type === 'income') {
+                    totalIncome += amount;
+                } else {
+                    totalExpense += amount;
+                    // Check if it's this month's expense
+                    if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+                        monthlyExpense += amount;
+                    }
+                }
+            });
+
+            setBalance(totalIncome - totalExpense);
+            setExpenses(monthlyExpense);
+            // Savings logic can be added later, for now 0 or static
+            setSavings(0);
+
+        } catch (error) {
+            console.error('Error fetching financial data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="container">
@@ -18,10 +74,10 @@ export default function Dashboard() {
             }}>
                 <div>
                     <h1>Dashboard</h1>
-                    <p>Welcome back, {profile?.full_name || user?.email}</p>
+                    <p>Bem-vindo de volta, {profile?.full_name || user?.email}</p>
                 </div>
                 <Button variant="ghost" onClick={signOut} icon={LogOut}>
-                    Sign Out
+                    Sair
                 </Button>
             </header>
 
@@ -31,10 +87,12 @@ export default function Dashboard() {
                         <div style={{ padding: '0.5rem', background: 'rgba(18, 194, 233, 0.2)', borderRadius: '12px', color: 'var(--secondary)' }}>
                             <Wallet size={24} />
                         </div>
-                        <h3>Total Balance</h3>
+                        <h3>Saldo Total</h3>
                     </div>
-                    <h2 style={{ fontSize: '2.5rem' }}>$12,450.00</h2>
-                    <p style={{ color: 'var(--secondary)' }}>+2.5% from last month</p>
+                    <h2 style={{ fontSize: '2.5rem' }}>
+                        R$ {loading ? '...' : balance.toFixed(2).replace('.', ',')}
+                    </h2>
+                    <p style={{ color: 'var(--secondary)' }}>Atualizado agora</p>
                 </Card>
 
                 <Card>
@@ -42,10 +100,12 @@ export default function Dashboard() {
                         <div style={{ padding: '0.5rem', background: 'rgba(246, 79, 89, 0.2)', borderRadius: '12px', color: 'var(--accent)' }}>
                             <TrendingUp size={24} />
                         </div>
-                        <h3>Monthly Expenses</h3>
+                        <h3>Despesas (Mês)</h3>
                     </div>
-                    <h2 style={{ fontSize: '2.5rem' }}>$3,200.00</h2>
-                    <p style={{ color: 'var(--accent)' }}>-12% vs budget</p>
+                    <h2 style={{ fontSize: '2.5rem' }}>
+                        R$ {loading ? '...' : expenses.toFixed(2).replace('.', ',')}
+                    </h2>
+                    <p style={{ color: 'var(--accent)' }}>Este mês</p>
                 </Card>
 
                 <Card>
@@ -53,24 +113,26 @@ export default function Dashboard() {
                         <div style={{ padding: '0.5rem', background: 'rgba(196, 113, 237, 0.2)', borderRadius: '12px', color: 'var(--primary)' }}>
                             <PiggyBank size={24} />
                         </div>
-                        <h3>Savings Goal</h3>
+                        <h3>Meta de Economia</h3>
                     </div>
-                    <h2 style={{ fontSize: '2.5rem' }}>$8,500.00</h2>
-                    <p style={{ color: 'var(--primary)' }}>65% of goal reached</p>
+                    <h2 style={{ fontSize: '2.5rem' }}>
+                        R$ {loading ? '...' : savings.toFixed(2).replace('.', ',')}
+                    </h2>
+                    <p style={{ color: 'var(--primary)' }}>Em breve</p>
                 </Card>
             </div>
 
             <div style={{ marginTop: '3rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h2>Recent Transactions</h2>
+                    <h2>Transações Recentes</h2>
                     <Link to="/transactions">
-                        <Button variant="ghost">View All</Button>
+                        <Button variant="ghost">Ver Todas</Button>
                     </Link>
                 </div>
 
                 <div className="glass-panel" style={{ padding: '1rem' }}>
                     <p style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                        No transactions yet. Start by adding one!
+                        Suas transações recentes aparecerão aqui.
                     </p>
                 </div>
             </div>

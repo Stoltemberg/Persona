@@ -1,4 +1,4 @@
-```javascript
+
 import { Modal } from './Modal';
 import { Button } from './Button';
 import { X, Check, Star } from 'lucide-react'; // Keep Star as it's used, add X if intended
@@ -16,7 +16,7 @@ export function UpgradeModal({ isOpen, onClose }) {
         setLoading(true);
         try {
             const { data, error } = await supabase.functions.invoke('create-checkout');
-            
+
             if (error) throw error;
             if (!data?.init_point) throw new Error('Link de pagamento não gerado.');
 

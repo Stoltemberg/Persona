@@ -243,7 +243,7 @@ body {
 }
 
 .input-field:hover {
-  background: rgba(125, 125, 125, 0.15);
+  background-color: rgba(125, 125, 125, 0.15);
   /* Keep generic or make var */
   border-color: var(--glass-border-highlight);
 }
@@ -251,7 +251,7 @@ body {
 .input-field:focus {
   outline: none;
   border-color: var(--color-2);
-  background: var(--input-bg);
+  background-color: var(--input-bg);
   box-shadow: 0 0 0 3px rgba(196, 113, 237, 0.15);
 }
 

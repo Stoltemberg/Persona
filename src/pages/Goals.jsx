@@ -145,6 +145,23 @@ export default function Goals() {
         }
     };
 
+    const handleSetPrimary = async (goalId) => {
+        try {
+            // 1. Reset all others
+            await supabase.from('goals').update({ is_primary: false }).eq('profile_id', user.id);
+
+            // 2. Set new primary
+            const { error } = await supabase.from('goals').update({ is_primary: true }).eq('id', goalId);
+
+            if (error) throw error;
+            await fetchGoals();
+        } catch (error) {
+            console.error("Error setting primary goal:", error);
+            // Non-blocking error
+            alert("Erro ao definir principal. Tente novamente mais tarde.");
+        }
+    };
+
     const resetForm = () => {
         setTitle('');
         setTargetAmount('');

@@ -168,7 +168,7 @@ export default function Dashboard() {
                 </Card>
 
                 <Link to="/analysis" style={{ textDecoration: 'none', color: 'inherit' }} className="card-min-width">
-                    <Card className="stagger-2" hover>
+                    <Card className="stagger-2" hover style={{ height: '100%' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                             <div style={{ padding: '0.8rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '14px', color: '#f64f59' }}>
                                 <TrendingUp size={28} />

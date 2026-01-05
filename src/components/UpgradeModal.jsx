@@ -1,13 +1,34 @@
+```javascript
 import { Modal } from './Modal';
 import { Button } from './Button';
-import { Check, Star, Zap } from 'lucide-react';
+import { X, Check, Star } from 'lucide-react'; // Keep Star as it's used, add X if intended
+import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
+import { useToast } from '../context/ToastContext';
+import { useState } from 'react';
 
 export function UpgradeModal({ isOpen, onClose }) {
-    // Replace with your actual Mercado Pago Link or Checkout Logic
-    const handleUpgrade = () => {
-        // Link de Preferência (Pagamento Único - Aceita PIX)
-        window.open('https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=176833824-ceec91f1-c774-4f4a-9285-27ce14f408a2', '_blank');
-        onClose();
+    const { user } = useAuth();
+    const { addToast } = useToast();
+    const [loading, setLoading] = useState(false);
+
+    const handleUpgrade = async () => {
+        setLoading(true);
+        try {
+            const { data, error } = await supabase.functions.invoke('create-checkout');
+            
+            if (error) throw error;
+            if (!data?.init_point) throw new Error('Link de pagamento não gerado.');
+
+            // Redireciona para o Mercado Pago
+            window.open(data.init_point, '_blank');
+            onClose();
+        } catch (error) {
+            console.error('Erro no checkout:', error);
+            addToast('Erro ao iniciar pagamento. Tente novamente.', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

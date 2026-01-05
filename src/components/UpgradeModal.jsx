@@ -15,7 +15,14 @@ export function UpgradeModal({ isOpen, onClose }) {
     const handleUpgrade = async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase.functions.invoke('create-checkout');
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) throw new Error('Usuário não autenticado.');
+
+            const { data, error } = await supabase.functions.invoke('create-checkout', {
+                headers: {
+                    Authorization: `Bearer ${session.access_token}`
+                }
+            });
 
             if (error) throw error;
             if (!data?.init_point) throw new Error('Link de pagamento não gerado.');

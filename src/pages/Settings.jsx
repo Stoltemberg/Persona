@@ -51,8 +51,7 @@ export default function Settings() {
             // Fetch categories correctly as per Budgets.jsx logic if possible, or just all expense categories
             const { data: expenseCategories } = await supabase.from('categories').select('*').eq('type', 'expense');
 
-            // Fetch categories correctly as per Budgets.jsx logic if possible, or just all expense categories
-            const { data: expenseCategories } = await supabase.from('categories').select('*').eq('type', 'expense');
+
 
             await exportDataToExcel(
                 profile?.full_name || 'Usuário',

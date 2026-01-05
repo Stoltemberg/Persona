@@ -310,6 +310,36 @@ p {
   }
 }
 
+/* Page Headers (New) */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.page-header .btn-primary {
+  white-space: nowrap;
+  /* Prevent wrap */
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    margin-bottom: 2rem;
+    gap: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.8rem !important;
+  }
+
+  .page-header .btn-primary {
+    padding: 0.6rem 1rem !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+
 /* Utilities */
 .flex-center {
   display: flex;

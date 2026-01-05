@@ -219,7 +219,7 @@ export default function Goals() {
     return (
         <div className="container fade-in">
             {/* ... header ... */}
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+            <header className="page-header">
                 <div>
                     <h1 className="text-gradient">Metas Financeiras</h1>
                     <p>Acompanhe e realize seus sonhos</p>

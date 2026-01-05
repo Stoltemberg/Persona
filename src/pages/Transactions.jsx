@@ -188,9 +188,9 @@ export default function Transactions() {
 
     return (
         <div className="container fade-in">
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+            <header className="page-header">
                 <h1 className="text-gradient">Transações</h1>
-                <Button onClick={handleOpenNew} icon={Plus}>
+                <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
                     Nova Transação
                 </Button>
             </header>

@@ -421,6 +421,16 @@ p {
   width: 100%;
 }
 
+/* Scroll Hint */
+.scroll-hint {
+  display: none;
+  /* Hidden by default (desktop) */
+}
+
+.rotate-arrow {
+  transform: rotate(45deg);
+}
+
 /* media query for desktop, switching to grid */
 /* Desktop Grid Layout */
 @media (min-width: 1024px) {
@@ -554,6 +564,14 @@ p {
 
   .mobile-nav-container {
     display: block;
+  }
+
+  .scroll-hint {
+    display: flex;
+    justify-content: center;
+    margin-top: -1.5rem;
+    /* Pull up closer */
+    margin-bottom: 2rem;
   }
 
   /* Mobile Horizontal Scroll */

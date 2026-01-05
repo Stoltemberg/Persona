@@ -552,27 +552,89 @@ p {
     scroll-snap-align: center;
   }
 
-  /* Transaction Card Mobile */
+  /* Transaction Card Mobile - Compact Row */
   .transaction-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1rem !important;
-    /* Smaller padding */
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem !important;
+    width: 100%;
+    /* Ensure full width */
   }
 
   .transaction-left {
-    width: 100%;
-    gap: 1rem;
+    width: auto;
+    flex: 1;
+    gap: 0.75rem;
+    overflow: hidden;
+    /* Prevent text overflow */
+  }
+
+  /* Compact Icon */
+  .transaction-left>div:first-child {
+    padding: 0.4rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  .transaction-left h4 {
+    font-size: 0.95rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .transaction-left p {
+    font-size: 0.75rem !important;
   }
 
   .transaction-right {
+    width: auto;
+    justify-content: flex-end;
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+    gap: 0.5rem;
+  }
+
+  .transaction-right h3 {
+    font-size: 0.95rem !important;
+  }
+
+  /* Hide edit/delete on very small screens if needed, or make them smaller */
+  .transaction-right button {
+    padding: 0.4rem !important;
+  }
+}
+
+/* Date Filters */
+.date-filters {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .date-filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 0.5rem;
     width: 100%;
-    justify-content: space-between;
-    margin-top: 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    /* Separator */
-    padding-top: 1rem;
+  }
+
+  .date-filters>div {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.25rem !important;
+  }
+
+  .date-filters input {
+    width: 100%;
+    font-size: 0.8rem;
   }
 }
 

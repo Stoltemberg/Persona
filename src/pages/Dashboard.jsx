@@ -240,13 +240,10 @@ export default function Dashboard() {
                         </div>
                     ) : (
                         recentTransactions.map((tx, index) => (
-                            <Card key={tx.id} hover style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                padding: '1.25rem 2rem',
-                                animationDelay: `${0.1 * index}s`
-                            }} className="fade-in">
+                            <Card key={tx.id} hover className="fade-in transaction-card" style={{
+                                animationDelay: `${0.1 * index}s`,
+                                padding: '0.75rem 1rem'
+                            }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                                     <div style={{
                                         padding: '1rem',

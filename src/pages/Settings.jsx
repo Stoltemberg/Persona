@@ -95,6 +95,46 @@ export default function Settings() {
                     </form>
                 </Card>
 
+                {/* Appearance Settings */}
+                <Card className="glass-card fade-in stagger-2">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                        <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px' }}>
+                            <Sun size={24} color="white" />
+                        </div>
+                        <h3>Aparência</h3>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        {[
+                            { id: 'light', icon: Sun, label: 'Claro' },
+                            { id: 'dark', icon: Moon, label: 'Escuro' },
+                            { id: 'system', icon: Monitor, label: 'Sistema' }
+                        ].map((t) => (
+                            <button
+                                key={t.id}
+                                onClick={() => changeTheme(t.id)}
+                                style={{
+                                    flex: 1,
+                                    padding: '1rem',
+                                    borderRadius: '12px',
+                                    border: theme === t.id ? '2px solid var(--color-2)' : '1px solid var(--glass-border)',
+                                    background: theme === t.id ? 'var(--glass-border-highlight)' : 'transparent',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                    color: 'var(--text-main)',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                <t.icon size={24} />
+                                <span style={{ fontSize: '0.9rem' }}>{t.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </Card>
+
                 {/* Other Settings Placeholders */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                     <Card className="glass-card fade-in stagger-2">

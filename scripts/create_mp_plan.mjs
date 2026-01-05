@@ -39,10 +39,22 @@ async function createPlan() {
                 frequency_type: 'months',
                 transaction_amount: 29.90,
                 currency_id: 'BRL',
-                start_date: new Date(new Date().getTime() + 60000).toISOString() // Now + 1min
+                start_date: new Date(new Date().getTime() + 60000).toISOString()
             },
             back_url: 'https://app-persona-demo.com/settings',
-            status: 'active'
+            status: 'active',
+            payment_methods_allowed: {
+                payment_types: [
+                    { id: "credit_card" },
+                    { id: "ticket" },
+                    { id: "bank_transfer" }, // Covers PIX
+                    { id: "account_money" }
+                ],
+                payment_methods: [
+                    { id: "pix" },
+                    { id: "bolbradesco" }
+                ]
+            }
         };
 
         const response = await fetch(url, {

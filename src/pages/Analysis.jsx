@@ -3,7 +3,6 @@ import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { filter } from 'lodash'; // Using lodash if available or native filter
 
 export default function Analysis() {
     const { user } = useAuth();

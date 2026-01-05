@@ -326,26 +326,66 @@ p {
   animation-delay: 0.3s;
 }
 
+
 /* Layout Styles */
 .app-layout {
   display: flex;
   min-height: 100vh;
   max-width: 1600px;
   margin: 0 auto;
-}
-
-.sidebar-container {
-  width: 280px;
-  flex-shrink: 0;
-  display: none;
-  /* Hidden by default on mobile */
+  /* Prevent horizontal scroll but allow vertical */
+  overflow-x: hidden;
 }
 
 .main-content {
   flex: 1;
   padding: 1rem;
-  overflow-x: hidden;
-  max-width: 100%;
+  width: 100%;
+  /* Ensure width is explicit */
+}
+
+/* ... Media Queries ... */
+
+@media (max-width: 1023px) {
+  .main-content {
+    padding-bottom: 7rem;
+    /* More space for bottom nav + safe area */
+    overflow-y: auto;
+    /* Ensure vertical scroll is enabled */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scroll on iOS */
+  }
+}
+
+/* Enhanced Modal Styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.75);
+  /* Darker backdrop */
+  backdrop-filter: blur(8px);
+  /* Stronger blur */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+  padding: 2rem;
+  position: relative;
+  max-height: 90vh;
+  /* Prevent it from being taller than screen */
+  overflow-y: auto;
+  /* Internal scroll if too tall */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  /* Deep shadow */
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .nav-item {

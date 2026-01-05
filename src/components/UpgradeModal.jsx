@@ -18,11 +18,8 @@ export function UpgradeModal({ isOpen, onClose }) {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) throw new Error('Usuário não autenticado.');
 
-            const { data, error } = await supabase.functions.invoke('create-checkout', {
-                headers: {
-                    Authorization: `Bearer ${session.access_token}`
-                }
-            });
+            // A função invoke envia o token automaticamente se o usuário estiver logado
+            const { data, error } = await supabase.functions.invoke('create-checkout');
 
             if (error) throw error;
             if (!data?.init_point) throw new Error('Link de pagamento não gerado.');

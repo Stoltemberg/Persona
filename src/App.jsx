@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Transactions from './pages/Transactions';
-import Categories from './pages/Categories';
-import Goals from './pages/Goals';
-import Analysis from './pages/Analysis';
+import Budgets from './pages/Budgets';
+// ...
+            <Route path="/analysis" element={<Analysis />} />
+            <Route path="/budgets" element={<Budgets />} />
+            <Route path="/goals" element={<Goals />} />
 import Settings from './pages/Settings';
 import { Layout } from './components/Layout';
 

@@ -188,27 +188,26 @@ export default function Settings() {
                             </Button>
                         </Link>
                         <p style={{ opacity: 0.7, fontSize: '0.85rem' }}>Organize suas contas, cartões e categorias.</p>
-                </div>
-            </Card>
+                    </Card>
 
-            <Card className="glass-card fade-in stagger-3">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                    <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px' }}>
-                        <Bell size={24} />
-                    </div>
-                    <h3>Notificações</h3>
+                    <Card className="glass-card fade-in stagger-3">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                            <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px' }}>
+                                <Bell size={24} />
+                            </div>
+                            <h3>Notificações</h3>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                            <span>Alertas de Orçamento</span>
+                            <input type="checkbox" defaultChecked />
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>Resumo Semanal</span>
+                            <input type="checkbox" />
+                        </div>
+                    </Card>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                    <span>Alertas de Orçamento</span>
-                    <input type="checkbox" defaultChecked />
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Resumo Semanal</span>
-                    <input type="checkbox" />
-                </div>
-            </Card>
+            </div>
         </div>
-            </div >
-        </div >
     );
 }

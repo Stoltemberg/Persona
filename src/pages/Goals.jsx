@@ -185,8 +185,30 @@ export default function Goals() {
         };
     };
 
+    // --- Dynamic Tips ---
+    const TIPS = [
+        "Reduzindo apenas 15% dos seus gastos variáveis, você atinge suas metas muito mais rápido.",
+        "O hábito de poupar importa mais que o valor. Comece com pouco, mas comece hoje.",
+        "Pequenos gastos invisíveis são como furos em um barco. Cuidado com o 'só hoje'.",
+        "Invista no seu conhecimento. A melhor taxa de juros vem de aprender algo novo.",
+        "Uma meta sem plano é só um desejo. Que bom que você já tem o plano aqui!",
+        "Antes de comprar, pergunte-se: 'Eu preciso disso ou eu quero isso agora?'",
+        "Liberdade financeira é poder escolher como gastar seu tempo, não só seu dinheiro."
+    ];
+
+    const [currentTip, setCurrentTip] = useState(TIPS[0]);
+
+    useEffect(() => {
+        // Randomize tip on mount
+        const randomIndex = Math.floor(Math.random() * TIPS.length);
+        setCurrentTip(TIPS[randomIndex]);
+    }, []);
+
+    // ... existing imports/code ...
+
     return (
         <div className="container fade-in">
+            {/* ... header ... */}
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <div>
                     <h1 className="text-gradient">Metas Financeiras</h1>
@@ -213,7 +235,7 @@ export default function Goals() {
                 <div>
                     <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'white' }}>Dica do Persona IA</h3>
                     <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.9)' }}>
-                        Reduzindo apenas <strong>15%</strong> dos seus gastos com <em>Lazer</em>, você poderia atingir sua meta principal <strong>2 meses antes</strong>. Que tal cozinhar em casa hoje?
+                        {currentTip}
                     </p>
                 </div>
             </div>

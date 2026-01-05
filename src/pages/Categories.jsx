@@ -6,7 +6,6 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { Plus, Trash2, Edit2, Wallet, TrendingUp, TrendingDown, Tag } from 'lucide-react';
-import { HexColorPicker } from 'react-colorful'; // Might need to install this or just use simple input type='color'
 
 export default function Categories() {
     const { user } = useAuth();

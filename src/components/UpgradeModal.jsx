@@ -15,11 +15,22 @@ export function UpgradeModal({ isOpen, onClose }) {
     const handleUpgrade = async () => {
         setLoading(true);
         try {
+            // Explicitly get session to ensure we have a valid token
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) throw new Error('Usuário não autenticado.');
+            if (!session) {
+                console.error('Sessão não encontrada no frontend.');
+                throw new Error('Você precisa estar logado para assinar.');
+            }
 
-            // A função invoke envia o token automaticamente se o usuário estiver logado
-            const { data, error } = await supabase.functions.invoke('create-checkout');
+            console.log('Iniciando checkout com token:', session.access_token.substring(0, 10) + '...');
+
+            const { data, error } = await supabase.functions.invoke('create-checkout', {
+                headers: {
+                    Authorization: `Bearer ${session.access_token}`
+                }
+            });
+
+            console.log('Resultado da função:', { data, error });
 
             if (error) throw error;
             if (!data?.init_point) throw new Error('Link de pagamento não gerado.');

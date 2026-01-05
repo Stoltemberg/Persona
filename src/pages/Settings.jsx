@@ -4,11 +4,13 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { User, Bell, Shield, Wallet } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { User, Bell, Shield, Wallet, Moon, Sun, Monitor } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Settings() {
     const { profile, user } = useAuth();
+    const { theme, changeTheme } = useTheme();
     const [loading, setLoading] = useState(false);
     const [fullName, setFullName] = useState(profile?.full_name || '');
 

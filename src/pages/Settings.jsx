@@ -120,7 +120,7 @@ export default function Settings() {
                             ) : subscription?.current_period_end ? (
                                 <p style={{ fontSize: '0.9rem' }}>Válido até: <strong>{new Date(subscription.current_period_end).toLocaleDateString('pt-BR')}</strong></p>
                             ) : (
-                                <p style={{ fontSize: '0.9rem' }}>Válido até: <strong>Vitalício/Manual</strong></p>
+                                <p style={{ fontSize: '0.9rem' }}>Ciclo: <strong>Mensal</strong></p>
                             )}
                         </div>
                     ) : (

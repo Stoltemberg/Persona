@@ -193,7 +193,17 @@ export default function Goals() {
         "Invista no seu conhecimento. A melhor taxa de juros vem de aprender algo novo.",
         "Uma meta sem plano é só um desejo. Que bom que você já tem o plano aqui!",
         "Antes de comprar, pergunte-se: 'Eu preciso disso ou eu quero isso agora?'",
-        "Liberdade financeira é poder escolher como gastar seu tempo, não só seu dinheiro."
+        "Liberdade financeira é poder escolher como gastar seu tempo, não só seu dinheiro.",
+        "Não poupe o que sobra depois de gastar, mas gaste o que sobra depois de poupar.",
+        "Cuidado com as pequenas despesas; um pequeno vazamento afunda um grande navio.",
+        "Preço é o que você paga. Valor é o que você leva.",
+        "A paz financeira vale mais que qualquer status social.",
+        "Controle seu dinheiro ou a falta dele controlará você.",
+        "Riqueza não é sobre ter muito, é sobre precisar de pouco.",
+        "O melhor investimento que você pode fazer é em si mesmo.",
+        "Juros compostos são a oitava maravilha do mundo. Quem entende, ganha; quem não, paga.",
+        "Se comprar coisas que não precisa, logo terá que vender coisas que precisa.",
+        "Ouvir conselhos financeiros é bom, mas seguir o próprio plano é melhor."
     ];
 
     const [currentTip, setCurrentTip] = useState(TIPS[0]);

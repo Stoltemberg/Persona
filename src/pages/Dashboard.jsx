@@ -134,21 +134,21 @@ export default function Dashboard() {
                 </div>
             </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
-                <Card className="stagger-1" hover>
+            <div className="cards-scroll-container fade-in">
+                <Card className="stagger-1 card-min-width" hover>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                         <div style={{ padding: '0.8rem', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '14px', color: '#12c2e9' }}>
                             <Wallet size={28} />
                         </div>
                         <h3>Saldo Total</h3>
                     </div>
-                    <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>
+                    <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
                         {loading ? <Skeleton width="200px" height="60px" /> : `R$ ${balance.toFixed(2).replace('.', ',')}`}
                     </h2>
                     <p style={{ color: '#12c2e9', fontWeight: 500 }}>Atualizado agora</p>
                 </Card>
 
-                <Link to="/analysis" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Link to="/analysis" style={{ textDecoration: 'none', color: 'inherit' }} className="card-min-width">
                     <Card className="stagger-2" hover>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                             <div style={{ padding: '0.8rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '14px', color: '#f64f59' }}>
@@ -156,14 +156,14 @@ export default function Dashboard() {
                             </div>
                             <h3>Despesas (Mês)</h3>
                         </div>
-                        <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>
+                        <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
                             {loading ? <Skeleton width="180px" height="60px" /> : `R$ ${expenses.toFixed(2).replace('.', ',')}`}
                         </h2>
                         <p style={{ color: '#f64f59', fontWeight: 500 }}>Este mês &rarr;</p>
                     </Card>
                 </Link>
 
-                <Link to="/goals" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Link to="/goals" style={{ textDecoration: 'none', color: 'inherit' }} className="card-min-width">
                     <Card className="stagger-3" hover style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -172,7 +172,7 @@ export default function Dashboard() {
                                 </div>
                                 <h3>Meta de Economia</h3>
                             </div>
-                            <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>
+                            <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
                                 {loading ? <Skeleton width="180px" height="60px" /> : `R$ ${savings.toFixed(2).replace('.', ',')}`}
                             </h2>
                         </div>

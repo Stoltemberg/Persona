@@ -19,6 +19,7 @@ export default function Transactions() {
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('expense');
     const [category, setCategory] = useState('');
+    const [expenseType, setExpenseType] = useState('variable'); // Default
 
     useEffect(() => {
         if (user) fetchTransactions();
@@ -44,16 +45,21 @@ export default function Transactions() {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const { error } = await supabase.from('transactions').insert([
-                {
-                    description,
-                    amount: parseFloat(amount),
-                    type,
-                    category,
-                    date: new Date().toISOString(),
-                    profile_id: user.id,
-                },
-            ]);
+            const payload = {
+                description,
+                amount: parseFloat(amount),
+                type,
+                category,
+                date: new Date().toISOString(),
+                profile_id: user.id,
+            };
+
+            // Only add expense_type if it is an expense
+            if (type === 'expense') {
+                payload.expense_type = expenseType;
+            }
+
+            const { error } = await supabase.from('transactions').insert([payload]);
 
             if (error) throw error;
 
@@ -72,6 +78,7 @@ export default function Transactions() {
         setAmount('');
         setType('expense');
         setCategory('');
+        setExpenseType('variable');
     };
 
     const handleDeleteTransaction = async (id) => {
@@ -124,7 +131,22 @@ export default function Transactions() {
                                 </div>
                                 <div>
                                     <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>{tx.description}</h4>
-                                    <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
+                                    <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>
+                                        {tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}
+                                        {tx.expense_type && (
+                                            <span style={{
+                                                marginLeft: '0.5rem',
+                                                padding: '0.1rem 0.4rem',
+                                                borderRadius: '4px',
+                                                background: 'rgba(255,255,255,0.1)',
+                                                fontSize: '0.75rem'
+                                            }}>
+                                                {tx.expense_type === 'fixed' && 'Fixo'}
+                                                {tx.expense_type === 'variable' && 'Variável'}
+                                                {tx.expense_type === 'lifestyle' && 'Lazer'}
+                                            </span>
+                                        )}
+                                    </p>
                                 </div>
                             </div>
 
@@ -183,6 +205,40 @@ export default function Transactions() {
                         onChange={(e) => setAmount(e.target.value)}
                         required
                     />
+
+                    {/* Mandatory Expense Type Selection */}
+                    {type === 'expense' && (
+                        <div className="input-group" style={{ marginBottom: '1rem' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 500 }}>
+                                Tipo de Gasto <span style={{ color: '#f64f59' }}>*</span>
+                            </label>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+                                {[
+                                    { value: 'fixed', label: 'Fixo', icon: '🔒' },
+                                    { value: 'variable', label: 'Variável', icon: '💳' },
+                                    { value: 'lifestyle', label: 'Lazer', icon: '🍿' }
+                                ].map((opt) => (
+                                    <div
+                                        key={opt.value}
+                                        onClick={() => setExpenseType(opt.value)}
+                                        style={{
+                                            padding: '0.75rem 0.5rem',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            textAlign: 'center',
+                                            background: expenseType === opt.value ? 'rgba(246, 79, 89, 0.2)' : 'rgba(255,255,255,0.05)',
+                                            border: expenseType === opt.value ? '1px solid #f64f59' : '1px solid transparent',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        <div style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>{opt.icon}</div>
+                                        <div style={{ fontSize: '0.8rem', fontWeight: expenseType === opt.value ? 600 : 400 }}>{opt.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <Input
                         label="Descrição"
                         placeholder="Ex: Supermercado"

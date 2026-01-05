@@ -229,7 +229,7 @@ export default function Dashboard() {
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <h3 style={{
-                                        color: tx.type === 'income' ? '#12c2e9' : 'white',
+                                        color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
                                         fontWeight: 700,
                                         fontSize: '1.25rem'
                                     }}>

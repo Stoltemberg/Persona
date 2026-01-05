@@ -250,7 +250,7 @@ export default function Transactions() {
                             <div className="transaction-right">
                                 <div style={{ textAlign: 'right', marginRight: '1rem' }}>
                                     <h3 style={{
-                                        color: tx.type === 'income' ? '#12c2e9' : 'white',
+                                        color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
                                         fontWeight: 700,
                                         fontSize: '1.25rem'
                                     }}>

@@ -10,13 +10,16 @@ import { Link } from 'react-router-dom';
 
 import { useToast } from '../context/ToastContext';
 import { exportDataToExcel } from '../lib/exportUtils';
+import { UpgradeModal } from '../components/UpgradeModal';
+import { Lock } from 'lucide-react';
 
 export default function Settings() {
-    const { profile, user } = useAuth();
+    const { profile, user, isPro } = useAuth();
     const { theme, changeTheme } = useTheme();
     const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [fullName, setFullName] = useState(profile?.full_name || '');
+    const [showUpgrade, setShowUpgrade] = useState(false);
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
@@ -38,6 +41,11 @@ export default function Settings() {
     };
 
     const handleExport = async () => {
+        if (!isPro) {
+            setShowUpgrade(true);
+            return;
+        }
+
         setLoading(true);
         try {
             addToast('Gerando relatório...', 'info');
@@ -183,12 +191,39 @@ export default function Settings() {
                         <Button
                             variant="ghost"
                             className="btn-primary"
-                            style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center', background: 'linear-gradient(135deg, #11998e, #38ef7d)' }}
+                            style={{
+                                width: '100%',
+                                marginBottom: '1rem',
+                                justifyContent: 'center',
+                                background: !isPro
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'linear-gradient(135deg, #11998e, #38ef7d)',
+                                border: !isPro ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                                opacity: !isPro ? 0.7 : 1
+                            }}
                             onClick={handleExport}
                             disabled={loading}
                         >
+                            {!isPro && <Lock size={16} style={{ marginRight: '0.5rem' }} />}
                             Exportar Relatório (Excel)
                         </Button>
+
+                        {!isPro && (
+                            <Button
+                                className="btn-primary"
+                                style={{
+                                    width: '100%',
+                                    marginBottom: '1rem',
+                                    justifyContent: 'center',
+                                    background: 'linear-gradient(135deg, #FFD700, #FDB931)',
+                                    color: '#000',
+                                    fontWeight: 'bold'
+                                }}
+                                onClick={() => setShowUpgrade(true)}
+                            >
+                                Assinar Persona PRO 💎
+                            </Button>
+                        )}
 
                         <Link to="/wallets" style={{ textDecoration: 'none' }}>
                             <Button variant="ghost" className="btn-primary" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
@@ -221,6 +256,7 @@ export default function Settings() {
                     </Card>
                 </div>
             </div>
+            <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
         </div>
     );
 }

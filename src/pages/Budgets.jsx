@@ -8,9 +8,10 @@ import { Modal } from '../components/Modal';
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
+import { UpgradeModal } from '../components/UpgradeModal';
 
 export default function Budgets() {
-    const { user } = useAuth();
+    const { user, isPro } = useAuth();
     const { addToast } = useToast();
     const [categories, setCategories] = useState([]);
     const [budgets, setBudgets] = useState([]);
@@ -22,6 +23,7 @@ export default function Budgets() {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [budgetAmount, setBudgetAmount] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [showUpgrade, setShowUpgrade] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -80,9 +82,15 @@ export default function Budgets() {
     };
 
     const handleOpenModal = (category) => {
-        setSelectedCategory(category);
         // Find existing budget
         const existing = budgets.find(b => b.category_id === category.id);
+
+        if (!existing && !isPro && budgets.length >= 1) {
+            setShowUpgrade(true);
+            return;
+        }
+
+        setSelectedCategory(category);
         setBudgetAmount(existing ? existing.amount : '');
         setIsModalOpen(true);
     };
@@ -229,6 +237,8 @@ export default function Budgets() {
                     </Button>
                 </form>
             </Modal>
+
+            <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
         </div>
     );
 }

@@ -8,9 +8,10 @@ import { Modal } from '../components/Modal';
 import { Wallet, Plus, Trash2, Edit2, CreditCard, Banknote, Landmark } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
+import { UpgradeModal } from '../components/UpgradeModal';
 
 export default function Wallets() {
-    const { user } = useAuth();
+    const { user, isPro } = useAuth();
     const { addToast } = useToast();
     const [wallets, setWallets] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -23,6 +24,7 @@ export default function Wallets() {
     const [color, setColor] = useState('#12c2e9');
     const [initialBalance, setInitialBalance] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [showUpgrade, setShowUpgrade] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -47,6 +49,10 @@ export default function Wallets() {
     };
 
     const handleOpenNew = () => {
+        if (!isPro && wallets.length >= 1) {
+            setShowUpgrade(true);
+            return;
+        }
         setWalletToEdit(null);
         setName('');
         setType('checking');
@@ -229,6 +235,8 @@ export default function Wallets() {
                     </Button>
                 </form>
             </Modal>
+
+            <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
         </div>
     );
 }

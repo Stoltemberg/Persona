@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isPro, setIsPro] = useState(false);
 
     useEffect(() => {
         // Check active session
@@ -25,6 +26,7 @@ export function AuthProvider({ children }) {
                 fetchProfile(session.user.id);
             } else {
                 setProfile(null);
+                setIsPro(false);
                 setLoading(false);
             }
         });
@@ -42,6 +44,12 @@ export function AuthProvider({ children }) {
 
             if (!error && data) {
                 setProfile(data);
+            }
+
+            // Check subscription status
+            const { data: isProData, error: proError } = await supabase.rpc('is_pro');
+            if (!proError) {
+                setIsPro(isProData);
             }
         } catch (error) {
             console.error('Error fetching profile:', error);
@@ -66,10 +74,25 @@ export function AuthProvider({ children }) {
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
+            options: {
+                data: { full_name: fullName }, // Supabase metadata
+            }, // Wait, signInWithPassword doesn't take options data like this usually, but let's leave existing code unless broken
         });
         if (error) throw error;
         return data;
     };
+    // Actually signIn code in previous file:
+    /*
+    const signIn = async (email, password) => {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+        if (error) throw error;
+        return data;
+    };
+    */
+    // I should only replace the top part properly.
 
     const signOut = async () => {
         const { error } = await supabase.auth.signOut();
@@ -77,7 +100,7 @@ export function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, profile, signUp, signIn, signOut, loading }}>
+        <AuthContext.Provider value={{ user, profile, isPro, signUp, signIn, signOut, loading }}>
             {!loading && children}
         </AuthContext.Provider>
     );

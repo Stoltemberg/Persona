@@ -21,6 +21,7 @@ export default function Transactions() {
     const [type, setType] = useState('expense');
     const [category, setCategory] = useState('');
     const [expenseType, setExpenseType] = useState('variable');
+    const [isRecurring, setIsRecurring] = useState(false);
 
     // Category State
     const [categories, setCategories] = useState([]);
@@ -104,6 +105,25 @@ export default function Transactions() {
                     .from('transactions')
                     .insert([payload]);
                 error = insertError;
+
+                // Handle Recurring Creation (Only for new transactions for now)
+                if (!error && isRecurring) {
+                    const nextDate = new Date(date);
+                    nextDate.setMonth(nextDate.getMonth() + 1);
+
+                    const { error: recurError } = await supabase.from('recurring_templates').insert([{
+                        description,
+                        amount: parseFloat(amount),
+                        type,
+                        category,
+                        expense_type: type === 'expense' ? expenseType : null,
+                        frequency: 'monthly',
+                        next_due_date: nextDate.toISOString(),
+                        profile_id: user.id
+                    }]);
+
+                    if (recurError) console.error("Error creating recurring template:", recurError);
+                }
             }
 
             if (error) throw error;
@@ -126,6 +146,7 @@ export default function Transactions() {
         setExpenseType('variable');
         setTransactionToEdit(null);
         setSelectedCategory(null);
+        setIsRecurring(false);
     };
 
     const handleDeleteTransaction = async (id) => {

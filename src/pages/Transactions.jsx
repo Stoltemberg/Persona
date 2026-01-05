@@ -5,7 +5,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
-import { Plus, ArrowUpRight, ArrowDownLeft, Trash2 } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownLeft, Trash2, Edit2 } from 'lucide-react';
 
 export default function Transactions() {
     const { user } = useAuth();
@@ -15,11 +15,12 @@ export default function Transactions() {
     const [submitting, setSubmitting] = useState(false);
 
     // Form State
+    const [transactionToEdit, setTransactionToEdit] = useState(null);
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('expense');
     const [category, setCategory] = useState('');
-    const [expenseType, setExpenseType] = useState('variable'); // Default
+    const [expenseType, setExpenseType] = useState('variable');
 
     useEffect(() => {
         if (user) fetchTransactions();
@@ -41,7 +42,23 @@ export default function Transactions() {
         }
     };
 
-    const handleAddTransaction = async (e) => {
+    const handleOpenNew = () => {
+        setTransactionToEdit(null);
+        resetForm();
+        setIsModalOpen(true);
+    };
+
+    const handleOpenEdit = (tx) => {
+        setTransactionToEdit(tx);
+        setDescription(tx.description);
+        setAmount(tx.amount);
+        setType(tx.type);
+        setCategory(tx.category || '');
+        setExpenseType(tx.expense_type || 'variable');
+        setIsModalOpen(true);
+    };
+
+    const handleSaveTransaction = async (e) => {
         e.preventDefault();
         setSubmitting(true);
         try {
@@ -50,16 +67,27 @@ export default function Transactions() {
                 amount: parseFloat(amount),
                 type,
                 category,
-                date: new Date().toISOString(),
+                // If editing, keep original date or update? Let's keep original date for now unless we add a date picker
+                // Actually, let's allow updating date if we had a field, but we don't. 
+                // Creating new: use now(). Editing: keep existing date.
+                date: transactionToEdit ? transactionToEdit.date : new Date().toISOString(),
                 profile_id: user.id,
+                expense_type: type === 'expense' ? expenseType : null
             };
 
-            // Only add expense_type if it is an expense
-            if (type === 'expense') {
-                payload.expense_type = expenseType;
+            let error;
+            if (transactionToEdit) {
+                const { error: updateError } = await supabase
+                    .from('transactions')
+                    .update(payload)
+                    .eq('id', transactionToEdit.id);
+                error = updateError;
+            } else {
+                const { error: insertError } = await supabase
+                    .from('transactions')
+                    .insert([payload]);
+                error = insertError;
             }
-
-            const { error } = await supabase.from('transactions').insert([payload]);
 
             if (error) throw error;
 
@@ -79,6 +107,7 @@ export default function Transactions() {
         setType('expense');
         setCategory('');
         setExpenseType('variable');
+        setTransactionToEdit(null);
     };
 
     const handleDeleteTransaction = async (id) => {
@@ -97,7 +126,7 @@ export default function Transactions() {
         <div className="container fade-in">
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
                 <h1 className="text-gradient">Transações</h1>
-                <Button onClick={() => setIsModalOpen(true)} icon={Plus}>
+                <Button onClick={handleOpenNew} icon={Plus}>
                     Nova Transação
                 </Button>
             </header>
@@ -150,8 +179,8 @@ export default function Transactions() {
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                                <div style={{ textAlign: 'right' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ textAlign: 'right', marginRight: '1rem' }}>
                                     <h3 style={{
                                         color: tx.type === 'income' ? '#12c2e9' : 'white',
                                         fontWeight: 700,
@@ -161,10 +190,18 @@ export default function Transactions() {
                                     </h3>
                                 </div>
                                 <button
+                                    onClick={() => handleOpenEdit(tx)}
+                                    className="btn-ghost"
+                                    style={{ padding: '0.6rem' }}
+                                    title="Editar"
+                                >
+                                    <Edit2 size={20} />
+                                </button>
+                                <button
                                     onClick={() => handleDeleteTransaction(tx.id)}
                                     className="btn-ghost"
-                                    style={{ color: '#f64f59', padding: '0.5rem' }}
-                                    title="Excluir Transação"
+                                    style={{ color: '#f64f59', padding: '0.6rem' }}
+                                    title="Excluir"
                                 >
                                     <Trash2 size={20} />
                                 </button>
@@ -174,9 +211,9 @@ export default function Transactions() {
                 )}
             </div>
 
-            {/* Add Transaction Modal */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Nova Transação">
-                <form onSubmit={handleAddTransaction}>
+            {/* Add/Edit Transaction Modal */}
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={transactionToEdit ? "Editar Transação" : "Nova Transação"}>
+                <form onSubmit={handleSaveTransaction}>
                     <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                         <Button
                             type="button"
@@ -254,7 +291,7 @@ export default function Transactions() {
                     />
 
                     <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} loading={submitting}>
-                        Salvar
+                        {transactionToEdit ? "Salvar Alterações" : "Salvar"}
                     </Button>
                 </form>
             </Modal>

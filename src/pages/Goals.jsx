@@ -243,8 +243,8 @@ export default function Goals() {
                     <Lightbulb size={24} color="#fff" />
                 </div>
                 <div>
-                    <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'white' }}>Dica do Persona IA</h3>
-                    <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.9)' }}>
+                    <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>Dica do Persona IA</h3>
+                    <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
                         {currentTip}
                     </p>
                 </div>
@@ -281,7 +281,7 @@ export default function Goals() {
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <div>
-                                        <h3 style={{ marginBottom: '0.2rem', color: 'white', fontWeight: 600, fontSize: '1.4rem' }}>{goal.title}</h3>
+                                        <h3 style={{ marginBottom: '0.2rem', color: 'var(--text-main)', fontWeight: 600, fontSize: '1.4rem' }}>{goal.title}</h3>
                                         {goal.deadline && (
                                             <p style={{ fontSize: '0.85rem' }}>Alvo: {new Date(goal.deadline).toLocaleDateString('pt-BR')}</p>
                                         )}
@@ -344,7 +344,7 @@ export default function Goals() {
                                         textAlign: 'center',
                                         pointerEvents: 'none'
                                     }}>
-                                        <span style={{ fontSize: '2rem', fontWeight: 800, color: 'white' }}>{progress.toFixed(0)}%</span>
+                                        <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)' }}>{progress.toFixed(0)}%</span>
                                     </div>
                                 </div>
 

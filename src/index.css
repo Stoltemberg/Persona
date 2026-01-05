@@ -258,7 +258,8 @@ p {
     padding: 1rem !important;
   }
 
-  .glass-card {
+  .glass-card,
+  .glass-panel {
     padding: 1rem !important;
   }
 }

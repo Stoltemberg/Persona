@@ -19,7 +19,7 @@ export function Modal({ isOpen, onClose, title, children }) {
             style={{
                 position: 'fixed',
                 inset: 0,
-                zIndex: 50,
+                zIndex: 1000,
                 background: 'rgba(0,0,0,0.6)',
                 backdropFilter: 'blur(4px)',
                 display: 'flex',

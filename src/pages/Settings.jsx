@@ -91,16 +91,21 @@ export default function Settings() {
 
                 {/* Other Settings Placeholders */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                    import {Link} from 'react-router-dom';
+                    // ...
                     <Card className="glass-card fade-in stagger-2">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                             <div style={{ padding: '0.8rem', background: 'rgba(18, 194, 233, 0.1)', borderRadius: '12px', color: '#12c2e9' }}>
                                 <Wallet size={24} />
                             </div>
-                            <h3>Moeda & Região</h3>
+                            <h3>Finanças</h3>
                         </div>
-                        <p>Moeda padrão: <strong>BRL (R$)</strong></p>
-                        <p>Formato de data: <strong>DD/MM/AAAA</strong></p>
-                        <Button variant="ghost" style={{ marginTop: '1rem' }} disabled>Alterar</Button>
+                        <Link to="/categories" style={{ textDecoration: 'none' }}>
+                            <Button variant="ghost" className="btn-primary" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
+                                Gerenciar Categorias
+                            </Button>
+                        </Link>
+                        <p style={{ opacity: 0.7, fontSize: '0.85rem' }}>Personalize ícones e cores para suas despesas e receitas.</p>
                     </Card>
 
                     <Card className="glass-card fade-in stagger-3">

@@ -3,9 +3,14 @@ import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
-import Goals from './pages/Goals';
-import Analysis from './pages/Analysis';
-import Settings from './pages/Settings';
+import Categories from './pages/Categories';
+
+// ... (keep existing imports)
+
+// ... inside Routes
+            <Route path="/goals" element={<Goals />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/settings" element={<Settings />} />
 import { Layout } from './components/Layout';
 
 // Protected Route Wrapper

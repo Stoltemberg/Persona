@@ -1,77 +1,153 @@
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, PieChart, Wallet } from 'lucide-react';
+import { useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Receipt, Target, Settings, PieChart, Wallet, Menu as MenuIcon, X, PiggyBank } from 'lucide-react';
 import clsx from 'clsx';
+import { createPortal } from 'react-dom';
 
 export function MobileNav() {
-    const navItems = [
-        { icon: LayoutDashboard, label: 'Inicio', path: '/' },
-        { icon: Receipt, label: 'Transações', path: '/transactions' },
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const location = useLocation();
+
+    const mainItems = [
+        { icon: LayoutDashboard, label: 'Início', path: '/' },
+        { icon: Receipt, label: 'Extrato', path: '/transactions' },
         { icon: PieChart, label: 'Análise', path: '/analysis' },
-        { icon: Target, label: 'Metas', path: '/goals' },
-        { icon: Wallet, label: 'Orçamentos', path: '/budgets' },
-        { icon: Settings, label: 'Config', path: '/settings' },
+    ];
+
+    const menuItems = [
+        { icon: Target, label: 'Metas', path: '/goals', color: '#c471ed' },
+        { icon: PiggyBank, label: 'Orçamentos', path: '/budgets', color: '#f64f59' },
+        { icon: Wallet, label: 'Carteiras', path: '/wallets', color: '#12c2e9' },
+        { icon: Settings, label: 'Config', path: '/settings', color: 'var(--text-secondary)' },
     ];
 
     return (
-        <nav className="glass-panel" style={{
-            position: 'fixed',
-            bottom: '1rem',
-            left: '1rem',
-            right: '1rem',
-            zIndex: 100,
-            display: 'flex',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            padding: '0.75rem',
-            borderRadius: '20px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-            background: 'rgba(15, 15, 20, 0.8)' // A bit darker for visibility
-        }}>
-            {navItems.map((item) => (
-                <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className={({ isActive }) => clsx(
-                        'mobile-nav-item',
-                        isActive ? 'active' : ''
-                    )}
+        <>
+            {/* Main Bottom Bar */}
+            <nav className="glass-panel" style={{
+                position: 'fixed',
+                bottom: '1.5rem',
+                left: '1.5rem',
+                right: '1.5rem',
+                zIndex: 100,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0.8rem 1.5rem',
+                borderRadius: '24px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                background: 'var(--glass-bg)',
+                backdropFilter: 'blur(20px)'
+            }}>
+                {mainItems.map((item) => (
+                    <NavLink
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setIsMenuOpen(false)}
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                            textDecoration: 'none',
+                            color: 'var(--text-muted)',
+                            transition: 'all 0.3s'
+                        }}
+                    >
+                        {({ isActive }) => (
+                            <>
+                                <div style={{
+                                    color: isActive ? 'var(--color-2)' : 'inherit',
+                                    transform: isActive ? 'translateY(-2px)' : 'none',
+                                    transition: 'all 0.3s'
+                                }}>
+                                    <item.icon size={26} strokeWidth={isActive ? 2.5 : 2} />
+                                </div>
+                            </>
+                        )}
+                    </NavLink>
+                ))}
+
+                {/* Menu Toggle */}
+                <button
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
                     style={{
+                        background: 'none',
+                        border: 'none',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '0.2rem',
-                        textDecoration: 'none',
-                        color: 'var(--text-muted)',
-                        flex: 1,
-                        padding: '0.5rem',
-                        borderRadius: '12px',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                        gap: '0.3rem',
+                        color: isMenuOpen ? 'white' : 'var(--text-muted)',
+                        cursor: 'pointer'
                     }}
                 >
-                    {({ isActive }) => (
-                        <>
-                            <div style={{
-                                color: isActive ? '#c471ed' : 'inherit',
-                                transform: isActive ? 'translateY(-2px)' : 'none',
-                                transition: 'transform 0.3s'
-                            }}>
-                                <item.icon size={24} />
-                            </div>
-                            <span style={{
-                                fontSize: '0.7rem',
-                                fontWeight: 600,
-                                color: isActive ? 'white' : 'transparent', // Hide text when inactive for cleaner look? Or muted. Let's try muted.
-                                opacity: isActive ? 1 : 0,
-                                height: isActive ? 'auto' : 0,
-                                overflow: 'hidden',
-                                transition: 'all 0.3s'
-                            }}>
-                                {item.label}
-                            </span>
-                        </>
-                    )}
-                </NavLink>
-            ))}
-        </nav>
+                    {isMenuOpen ? <X size={26} /> : <MenuIcon size={26} />}
+                </button>
+            </nav>
+
+            {/* Menu Overlay */}
+            {isMenuOpen && createPortal(
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    zIndex: 99,
+                    background: 'rgba(0,0,0,0.6)',
+                    backdropFilter: 'blur(10px)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    paddingBottom: '7rem'
+                }} onClick={() => setIsMenuOpen(false)}>
+                    <div
+                        className="glass-panel slide-up"
+                        style={{
+                            margin: '1.5rem',
+                            padding: '1.5rem',
+                            borderRadius: '24px',
+                            background: 'var(--glass-panel-bg)',
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(2, 1fr)',
+                            gap: '1rem',
+                            animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                        }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        {menuItems.map((item) => (
+                            <NavLink
+                                key={item.path}
+                                to={item.path}
+                                onClick={() => setIsMenuOpen(false)}
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.8rem',
+                                    textDecoration: 'none',
+                                    padding: '1.2rem',
+                                    borderRadius: '16px',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    color: 'var(--text-main)',
+                                    border: '1px solid rgba(255,255,255,0.05)'
+                                }}
+                            >
+                                <div style={{ color: item.color }}>
+                                    <item.icon size={28} />
+                                </div>
+                                <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{item.label}</span>
+                            </NavLink>
+                        ))}
+                    </div>
+                </div>,
+                document.body
+            )}
+            <style>{`
+                @keyframes slideUp {
+                    from { transform: translateY(100%); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            `}</style>
+        </>
     );
 }

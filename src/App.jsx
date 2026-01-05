@@ -4,13 +4,9 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Categories from './pages/Categories';
-
-// ... (keep existing imports)
-
-// ... inside Routes
-            <Route path="/goals" element={<Goals />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/settings" element={<Settings />} />
+import Goals from './pages/Goals';
+import Analysis from './pages/Analysis';
+import Settings from './pages/Settings';
 import { Layout } from './components/Layout';
 
 // Protected Route Wrapper
@@ -32,6 +28,7 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/transactions" element={<Transactions />} />
+            <Route path="/categories" element={<Categories />} />
             <Route path="/analysis" element={<Analysis />} />
             <Route path="/goals" element={<Goals />} />
             <Route path="/settings" element={<Settings />} />

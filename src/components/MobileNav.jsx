@@ -9,7 +9,7 @@ export function MobileNav() {
     const location = useLocation();
 
     const mainItems = [
-        { icon: LayoutDashboard, label: 'Início', path: '/' },
+        { icon: LayoutDashboard, label: 'Início', path: '/dashboard' },
         { icon: Receipt, label: 'Extrato', path: '/transactions' },
         { icon: PieChart, label: 'Análise', path: '/analysis' },
     ];

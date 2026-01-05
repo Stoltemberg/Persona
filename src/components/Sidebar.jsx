@@ -7,7 +7,7 @@ export function Sidebar() {
     const { signOut } = useAuth();
 
     const navItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+        { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
         { icon: Receipt, label: 'Transações', path: '/transactions' },
         { icon: Target, label: 'Metas', path: '/goals' },
         { icon: PieChart, label: 'Análise', path: '/analysis' },

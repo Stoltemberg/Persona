@@ -20,6 +20,16 @@ export default function Settings() {
     const [loading, setLoading] = useState(false);
     const [fullName, setFullName] = useState(profile?.full_name || '');
     const [showUpgrade, setShowUpgrade] = useState(false);
+    const [subscription, setSubscription] = useState(null);
+
+    useEffect(() => {
+        if (!user) return;
+        supabase.from('subscriptions')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle()
+            .then(({ data }) => setSubscription(data));
+    }, [user]);
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
@@ -87,6 +97,43 @@ export default function Settings() {
             </header>
 
             <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+
+                {/* Plan Settings */}
+                <Card className="glass-card fade-in stagger-1" style={{ border: isPro ? '1px solid #38ef7d' : '1px solid var(--glass-border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                        <div style={{ padding: '0.8rem', background: isPro ? 'rgba(56, 239, 125, 0.1)' : 'rgba(255, 255, 255, 0.1)', borderRadius: '12px' }}>
+                            <Shield size={24} color={isPro ? '#38ef7d' : 'white'} />
+                        </div>
+                        <div>
+                            <h3>Meu Plano</h3>
+                            <p style={{ fontSize: '0.85rem', color: isPro ? '#38ef7d' : 'var(--text-muted)' }}>
+                                {isPro ? 'Membro Premium' : 'Plano Gratuito'}
+                            </p>
+                        </div>
+                    </div>
+
+                    {isPro ? (
+                        <div style={{ padding: '1rem', background: 'rgba(56, 239, 125, 0.05)', borderRadius: '12px', border: '1px solid rgba(56, 239, 125, 0.2)' }}>
+                            <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>Status: <strong style={{ color: '#38ef7d' }}>ATIVO</strong></p>
+                            {subscription?.valid_until ? (
+                                <p style={{ fontSize: '0.9rem' }}>Válido até: <strong>{new Date(subscription.valid_until).toLocaleDateString('pt-BR')}</strong></p>
+                            ) : subscription?.current_period_end ? (
+                                <p style={{ fontSize: '0.9rem' }}>Válido até: <strong>{new Date(subscription.current_period_end).toLocaleDateString('pt-BR')}</strong></p>
+                            ) : (
+                                <p style={{ fontSize: '0.9rem' }}>Válido até: <strong>Vitalício/Manual</strong></p>
+                            )}
+                        </div>
+                    ) : (
+                        <div>
+                            <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
+                                Você está no plano gratuito. Faça upgrade para liberar todos os recursos.
+                            </p>
+                            <Button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setShowUpgrade(true)}>
+                                Quero ser PRO
+                            </Button>
+                        </div>
+                    )}
+                </Card>
 
                 {/* Profile Settings */}
                 <Card className="glass-card fade-in stagger-1">

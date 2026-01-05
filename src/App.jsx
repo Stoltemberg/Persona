@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
-import Budgets from './pages/Budgets';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Categories from './pages/Categories';
@@ -9,6 +8,10 @@ import Goals from './pages/Goals';
 import Analysis from './pages/Analysis';
 import Wallets from './pages/Wallets';
 import Settings from './pages/Settings';
+import Budgets from './pages/Budgets';
+import Landing from './pages/Landing';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import { Layout } from './components/Layout';
 
 // Protected Route Wrapper
@@ -20,15 +23,25 @@ const ProtectedRoute = () => {
   return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
+// Root Route Logic
+const Home = () => {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="flex-center" style={{ height: '100vh' }}>Loading...</div>;
+  return user ? <Navigate to="/dashboard" /> : <Landing />;
+}
+
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/analysis" element={<Analysis />} />
@@ -38,9 +51,13 @@ function App() {
             <Route path="/settings" element={<Settings />} />
           </Route>
         </Route>
+
+        {/* Catch all redirect */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );
 }
+
 
 export default App;

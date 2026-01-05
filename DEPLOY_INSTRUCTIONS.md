@@ -149,7 +149,7 @@ Esta função libera o acesso Pro quando o pagamento é aprovado.
 
 ```typescript
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0'
 
 serve(async (req) => {
   try {
@@ -164,24 +164,63 @@ serve(async (req) => {
     const paymentId = id || body?.data?.id
     const type = topic || body?.type
 
+    console.log(`Webhook Recebido! Tópico: ${type}, ID: ${paymentId}`);
+
     if (type === 'payment' && paymentId) {
-        const mpAccessToken = Deno.env.get('MP_ACCESS_TOKEN')
+        // CREDENCIAIS:
+        const CLIENT_ID = '4711776498636308';
+        const CLIENT_SECRET = 'FvuLBDIXTP5nsIYTwpO8YsqCHvY9msTC';
+
+        // 1. GERAR TOKEN MP (Client Credentials)
+        console.log('Gerando Token MP para consulta...');
+        const tokenResponse = await fetch('https://api.mercadopago.com/oauth/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                client_id: CLIENT_ID,
+                client_secret: CLIENT_SECRET,
+                grant_type: 'client_credentials'
+            })
+        });
+        
+        const tokenData = await tokenResponse.json();
+        if (!tokenResponse.ok) {
+            throw new Error(`Erro ao gerar Token MP: ${JSON.stringify(tokenData)}`);
+        }
+        const mpAccessToken = tokenData.access_token;
+
+        // 2. Verificar Status no Mercado Pago
         const mpResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
             headers: { 'Authorization': `Bearer ${mpAccessToken}` }
         })
         const paymentData = await mpResponse.json()
         
+        console.log(`Status do Pagamento ${paymentId}: ${paymentData.status}`);
+
         if (paymentData.status === 'approved') {
             const userId = paymentData.external_reference
-            if (userId) {
-                 const supabaseAdmin = createClient(
-                    Deno.env.get('SUPABASE_URL') ?? '',
-                    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-                 )
+            console.log(`Usuário vinculado: ${userId}`);
+
+            if (userId && userId !== 'null') {
+                 // 4. Atualizar Supabase
+                 const sbUrl = Deno.env.get('SUPABASE_URL');
+                 const sbServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+                 if (!sbServiceKey) {
+                     console.error('ERRO CRÍTICO: Service Role Key não encontrada.');
+                     throw new Error('Service Role Key missing');
+                 }
+
+                 const supabaseAdmin = createClient(sbUrl, sbServiceKey);
+
                  const nextMonth = new Date()
                  nextMonth.setDate(nextMonth.getDate() + 30)
 
-                 await supabaseAdmin
+                 // Tenta atualizar. Se der erro de coluna, avisa no log.
+                 const { error } = await supabaseAdmin
                     .from('subscriptions')
                     .upsert({
                         user_id: userId,
@@ -190,14 +229,24 @@ serve(async (req) => {
                         current_period_end: nextMonth.toISOString(),
                         updated_at: new Date().toISOString()
                     })
-                 console.log(`User ${userId} upgraded to PRO!`)
+                 
+                 if (error) {
+                     console.error('Erro ao gravar no banco:', error);
+                     throw error;
+                 }
+                 
+                 console.log(`SUCESSO! Usuário ${userId} atualizado para PRO.`);
+            } else {
+                console.warn('Pagamento sem external_reference (ID do usuário).');
             }
         }
     }
-    return new Response('OK', { status: 200 })
+    
+    // RETURN DEBUG TEXT
+    return new Response(`[DEBUG] Webhook Processado! Status: ${type}`, { status: 200 })
+
   } catch (error) {
-      console.error(error)
-      return new Response('Internal Server Error', { status: 500 })
+    return new Response(`[DEBUG] Erro: ${error.message}`, { status: 500 })
   }
 })
 ```
@@ -232,4 +281,24 @@ Agora avise o Mercado Pago para chamar sua função.
 6. **Eventos:** Marque `Pagamentos` (Payments).
 7. Salve.
 
-Pronto! Seu sistema de automação está no ar.
+
+---
+
+## Solução de Problemas (Erros Comuns)
+
+### Erro: `null value in column "id"`
+Se der erro dizendo que a coluna ID não pode ser nula, rode este comando no **SQL Editor**:
+
+```sql
+ALTER TABLE subscriptions
+ALTER COLUMN id SET DEFAULT gen_random_uuid();
+```
+
+### Erro: `Could not find column ...`
+Se faltar colunas, rode:
+
+```sql
+ALTER TABLE subscriptions 
+ADD COLUMN IF NOT EXISTS current_period_end TIMESTAMPTZ,
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
+```

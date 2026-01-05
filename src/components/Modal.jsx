@@ -16,29 +16,11 @@ export function Modal({ isOpen, onClose, title, children }) {
 
     return (
         <div
-            style={{
-                position: 'fixed',
-                inset: 0,
-                zIndex: 1000,
-                background: 'rgba(0,0,0,0.6)',
-                backdropFilter: 'blur(4px)',
-                display: 'flex',
-                alignItems: 'flex-start', // Use flex-start to avoid top cutoff, margin-auto handles centering
-                justifyContent: 'center',
-                overflowY: 'auto', // Allow scrolling
-                padding: '1rem'
-            }}
+            className="modal-overlay"
             onClick={onClose}
         >
             <div
-                className="glass-panel"
-                style={{
-                    width: '100%',
-                    maxWidth: '500px',
-                    margin: 'auto', // Centers vertically and horizontally when space permits
-                    padding: '1.5rem',
-                    position: 'relative'
-                }}
+                className="glass-panel modal-content fade-in"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>

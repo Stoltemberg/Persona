@@ -328,44 +328,56 @@ p {
 
 
 /* Layout Styles */
+/* Layout Styles */
 .app-layout {
-  display: flex;
   min-height: 100vh;
-  max-width: 1600px;
   margin: 0 auto;
-  /* Prevent horizontal scroll but allow vertical */
   overflow-x: hidden;
 }
 
-.main-content {
-  flex: 1;
-  padding: 1rem;
-  width: 100%;
-  /* Ensure width is explicit */
+.sidebar-container {
+  display: none;
+  /* Hidden on mobile */
 }
 
-/* ... Media Queries ... */
+.main-content {
+  padding: 1rem;
+  width: 100%;
+}
 
-@media (max-width: 1023px) {
+/* media query for desktop, switching to grid */
+/* Desktop Grid Layout */
+@media (min-width: 1024px) {
+  .app-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    max-width: 1600px;
+  }
+
+  .sidebar-container {
+    display: block;
+    height: 100vh;
+    position: relative;
+  }
+
   .main-content {
-    padding-bottom: 7rem;
-    /* More space for bottom nav + safe area */
+    padding: 2rem;
     overflow-y: auto;
-    /* Ensure vertical scroll is enabled */
-    -webkit-overflow-scrolling: touch;
-    /* Smooth scroll on iOS */
+  }
+
+  .mobile-header,
+  .mobile-nav-container {
+    display: none;
   }
 }
 
-/* Enhanced Modal Styles */
+/* Global Component Styles */
 .modal-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
   background: rgba(0, 0, 0, 0.75);
-  /* Darker backdrop */
   backdrop-filter: blur(8px);
-  /* Stronger blur */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -384,7 +396,6 @@ p {
   overflow-y: auto;
   /* Internal scroll if too tall */
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  /* Deep shadow */
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -410,28 +421,12 @@ p {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@media (min-width: 1024px) {
-  .sidebar-container {
-    display: block;
-  }
-
-  .main-content {
-    padding: 2rem;
-  }
-
-  .mobile-header {
-    display: none;
-  }
-
-  .mobile-nav-container {
-    display: none;
-  }
-}
-
+/* Mobile specific overrides */
 @media (max-width: 1023px) {
   .main-content {
-    padding-bottom: 6rem;
-    /* Space for bottom nav */
+    padding-bottom: 7rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .mobile-header {
@@ -442,5 +437,3 @@ p {
     display: block;
   }
 }
-
-/* Mobile Nav Toggles would go here */

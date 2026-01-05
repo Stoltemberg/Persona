@@ -7,6 +7,7 @@ import Transactions from './pages/Transactions';
 import Categories from './pages/Categories';
 import Goals from './pages/Goals';
 import Analysis from './pages/Analysis';
+import Wallets from './pages/Wallets';
 import Settings from './pages/Settings';
 import { Layout } from './components/Layout';
 
@@ -33,6 +34,7 @@ function App() {
             <Route path="/analysis" element={<Analysis />} />
             <Route path="/budgets" element={<Budgets />} />
             <Route path="/goals" element={<Goals />} />
+            <Route path="/wallets" element={<Wallets />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
         </Route>

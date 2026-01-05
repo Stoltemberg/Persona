@@ -20,7 +20,7 @@ Esta função gera o link de pagamento.
 
 ```typescript
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -28,24 +28,64 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
-    )
+    // 1. Check Environment Variables
+    const sbUrl = Deno.env.get('SUPABASE_URL');
+    const sbKey = Deno.env.get('SUPABASE_ANON_KEY');
+    
+    // CREDENCIAIS (Funcionaram no script local):
+    const CLIENT_ID = '4711776498636308';
+    const CLIENT_SECRET = 'FvuLBDIXTP5nsIYTwpO8YsqCHvY9msTC';
 
-    const { data: { user } } = await supabaseClient.auth.getUser()
+    if (!sbUrl || !sbKey) {
+        throw new Error(`Configuração Errada: URL ou KEY do Supabase faltando. URL: ${!!sbUrl}`);
+    }
 
-    if (!user) throw new Error('User not found')
+    // 2. Initialize Supabase Client (Same as before)
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) throw new Error('Cabeçalho Authorization faltando');
 
-    const mpAccessToken = Deno.env.get('MP_ACCESS_TOKEN')
-    if (!mpAccessToken) throw new Error('Missing MP_ACCESS_TOKEN')
+    console.log(`Token recebido (Auth): ${authHeader.substring(0, 15)}...`);
 
+    const supabaseClient = createClient(sbUrl, sbKey, { 
+        global: { headers: { Authorization: authHeader } } 
+    });
+
+    // 3. Get User (Same as before)
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+
+    if (userError || !user) {
+        console.error('Erro Auth:', userError);
+        throw new Error(`Erro de Autenticação: ${userError?.message || 'Usuário nulo'}`);
+    }
+
+    // 4. GENERATE MP TOKEN (New Step)
+    console.log('Gerando Token MP...');
+    const tokenResponse = await fetch('https://api.mercadopago.com/oauth/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
+            grant_type: 'client_credentials'
+        })
+    });
+    
+    const tokenData = await tokenResponse.json();
+    if (!tokenResponse.ok) {
+        throw new Error(`Erro ao gerar Token MP: ${JSON.stringify(tokenData)}`);
+    }
+    const mpAccessToken = tokenData.access_token;
+
+    // 5. Create Preference using new token
     const body = {
       items: [
         {
@@ -57,13 +97,13 @@ serve(async (req) => {
         }
       ],
       back_urls: {
-        success: 'https://app-persona-demo.com/settings?status=success',
-        failure: 'https://app-persona-demo.com/settings?status=failure',
-        pending: 'https://app-persona-demo.com/settings?status=pending'
+         success: 'https://app-persona-demo.com/settings?status=success',
+         failure: 'https://app-persona-demo.com/settings?status=failure',
+         pending: 'https://app-persona-demo.com/settings?status=pending'
       },
       auto_return: 'approved',
       external_reference: user.id
-    }
+    };
 
     const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
@@ -72,21 +112,24 @@ serve(async (req) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body)
-    })
+    });
 
-    const data = await response.json()
-    if (!response.ok) throw new Error(`MP Error: ${JSON.stringify(data)}`)
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(`Erro Mercado Pago: ${JSON.stringify(data)}`);
+    }
 
     return new Response(
       JSON.stringify({ init_point: data.init_point }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
-    )
+    );
 
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message, stack: error.stack }), 
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-    )
+    );
   }
 })
 ```

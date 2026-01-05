@@ -74,9 +74,6 @@ export function AuthProvider({ children }) {
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
-            options: {
-                data: { full_name: fullName }, // Supabase metadata
-            }, // Wait, signInWithPassword doesn't take options data like this usually, but let's leave existing code unless broken
         });
         if (error) throw error;
         return data;

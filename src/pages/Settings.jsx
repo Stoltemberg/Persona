@@ -178,37 +178,37 @@ export default function Settings() {
                         </Button>
 
                         <Link to="/wallets" style={{ textDecoration: 'none' }}>
-                            <Link to="/wallets" style={{ textDecoration: 'none' }}>
-                                <Button variant="ghost" className="btn-primary" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
-                                    Gerenciar Carteiras
-                                </Button>
-                            </Link>
-                            <Link to="/categories" style={{ textDecoration: 'none' }}>
-                                <Button variant="ghost" className="btn-ghost" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                    Gerenciar Categorias
-                                </Button>
-                            </Link>
-                            <p style={{ opacity: 0.7, fontSize: '0.85rem' }}>Organize suas contas, cartões e categorias.</p>
-                    </Card>
-
-                    <Card className="glass-card fade-in stagger-3">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                            <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px' }}>
-                                <Bell size={24} />
-                            </div>
-                            <h3>Notificações</h3>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                            <span>Alertas de Orçamento</span>
-                            <input type="checkbox" defaultChecked />
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span>Resumo Semanal</span>
-                            <input type="checkbox" />
-                        </div>
-                    </Card>
+                            <Button variant="ghost" className="btn-primary" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
+                                Gerenciar Carteiras
+                            </Button>
+                        </Link>
+                        <Link to="/categories" style={{ textDecoration: 'none' }}>
+                            <Button variant="ghost" className="btn-ghost" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                Gerenciar Categorias
+                            </Button>
+                        </Link>
+                        <p style={{ opacity: 0.7, fontSize: '0.85rem' }}>Organize suas contas, cartões e categorias.</p>
                 </div>
-            </div>
+            </Card>
+
+            <Card className="glass-card fade-in stagger-3">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px' }}>
+                        <Bell size={24} />
+                    </div>
+                    <h3>Notificações</h3>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <span>Alertas de Orçamento</span>
+                    <input type="checkbox" defaultChecked />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Resumo Semanal</span>
+                    <input type="checkbox" />
+                </div>
+            </Card>
         </div>
+            </div >
+        </div >
     );
 }

@@ -13,6 +13,7 @@ export default function Dashboard() {
     const [expenses, setExpenses] = useState(0);
     const [savings, setSavings] = useState(0);
     const [recentTransactions, setRecentTransactions] = useState([]);
+    const [primaryGoal, setPrimaryGoal] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -105,9 +106,27 @@ export default function Dashboard() {
                 }
             });
 
+            // Fetch Goals for Savings Card
+            const { data: goalsData } = await supabase
+                .from('goals')
+                .select('*')
+                .eq('profile_id', user.id);
+
+            let totalSavings = 0;
+            let primaryGoal = null;
+
+            if (goalsData) {
+                totalSavings = goalsData.reduce((acc, curr) => acc + (parseFloat(curr.current_amount) || 0), 0);
+                primaryGoal = goalsData.find(g => g.is_primary) || null;
+            }
+
             setBalance(totalIncome - totalExpense);
             setExpenses(monthlyExpense);
-            setSavings(0); // Future feature
+            setSavings(totalSavings);
+            // We can store primaryGoal in a state if we want to display it specifically,
+            // or just use totalSavings for now as the base requirement.
+            // Let's add a state for it to use in the UI.
+            setPrimaryGoal(primaryGoal);
 
             // Set the first 5 for the recent list
             setRecentTransactions(data.slice(0, 5));
@@ -170,13 +189,29 @@ export default function Dashboard() {
                                 <div style={{ padding: '0.8rem', background: 'rgba(196, 113, 237, 0.15)', borderRadius: '14px', color: '#c471ed' }}>
                                     <PiggyBank size={28} />
                                 </div>
-                                <h3>Meta de Economia</h3>
+                                <h3 style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {primaryGoal ? primaryGoal.title : 'Total Economizado'}
+                                </h3>
                             </div>
                             <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                                {loading ? <Skeleton width="180px" height="60px" /> : `R$ ${savings.toFixed(2).replace('.', ',')}`}
+                                {loading ? <Skeleton width="180px" height="60px" /> : `R$ ${primaryGoal ? parseFloat(primaryGoal.current_amount).toFixed(2).replace('.', ',') : savings.toFixed(2).replace('.', ',')}`}
                             </h2>
+                            {primaryGoal && (
+                                <div style={{ marginTop: '0.5rem' }}>
+                                    <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                                        <div style={{
+                                            width: `${Math.min((primaryGoal.current_amount / primaryGoal.target_amount) * 100, 100)}%`,
+                                            height: '100%',
+                                            background: '#c471ed'
+                                        }} />
+                                    </div>
+                                    <p style={{ fontSize: '0.8rem', marginTop: '0.25rem', color: 'rgba(255,255,255,0.5)' }}>
+                                        Meta: R$ {parseFloat(primaryGoal.target_amount).toFixed(2).replace('.', ',')}
+                                    </p>
+                                </div>
+                            )}
                         </div>
-                        <p style={{ color: '#c471ed', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <p style={{ color: '#c471ed', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: primaryGoal ? '1rem' : 0 }}>
                             Ver Metas <span style={{ fontSize: '1.2rem' }}>&rarr;</span>
                         </p>
                     </Card>

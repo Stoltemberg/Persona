@@ -5,7 +5,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
-import { Plus, Trash2, Edit2, TrendingUp, Lightbulb, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, Edit2, TrendingUp, Lightbulb, AlertTriangle, Star } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 export default function Goals() {
@@ -289,6 +289,14 @@ export default function Goals() {
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                                         <button onClick={() => handleOpenEdit(goal)} className="btn-ghost" style={{ padding: '0.5rem' }} title="Editar">
                                             <Edit2 size={18} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleSetPrimary(goal.id)}
+                                            className="btn-ghost"
+                                            style={{ padding: '0.5rem', color: goal.is_primary ? '#c471ed' : 'var(--text-muted)' }}
+                                            title={goal.is_primary ? "Principal" : "Definir como Principal"}
+                                        >
+                                            <Star size={18} fill={goal.is_primary ? '#c471ed' : 'none'} />
                                         </button>
                                         <button onClick={() => handleDeleteGoal(goal.id)} className="btn-ghost" style={{ padding: '0.5rem', color: '#f64f59' }} title="Excluir">
                                             <Trash2 size={18} />

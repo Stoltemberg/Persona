@@ -122,8 +122,65 @@ export default function Transactions() {
         }
     };
 
+    // Category State
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null); // Stores the full object
+
+    useEffect(() => {
+        if (user) {
+            fetchTransactions();
+            fetchCategories();
+        }
+    }, [user]);
+
+    const fetchCategories = async () => {
+        const { data } = await supabase.from('categories').select('*');
+        setCategories(data || []);
+    };
+
+    // ... existing fetchTransactions ...
+
+    const handleOpenNew = () => {
+        setTransactionToEdit(null);
+        resetForm();
+        setIsModalOpen(true);
+    };
+
+    const handleOpenEdit = (tx) => {
+        setTransactionToEdit(tx);
+        setDescription(tx.description);
+        setAmount(tx.amount);
+        setType(tx.type);
+        setCategory(tx.category || '');
+        setExpenseType(tx.expense_type || 'variable');
+
+        // Try to match existing string category to a category object for UI highlight
+        const match = categories.find(c => c.name === tx.category && c.type === tx.type);
+        setSelectedCategory(match || null);
+
+        setIsModalOpen(true);
+    };
+
+    // ... handleSaveTransaction ...
+
+    const resetForm = () => {
+        setDescription('');
+        setAmount('');
+        setType('expense');
+        setCategory('');
+        setExpenseType('variable');
+        setTransactionToEdit(null);
+        setSelectedCategory(null);
+    };
+
+    // ... handleDelete ...
+
+    // Filter categories for the modal based on current type
+    const availableCategories = categories.filter(c => c.type === type);
+
     return (
         <div className="container fade-in">
+            {/* ... Header & List ... */}
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
                 <h1 className="text-gradient">Transações</h1>
                 <Button onClick={handleOpenNew} icon={Plus}>
@@ -149,15 +206,23 @@ export default function Transactions() {
                             animationDelay: `${index * 0.05}s`
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                                <div style={{
-                                    padding: '1rem',
-                                    borderRadius: '50%',
-                                    background: tx.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
-                                    color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
-                                    display: 'flex', alignItems: 'center', justifyItems: 'center'
-                                }}>
-                                    {tx.type === 'income' ? <ArrowDownLeft size={24} /> : <ArrowUpRight size={24} />}
-                                </div>
+                                {/* Try to find icon for this transaction category */}
+                                {(() => {
+                                    const cat = categories.find(c => c.name === tx.category && c.type === tx.type);
+                                    return (
+                                        <div style={{
+                                            padding: '1rem',
+                                            borderRadius: '50%',
+                                            background: cat ? `${cat.color}20` : (tx.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)'),
+                                            color: cat ? cat.color : (tx.type === 'income' ? '#12c2e9' : '#f64f59'),
+                                            display: 'flex', alignItems: 'center', justifyItems: 'center',
+                                            fontSize: '1.2rem'
+                                        }}>
+                                            {cat ? cat.icon : (tx.type === 'income' ? <ArrowDownLeft size={24} /> : <ArrowUpRight size={24} />)}
+                                        </div>
+                                    );
+                                })()}
+
                                 <div>
                                     <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>{tx.description}</h4>
                                     <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>
@@ -219,7 +284,7 @@ export default function Transactions() {
                             type="button"
                             className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
                             style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--color-3)' : undefined, border: type === 'expense' ? 'none' : undefined }}
-                            onClick={() => setType('expense')}
+                            onClick={() => { setType('expense'); setCategory(''); setSelectedCategory(null); }}
                         >
                             Despesa
                         </Button>
@@ -227,7 +292,7 @@ export default function Transactions() {
                             type="button"
                             className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
                             style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--color-4)' : undefined, border: type === 'income' ? 'none' : undefined }}
-                            onClick={() => setType('income')}
+                            onClick={() => { setType('income'); setCategory(''); setSelectedCategory(null); }}
                         >
                             Receita
                         </Button>
@@ -242,6 +307,48 @@ export default function Transactions() {
                         onChange={(e) => setAmount(e.target.value)}
                         required
                     />
+
+                    {/* Category Selection Grid */}
+                    <div className="input-group" style={{ marginBottom: '1rem' }}>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                            Categoria
+                        </label>
+                        {availableCategories.length > 0 ? (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '0.5rem' }}>
+                                {availableCategories.map(cat => (
+                                    <div
+                                        key={cat.id}
+                                        onClick={() => {
+                                            setCategory(cat.name);
+                                            setSelectedCategory(cat);
+                                        }}
+                                        style={{
+                                            padding: '0.5rem',
+                                            borderRadius: '8px',
+                                            background: selectedCategory?.id === cat.id ? `${cat.color}40` : 'rgba(255,255,255,0.05)',
+                                            border: selectedCategory?.id === cat.id ? `1px solid ${cat.color}` : '1px solid transparent',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            gap: '0.2rem',
+                                            transition: 'all 0.2s',
+                                            textAlign: 'center'
+                                        }}
+                                    >
+                                        <div style={{ fontSize: '1.5rem' }}>{cat.icon}</div>
+                                        <div style={{ fontSize: '0.7rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>{cat.name}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                                <p>Nenhuma categoria criada.</p>
+                                <Button type="button" variant="ghost" className="btn-primary" style={{ marginTop: '0.5rem', fontSize: '0.8rem' }} onClick={() => window.location.href = '/categories'}>Criar Agora</Button>
+                            </div>
+                        )}
+                        {/* Fallback Input if needed (hidden or optional? Let's hide it if categories exist) */}
+                    </div>
 
                     {/* Mandatory Expense Type Selection */}
                     {type === 'expense' && (
@@ -282,12 +389,6 @@ export default function Transactions() {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         required
-                    />
-                    <Input
-                        label="Categoria"
-                        placeholder="Ex: Alimentação"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
                     />
 
                     <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} loading={submitting}>

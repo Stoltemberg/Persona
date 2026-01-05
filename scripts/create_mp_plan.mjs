@@ -1,31 +1,54 @@
-import fetch from 'node-fetch'; // Requires "type": "module" in package.json or .mjs extension
-// Or standard fetch if Node 18+
+const CLIENT_ID = '4711776498636308';
+const CLIENT_SECRET = 'FvuLBDIXTP5nsIYTwpO8YsqCHvY9msTC';
 
-const ACCESS_TOKEN = 'APP_USR-ffa5816d-b8a5-429c-be24-eb95f795a3a8';
+async function generateToken() {
+    console.log('Gerando novo Access Token...');
+    const response = await fetch('https://api.mercadopago.com/oauth/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
+            grant_type: 'client_credentials'
+        })
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+        console.log('Token gerado com sucesso.');
+        return data.access_token;
+    } else {
+        throw new Error(`Falha ao gerar token: ${JSON.stringify(data)}`);
+    }
+}
 
 async function createPlan() {
-    console.log('Criando plano no Mercado Pago...');
-
-    const url = 'https://api.mercadopago.com/preapproval_plan';
-
-    const body = {
-        reason: 'Persona PRO (Assinatura Mensal)',
-        auto_recurring: {
-            frequency: 1,
-            frequency_type: 'months',
-            transaction_amount: 29.90,
-            currency_id: 'BRL',
-            start_date: new Date(new Date().getTime() + 60000).toISOString() // Now + 1min
-        },
-        back_url: 'https://app-persona-demo.com/settings', // Placeholder return URL
-        status: 'active'
-    };
-
     try {
+        const accessToken = await generateToken();
+
+        console.log('Criando plano no Mercado Pago...');
+        const url = 'https://api.mercadopago.com/preapproval_plan';
+
+        const body = {
+            reason: 'Persona PRO (Assinatura Mensal)',
+            auto_recurring: {
+                frequency: 1,
+                frequency_type: 'months',
+                transaction_amount: 29.90,
+                currency_id: 'BRL',
+                start_date: new Date(new Date().getTime() + 60000).toISOString() // Now + 1min
+            },
+            back_url: 'https://app-persona-demo.com/settings',
+            status: 'active'
+        };
+
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${ACCESS_TOKEN}`,
+                'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(body)
@@ -41,8 +64,9 @@ async function createPlan() {
         } else {
             console.error('Erro ao criar plano:', data);
         }
+
     } catch (error) {
-        console.error('Erro de rede:', error);
+        console.error('Erro Fatal:', error.message);
     }
 }
 

@@ -5,8 +5,8 @@ import { Check, Star, Zap } from 'lucide-react';
 export function UpgradeModal({ isOpen, onClose }) {
     // Replace with your actual Mercado Pago Link or Checkout Logic
     const handleUpgrade = () => {
-        // Example Link - Replace with user provided link or generic placeholder
-        window.open('https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=YOUR_PLAN_ID', '_blank');
+        // Link gerado oficialmente via API
+        window.open('https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=fb6be4e955354b70bd2d60a64626069b', '_blank');
         onClose();
     };
 

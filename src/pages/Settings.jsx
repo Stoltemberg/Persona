@@ -5,6 +5,7 @@ import { Input } from '../components/Input';
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { User, Bell, Shield, Wallet } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Settings() {
     const { profile, user } = useAuth();
@@ -91,8 +92,6 @@ export default function Settings() {
 
                 {/* Other Settings Placeholders */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                    import {Link} from 'react-router-dom';
-                    // ...
                     <Card className="glass-card fade-in stagger-2">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                             <div style={{ padding: '0.8rem', background: 'rgba(18, 194, 233, 0.1)', borderRadius: '12px', color: '#12c2e9' }}>

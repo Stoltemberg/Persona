@@ -310,7 +310,7 @@ p {
   }
 }
 
-/* Page Headers (New) */
+/* Page Headers */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -431,6 +431,26 @@ p {
   transform: rotate(45deg);
 }
 
+/* Transaction Card Styles */
+.transaction-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+}
+
+.transaction-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.transaction-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 /* media query for desktop, switching to grid */
 /* Desktop Grid Layout */
 @media (min-width: 1024px) {
@@ -454,6 +474,78 @@ p {
   .mobile-header,
   .mobile-nav-container {
     display: none;
+  }
+}
+
+/* Mobile specific overrides */
+@media (max-width: 1023px) {
+  .main-content {
+    padding-bottom: 7rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-header {
+    display: block;
+  }
+
+  .mobile-nav-container {
+    display: block;
+  }
+
+  .scroll-hint {
+    display: flex;
+    justify-content: center;
+    margin-top: -1.5rem;
+    /* Pull up closer */
+    margin-bottom: 2rem;
+  }
+
+  /* Mobile Horizontal Scroll */
+  .cards-scroll-container {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    margin: 0 -1rem;
+    /* Negative margin to touch edges */
+    padding: 0 1rem 1rem 1rem;
+    /* Padding to compensate */
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cards-scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card-min-width {
+    min-width: 85vw;
+    /* Show part of next card */
+    scroll-snap-align: center;
+  }
+
+  /* Transaction Card Mobile */
+  .transaction-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem !important;
+    /* Smaller padding */
+  }
+
+  .transaction-left {
+    width: 100%;
+    gap: 1rem;
+  }
+
+  .transaction-right {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    /* Separator */
+    padding-top: 1rem;
   }
 }
 
@@ -547,55 +639,6 @@ p {
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
-  }
-}
-
-/* Mobile specific overrides */
-@media (max-width: 1023px) {
-  .main-content {
-    padding-bottom: 7rem;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .mobile-header {
-    display: block;
-  }
-
-  .mobile-nav-container {
-    display: block;
-  }
-
-  .scroll-hint {
-    display: flex;
-    justify-content: center;
-    margin-top: -1.5rem;
-    /* Pull up closer */
-    margin-bottom: 2rem;
-  }
-
-  /* Mobile Horizontal Scroll */
-  .cards-scroll-container {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    padding-bottom: 1rem;
-    margin: 0 -1rem;
-    /* Negative margin to touch edges */
-    padding: 0 1rem 1rem 1rem;
-    /* Padding to compensate */
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .cards-scroll-container::-webkit-scrollbar {
-    display: none;
-  }
-
-  .card-min-width {
-    min-width: 85vw;
-    /* Show part of next card */
-    scroll-snap-align: center;
   }
 }
 

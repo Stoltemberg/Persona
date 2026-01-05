@@ -205,14 +205,10 @@ export default function Transactions() {
                     </div>
                 ) : (
                     transactions.map((tx, index) => (
-                        <Card key={tx.id} hover className="fade-in" style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            padding: '1.5rem 2rem',
+                        <Card key={tx.id} hover className="fade-in transaction-card" style={{
                             animationDelay: `${index * 0.05}s`
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                            <div className="transaction-left">
                                 {/* Try to find icon for this transaction category */}
                                 {(() => {
                                     const cat = categories.find(c => c.name === tx.category && c.type === tx.type);
@@ -251,7 +247,7 @@ export default function Transactions() {
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div className="transaction-right">
                                 <div style={{ textAlign: 'right', marginRight: '1rem' }}>
                                     <h3 style={{
                                         color: tx.type === 'income' ? '#12c2e9' : 'white',
@@ -261,22 +257,24 @@ export default function Transactions() {
                                         {tx.type === 'income' ? '+ ' : '- '}R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
                                     </h3>
                                 </div>
-                                <button
-                                    onClick={() => handleOpenEdit(tx)}
-                                    className="btn-ghost"
-                                    style={{ padding: '0.6rem' }}
-                                    title="Editar"
-                                >
-                                    <Edit2 size={20} />
-                                </button>
-                                <button
-                                    onClick={() => handleDeleteTransaction(tx.id)}
-                                    className="btn-ghost"
-                                    style={{ color: '#f64f59', padding: '0.6rem' }}
-                                    title="Excluir"
-                                >
-                                    <Trash2 size={20} />
-                                </button>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <button
+                                        onClick={() => handleOpenEdit(tx)}
+                                        className="btn-ghost"
+                                        style={{ padding: '0.6rem' }}
+                                        title="Editar"
+                                    >
+                                        <Edit2 size={20} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteTransaction(tx.id)}
+                                        className="btn-ghost"
+                                        style={{ color: '#f64f59', padding: '0.6rem' }}
+                                        title="Excluir"
+                                    >
+                                        <Trash2 size={20} />
+                                    </button>
+                                </div>
                             </div>
                         </Card>
                     ))

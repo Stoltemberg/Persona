@@ -99,12 +99,17 @@ export default function Settings() {
                             </div>
                             <h3>Finanças</h3>
                         </div>
-                        <Link to="/categories" style={{ textDecoration: 'none' }}>
+                        <Link to="/wallets" style={{ textDecoration: 'none' }}>
                             <Button variant="ghost" className="btn-primary" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
+                                Gerenciar Carteiras
+                            </Button>
+                        </Link>
+                        <Link to="/categories" style={{ textDecoration: 'none' }}>
+                            <Button variant="ghost" className="btn-ghost" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
                                 Gerenciar Categorias
                             </Button>
                         </Link>
-                        <p style={{ opacity: 0.7, fontSize: '0.85rem' }}>Personalize ícones e cores para suas despesas e receitas.</p>
+                        <p style={{ opacity: 0.7, fontSize: '0.85rem' }}>Organize suas contas, cartões e categorias.</p>
                     </Card>
 
                     <Card className="glass-card fade-in stagger-3">

@@ -128,72 +128,81 @@ export default function Budgets() {
 
             {loading ? <p>Carregando...</p> : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                    {categories.map((cat, index) => {
-                        const budget = budgets.find(b => b.category_id === cat.id);
-                        const limit = budget ? parseFloat(budget.amount) : 0;
-                        const spent = monthlySpent[cat.name] || 0;
-                        const progress = limit > 0 ? (spent / limit) * 100 : 0;
-                        const isOver = spent > limit && limit > 0;
+                    {categories.length === 0 ? (
+                        <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '3rem', opacity: 0.6 }}>
+                            <p>Nenhuma categoria de despesa encontrada.</p>
+                            <Button variant="ghost" className="btn-primary" style={{ marginTop: '1rem' }} onClick={() => window.location.href = '/categories'}>
+                                Criar Categorias
+                            </Button>
+                        </div>
+                    ) : (
+                        categories.map((cat, index) => {
+                            const budget = budgets.find(b => b.category_id === cat.id);
+                            const limit = budget ? parseFloat(budget.amount) : 0;
+                            const spent = monthlySpent[cat.name] || 0;
+                            const progress = limit > 0 ? (spent / limit) * 100 : 0;
+                            const isOver = spent > limit && limit > 0;
 
-                        return (
-                            <Card key={cat.id} className="fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <div style={{
-                                            fontSize: '1.5rem',
-                                            background: `${cat.color}20`,
-                                            padding: '0.8rem',
-                                            borderRadius: '12px',
-                                            lineHeight: 1
-                                        }}>
-                                            {cat.icon}
-                                        </div>
-                                        <div>
-                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '0.2rem' }}>{cat.name}</h3>
-                                            <p style={{ fontSize: '0.85rem', opacity: 0.7 }}>
-                                                {limit > 0 ? `Meta: R$ ${limit.toLocaleString('pt-BR')}` : 'Sem meta definida'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <Button variant="ghost" className="btn-ghost" onClick={() => handleOpenModal(cat)}>
-                                        Definir
-                                    </Button>
-                                </div>
-
-                                {limit > 0 && (
-                                    <div style={{ marginTop: '1rem' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
-                                            <span style={{ color: isOver ? '#f64f59' : 'inherit' }}>
-                                                R$ {spent.toLocaleString('pt-BR')}
-                                            </span>
-                                            <span>
-                                                {Math.min(progress, 100).toFixed(0)}%
-                                            </span>
-                                        </div>
-                                        <div style={{
-                                            height: '8px',
-                                            background: 'rgba(255,255,255,0.1)',
-                                            borderRadius: '4px',
-                                            overflow: 'hidden'
-                                        }}>
+                            return (
+                                <Card key={cat.id} className="fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             <div style={{
-                                                width: `${Math.min(progress, 100)}%`,
-                                                height: '100%',
-                                                background: isOver ? '#f64f59' : cat.color,
-                                                transition: 'width 1s ease-in-out'
-                                            }} />
-                                        </div>
-                                        {isOver && (
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.8rem', color: '#f64f59', fontSize: '0.85rem' }}>
-                                                <AlertCircle size={16} />
-                                                <span>Você excedeu o orçamento!</span>
+                                                fontSize: '1.5rem',
+                                                background: `${cat.color}20`,
+                                                padding: '0.8rem',
+                                                borderRadius: '12px',
+                                                lineHeight: 1
+                                            }}>
+                                                {cat.icon}
                                             </div>
-                                        )}
+                                            <div>
+                                                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.2rem' }}>{cat.name}</h3>
+                                                <p style={{ fontSize: '0.85rem', opacity: 0.7 }}>
+                                                    {limit > 0 ? `Meta: R$ ${limit.toLocaleString('pt-BR')}` : 'Sem meta definida'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Button variant="ghost" className="btn-ghost" onClick={() => handleOpenModal(cat)}>
+                                            Definir
+                                        </Button>
                                     </div>
-                                )}
-                            </Card>
-                        );
-                    })}
+
+                                    {limit > 0 && (
+                                        <div style={{ marginTop: '1rem' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                                                <span style={{ color: isOver ? '#f64f59' : 'inherit' }}>
+                                                    R$ {spent.toLocaleString('pt-BR')}
+                                                </span>
+                                                <span>
+                                                    {Math.min(progress, 100).toFixed(0)}%
+                                                </span>
+                                            </div>
+                                            <div style={{
+                                                height: '8px',
+                                                background: 'rgba(255,255,255,0.1)',
+                                                borderRadius: '4px',
+                                                overflow: 'hidden'
+                                            }}>
+                                                <div style={{
+                                                    width: `${Math.min(progress, 100)}%`,
+                                                    height: '100%',
+                                                    background: isOver ? '#f64f59' : cat.color,
+                                                    transition: 'width 1s ease-in-out'
+                                                }} />
+                                            </div>
+                                            {isOver && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.8rem', color: '#f64f59', fontSize: '0.85rem' }}>
+                                                    <AlertCircle size={16} />
+                                                    <span>Você excedeu o orçamento!</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </Card>
+                            );
+                        })
+                    )}
                 </div>
             )}
 

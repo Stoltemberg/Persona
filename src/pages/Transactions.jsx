@@ -23,6 +23,10 @@ export default function Transactions() {
     const [expenseType, setExpenseType] = useState('variable');
     const [isRecurring, setIsRecurring] = useState(false);
 
+    // Wallets State
+    const [wallets, setWallets] = useState([]);
+    const [selectedWalletId, setSelectedWalletId] = useState('');
+
     // Category State
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null); // Stores the full object
@@ -31,8 +35,20 @@ export default function Transactions() {
         if (user) {
             fetchTransactions();
             fetchCategories();
+            fetchWallets();
         }
     }, [user]);
+
+    // ... fetchTransactions ...
+
+    const fetchWallets = async () => {
+        const { data } = await supabase.from('wallets').select('*');
+        setWallets(data || []);
+        // Set default wallet if none selected or available
+        if (data && data.length > 0 && !selectedWalletId) {
+            setSelectedWalletId(data[0].id);
+        }
+    };
 
     const fetchTransactions = async () => {
         try {
@@ -68,6 +84,8 @@ export default function Transactions() {
         setType(tx.type);
         setCategory(tx.category || '');
         setExpenseType(tx.expense_type || 'variable');
+        setSelectedWalletId(tx.wallet_id || (wallets.length > 0 ? wallets[0].id : ''));
+        setIsRecurring(false);
 
         // Try to match existing string category to a category object for UI highlight
         const match = categories.find(c => c.name === tx.category && c.type === tx.type);

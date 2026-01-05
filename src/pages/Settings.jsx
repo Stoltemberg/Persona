@@ -46,12 +46,10 @@ export default function Settings() {
             const { data: allTransactions } = await supabase.from('transactions').select('*').eq('profile_id', user.id);
             const { data: allWallets } = await supabase.from('wallets').select('*').eq('profile_id', user.id);
             const { data: allGoals } = await supabase.from('goals').select('*').eq('profile_id', user.id);
-
-            const { data: allGoals } = await supabase.from('goals').select('*').eq('profile_id', user.id);
-            const { data: allCategories } = await supabase.from('categories').select('*').or(`profile_id.eq.${user.id},type.eq.expense`); // Fetch user specific or default
-            // Actually categories might be global or user specific. Budgets page fetches all 'expense' type.
-            // Let's stick to simple fetch.
             const { data: allBudgets } = await supabase.from('budgets').select('*').eq('profile_id', user.id);
+
+            // Fetch categories correctly as per Budgets.jsx logic if possible, or just all expense categories
+            const { data: expenseCategories } = await supabase.from('categories').select('*').eq('type', 'expense');
 
             // Fetch categories correctly as per Budgets.jsx logic if possible, or just all expense categories
             const { data: expenseCategories } = await supabase.from('categories').select('*').eq('type', 'expense');

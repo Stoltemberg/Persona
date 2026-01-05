@@ -8,9 +8,12 @@ import { useTheme } from '../context/ThemeContext';
 import { User, Bell, Shield, Wallet, Moon, Sun, Monitor } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import { useToast } from '../context/ToastContext';
+
 export default function Settings() {
     const { profile, user } = useAuth();
     const { theme, changeTheme } = useTheme();
+    const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [fullName, setFullName] = useState(profile?.full_name || '');
 
@@ -24,10 +27,10 @@ export default function Settings() {
                 .eq('id', user.id);
 
             if (error) throw error;
-            alert('Perfil atualizado!');
+            addToast('Perfil atualizado com sucesso!', 'success');
         } catch (error) {
             console.error(error);
-            alert('Erro ao atualizar');
+            addToast('Erro ao atualizar perfil.', 'error');
         } finally {
             setLoading(false);
         }

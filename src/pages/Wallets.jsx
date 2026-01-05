@@ -7,8 +7,11 @@ import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { Wallet, Plus, Trash2, Edit2, CreditCard, Banknote, Landmark } from 'lucide-react';
 
+import { useToast } from '../context/ToastContext';
+
 export default function Wallets() {
     const { user } = useAuth();
+    const { addToast } = useToast();
     const [wallets, setWallets] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -88,8 +91,9 @@ export default function Wallets() {
 
             await fetchWallets();
             setIsModalOpen(false);
+            addToast(walletToEdit ? 'Carteira atualizada.' : 'Carteira criada.', 'success');
         } catch (error) {
-            alert(error.message);
+            addToast(error.message, 'error');
         } finally {
             setSubmitting(false);
         }
@@ -101,8 +105,9 @@ export default function Wallets() {
             const { error } = await supabase.from('wallets').delete().eq('id', id);
             if (error) throw error;
             setWallets(wallets.filter(w => w.id !== id));
+            addToast('Carteira excluída.', 'success');
         } catch (error) {
-            alert('Erro ao excluir carteira.');
+            addToast('Erro ao excluir carteira.', 'error');
         }
     };
 

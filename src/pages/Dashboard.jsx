@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import { Skeleton } from '../components/Skeleton';
 import { LogOut, Wallet, TrendingUp, PiggyBank, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -142,7 +143,7 @@ export default function Dashboard() {
                         <h3>Saldo Total</h3>
                     </div>
                     <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>
-                        R$ {loading ? '...' : balance.toFixed(2).replace('.', ',')}
+                        {loading ? <Skeleton width="200px" height="60px" /> : `R$ ${balance.toFixed(2).replace('.', ',')}`}
                     </h2>
                     <p style={{ color: '#12c2e9', fontWeight: 500 }}>Atualizado agora</p>
                 </Card>
@@ -156,7 +157,7 @@ export default function Dashboard() {
                             <h3>Despesas (Mês)</h3>
                         </div>
                         <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>
-                            R$ {loading ? '...' : expenses.toFixed(2).replace('.', ',')}
+                            {loading ? <Skeleton width="180px" height="60px" /> : `R$ ${expenses.toFixed(2).replace('.', ',')}`}
                         </h2>
                         <p style={{ color: '#f64f59', fontWeight: 500 }}>Este mês &rarr;</p>
                     </Card>
@@ -172,7 +173,7 @@ export default function Dashboard() {
                                 <h3>Meta de Economia</h3>
                             </div>
                             <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>
-                                R$ {loading ? '...' : savings.toFixed(2).replace('.', ',')}
+                                {loading ? <Skeleton width="180px" height="60px" /> : `R$ ${savings.toFixed(2).replace('.', ',')}`}
                             </h2>
                         </div>
                         <p style={{ color: '#c471ed', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -192,7 +193,9 @@ export default function Dashboard() {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {loading ? (
-                        <p>Carregando...</p>
+                        Array(3).fill(0).map((_, i) => (
+                            <Skeleton key={i} width="100%" height="80px" borderRadius="20px" />
+                        ))
                     ) : recentTransactions.length === 0 ? (
                         <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                             <p style={{ fontSize: '1.1rem' }}>Nenhuma transação encontrada</p>

@@ -7,8 +7,11 @@ import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { Plus, ArrowUpRight, ArrowDownLeft, Trash2, Edit2 } from 'lucide-react';
 
+import { useToast } from '../context/ToastContext';
+
 export default function Transactions() {
     const { user } = useAuth();
+    const { addToast } = useToast();
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -149,8 +152,9 @@ export default function Transactions() {
             await fetchTransactions();
             setIsModalOpen(false);
             resetForm();
+            addToast(transactionToEdit ? 'Transação atualizada!' : 'Transação criada!', 'success');
         } catch (error) {
-            alert(error.message);
+            addToast(error.message, 'error');
         } finally {
             setSubmitting(false);
         }

@@ -7,8 +7,11 @@ import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { TrendingUp, TrendingDown, AlertCircle, CheckCircle } from 'lucide-react';
 
+import { useToast } from '../context/ToastContext';
+
 export default function Budgets() {
     const { user } = useAuth();
+    const { addToast } = useToast();
     const [categories, setCategories] = useState([]);
     const [budgets, setBudgets] = useState([]);
     const [monthlySpent, setMonthlySpent] = useState({});
@@ -112,8 +115,9 @@ export default function Budgets() {
 
             await fetchData();
             setIsModalOpen(false);
+            addToast('Orçamento salvo!', 'success');
         } catch (error) {
-            alert(error.message);
+            addToast(error.message, 'error');
         } finally {
             setSubmitting(false);
         }

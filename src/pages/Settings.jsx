@@ -9,6 +9,7 @@ import { User, Bell, Shield, Wallet, Moon, Sun, Monitor } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { useToast } from '../context/ToastContext';
+import { exportDataToExcel } from '../lib/exportUtils';
 
 export default function Settings() {
     const { profile, user } = useAuth();
@@ -31,6 +32,27 @@ export default function Settings() {
         } catch (error) {
             console.error(error);
             addToast('Erro ao atualizar perfil.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleExport = async () => {
+        setLoading(true);
+        try {
+            addToast('Gerando relatório...', 'info');
+
+            // Fetch fresh data
+            const { data: allTransactions } = await supabase.from('transactions').select('*').eq('profile_id', user.id);
+            const { data: allWallets } = await supabase.from('wallets').select('*').eq('profile_id', user.id);
+            const { data: allGoals } = await supabase.from('goals').select('*').eq('profile_id', user.id);
+
+            await exportDataToExcel(profile?.full_name || 'Usuário', allTransactions || [], allWallets || [], allGoals || []);
+
+            addToast('Relatório baixado com sucesso!', 'success');
+        } catch (err) {
+            console.error(err);
+            addToast('Erro ao exportar dados.', 'error');
         } finally {
             setLoading(false);
         }
@@ -144,17 +166,29 @@ export default function Settings() {
                             </div>
                             <h3>Finanças</h3>
                         </div>
+
+                        <Button
+                            variant="ghost"
+                            className="btn-primary"
+                            style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center', background: 'linear-gradient(135deg, #11998e, #38ef7d)' }}
+                            onClick={handleExport}
+                            disabled={loading}
+                        >
+                            Exportar Relatório (Excel)
+                        </Button>
+
                         <Link to="/wallets" style={{ textDecoration: 'none' }}>
-                            <Button variant="ghost" className="btn-primary" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
-                                Gerenciar Carteiras
-                            </Button>
-                        </Link>
-                        <Link to="/categories" style={{ textDecoration: 'none' }}>
-                            <Button variant="ghost" className="btn-ghost" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                Gerenciar Categorias
-                            </Button>
-                        </Link>
-                        <p style={{ opacity: 0.7, fontSize: '0.85rem' }}>Organize suas contas, cartões e categorias.</p>
+                            <Link to="/wallets" style={{ textDecoration: 'none' }}>
+                                <Button variant="ghost" className="btn-primary" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
+                                    Gerenciar Carteiras
+                                </Button>
+                            </Link>
+                            <Link to="/categories" style={{ textDecoration: 'none' }}>
+                                <Button variant="ghost" className="btn-ghost" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                    Gerenciar Categorias
+                                </Button>
+                            </Link>
+                            <p style={{ opacity: 0.7, fontSize: '0.85rem' }}>Organize suas contas, cartões e categorias.</p>
                     </Card>
 
                     <Card className="glass-card fade-in stagger-3">

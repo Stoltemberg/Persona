@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { X } from 'lucide-react';
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 export function Modal({ isOpen, onClose, title, children }) {
     useEffect(() => {
@@ -14,7 +15,7 @@ export function Modal({ isOpen, onClose, title, children }) {
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div
             className="modal-overlay"
             onClick={onClose}
@@ -32,6 +33,7 @@ export function Modal({ isOpen, onClose, title, children }) {
 
                 {children}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

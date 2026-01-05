@@ -22,8 +22,15 @@ export default function Transactions() {
     const [category, setCategory] = useState('');
     const [expenseType, setExpenseType] = useState('variable');
 
+    // Category State
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null); // Stores the full object
+
     useEffect(() => {
-        if (user) fetchTransactions();
+        if (user) {
+            fetchTransactions();
+            fetchCategories();
+        }
     }, [user]);
 
     const fetchTransactions = async () => {
@@ -42,6 +49,11 @@ export default function Transactions() {
         }
     };
 
+    const fetchCategories = async () => {
+        const { data } = await supabase.from('categories').select('*');
+        setCategories(data || []);
+    };
+
     const handleOpenNew = () => {
         setTransactionToEdit(null);
         resetForm();
@@ -55,6 +67,11 @@ export default function Transactions() {
         setType(tx.type);
         setCategory(tx.category || '');
         setExpenseType(tx.expense_type || 'variable');
+
+        // Try to match existing string category to a category object for UI highlight
+        const match = categories.find(c => c.name === tx.category && c.type === tx.type);
+        setSelectedCategory(match || null);
+
         setIsModalOpen(true);
     };
 
@@ -108,6 +125,7 @@ export default function Transactions() {
         setCategory('');
         setExpenseType('variable');
         setTransactionToEdit(null);
+        setSelectedCategory(null);
     };
 
     const handleDeleteTransaction = async (id) => {
@@ -122,65 +140,11 @@ export default function Transactions() {
         }
     };
 
-    // Category State
-    const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState(null); // Stores the full object
-
-    useEffect(() => {
-        if (user) {
-            fetchTransactions();
-            fetchCategories();
-        }
-    }, [user]);
-
-    const fetchCategories = async () => {
-        const { data } = await supabase.from('categories').select('*');
-        setCategories(data || []);
-    };
-
-    // ... existing fetchTransactions ...
-
-    const handleOpenNew = () => {
-        setTransactionToEdit(null);
-        resetForm();
-        setIsModalOpen(true);
-    };
-
-    const handleOpenEdit = (tx) => {
-        setTransactionToEdit(tx);
-        setDescription(tx.description);
-        setAmount(tx.amount);
-        setType(tx.type);
-        setCategory(tx.category || '');
-        setExpenseType(tx.expense_type || 'variable');
-
-        // Try to match existing string category to a category object for UI highlight
-        const match = categories.find(c => c.name === tx.category && c.type === tx.type);
-        setSelectedCategory(match || null);
-
-        setIsModalOpen(true);
-    };
-
-    // ... handleSaveTransaction ...
-
-    const resetForm = () => {
-        setDescription('');
-        setAmount('');
-        setType('expense');
-        setCategory('');
-        setExpenseType('variable');
-        setTransactionToEdit(null);
-        setSelectedCategory(null);
-    };
-
-    // ... handleDelete ...
-
     // Filter categories for the modal based on current type
     const availableCategories = categories.filter(c => c.type === type);
 
     return (
         <div className="container fade-in">
-            {/* ... Header & List ... */}
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
                 <h1 className="text-gradient">Transações</h1>
                 <Button onClick={handleOpenNew} icon={Plus}>

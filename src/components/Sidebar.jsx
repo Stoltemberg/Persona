@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import clsx from 'clsx';
 
@@ -10,6 +10,7 @@ export function Sidebar() {
         { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
         { icon: Receipt, label: 'Transações', path: '/transactions' },
         { icon: Target, label: 'Metas', path: '/goals' },
+        { icon: PieChart, label: 'Análise', path: '/analysis' },
         { icon: Settings, label: 'Configurações', path: '/settings' },
     ];
 

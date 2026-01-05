@@ -97,18 +97,20 @@ export default function Dashboard() {
                     <p style={{ color: '#12c2e9', fontWeight: 500 }}>Atualizado agora</p>
                 </Card>
 
-                <Card className="stagger-2" hover>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <div style={{ padding: '0.8rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '14px', color: '#f64f59' }}>
-                            <TrendingUp size={28} />
+                <Link to="/analysis" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Card className="stagger-2" hover>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                            <div style={{ padding: '0.8rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '14px', color: '#f64f59' }}>
+                                <TrendingUp size={28} />
+                            </div>
+                            <h3>Despesas (Mês)</h3>
                         </div>
-                        <h3>Despesas (Mês)</h3>
-                    </div>
-                    <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>
-                        R$ {loading ? '...' : expenses.toFixed(2).replace('.', ',')}
-                    </h2>
-                    <p style={{ color: '#f64f59', fontWeight: 500 }}>Este mês</p>
-                </Card>
+                        <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>
+                            R$ {loading ? '...' : expenses.toFixed(2).replace('.', ',')}
+                        </h2>
+                        <p style={{ color: '#f64f59', fontWeight: 500 }}>Este mês &rarr;</p>
+                    </Card>
+                </Link>
 
                 <Link to="/goals" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <Card className="stagger-3" hover style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>

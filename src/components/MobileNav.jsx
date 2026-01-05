@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, PieChart } from 'lucide-react';
 import clsx from 'clsx';
 
 export function MobileNav() {
     const navItems = [
         { icon: LayoutDashboard, label: 'Inicio', path: '/' },
         { icon: Receipt, label: 'Transações', path: '/transactions' },
+        { icon: PieChart, label: 'Análise', path: '/analysis' },
         { icon: Target, label: 'Metas', path: '/goals' },
         { icon: Settings, label: 'Config', path: '/settings' },
     ];

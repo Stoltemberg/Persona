@@ -347,6 +347,21 @@ export default function Transactions() {
                         </div>
                     )}
 
+                    {!transactionToEdit && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                            <input
+                                type="checkbox"
+                                id="recurring"
+                                checked={isRecurring}
+                                onChange={(e) => setIsRecurring(e.target.checked)}
+                                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                            />
+                            <label htmlFor="recurring" style={{ cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
+                                Repetir mensalmente?
+                            </label>
+                        </div>
+                    )}
+
                     <Input
                         label="Descrição"
                         placeholder="Ex: Supermercado"

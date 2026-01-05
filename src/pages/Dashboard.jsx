@@ -16,9 +16,59 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (user) {
+            checkRecurring();
             fetchFinancialData();
         }
     }, [user]);
+
+    const checkRecurring = async () => {
+        try {
+            const now = new Date();
+            // Fetch active templates due today or before
+            const { data: templates } = await supabase
+                .from('recurring_templates')
+                .select('*')
+                .eq('active', true)
+                .lte('next_due_date', now.toISOString());
+
+            if (templates && templates.length > 0) {
+                console.log(`Processing ${templates.length} recurring transactions...`);
+
+                for (const tmpl of templates) {
+                    // 1. Create Transaction
+                    const { error: txError } = await supabase.from('transactions').insert([{
+                        description: tmpl.description,
+                        amount: tmpl.amount,
+                        type: tmpl.type,
+                        category: tmpl.category,
+                        expense_type: tmpl.expense_type,
+                        date: new Date().toISOString(), // Created today
+                        profile_id: user.id
+                    }]);
+
+                    if (!txError) {
+                        // 2. Update Next Due Date
+                        const nextDate = new Date(tmpl.next_due_date);
+                        // Simple monthly logic
+                        if (tmpl.frequency === 'monthly') {
+                            nextDate.setMonth(nextDate.getMonth() + 1);
+                        } else if (tmpl.frequency === 'weekly') {
+                            nextDate.setDate(nextDate.getDate() + 7);
+                        }
+
+                        await supabase.from('recurring_templates').update({
+                            last_generated_date: new Date().toISOString(),
+                            next_due_date: nextDate.toISOString()
+                        }).eq('id', tmpl.id);
+                    }
+                }
+                // Refresh data after processing
+                fetchFinancialData();
+            }
+        } catch (error) {
+            console.error('Error processing recurring:', error);
+        }
+    };
 
     const fetchFinancialData = async () => {
         try {

@@ -29,7 +29,20 @@ export function UpgradeModal({ isOpen, onClose }) {
             onClose();
         } catch (error) {
             console.error('Erro no checkout:', error);
-            addToast('Erro ao iniciar pagamento. Tente novamente.', 'error');
+
+            let msg = 'Erro ao iniciar pagamento.';
+            if (error && error.context && typeof error.context.json === 'function') {
+                try {
+                    const body = await error.context.json();
+                    if (body && body.error) {
+                        msg = `Erro do Servidor: ${body.error}`;
+                    }
+                } catch (e) {
+                    console.error('Erro ao ler corpo do erro:', e);
+                }
+            }
+
+            addToast(msg, 'error');
         } finally {
             setLoading(false);
         }

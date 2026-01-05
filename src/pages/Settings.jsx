@@ -43,7 +43,7 @@ export default function Settings() {
                 <p>Gerencie sua conta e preferências</p>
             </header>
 
-            <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))' }}>
+            <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
 
                 {/* Profile Settings */}
                 <Card className="glass-card fade-in stagger-1">

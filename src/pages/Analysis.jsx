@@ -101,7 +101,7 @@ export default function Analysis() {
                 </div>
 
                 {/* Month Selector */}
-                <div className="glass-panel" style={{ display: 'flex', alignItems: 'center', padding: '0.5rem', borderRadius: '12px', gap: '1rem' }}>
+                <div className="glass-panel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', borderRadius: '12px', gap: '1rem', margin: '0 0' /* Changed from 0 auto if needed or let flex handle it */, flex: 1, maxWidth: '400px' }}>
                     <button
                         onClick={() => changeMonth(-1)}
                         className="btn-ghost"

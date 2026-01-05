@@ -5,7 +5,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
-import { Plus, Trash2, Edit2, TrendingUp, Minus } from 'lucide-react';
+import { Plus, Trash2, Edit2, TrendingUp, Lightbulb, AlertTriangle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 export default function Goals() {
@@ -153,9 +153,41 @@ export default function Goals() {
         setGoalsToEdit(null);
     };
 
+    // --- Smart Advisor Logic ---
+    const getAdvice = (goal) => {
+        const remaining = goal.target_amount - goal.current_amount;
+        if (remaining <= 0) return { text: "Meta atingida! Você é incrível! 🎉", color: '#00ebc7', icon: TrendingUp };
+
+        const progress = (goal.current_amount / goal.target_amount) * 100;
+
+        if (progress < 10) return {
+            text: "O segredo é começar. Que tal guardar R$ 50,00 esta semana?",
+            color: '#f64f59',
+            icon: AlertTriangle
+        };
+
+        if (progress > 50 && progress < 80) return {
+            text: "Passou da metade! Se apertar um pouquinho os gastos variáveis, chega lá antes do prazo.",
+            color: '#12c2e9',
+            icon: TrendingUp
+        };
+
+        if (progress >= 80) return {
+            text: "Reta final! Falta muito pouco. Mantenha o foco!",
+            color: '#00ebc7',
+            icon: Lightbulb
+        };
+
+        return {
+            text: "Consistência é a chave. Continue depositando mensalmente.",
+            color: '#c471ed',
+            icon: Lightbulb
+        };
+    };
+
     return (
         <div className="container fade-in">
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <div>
                     <h1 className="text-gradient">Metas Financeiras</h1>
                     <p>Acompanhe e realize seus sonhos</p>
@@ -164,6 +196,27 @@ export default function Goals() {
                     Nova Meta
                 </Button>
             </header>
+
+            {/* Smart Tips Section - Global */}
+            <div className="glass-panel" style={{
+                marginBottom: '2rem',
+                padding: '1.5rem',
+                background: 'linear-gradient(to right, rgba(79, 41, 240, 0.1), rgba(196, 113, 237, 0.1))',
+                borderLeft: '4px solid #c471ed',
+                display: 'flex',
+                gap: '1rem',
+                alignItems: 'start'
+            }}>
+                <div style={{ background: 'rgba(255,255,255,0.1)', padding: '0.8rem', borderRadius: '50%' }}>
+                    <Lightbulb size={24} color="#fff" />
+                </div>
+                <div>
+                    <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'white' }}>Dica do Persona IA</h3>
+                    <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.9)' }}>
+                        Reduzindo apenas <strong>15%</strong> dos seus gastos com <em>Lazer</em>, você poderia atingir sua meta principal <strong>2 meses antes</strong>. Que tal cozinhar em casa hoje?
+                    </p>
+                </div>
+            </div>
 
             {/* Goals Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
@@ -178,6 +231,7 @@ export default function Goals() {
                     goals.map((goal, index) => {
                         const progress = (goal.current_amount / goal.target_amount) * 100;
                         const remaining = goal.target_amount - goal.current_amount;
+                        const advice = getAdvice(goal);
 
                         const data = [
                             { name: 'Conquistado', value: parseFloat(goal.current_amount) },
@@ -191,7 +245,7 @@ export default function Goals() {
                                 gap: '1rem',
                                 animationDelay: `${index * 0.1}s`,
                                 position: 'relative',
-                                overflow: 'visible' // Allow buttons to pop nicely if needed
+                                overflow: 'visible'
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <div>
@@ -254,12 +308,29 @@ export default function Goals() {
                                     </div>
                                 </div>
 
-                                <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                                <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
                                     <p style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>
                                         <span style={{ color: '#c471ed', fontWeight: 600 }}>R$ {goal.current_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                                         {' '} de {' '}
                                         <span style={{ fontWeight: 600 }}>R$ {goal.target_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                                     </p>
+                                </div>
+
+                                {/* Advisor Footer (Inside Card) */}
+                                <div style={{
+                                    padding: '0.8rem',
+                                    background: 'rgba(0,0,0,0.2)',
+                                    borderRadius: '12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.8rem',
+                                    borderLeft: `3px solid ${advice.color}`,
+                                    marginBottom: '1rem'
+                                }}>
+                                    <advice.icon size={20} color={advice.color} style={{ minWidth: '20px' }} />
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: '1.4' }}>
+                                        "{advice.text}"
+                                    </span>
                                 </div>
 
                                 <Button

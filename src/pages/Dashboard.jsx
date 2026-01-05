@@ -13,6 +13,7 @@ export default function Dashboard() {
     const [expenses, setExpenses] = useState(0);
     const [savings, setSavings] = useState(0);
     const [recentTransactions, setRecentTransactions] = useState([]);
+    const [wallets, setWallets] = useState([]);
     const [primaryGoal, setPrimaryGoal] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -120,6 +121,27 @@ export default function Dashboard() {
                 primaryGoal = goalsData.find(g => g.is_primary) || null;
             }
 
+            // Fetch Wallets
+            const { data: walletsData } = await supabase
+                .from('wallets')
+                .select('*')
+                .eq('profile_id', user.id);
+
+            let walletsWithBalance = [];
+            if (walletsData) {
+                walletsWithBalance = walletsData.map(w => {
+                    const walletTxs = data.filter(tx => tx.wallet_id === w.id);
+                    // If transactions don't have wallet_id (legacy), we shouldn't assume they belong to a specific wallet 
+                    // unless we want a default. For now, strict matching.
+                    const income = walletTxs.filter(t => t.type === 'income').reduce((acc, t) => acc + parseFloat(t.amount), 0);
+                    const expense = walletTxs.filter(t => t.type === 'expense').reduce((acc, t) => acc + parseFloat(t.amount), 0);
+                    return {
+                        ...w,
+                        current_balance: (parseFloat(w.initial_balance) || 0) + income - expense
+                    };
+                });
+            }
+
             setBalance(totalIncome - totalExpense);
             setExpenses(monthlyExpense);
             setSavings(totalSavings);
@@ -127,6 +149,7 @@ export default function Dashboard() {
             // or just use totalSavings for now as the base requirement.
             // Let's add a state for it to use in the UI.
             setPrimaryGoal(primaryGoal);
+            setWallets(walletsWithBalance);
 
             // Set the first 5 for the recent list
             setRecentTransactions(data.slice(0, 5));
@@ -216,6 +239,25 @@ export default function Dashboard() {
                         </p>
                     </Card>
                 </Link>
+
+                {/* Display Wallets */}
+                {wallets.map((w, index) => (
+                    <Card key={w.id} className="stagger-4 card-min-width" hover style={{ height: '100%', minWidth: '260px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                            <div style={{ padding: '0.8rem', background: `${w.color}20`, borderRadius: '14px', color: w.color }}>
+                                <Wallet size={28} />
+                            </div>
+                            <div>
+                                <h3 style={{ fontSize: '1.1rem' }}>{w.name}</h3>
+                                <p style={{ fontSize: '0.8rem', opacity: 0.7, textTransform: 'capitalize' }}>{w.type?.replace('_', ' ') || 'Carteira'}</p>
+                            </div>
+                        </div>
+                        <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>
+                            {loading ? <Skeleton width="160px" height="50px" /> : `R$ ${w.current_balance.toFixed(2).replace('.', ',')}`}
+                        </h2>
+                        <p style={{ color: w.color, fontWeight: 500, fontSize: '0.9rem' }}>Saldo Atual</p>
+                    </Card>
+                ))}
             </div>
 
             <div className="fade-in" style={{ animationDelay: '0.4s' }}>

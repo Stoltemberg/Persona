@@ -245,6 +245,24 @@ p {
   line-height: 1.6;
 }
 
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem !important;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .container {
+    padding: 1rem !important;
+  }
+
+  .glass-card {
+    padding: 1rem !important;
+  }
+}
+
 /* Utilities */
 .flex-center {
   display: flex;

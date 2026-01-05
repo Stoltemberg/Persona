@@ -74,7 +74,7 @@ export default function Dashboard() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '4rem',
+                marginBottom: '2rem',
                 paddingTop: '0.5rem'
             }}>
                 <div>

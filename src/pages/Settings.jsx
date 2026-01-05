@@ -2,7 +2,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../context/ThemeContext';
 import { User, Bell, Shield, Wallet, Moon, Sun, Monitor } from 'lucide-react';

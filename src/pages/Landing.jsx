@@ -58,23 +58,32 @@ export default function Landing() {
                     </Link>
                 </div>
 
-                {/* Dashboard Preview (Abstract) */}
+                {/* Dashboard Preview */}
                 <div className="fade-in stagger-5" style={{
                     marginTop: '4rem',
                     width: '100%',
                     maxWidth: '1000px',
-                    aspectRatio: '16/9',
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01))',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid var(--glass-border)',
-                    borderRadius: '24px',
-                    boxShadow: '0 20px 50px -10px rgba(0,0,0,0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--text-muted)'
+                    position: 'relative',
+                    perspective: '1000px'
                 }}>
-                    (Imagem do Dashboard aqui)
+                    <div style={{
+                        borderRadius: '24px',
+                        overflow: 'hidden',
+                        boxShadow: '0 50px 100px -20px rgba(0,0,0,0.5)',
+                        border: '1px solid var(--glass-border)',
+                        transform: 'rotateX(5deg)',
+                        transition: 'transform 0.5s ease',
+                        background: 'rgba(23, 23, 23, 0.8)'
+                    }}
+                        onMouseEnter={e => e.currentTarget.style.transform = 'rotateX(0deg) scale(1.02)'}
+                        onMouseLeave={e => e.currentTarget.style.transform = 'rotateX(5deg)'}
+                    >
+                        <img
+                            src="/dashboard-preview.png"
+                            alt="Persona Dashboard"
+                            style={{ width: '100%', height: 'auto', display: 'block' }}
+                        />
+                    </div>
                 </div>
             </section>
 

@@ -8,6 +8,7 @@ import { Modal } from '../components/Modal';
 import { Plus, ArrowUpRight, ArrowDownLeft, Trash2, Edit2 } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
+import { EmptyState } from '../components/EmptyState';
 
 export default function Transactions() {
     const { user } = useAuth();
@@ -251,9 +252,13 @@ export default function Transactions() {
                 {loading ? (
                     <p>Carregando...</p>
                 ) : transactions.length === 0 ? (
-                    <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                        <p style={{ fontSize: '1.2rem' }}>Nenhuma transação encontrada</p>
-                    </div>
+                    <EmptyState
+                        icon={ArrowUpRight}
+                        title="Nenhuma transação ainda"
+                        description="Comece registrando seus ganhos e gastos para ver o poder do dashboard."
+                        actionText="Nova Transação"
+                        onAction={handleOpenNew}
+                    />
                 ) : (
 
                     transactions

@@ -9,6 +9,7 @@ import { Wallet, Plus, Trash2, Edit2, CreditCard, Banknote, Landmark } from 'luc
 
 import { useToast } from '../context/ToastContext';
 import { UpgradeModal } from '../components/UpgradeModal';
+import { EmptyState } from '../components/EmptyState';
 
 export default function Wallets() {
     const { user, isPro } = useAuth();
@@ -168,8 +169,14 @@ export default function Wallets() {
                     ))}
 
                     {wallets.length === 0 && (
-                        <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '3rem', opacity: 0.6 }}>
-                            <p>Nenhuma carteira encontrada. Adicione uma para começar a organizar.</p>
+                        <div style={{ gridColumn: '1/-1' }}>
+                            <EmptyState
+                                icon={Wallet}
+                                title="Nenhuma carteira encontrada"
+                                description="Adicione suas contas bancárias, dinheiro físico ou cartões para começar a controlar seu patrimônio."
+                                actionText="Criar Primeira Carteira"
+                                onAction={handleOpenNew}
+                            />
                         </div>
                     )}
                 </div>

@@ -7,6 +7,7 @@ import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { Plus, Trash2, Edit2, TrendingUp, Lightbulb, AlertTriangle, Star } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { EmptyState } from '../components/EmptyState';
 
 export default function Goals() {
     const { user } = useAuth();
@@ -272,9 +273,14 @@ export default function Goals() {
                 {loading ? (
                     <p>Carregando...</p>
                 ) : goals.length === 0 ? (
-                    <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
-                        <p style={{ fontSize: '1.1rem' }}>Sua lista de sonhos está vazia.</p>
-                        <Button style={{ marginTop: '1rem' }} onClick={handleOpenNew}>Criar primeira meta</Button>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                        <EmptyState
+                            icon={TrendingUp}
+                            title="Nenhuma meta definida"
+                            description="Transforme seus sonhos em planos. Crie uma meta e comece a poupar hoje."
+                            actionText="Criar Primeira Meta"
+                            onAction={handleOpenNew}
+                        />
                     </div>
                 ) : (
                     goals.map((goal, index) => {

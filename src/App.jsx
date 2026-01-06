@@ -12,6 +12,7 @@ import Budgets from './pages/Budgets';
 import Landing from './pages/Landing';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import NotFound from './pages/NotFound';
 import { Layout } from './components/Layout';
 
 // Protected Route Wrapper
@@ -40,6 +41,7 @@ function App() {
         <Route path="/privacy" element={<Privacy />} />
 
         <Route element={<ProtectedRoute />}>
+          {/* ... existing routes ... */}
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/transactions" element={<Transactions />} />
@@ -53,7 +55,7 @@ function App() {
         </Route>
 
         {/* Catch all redirect */}
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

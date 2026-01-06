@@ -6,6 +6,7 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { Plus, ArrowUpRight, ArrowDownLeft, Trash2, Edit2 } from 'lucide-react';
+import { Skeleton } from '../components/Skeleton';
 
 import { useToast } from '../context/ToastContext';
 import { EmptyState } from '../components/EmptyState';
@@ -250,7 +251,9 @@ export default function Transactions() {
             {/* Transaction List */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {loading ? (
-                    <p>Carregando...</p>
+                    Array(5).fill(0).map((_, i) => (
+                        <Skeleton key={i} width="100%" height="72px" borderRadius="16px" />
+                    ))
                 ) : transactions.length === 0 ? (
                     <EmptyState
                         icon={ArrowUpRight}

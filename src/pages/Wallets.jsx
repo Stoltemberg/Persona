@@ -5,6 +5,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
+import { Skeleton } from '../components/Skeleton';
 import { Wallet, Plus, Trash2, Edit2, CreditCard, Banknote, Landmark } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
@@ -139,7 +140,13 @@ export default function Wallets() {
                 </Button>
             </header>
 
-            {loading ? <p>Carregando...</p> : (
+            {loading ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                    {Array(3).fill(0).map((_, i) => (
+                        <Skeleton key={i} width="100%" height="200px" borderRadius="24px" />
+                    ))}
+                </div>
+            ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
                     {wallets.map((wallet, index) => (
                         <Card key={wallet.id} className="fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
@@ -180,7 +187,8 @@ export default function Wallets() {
                         </div>
                     )}
                 </div>
-            )}
+            )
+            }
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={walletToEdit ? "Editar Carteira" : "Nova Carteira"}>
                 <form onSubmit={handleSaveWallet}>
@@ -244,6 +252,6 @@ export default function Wallets() {
             </Modal>
 
             <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
-        </div>
+        </div >
     );
 }

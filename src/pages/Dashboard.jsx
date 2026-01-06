@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import { OnboardingTour } from '../components/OnboardingTour';
 import { Skeleton } from '../components/Skeleton';
 import { LogOut, Wallet, TrendingUp, PiggyBank, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -163,7 +164,8 @@ export default function Dashboard() {
 
     return (
         <div className="container fade-in">
-            <header style={{
+            <OnboardingTour />
+            <header id="tour-welcome" style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -206,7 +208,7 @@ export default function Dashboard() {
                 </Link>
 
                 <Link to="/goals" style={{ textDecoration: 'none', color: 'inherit' }} className="card-min-width">
-                    <Card className="stagger-3" hover style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <Card id="tour-goals" className="stagger-3" hover style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                                 <div style={{ padding: '0.8rem', background: 'rgba(196, 113, 237, 0.15)', borderRadius: '14px', color: '#c471ed' }}>
@@ -241,78 +243,80 @@ export default function Dashboard() {
                 </Link>
 
                 {/* Display Wallets */}
-                {wallets.map((w, index) => (
-                    <Card key={w.id} className="stagger-4 card-min-width" hover style={{ height: '100%', minWidth: '260px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                            <div style={{ padding: '0.8rem', background: `${w.color}20`, borderRadius: '14px', color: w.color }}>
-                                <Wallet size={28} />
+                <div id="tour-wallets" style={{ display: 'contents' }}>
+                    {wallets.map((w, index) => (
+                        <Card key={w.id} className="stagger-4 card-min-width" hover style={{ height: '100%', minWidth: '260px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                                <div style={{ padding: '0.8rem', background: `${w.color}20`, borderRadius: '14px', color: w.color }}>
+                                    <Wallet size={28} />
+                                </div>
+                                <div>
+                                    <h3 style={{ fontSize: '1.1rem' }}>{w.name}</h3>
+                                    <p style={{ fontSize: '0.8rem', opacity: 0.7, textTransform: 'capitalize' }}>{w.type?.replace('_', ' ') || 'Carteira'}</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 style={{ fontSize: '1.1rem' }}>{w.name}</h3>
-                                <p style={{ fontSize: '0.8rem', opacity: 0.7, textTransform: 'capitalize' }}>{w.type?.replace('_', ' ') || 'Carteira'}</p>
-                            </div>
-                        </div>
-                        <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>
-                            {loading ? <Skeleton width="160px" height="50px" /> : `R$ ${w.current_balance.toFixed(2).replace('.', ',')}`}
-                        </h2>
-                        <p style={{ color: w.color, fontWeight: 500, fontSize: '0.9rem' }}>Saldo Atual</p>
-                    </Card>
-                ))}
-            </div>
-
-            <div className="fade-in" style={{ animationDelay: '0.4s' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                    <h2 style={{ fontSize: '2rem' }}>Transações Recentes</h2>
-                    <Link to="/transactions">
-                        <Button variant="ghost">Ver Todas</Button>
-                    </Link>
+                            <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>
+                                {loading ? <Skeleton width="160px" height="50px" /> : `R$ ${w.current_balance.toFixed(2).replace('.', ',')}`}
+                            </h2>
+                            <p style={{ color: w.color, fontWeight: 500, fontSize: '0.9rem' }}>Saldo Atual</p>
+                        </Card>
+                    ))}
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {loading ? (
-                        Array(3).fill(0).map((_, i) => (
-                            <Skeleton key={i} width="100%" height="80px" borderRadius="20px" />
-                        ))
-                    ) : recentTransactions.length === 0 ? (
-                        <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                            <p style={{ fontSize: '1.1rem' }}>Nenhuma transação encontrada</p>
-                            <Button style={{ marginTop: '1rem' }} onClick={() => window.location.href = '/transactions'}>
-                                Adicionar primeira
-                            </Button>
-                        </div>
-                    ) : (
-                        recentTransactions.map((tx, index) => (
-                            <Card key={tx.id} hover className="fade-in transaction-card" style={{
-                                animationDelay: `${0.1 * index}s`,
-                                padding: '0.75rem 1rem'
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                                    <div style={{
-                                        padding: '1rem',
-                                        borderRadius: '50%',
-                                        background: tx.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
-                                        color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
-                                        display: 'flex'
-                                    }}>
-                                        {tx.type === 'income' ? <ArrowDownLeft size={24} /> : <ArrowUpRight size={24} />}
+                <div className="fade-in" style={{ animationDelay: '0.4s' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                        <h2 style={{ fontSize: '2rem' }}>Transações Recentes</h2>
+                        <Link to="/transactions">
+                            <Button variant="ghost">Ver Todas</Button>
+                        </Link>
+                    </div>
+
+                    <div id="tour-transactions" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {loading ? (
+                            Array(3).fill(0).map((_, i) => (
+                                <Skeleton key={i} width="100%" height="80px" borderRadius="20px" />
+                            ))
+                        ) : recentTransactions.length === 0 ? (
+                            <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                                <p style={{ fontSize: '1.1rem' }}>Nenhuma transação encontrada</p>
+                                <Button style={{ marginTop: '1rem' }} onClick={() => window.location.href = '/transactions'}>
+                                    Adicionar primeira
+                                </Button>
+                            </div>
+                        ) : (
+                            recentTransactions.map((tx, index) => (
+                                <Card key={tx.id} hover className="fade-in transaction-card" style={{
+                                    animationDelay: `${0.1 * index}s`,
+                                    padding: '0.75rem 1rem'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                        <div style={{
+                                            padding: '1rem',
+                                            borderRadius: '50%',
+                                            background: tx.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
+                                            color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
+                                            display: 'flex'
+                                        }}>
+                                            {tx.type === 'income' ? <ArrowDownLeft size={24} /> : <ArrowUpRight size={24} />}
+                                        </div>
+                                        <div>
+                                            <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>{tx.description}</h4>
+                                            <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>{tx.description}</h4>
-                                        <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <h3 style={{
+                                            color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
+                                            fontWeight: 700,
+                                            fontSize: '1.25rem'
+                                        }}>
+                                            {tx.type === 'income' ? '+ ' : '- '}R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
+                                        </h3>
                                     </div>
-                                </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <h3 style={{
-                                        color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
-                                        fontWeight: 700,
-                                        fontSize: '1.25rem'
-                                    }}>
-                                        {tx.type === 'income' ? '+ ' : '- '}R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
-                                    </h3>
-                                </div>
-                            </Card>
-                        ))
-                    )}
+                                </Card>
+                            ))
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

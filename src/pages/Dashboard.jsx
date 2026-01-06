@@ -5,6 +5,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { OnboardingTour } from '../components/OnboardingTour';
 import { Skeleton } from '../components/Skeleton';
+import { InsightsCard } from '../components/InsightsCard';
 import { LogOut, Wallet, TrendingUp, PiggyBank, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -14,6 +15,7 @@ export default function Dashboard() {
     const [expenses, setExpenses] = useState(0);
     const [savings, setSavings] = useState(0);
     const [recentTransactions, setRecentTransactions] = useState([]);
+    const [allTransactions, setAllTransactions] = useState([]); // For Insights
     const [wallets, setWallets] = useState([]);
     const [primaryGoal, setPrimaryGoal] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -152,8 +154,12 @@ export default function Dashboard() {
             setPrimaryGoal(primaryGoal);
             setWallets(walletsWithBalance);
 
+            setPrimaryGoal(primaryGoal);
+            setWallets(walletsWithBalance);
+
             // Set the first 5 for the recent list
             setRecentTransactions(data.slice(0, 5));
+            setAllTransactions(data);
 
         } catch (error) {
             console.error('Error fetching financial data:', error);
@@ -177,6 +183,8 @@ export default function Dashboard() {
                     <p style={{ fontSize: '1.1rem', marginTop: '0.5rem' }}>Bem-vindo de volta, {profile?.full_name || user?.email}</p>
                 </div>
             </header>
+
+            {!loading && <InsightsCard transactions={allTransactions} />}
 
             <div className="cards-scroll-container fade-in">
                 <Card className="stagger-1 card-min-width" hover>

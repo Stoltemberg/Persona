@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 
 export default function Analysis() {
@@ -88,6 +88,37 @@ export default function Analysis() {
             { name: 'Lazer', value: totals.lifestyle, color: '#c471ed' }
         ].filter(d => d.value > 0);
     };
+
+    // --- Trend Data (Last 6 Months) ---
+    const processTrendData = () => {
+        const trend = [];
+        const today = new Date();
+
+        // Generate last 6 months keys
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            trend.push({
+                monthStr: d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''),
+                monthIndex: d.getMonth(),
+                year: d.getFullYear(),
+                income: 0,
+                expense: 0
+            });
+        }
+
+        transactions.forEach(tx => {
+            const txDate = new Date(tx.date);
+            const match = trend.find(t => t.monthIndex === txDate.getMonth() && t.year === txDate.getFullYear());
+            if (match) {
+                if (tx.type === 'income') match.income += parseFloat(tx.amount);
+                else match.expense += parseFloat(tx.amount);
+            }
+        });
+
+        return trend;
+    };
+
+    const trendData = processTrendData();
 
     const chartData = processChartData();
     const totalExpenses = chartData.reduce((acc, curr) => acc + curr.value, 0);

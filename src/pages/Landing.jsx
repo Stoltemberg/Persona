@@ -147,7 +147,8 @@ function PricingCard({ title, price, features, featured, buttonText = "Começar"
             width: '100%',
             maxWidth: '350px',
             border: featured ? '1px solid #38ef7d' : '1px solid var(--glass-border)',
-            position: 'relative'
+            position: 'relative',
+            overflow: 'visible'
         }}>
             {featured && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#38ef7d', color: '#000', padding: '0.2rem 1rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' }}>RECOMENDADO</div>}
             <h3>{title}</h3>

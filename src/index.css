@@ -744,6 +744,10 @@ p {
     grid-template-columns: repeat(3, 1fr);
     /* Force 3 columns on desktop */
     gap: 2rem;
+    margin: 0;
+    /* Reset negative margin */
+    padding: 0;
+    /* Reset mobile padding */
     margin-bottom: 4rem;
     overflow: visible;
   }

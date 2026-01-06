@@ -11,6 +11,8 @@ import { Wallet, Plus, Trash2, Edit2, CreditCard, Banknote, Landmark } from 'luc
 import { useToast } from '../context/ToastContext';
 import { UpgradeModal } from '../components/UpgradeModal';
 import { EmptyState } from '../components/EmptyState';
+import { TransferModal } from '../components/TransferModal';
+import { ArrowRightLeft } from 'lucide-react';
 
 export default function Wallets() {
     const { user, isPro } = useAuth();
@@ -27,6 +29,7 @@ export default function Wallets() {
     const [initialBalance, setInitialBalance] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [showUpgrade, setShowUpgrade] = useState(false);
+    const [isTransferOpen, setIsTransferOpen] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -135,9 +138,14 @@ export default function Wallets() {
                     <h1 className="text-gradient">Minhas Carteiras</h1>
                     <p>Gerencie suas contas bancárias e dinheiro físico</p>
                 </div>
-                <Button onClick={handleOpenNew} icon={Plus}>
-                    Nova Carteira
-                </Button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <Button onClick={() => setIsTransferOpen(true)} variant="ghost" icon={ArrowRightLeft} disabled={wallets.length < 2} title={wallets.length < 2 ? "Precisa de pelo menos 2 carteiras" : "Transferir"}>
+                        Transferir
+                    </Button>
+                    <Button onClick={handleOpenNew} icon={Plus}>
+                        Nova Carteira
+                    </Button>
+                </div>
             </header>
 
             {loading ? (
@@ -252,6 +260,12 @@ export default function Wallets() {
             </Modal>
 
             <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
-        </div >
+            <TransferModal
+                isOpen={isTransferOpen}
+                onClose={() => setIsTransferOpen(false)}
+                wallets={wallets}
+                onTransferSuccess={fetchWallets}
+            />
+        </div>
     );
 }

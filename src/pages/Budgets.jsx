@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
@@ -143,9 +144,11 @@ export default function Budgets() {
                     {categories.length === 0 ? (
                         <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '3rem', opacity: 0.6 }}>
                             <p>Nenhuma categoria de despesa encontrada.</p>
-                            <Button variant="ghost" className="btn-primary" style={{ marginTop: '1rem' }} onClick={() => window.location.href = '/categories'}>
-                                Criar Categorias
-                            </Button>
+                            <Link to="/categories">
+                                <Button variant="ghost" className="btn-primary" style={{ marginTop: '1rem' }}>
+                                    Criar Categorias
+                                </Button>
+                            </Link>
                         </div>
                     ) : (
                         categories.map((cat, index) => {
@@ -154,6 +157,13 @@ export default function Budgets() {
                             const spent = monthlySpent[cat.name] || 0;
                             const progress = limit > 0 ? (spent / limit) * 100 : 0;
                             const isOver = spent > limit && limit > 0;
+                            const isWarning = !isOver && limit > 0 && progress >= 80;
+
+                            const getBarColor = () => {
+                                if (isOver) return '#f64f59'; // Red
+                                if (isWarning) return '#F2994A'; // Orange/Yellow
+                                return cat.color;
+                            };
 
                             return (
                                 <Card key={cat.id} className="fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
@@ -183,7 +193,7 @@ export default function Budgets() {
                                     {limit > 0 && (
                                         <div style={{ marginTop: '1rem' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
-                                                <span style={{ color: isOver ? '#f64f59' : 'inherit' }}>
+                                                <span style={{ color: isOver ? '#f64f59' : (isWarning ? '#F2994A' : 'inherit'), fontWeight: isOver || isWarning ? 600 : 400 }}>
                                                     R$ {spent.toLocaleString('pt-BR')}
                                                 </span>
                                                 <span>
@@ -199,7 +209,7 @@ export default function Budgets() {
                                                 <div style={{
                                                     width: `${Math.min(progress, 100)}%`,
                                                     height: '100%',
-                                                    background: isOver ? '#f64f59' : cat.color,
+                                                    background: getBarColor(),
                                                     transition: 'width 1s ease-in-out'
                                                 }} />
                                             </div>
@@ -207,6 +217,12 @@ export default function Budgets() {
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.8rem', color: '#f64f59', fontSize: '0.85rem' }}>
                                                     <AlertCircle size={16} />
                                                     <span>Você excedeu o orçamento!</span>
+                                                </div>
+                                            )}
+                                            {isWarning && (
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.8rem', color: '#F2994A', fontSize: '0.85rem' }}>
+                                                    <AlertCircle size={16} />
+                                                    <span>Atenção: 80% do orçamento atingido.</span>
                                                 </div>
                                             )}
                                         </div>

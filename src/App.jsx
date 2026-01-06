@@ -9,6 +9,7 @@ import Analysis from './pages/Analysis';
 import Wallets from './pages/Wallets';
 import Settings from './pages/Settings';
 import Budgets from './pages/Budgets';
+import Recurring from './pages/Recurring';
 import Landing from './pages/Landing';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
@@ -47,6 +48,7 @@ function App() {
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/analysis" element={<Analysis />} />
+            <Route path="/recurring" element={<Recurring />} />
             <Route path="/budgets" element={<Budgets />} />
             <Route path="/goals" element={<Goals />} />
             <Route path="/wallets" element={<Wallets />} />

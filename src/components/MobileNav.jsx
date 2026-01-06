@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, PieChart, Wallet, Menu as MenuIcon, X, PiggyBank } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, PieChart, Wallet, Menu as MenuIcon, X, PiggyBank, Repeat } from 'lucide-react';
 import clsx from 'clsx';
 import { createPortal } from 'react-dom';
 
@@ -16,6 +16,7 @@ export function MobileNav() {
 
     const menuItems = [
         { icon: Target, label: 'Metas', path: '/goals', color: '#c471ed' },
+        { icon: Repeat, label: 'Recorrentes', path: '/recurring', color: '#00ebc7' },
         { icon: PiggyBank, label: 'Orçamentos', path: '/budgets', color: '#f64f59' },
         { icon: Wallet, label: 'Carteiras', path: '/wallets', color: '#12c2e9' },
         { icon: Settings, label: 'Config', path: '/settings', color: 'var(--text-secondary)' },

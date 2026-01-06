@@ -5,7 +5,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
-import { Plus, ArrowUpRight, ArrowDownLeft, Trash2, Edit2 } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownLeft, Trash2, Edit2, Download } from 'lucide-react';
 import { Skeleton } from '../components/Skeleton';
 
 import { useToast } from '../context/ToastContext';
@@ -189,6 +189,39 @@ export default function Transactions() {
         }
     };
 
+    const handleExport = () => {
+        if (transactions.length === 0) {
+            addToast('Sem transações para exportar.', 'error');
+            return;
+        }
+
+        const headers = ['Data', 'Descrição', 'Valor', 'Tipo', 'Categoria', 'Tipo de Gasto'];
+        const rows = transactions.map(tx => [
+            new Date(tx.date).toLocaleDateString('pt-BR'),
+            `"${tx.description.replace(/"/g, '""')}"`, // Escape quotes
+            parseFloat(tx.amount).toFixed(2).replace('.', ','),
+            tx.type === 'income' ? 'Receita' : 'Despesa',
+            tx.category,
+            tx.expense_type === 'fixed' ? 'Fixo' :
+                tx.expense_type === 'variable' ? 'Variável' :
+                    tx.expense_type === 'lifestyle' ? 'Lazer' : ''
+        ]);
+
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.join(','))
+        ].join('\n');
+
+        const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `transacoes_persona_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     // Filter categories for the modal based on current type
     const availableCategories = categories.filter(c => c.type === type);
 
@@ -197,9 +230,14 @@ export default function Transactions() {
             <header className="page-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                     <h1 className="text-gradient">Transações</h1>
-                    <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
-                        Nova Transação
-                    </Button>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        <Button onClick={handleExport} variant="ghost" icon={Download}>
+                            Exportar
+                        </Button>
+                        <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
+                            Nova Transação
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Date Filters */}

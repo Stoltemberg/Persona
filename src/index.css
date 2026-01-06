@@ -177,6 +177,10 @@ body {
   overflow: hidden;
 }
 
+.btn:active {
+  transform: scale(0.96);
+}
+
 .btn-primary {
   background: linear-gradient(135deg, var(--color-2), var(--color-1));
   color: white;
@@ -251,8 +255,9 @@ body {
 .input-field:focus {
   outline: none;
   border-color: var(--color-2);
-  background-color: var(--input-bg);
-  box-shadow: 0 0 0 3px rgba(196, 113, 237, 0.15);
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(196, 113, 237, 0.2);
+  transform: translateY(-1px);
 }
 
 /* Select specific styling */
@@ -681,6 +686,7 @@ p {
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.05);
   color: white !important;
+  transform: translateX(4px);
 }
 
 .nav-item.active {

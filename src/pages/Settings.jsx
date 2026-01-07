@@ -2,16 +2,25 @@ import { useAuth } from '../hooks/useAuth';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
+import { Switch } from '../components/Switch';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../context/ThemeContext';
-import { User, Bell, Shield, Wallet, Moon, Sun, Monitor } from 'lucide-react';
+import { User, Bell, Shield, Wallet, Moon, Sun, Monitor, Camera } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { useToast } from '../context/ToastContext';
 import { exportDataToExcel } from '../lib/exportUtils';
 import { UpgradeModal } from '../components/UpgradeModal';
 import { Lock } from 'lucide-react';
+
+const AVATAR_PRESETS = [
+    'linear-gradient(135deg, #c471ed, #f64f59)',
+    'linear-gradient(135deg, #12c2e9, #c471ed)',
+    'linear-gradient(135deg, #f64f59, #f7797d)',
+    'linear-gradient(135deg, #11998e, #38ef7d)',
+    'linear-gradient(135deg, #FFD700, #FDB931)'
+];
 
 export default function Settings() {
     const { profile, user, isPro } = useAuth();
@@ -21,6 +30,11 @@ export default function Settings() {
     const [fullName, setFullName] = useState(profile?.full_name || '');
     const [showUpgrade, setShowUpgrade] = useState(false);
     const [subscription, setSubscription] = useState(null);
+    const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_PRESETS[0]);
+    const [notifications, setNotifications] = useState({
+        budget: true,
+        weekly: false
+    });
 
     useEffect(() => {
         if (!user) return;
@@ -29,6 +43,10 @@ export default function Settings() {
             .eq('user_id', user.id)
             .maybeSingle()
             .then(({ data }) => setSubscription(data));
+
+        // Load persisted avatar if any (mock implementation)
+        const savedAvatar = localStorage.getItem('user_avatar_gradient');
+        if (savedAvatar) setSelectedAvatar(savedAvatar);
     }, [user]);
 
     const handleUpdateProfile = async (e) => {
@@ -39,6 +57,8 @@ export default function Settings() {
                 .from('profiles')
                 .update({ full_name: fullName })
                 .eq('id', user.id);
+
+            localStorage.setItem('user_avatar_gradient', selectedAvatar);
 
             if (error) throw error;
             addToast('Perfil atualizado com sucesso!', 'success');
@@ -68,8 +88,6 @@ export default function Settings() {
 
             // Fetch categories correctly as per Budgets.jsx logic if possible, or just all expense categories
             const { data: expenseCategories } = await supabase.from('categories').select('*').eq('type', 'expense');
-
-
 
             await exportDataToExcel(
                 profile?.full_name || 'Usuário',
@@ -146,23 +164,44 @@ export default function Settings() {
 
                     <form onSubmit={handleUpdateProfile}>
                         <div style={{ display: 'grid', gap: '1rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
                                 <div style={{
                                     width: '80px',
                                     height: '80px',
                                     borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #c471ed, #f64f59)',
+                                    background: selectedAvatar,
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     fontSize: '2rem',
                                     fontWeight: 700,
-                                    color: 'white'
+                                    color: 'white',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                                 }}>
                                     {profile?.full_name?.[0] || user?.email?.[0]?.toUpperCase()}
                                 </div>
-                                <div>
-                                    <Button type="button" variant="ghost" style={{ fontSize: '0.9rem' }}>Alterar Foto (Indisponível)</Button>
+                                <div style={{ flex: 1 }}>
+                                    <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem', fontWeight: 500 }}>Estilo do Avatar</p>
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                        {AVATAR_PRESETS.map((grad, i) => (
+                                            <button
+                                                key={i}
+                                                type="button"
+                                                onClick={() => setSelectedAvatar(grad)}
+                                                style={{
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    borderRadius: '50%',
+                                                    background: grad,
+                                                    border: selectedAvatar === grad ? '2px solid white' : '2px solid transparent',
+                                                    cursor: 'pointer',
+                                                    transition: 'transform 0.2s',
+                                                    transform: selectedAvatar === grad ? 'scale(1.1)' : 'scale(1)'
+                                                }}
+                                                aria-label={`Select avatar style ${i + 1}`}
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 
@@ -292,13 +331,19 @@ export default function Settings() {
                             </div>
                             <h3>Notificações</h3>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                             <span>Alertas de Orçamento</span>
-                            <input type="checkbox" defaultChecked />
+                            <Switch
+                                checked={notifications.budget}
+                                onChange={(val) => setNotifications(prev => ({ ...prev, budget: val }))}
+                            />
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span>Resumo Semanal</span>
-                            <input type="checkbox" />
+                            <Switch
+                                checked={notifications.weekly}
+                                onChange={(val) => setNotifications(prev => ({ ...prev, weekly: val }))}
+                            />
                         </div>
                     </Card>
                 </div>

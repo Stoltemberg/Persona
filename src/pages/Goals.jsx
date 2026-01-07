@@ -172,32 +172,62 @@ export default function Goals() {
     };
 
     // --- Smart Advisor Logic ---
+    // --- Gamified Advisor Logic ---
     const getAdvice = (goal) => {
         const remaining = goal.target_amount - goal.current_amount;
-        if (remaining <= 0) return { text: "Meta atingida! Você é incrível! 🎉", color: '#00ebc7', icon: TrendingUp };
+        if (remaining <= 0) return { text: "Meta atingida! Você é incrível! 🎉", color: '#00ebc7', icon: Star };
 
         const progress = (goal.current_amount / goal.target_amount) * 100;
 
-        if (progress < 10) return {
-            text: "O segredo é começar. Que tal guardar R$ 50,00 esta semana?",
-            color: '#f64f59',
-            icon: AlertTriangle
+        // Time projection (Simulated for now, can be improved with real transaction history in v2)
+        const weeklyDeposit = 100; // Placeholder average
+        const weeksLeft = Math.ceil(remaining / weeklyDeposit);
+
+        // Deadline Logic
+        if (goal.deadline) {
+            const today = new Date();
+            const deadlineDate = new Date(goal.deadline);
+            const daysLeft = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
+
+            if (daysLeft < 0) return {
+                text: "O prazo venceu, mas não desista! Continue até conseguir.",
+                color: '#f64f59',
+                icon: AlertTriangle
+            };
+
+            if (daysLeft < 30 && progress < 80) return {
+                text: "Estamos na reta final! Tente fazer um esforço extra este mês.",
+                color: '#f64f59',
+                icon: TrendingUp
+            };
+        }
+
+        if (progress < 15) return {
+            text: "O início é a parte mais difícil. Deposite R$ 50 hoje para criar tração!",
+            color: '#c471ed',
+            icon: Lightbulb
         };
 
-        if (progress > 50 && progress < 80) return {
-            text: "Passou da metade! Se apertar um pouquinho os gastos variáveis, chega lá antes do prazo.",
+        if (progress >= 15 && progress < 50) return {
+            text: `Ótimo ritmo! Faltam apenas R$ ${remaining.toLocaleString('pt-BR')} para completar.`,
             color: '#12c2e9',
             icon: TrendingUp
         };
 
+        if (progress >= 50 && progress < 80) return {
+            text: "Passou da metade! Se você mantiver o foco, chega lá rapidinho.",
+            color: '#4f29f0',
+            icon: TrendingUp
+        };
+
         if (progress >= 80) return {
-            text: "Reta final! Falta muito pouco. Mantenha o foco!",
+            text: "Quase lá! Visualize seu objetivo realizado. Falta muito pouco!",
             color: '#00ebc7',
-            icon: Lightbulb
+            icon: Star
         };
 
         return {
-            text: "Consistência é a chave. Continue depositando mensalmente.",
+            text: "Consistência é a chave. Continue assim.",
             color: '#c471ed',
             icon: Lightbulb
         };

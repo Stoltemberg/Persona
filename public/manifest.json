@@ -1,0 +1,16 @@
+{
+    "name": "Persona",
+    "short_name": "Persona",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#0f0f13",
+    "theme_color": "#c471ed",
+    "description": "Seu gerenciador financeiro pessoal",
+    "icons": [
+        {
+            "src": "/vite.svg",
+            "type": "image/svg+xml",
+            "sizes": "512x512"
+        }
+    ]
+}

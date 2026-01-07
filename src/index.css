@@ -777,6 +777,17 @@ p {
 .nav-item.active {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  /* Default for dark modes */
+}
+
+/* Light/Clean Mode Active State */
+.light .nav-item.active,
+.full-white .nav-item.active {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--color-2) !important;
+  /* Use primary color for active text in light mode */
 }
 
 /* Skeleton Loading */

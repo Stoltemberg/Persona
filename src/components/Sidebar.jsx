@@ -52,7 +52,6 @@ export function Sidebar() {
                                     <item.icon size={22} />
                                 </div>
                                 <span style={{
-                                    color: isActive ? 'white' : 'inherit',
                                     fontWeight: isActive ? 600 : 500
                                 }}>
                                     {item.label}

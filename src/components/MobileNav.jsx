@@ -50,7 +50,7 @@ export function MobileNav() {
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="mobile-nav-item"
-                    style={{ color: isMenuOpen ? 'white' : 'var(--text-muted)' }}
+                    style={{ color: isMenuOpen ? 'var(--color-2)' : 'var(--text-muted)' }}
                 >
                     {isMenuOpen ? <X size={26} /> : <MenuIcon size={26} />}
                 </button>

@@ -51,24 +51,69 @@ export function InsightsCard({ transactions }) {
 
         // 2. High Category
         const catMap = {};
+        const catDetails = {}; // Store expense types for analysis
+
         thisMonthTx.filter(t => t.type === 'expense').forEach(t => {
-            if (!catMap[t.category]) catMap[t.category] = 0;
-            catMap[t.category] += parseFloat(t.amount);
+            if (!catMap[t.category]) {
+                catMap[t.category] = 0;
+                catDetails[t.category] = { fixed: 0, variable: 0, total: 0 };
+            }
+            const amount = parseFloat(t.amount);
+            catMap[t.category] += amount;
+            catDetails[t.category].total += amount;
+
+            // Count expense types
+            if (t.expense_type === 'fixed') catDetails[t.category].fixed += amount;
+            else catDetails[t.category].variable += amount; // Treat null/lifestyle as variable for this purpose
         });
 
         const sortedCats = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
-        if (sortedCats.length > 0) {
-            const topCat = sortedCats[0];
-            const total = thisMonthExpense;
-            const catPct = (topCat[1] / total) * 100;
 
-            if (catPct > 40) {
+        // Find the first "cuttable" category
+        // We look for a category that is NOT predominantly fixed (> 80% fixed)
+        // and represents a meaningful chunk of expenses (> 10%)
+        let targetCategory = null;
+        const totalExpenses = thisMonthExpense;
+
+        for (const [catName, catTotal] of sortedCats) {
+            const details = catDetails[catName];
+            const fixedRatio = details.fixed / details.total;
+            const expenseShare = catTotal / totalExpenses;
+
+            // Debug log just in case (removed for prod)
+            // console.log(`${catName}: Fixed ${fixedRatio.toFixed(2)}, Share ${expenseShare.toFixed(2)}`);
+
+            // Criteria:
+            // 1. Not > 80% fixed costs
+            // 2. Represents at least 15% of total expenses (don't nitpick small stuff)
+            if (fixedRatio < 0.8 && expenseShare > 0.15) {
+                targetCategory = { name: catName, total: catTotal, pct: expenseShare * 100 };
+                break;
+            }
+        }
+
+        if (targetCategory) {
+            return {
+                type: 'info',
+                icon: Lightbulb,
+                color: '#c471ed',
+                title: 'Dica de Orçamento',
+                message: `"${targetCategory.name}" e seus gastos variáveis representam ${targetCategory.pct.toFixed(0)}% das despesas. Que tal economizar aqui?`
+            };
+        } else if (sortedCats.length > 0 && thisMonthExpense > 0) {
+            // Fallback if all big categories are fixed:
+            // Check if ANY variable spending exists overall
+            const totalVariable = thisMonthTx
+                .filter(t => t.type === 'expense' && t.expense_type !== 'fixed')
+                .reduce((acc, t) => acc + parseFloat(t.amount), 0);
+
+            if (totalVariable > (thisMonthExpense * 0.2)) {
                 return {
-                    type: 'info',
-                    icon: Lightbulb,
-                    color: '#c471ed',
-                    title: 'Dica de Orçamento',
-                    message: `"${topCat[0]}" representa ${catPct.toFixed(0)}% das suas despesas este mês. Tente reduzir este valor.`
+                    type: 'neutral',
+                    icon: TrendingDown,
+                    color: '#12c2e9',
+                    title: 'Pequenos Cortes',
+                    message: 'Seus maiores gastos são fixos. Tente rever pequenos gastos variáveis do dia a dia para economizar.'
                 };
             }
         }

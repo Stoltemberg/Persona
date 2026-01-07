@@ -14,13 +14,13 @@ export function ThemeProvider({ children }) {
 
     const applyTheme = (t) => {
         const root = window.document.documentElement;
+        // Remove all theme classes first
+        root.classList.remove('dark', 'light', 'amoled', 'full-white');
 
         if (t === 'system') {
             const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            root.classList.remove('dark', 'light');
             root.classList.add(systemTheme);
         } else {
-            root.classList.remove('dark', 'light');
             root.classList.add(t);
         }
     };

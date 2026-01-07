@@ -319,7 +319,7 @@ export default function Settings() {
                             </Button>
                         </Link>
                         <Link to="/categories" style={{ textDecoration: 'none' }}>
-                            <Button variant="ghost" className="btn-ghost" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <Button variant="ghost" className="btn-ghost" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
                                 Gerenciar Categorias
                             </Button>
                         </Link>

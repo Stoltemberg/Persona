@@ -17,20 +17,13 @@ export function Sidebar() {
     ];
 
     return (
-        <aside className="glass-panel" style={{
-            width: '100%',
-            height: '92vh', /* slightly less than full height for visual balance */
-            margin: '2vh 0',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '2rem',
-        }}>
-            <div style={{ marginBottom: '3rem', paddingLeft: '0.5rem' }}>
+        <aside className="glass-panel sidebar-panel">
+            <div className="sidebar-header">
                 <h1 style={{ fontSize: '2rem' }} className="text-gradient">Persona</h1>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Professional Finance</p>
             </div>
 
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
+            <nav className="sidebar-nav">
                 {navItems.map((item) => (
                     <NavLink
                         key={item.path}
@@ -71,25 +64,10 @@ export function Sidebar() {
 
             <button
                 onClick={signOut}
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    padding: '1rem',
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#f64f59',
-                    cursor: 'pointer',
-                    marginTop: 'auto',
-                    borderRadius: '12px',
-                    transition: 'background 0.3s',
-                    fontSize: '0.95rem'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(246, 79, 89, 0.1)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                className="logout-btn"
             >
                 <LogOut size={22} />
-                <span style={{ fontWeight: 600 }}>Sair da Conta</span>
+                <span>Sair da Conta</span>
             </button>
         </aside>
     );

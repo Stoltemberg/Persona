@@ -25,42 +25,19 @@ export function MobileNav() {
     return (
         <>
             {/* Main Bottom Bar */}
-            <nav className="glass-panel" style={{
-                position: 'fixed',
-                bottom: '1.5rem',
-                left: '1.5rem',
-                right: '1.5rem',
-                zIndex: 100,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '0.8rem 1.5rem',
-                borderRadius: '24px',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                background: 'var(--glass-bg)',
-                backdropFilter: 'blur(20px)'
-            }}>
+            <nav className="mobile-bottom-bar">
                 {mainItems.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
                         onClick={() => setIsMenuOpen(false)}
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '0.3rem',
-                            textDecoration: 'none',
-                            color: 'var(--text-muted)',
-                            transition: 'all 0.3s'
-                        }}
+                        className="mobile-nav-item"
                     >
                         {({ isActive }) => (
                             <>
-                                <div style={{
+                                <div className={`mobile-nav-icon ${isActive ? 'active' : ''}`} style={{
                                     color: isActive ? 'var(--color-2)' : 'inherit',
-                                    transform: isActive ? 'translateY(-2px)' : 'none',
-                                    transition: 'all 0.3s'
+                                    transform: isActive ? 'translateY(-2px)' : 'none'
                                 }}>
                                     <item.icon size={26} strokeWidth={isActive ? 2.5 : 2} />
                                 </div>
@@ -72,16 +49,8 @@ export function MobileNav() {
                 {/* Menu Toggle */}
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '0.3rem',
-                        color: isMenuOpen ? 'white' : 'var(--text-muted)',
-                        cursor: 'pointer'
-                    }}
+                    className="mobile-nav-item"
+                    style={{ color: isMenuOpen ? 'white' : 'var(--text-muted)' }}
                 >
                     {isMenuOpen ? <X size={26} /> : <MenuIcon size={26} />}
                 </button>
@@ -89,29 +58,9 @@ export function MobileNav() {
 
             {/* Menu Overlay */}
             {isMenuOpen && createPortal(
-                <div style={{
-                    position: 'fixed',
-                    inset: 0,
-                    zIndex: 99,
-                    background: 'rgba(0,0,0,0.6)',
-                    backdropFilter: 'blur(10px)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    paddingBottom: '7rem'
-                }} onClick={() => setIsMenuOpen(false)}>
+                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)}>
                     <div
-                        className="glass-panel slide-up"
-                        style={{
-                            margin: '1.5rem',
-                            padding: '1.5rem',
-                            borderRadius: '24px',
-                            background: 'var(--glass-panel-bg)',
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(2, 1fr)',
-                            gap: '1rem',
-                            animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
-                        }}
+                        className="mobile-menu-grid"
                         onClick={e => e.stopPropagation()}
                     >
                         {menuItems.map((item) => (
@@ -119,19 +68,7 @@ export function MobileNav() {
                                 key={item.path}
                                 to={item.path}
                                 onClick={() => setIsMenuOpen(false)}
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.8rem',
-                                    textDecoration: 'none',
-                                    padding: '1.2rem',
-                                    borderRadius: '16px',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    color: 'var(--text-main)',
-                                    border: '1px solid rgba(255,255,255,0.05)'
-                                }}
+                                className="mobile-menu-item"
                             >
                                 <div style={{ color: item.color }}>
                                     <item.icon size={28} />
@@ -143,12 +80,6 @@ export function MobileNav() {
                 </div>,
                 document.body
             )}
-            <style>{`
-                @keyframes slideUp {
-                    from { transform: translateY(100%); opacity: 0; }
-                    to { transform: translateY(0); opacity: 1; }
-                }
-            `}</style>
         </>
     );
 }

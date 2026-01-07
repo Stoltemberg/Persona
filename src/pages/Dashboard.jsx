@@ -8,9 +8,11 @@ import { Skeleton } from '../components/Skeleton';
 import { InsightsCard } from '../components/InsightsCard';
 import { LogOut, Wallet, TrendingUp, PiggyBank, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { usePrivacy } from '../context/PrivacyContext';
 
 export default function Dashboard() {
     const { user, profile, signOut } = useAuth();
+    const { isPrivacyMode } = usePrivacy();
     const [balance, setBalance] = useState(0);
     const [expenses, setExpenses] = useState(0);
     const [savings, setSavings] = useState(0);
@@ -24,6 +26,11 @@ export default function Dashboard() {
         if (user) {
             checkRecurring();
             fetchFinancialData();
+
+            // Listen for global updates (e.g. from FAB)
+            const handleUpdate = () => fetchFinancialData();
+            window.addEventListener('transaction-updated', handleUpdate);
+            return () => window.removeEventListener('transaction-updated', handleUpdate);
         }
     }, [user]);
 
@@ -195,7 +202,7 @@ export default function Dashboard() {
                         <h3>Saldo Total</h3>
                     </div>
                     <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                        {loading ? <Skeleton width="200px" height="60px" /> : `R$ ${balance.toFixed(2).replace('.', ',')}`}
+                        {loading ? <Skeleton width="200px" height="60px" /> : (isPrivacyMode ? '****' : `R$ ${balance.toFixed(2).replace('.', ',')}`)}
                     </h2>
                     <p style={{ color: '#12c2e9', fontWeight: 500 }}>Atualizado agora</p>
                 </Card>
@@ -209,7 +216,7 @@ export default function Dashboard() {
                             <h3>Despesas (Mês)</h3>
                         </div>
                         <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                            {loading ? <Skeleton width="180px" height="60px" /> : `R$ ${expenses.toFixed(2).replace('.', ',')}`}
+                            {loading ? <Skeleton width="180px" height="60px" /> : (isPrivacyMode ? '****' : `R$ ${expenses.toFixed(2).replace('.', ',')}`)}
                         </h2>
                         <p style={{ color: '#f64f59', fontWeight: 500 }}>Este mês &rarr;</p>
                     </Card>
@@ -227,7 +234,7 @@ export default function Dashboard() {
                                 </h3>
                             </div>
                             <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                                {loading ? <Skeleton width="180px" height="60px" /> : `R$ ${primaryGoal ? parseFloat(primaryGoal.current_amount).toFixed(2).replace('.', ',') : savings.toFixed(2).replace('.', ',')}`}
+                                {loading ? <Skeleton width="180px" height="60px" /> : (isPrivacyMode ? '****' : `R$ ${primaryGoal ? parseFloat(primaryGoal.current_amount).toFixed(2).replace('.', ',') : savings.toFixed(2).replace('.', ',')}`)}
                             </h2>
                             {primaryGoal && (
                                 <div style={{ marginTop: '0.5rem' }}>
@@ -264,7 +271,7 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>
-                                {loading ? <Skeleton width="160px" height="50px" /> : `R$ ${w.current_balance.toFixed(2).replace('.', ',')}`}
+                                {loading ? <Skeleton width="160px" height="50px" /> : (isPrivacyMode ? '****' : `R$ ${w.current_balance.toFixed(2).replace('.', ',')}`)}
                             </h2>
                             <p style={{ color: w.color, fontWeight: 500, fontSize: '0.9rem' }}>Saldo Atual</p>
                         </Card>
@@ -320,7 +327,7 @@ export default function Dashboard() {
                                         fontWeight: 700,
                                         fontSize: '1.25rem'
                                     }}>
-                                        {tx.type === 'income' ? '+ ' : '- '}R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
+                                        {isPrivacyMode ? '****' : (tx.type === 'income' ? '+ ' : '- ') + `R$ ${parseFloat(tx.amount).toFixed(2).replace('.', ',')}`}
                                     </h3>
                                 </div>
                             </Card>

@@ -1,10 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart, Wallet, Repeat } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart, Wallet, Repeat, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { usePrivacy } from '../context/PrivacyContext';
 import clsx from 'clsx';
 
 export function Sidebar() {
     const { signOut } = useAuth();
+    const { isPrivacyMode, togglePrivacy } = usePrivacy();
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -19,7 +21,16 @@ export function Sidebar() {
     return (
         <aside className="glass-panel sidebar-panel">
             <div className="sidebar-header">
-                <h1 style={{ fontSize: '2rem' }} className="text-gradient">Persona</h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                    <h1 style={{ fontSize: '2rem', marginBottom: 0 }} className="text-gradient">Persona</h1>
+                    <button
+                        onClick={togglePrivacy}
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
+                        title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
+                    >
+                        {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                </div>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Professional Finance</p>
             </div>
 

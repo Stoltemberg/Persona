@@ -12,6 +12,7 @@ export default function Analysis() {
 
     // Date State (Native JS)
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [selectedType, setSelectedType] = useState(null);
 
     useEffect(() => {
         if (user) fetchTransactions();
@@ -83,9 +84,9 @@ export default function Analysis() {
         });
 
         return [
-            { name: 'Fixo', value: totals.fixed, color: '#f64f59' },
-            { name: 'Variável', value: totals.variable, color: '#12c2e9' },
-            { name: 'Lazer', value: totals.lifestyle, color: '#c471ed' }
+            { name: 'Fixo', value: totals.fixed, color: '#f64f59', key: 'fixed' },
+            { name: 'Variável', value: totals.variable, color: '#12c2e9', key: 'variable' },
+            { name: 'Lazer', value: totals.lifestyle, color: '#c471ed', key: 'lifestyle' }
         ].filter(d => d.value > 0);
     };
 
@@ -207,9 +208,17 @@ export default function Analysis() {
                                         outerRadius={110}
                                         paddingAngle={5}
                                         dataKey="value"
+                                        onClick={(data) => setSelectedType(prev => prev === data.key ? null : data.key)}
+                                        style={{ cursor: 'pointer' }}
                                     >
                                         {chartData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={entry.color}
+                                                stroke={selectedType === entry.key ? '#fff' : 'none'}
+                                                strokeWidth={2}
+                                                style={{ opacity: selectedType && selectedType !== entry.key ? 0.3 : 1, transition: 'all 0.3s', cursor: 'pointer' }}
+                                            />
                                         ))}
                                     </Pie>
                                     <Tooltip
@@ -267,6 +276,33 @@ export default function Analysis() {
                     )}
                 </div>
             </div>
+
+            {/* Detailed Transaction List for Selected Type */}
+            {selectedType && (
+                <div className="fade-in" style={{ marginTop: '2rem', animationDuration: '0.4s' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <h3>Detalhes: {selectedType === 'fixed' ? 'Gastos Fixos' : selectedType === 'variable' ? 'Gastos Variáveis' : 'Lazer'}</h3>
+                        <button onClick={() => setSelectedType(null)} className="btn-ghost" style={{ fontSize: '0.9rem' }}>Fechar X</button>
+                    </div>
+
+                    <div style={{ display: 'grid', gap: '1rem' }}>
+                        {monthlyData
+                            .filter(t => t.type === 'expense' && (t.expense_type === selectedType || (!t.expense_type && selectedType === 'variable')))
+                            .sort((a, b) => b.amount - a.amount)
+                            .map((tx, i) => (
+                                <Card key={tx.id} className="glass-card" style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div>
+                                        <div style={{ fontWeight: 600 }}>{tx.description}</div>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</div>
+                                    </div>
+                                    <div style={{ fontWeight: 700, color: '#f64f59' }}>
+                                        - R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
+                                    </div>
+                                </Card>
+                            ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

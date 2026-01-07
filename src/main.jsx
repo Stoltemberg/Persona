@@ -4,14 +4,16 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './hooks/useAuth'
 import { ThemeProvider } from './context/ThemeContext'
-import { ToastProvider } from './context/ToastContext'
+import { PrivacyProvider } from './context/PrivacyContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
       <ThemeProvider>
         <ToastProvider>
-          <App />
+          <PrivacyProvider>
+            <App />
+          </PrivacyProvider>
         </ToastProvider>
       </ThemeProvider>
     </AuthProvider>

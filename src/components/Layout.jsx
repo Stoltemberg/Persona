@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { MobileNav } from './MobileNav';
+import { FAB } from './FAB';
 
 export function Layout() {
     const location = useLocation();
@@ -25,6 +26,8 @@ export function Layout() {
             <div className="mobile-nav-container">
                 <MobileNav />
             </div>
+
+            <FAB />
 
         </div>
     );

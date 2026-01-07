@@ -457,6 +457,20 @@ p {
   -webkit-text-fill-color: transparent;
 }
 
+/* Fix for Full White mode where text needs to be dark */
+.full-white .text-gradient {
+  background: linear-gradient(to right, #000000, #404040);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.full-white .btn-primary {
+  color: white;
+  /* Ensure text remains white on gradient buttons if they are used, or adjust if buttons change */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

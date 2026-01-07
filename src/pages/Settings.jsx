@@ -6,7 +6,7 @@ import { Switch } from '../components/Switch';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../context/ThemeContext';
-import { User, Bell, Shield, Wallet, Moon, Sun, Monitor, Camera } from 'lucide-react';
+import { User, Bell, Shield, Wallet, Moon, Sun, Monitor, Camera, Zap, Maximize } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { useToast } from '../context/ToastContext';
@@ -233,11 +233,12 @@ export default function Settings() {
                         <h3>Aparência</h3>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                         {[
                             { id: 'light', icon: Sun, label: 'Claro' },
                             { id: 'dark', icon: Moon, label: 'Escuro' },
-                            { id: 'system', icon: Monitor, label: 'Sistema' }
+                            { id: 'amoled', icon: Zap, label: 'Amoled' },
+                            { id: 'full-white', icon: Maximize, label: 'Clean' }
                         ].map((t) => (
                             <button
                                 key={t.id}
@@ -247,11 +248,12 @@ export default function Settings() {
                                     padding: '1rem',
                                     borderRadius: '12px',
                                     border: theme === t.id ? '2px solid var(--color-2)' : '1px solid var(--glass-border)',
-                                    background: theme === t.id ? 'var(--glass-border-highlight)' : 'transparent',
+                                    background: theme === t.id ? 'var(--glass-border-highlight)' : 'rgba(255,255,255,0.03)',
                                     cursor: 'pointer',
                                     display: 'flex',
-                                    flexDirection: 'column',
+                                    flexDirection: 'row',
                                     alignItems: 'center',
+                                    justifyContent: 'center',
                                     gap: '0.5rem',
                                     color: 'var(--text-main)',
                                     transition: 'all 0.2s'

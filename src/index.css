@@ -781,13 +781,23 @@ p {
   /* Default for dark modes */
 }
 
-/* Light/Clean Mode Active State */
-.light .nav-item.active,
-.full-white .nav-item.active {
+/* Light Mode Active State */
+.light .nav-item.active {
   background: rgba(0, 0, 0, 0.05);
   border-color: rgba(0, 0, 0, 0.1);
   color: var(--color-2) !important;
-  /* Use primary color for active text in light mode */
+}
+
+/* Full White Mode Active State */
+.full-white .nav-item.active {
+  background: #f0f0f0;
+  border-color: #e0e0e0;
+  color: #000000 !important;
+  font-weight: 700;
+}
+
+.full-white .nav-item.active span {
+  color: #000000 !important;
 }
 
 /* Skeleton Loading */

@@ -600,6 +600,15 @@ p {
   .mobile-nav-container {
     display: none;
   }
+
+  .desktop-actions {
+    display: flex !important;
+  }
+}
+
+.desktop-actions {
+  display: none !important;
+  /* Hidden on mobile by default */
 }
 
 /* Mobile specific overrides */

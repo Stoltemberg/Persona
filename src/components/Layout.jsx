@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { MobileNav } from './MobileNav';
 import { FAB } from './FAB';
+import { InstallPrompt } from './InstallPrompt';
 
 export function Layout() {
     const location = useLocation();
@@ -28,6 +29,7 @@ export function Layout() {
             </div>
 
             <FAB />
+            <InstallPrompt />
 
         </div>
     );

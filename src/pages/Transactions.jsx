@@ -12,6 +12,7 @@ import { useToast } from '../context/ToastContext';
 import { EmptyState } from '../components/EmptyState';
 import { exportTransactionsToExcel } from '../lib/exportUtils';
 import { getSmartCategory } from '../utils/smartCategories';
+import { TransactionItem } from '../components/TransactionItem';
 
 export default function Transactions() {
     const { user } = useAuth();
@@ -315,30 +316,21 @@ export default function Transactions() {
                     transactions
                         .filter(tx => {
                             if (!startDate && !endDate) return true;
-                            // Adjust timezone issues by only comparing YYYY-MM-DD parts or ensuring pure date comparison
                             const txDate = new Date(tx.date);
-                            // Normalize txDate to midnight to avoid time issues impacting the inclusivity
                             txDate.setHours(0, 0, 0, 0);
 
                             let start = null;
                             let end = null;
 
                             if (startDate) {
-                                start = new Date(startDate);
-                                start.setHours(0, 0, 0, 0); // start of that day
-                                // Fix for Javascript Date parsing being UTC often - use local split if needed, 
-                                // but usually input type=date returns YYYY-MM-DD. 
-                                // Assuming local browser time consistency.
-                                // To be safe with "De:" (From), we iterate >= start
                                 const [y, m, d] = startDate.split('-');
                                 start = new Date(Number(y), Number(m) - 1, Number(d));
                             }
 
                             if (endDate) {
-                                // To be safe with "Até:" (To), we iterate <= end
                                 const [y, m, d] = endDate.split('-');
                                 end = new Date(Number(y), Number(m) - 1, Number(d));
-                                end.setHours(23, 59, 59, 999); // End of that day
+                                end.setHours(23, 59, 59, 999);
                             }
 
                             if (start && txDate < start) return false;
@@ -347,79 +339,14 @@ export default function Transactions() {
                             return true;
                         })
                         .map((tx, index) => (
-                            <Card key={tx.id} hover className="fade-in transaction-card" style={{
-                                animationDelay: `${index * 0.05}s`,
-                                padding: '0.75rem 1rem' // Override for compact view
-                            }}>
-                                <div className="transaction-left">
-                                    {/* Try to find icon for this transaction category */}
-                                    {(() => {
-                                        const cat = categories.find(c => c.name === tx.category && c.type === tx.type);
-                                        return (
-                                            <div style={{
-                                                padding: '0.6rem',
-                                                borderRadius: '50%',
-                                                background: cat ? `${cat.color}20` : (tx.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)'),
-                                                color: cat ? cat.color : (tx.type === 'income' ? '#12c2e9' : '#f64f59'),
-                                                display: 'flex', alignItems: 'center', justifyItems: 'center',
-                                                fontSize: '1rem'
-                                            }}>
-                                                {cat ? cat.icon : (tx.type === 'income' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />)}
-                                            </div>
-                                        );
-                                    })()}
-
-                                    <div>
-                                        <h4 style={{ marginBottom: '0.1rem', fontSize: '0.95rem' }}>{tx.description}</h4>
-                                        <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                                            {tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}
-                                            {tx.expense_type && (
-                                                <span style={{
-                                                    marginLeft: '0.5rem',
-                                                    padding: '0.1rem 0.4rem',
-                                                    borderRadius: '4px',
-                                                    background: 'rgba(255,255,255,0.1)',
-                                                    fontSize: '0.75rem'
-                                                }}>
-                                                    {tx.expense_type === 'fixed' && 'Fixo'}
-                                                    {tx.expense_type === 'variable' && 'Variável'}
-                                                    {tx.expense_type === 'lifestyle' && 'Lazer'}
-                                                </span>
-                                            )}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="transaction-right">
-                                    <div style={{ textAlign: 'right', marginRight: '1rem' }}>
-                                        <h3 style={{
-                                            color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
-                                            fontWeight: 600,
-                                            fontSize: '1rem'
-                                        }}>
-                                            {tx.type === 'income' ? '+ ' : '- '}R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
-                                        </h3>
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <button
-                                            onClick={() => handleOpenEdit(tx)}
-                                            className="btn-ghost"
-                                            style={{ padding: '0.6rem' }}
-                                            title="Editar"
-                                        >
-                                            <Edit2 size={16} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteTransaction(tx.id)}
-                                            className="btn-ghost"
-                                            style={{ color: '#f64f59', padding: '0.6rem' }}
-                                            title="Excluir"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </Card>
+                            <TransactionItem
+                                key={tx.id}
+                                transaction={tx}
+                                categories={categories}
+                                onEdit={handleOpenEdit}
+                                onDelete={handleDeleteTransaction}
+                                index={index}
+                            />
                         ))
                 )}
             </div>

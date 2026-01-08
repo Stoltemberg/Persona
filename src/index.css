@@ -1339,6 +1339,19 @@ p {
   filter: drop-shadow(0 0 6px currentColor);
 }
 
+/* Utils for Responsive Headers */
+@media (max-width: 768px) {
+  .responsive-btn-text {
+    display: none;
+  }
+
+  .page-header {
+    flex-direction: row !important;
+    /* Force row on mobile if possible, or handle wrapping */
+    flex-wrap: wrap;
+  }
+}
+
 /* Premium Mobile Menu Visuals */
 @media (max-width: 768px) {
   .mobile-menu-grid {

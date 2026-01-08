@@ -161,7 +161,7 @@ export default function Recurring() {
                     <p>Gerencie seus gastos e ganhos fixos</p>
                 </div>
                 <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
-                    Nova Recorrência
+                    <span className="responsive-btn-text">Nova Recorrência</span>
                 </Button>
             </header>
 

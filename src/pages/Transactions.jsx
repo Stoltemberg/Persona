@@ -243,10 +243,10 @@ export default function Transactions() {
                     <h1 className="text-gradient">Transações</h1>
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         <Button onClick={handleExport} variant="ghost" icon={Download}>
-                            Exportar
+                            <span className="responsive-btn-text">Exportar</span>
                         </Button>
                         <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
-                            Nova Transação
+                            <span className="responsive-btn-text">Nova Transação</span>
                         </Button>
                     </div>
                 </div>

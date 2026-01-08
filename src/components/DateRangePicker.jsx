@@ -37,44 +37,57 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
     // Calculate position
     useEffect(() => {
         if (isOpen && containerRef.current) {
-            const rect = containerRef.current.getBoundingClientRect();
-            const isMobile = window.innerWidth < 768; // Mobile breakpoint
+            const updatePosition = () => {
+                const rect = containerRef.current.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+                const dropdownWidth = 330; // Estimated max width
+                const gap = 8;
+                const edgePadding = 10;
 
-            if (isMobile) {
-                // Centered modal style for mobile (Fixed)
-                setCoords({
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '90%',
-                    maxWidth: '350px'
-                });
-            } else {
-                // Desktop: Smart Positioning
-                const dropdownWidth = 330;
+                // Center point of the trigger button
+                const triggerCenter = rect.left + (rect.width / 2);
 
-                // Default: Align Right edge of dropdown to Right edge of trigger
-                let leftPos = rect.right - dropdownWidth;
+                // Initial Left position (centering the dropdown)
+                let leftPos = triggerCenter - (dropdownWidth / 2);
 
-                // If this pushes it off-screen to the left (negative left), align to Left edge instead
-                if (leftPos < 10) {
-                    leftPos = rect.left;
+                // Clamp logic: Ensure it doesn't cross left or right screen edges
+                // 1. Fix Left Edge
+                if (leftPos < edgePadding) {
+                    leftPos = edgePadding;
                 }
 
-                // If aligning Left pushes it off-screen to the right, clamp it
-                if (leftPos + dropdownWidth > window.innerWidth) {
-                    leftPos = window.innerWidth - dropdownWidth - 20;
+                // 2. Fix Right Edge
+                if (leftPos + dropdownWidth > viewportWidth - edgePadding) {
+                    leftPos = viewportWidth - dropdownWidth - edgePadding;
                 }
 
-                setCoords({
-                    top: rect.bottom + 8,
-                    left: leftPos,
-                    transform: 'none',
-                    width: 'auto'
-                });
-            }
+                // Mobile Specific Overrides (Optional, mainly for vertical centering)
+                // But this clamp logic usually works great for horizontal on mobile too if width is handled
+                const isMobile = window.innerWidth < 768;
+
+                if (isMobile) {
+                    setCoords({
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 'auto'
+                    });
+                } else {
+                    setCoords({
+                        top: rect.bottom + gap,
+                        left: leftPos,
+                        transform: 'none',
+                        width: 'auto'
+                    });
+                }
+            };
+
+            updatePosition();
+            window.addEventListener('resize', updatePosition);
+            return () => window.removeEventListener('resize', updatePosition);
         }
     }, [isOpen]);
+
 
     const handleDateChange = (range) => {
         onChange(range);
@@ -145,15 +158,14 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
                             transition={{ duration: 0.15 }}
                             className="glass-card"
                             style={{
-                                position: 'fixed', // Fixed to viewport
+                                position: 'fixed', // Keep fixed to avoid container overflow issues
                                 top: coords.top,
                                 left: coords.left,
-                                transform: coords.transform, // Add transform
-                                width: coords.width, // Add width
-                                maxWidth: '350px', // Ensure max width
-                                zIndex: 9999, // Super high z-index
+                                transform: coords.transform,
+                                zIndex: 9999,
                                 padding: '1rem',
-                                minWidth: 'unset', // Allow it to shrink on mobile
+                                width: '330px', // Consistent width
+                                maxWidth: '95vw', // Responsive safety
                                 boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
                                 border: '1px solid var(--glass-border)'
                             }}

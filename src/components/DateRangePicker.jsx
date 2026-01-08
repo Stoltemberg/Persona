@@ -11,6 +11,7 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
     const [coords, setCoords] = useState({ top: 0, left: 0, transform: 'none', width: 'auto' });
+    const [isMobileState, setIsMobileState] = useState(false);
 
     // Close on click outside
     useEffect(() => {
@@ -61,15 +62,14 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
                     leftPos = viewportWidth - dropdownWidth - edgePadding;
                 }
 
-                // Mobile Specific Overrides (Optional, mainly for vertical centering)
-                // But this clamp logic usually works great for horizontal on mobile too if width is handled
-                const isMobile = window.innerWidth < 768;
+                const isMobile = window.matchMedia('(max-width: 768px)').matches;
+                setIsMobileState(isMobile);
 
                 if (isMobile) {
                     setCoords({
                         top: '50%',
                         left: '50%',
-                        transform: 'translate(-50%, -50%)',
+                        transform: 'translate(-50%, -50%)', // This will be handled by motion animate
                         width: 'auto'
                     });
                 } else {
@@ -104,6 +104,20 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
         e.stopPropagation();
         onChange({ start: null, end: null });
         setIsOpen(false);
+    };
+
+    // Animation Variants
+    const desktopVariants = {
+        initial: { opacity: 0, y: 10, scale: 0.95 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, y: 10, scale: 0.95 }
+    };
+
+    // For mobile, we bake the centering translate (-50%, -50%) into x/y
+    const mobileVariants = {
+        initial: { opacity: 0, scale: 0.95, x: "-50%", y: "-45%" }, // Slight offset for entry effect
+        animate: { opacity: 1, scale: 1, x: "-50%", y: "-50%" },
+        exit: { opacity: 0, scale: 0.95, x: "-50%", y: "-45%" }
     };
 
     return (
@@ -152,16 +166,16 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
                     {isOpen && (
                         <motion.div
                             id="date-range-dropdown"
-                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            initial={isMobileState ? mobileVariants.initial : desktopVariants.initial}
+                            animate={isMobileState ? mobileVariants.animate : desktopVariants.animate}
+                            exit={isMobileState ? mobileVariants.exit : desktopVariants.exit}
                             transition={{ duration: 0.15 }}
                             className="glass-card"
                             style={{
                                 position: 'fixed', // Keep fixed to avoid container overflow issues
                                 top: coords.top,
                                 left: coords.left,
-                                transform: coords.transform,
+                                // transform is removed here because motion handles it via x/y variants
                                 zIndex: 9999,
                                 padding: '1rem',
                                 width: '330px', // Consistent width

@@ -36,24 +36,19 @@ export default function Login() {
     };
 
     return (
-        <div className="flex-center" style={{ minHeight: '100vh', padding: '1rem', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+        <div className="flex-center login-container">
 
             {/* Background Decor - Optional additional blobs if desired, but body has them */}
 
-            <div style={{ textAlign: 'center', marginBottom: '3rem', position: 'relative', zIndex: 10 }} className="fade-in">
-                <h1 style={{
-                    fontSize: '4rem',
-                    background: 'linear-gradient(135deg, #fff 0%, #c471ed 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    filter: 'drop-shadow(0 0 20px rgba(196, 113, 237, 0.3))'
-                }}>
+            <div className="login-header fade-in">
+                <h1 className="login-title">
                     Persona
                 </h1>
-                <p style={{ fontSize: '1.2rem', letterSpacing: '0.05em', color: 'rgba(255,255,255,0.8)' }}>
-                    Finanças a dois, simplificadas.
+                <p className="login-subtitle">
+                    Finanças simplificadas.
                 </p>
             </div>
+
 
             <Card style={{ width: '100%', maxWidth: '420px', padding: '2.5rem' }} className="fade-in stagger-1">
                 <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '1.75rem' }}>
@@ -110,25 +105,16 @@ export default function Login() {
                 </form>
 
                 <div style={{ textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1.5rem' }}>
-                    <p style={{ fontSize: '0.9rem' }}>
+                    <p className="text-small">
                         {isSignUp ? 'Já tem cadastro?' : "Novo por aqui?"}{' '}
                         <button
-                            className=""
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#c471ed',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                textDecoration: 'underline',
-                                marginLeft: '0.5rem',
-                                fontSize: '0.9rem'
-                            }}
+                            className="toggle-btn"
                             onClick={() => setIsSignUp(!isSignUp)}
                         >
                             {isSignUp ? 'Fazer Login' : 'Criar Conta'}
                         </button>
                     </p>
+
                 </div>
             </Card>
         </div>

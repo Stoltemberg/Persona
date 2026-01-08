@@ -126,14 +126,14 @@ export default function Analysis() {
 
     return (
         <div className="container fade-in">
-            <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <header className="flex-between mb-2 flex-wrap gap-1">
                 <div>
                     <h1 className="text-gradient">Análise Mensal</h1>
-                    <p>Resumo financeiro completo</p>
+                    <p className="text-muted">Resumo financeiro completo</p>
                 </div>
 
                 {/* Month Selector */}
-                <div className="glass-panel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0.5rem', borderRadius: '12px', gap: '1rem', margin: '0 0' /* Changed from 0 auto if needed or let flex handle it */, flex: 1, maxWidth: '400px' }}>
+                <div className="glass-panel flex-center gap-1" style={{ padding: '0.5rem', borderRadius: '12px', flex: 1, maxWidth: '400px' }}>
                     <button
                         onClick={() => changeMonth(-1)}
                         className="btn-ghost"
@@ -141,7 +141,7 @@ export default function Analysis() {
                     >
                         <ChevronLeft size={20} />
                     </button>
-                    <div style={{ fontWeight: 600, fontSize: '1.1rem', textTransform: 'capitalize', minWidth: '140px', textAlign: 'center' }}>
+                    <div className="text-center text-bold" style={{ fontSize: '1.1rem', textTransform: 'capitalize', minWidth: '140px' }}>
                         {formatMonth(currentDate)}
                     </div>
                     <button
@@ -154,34 +154,35 @@ export default function Analysis() {
                 </div>
             </header>
 
+
             {/* Summary Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
-                <Card className="glass-card stagger-1" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <div className="grid-responsive mb-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+                <Card className="glass-card stagger-1 flex-align-center gap-15" style={{ padding: '1.5rem' }}>
                     <div style={{ padding: '1rem', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '50%', color: '#12c2e9' }}>
                         <TrendingUp size={28} />
                     </div>
                     <div>
-                        <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>Entradas</p>
+                        <p className="text-muted text-small">Entradas</p>
                         <h2 style={{ color: '#12c2e9' }}>R$ {stats.income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h2>
                     </div>
                 </Card>
 
-                <Card className="glass-card stagger-2" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                <Card className="glass-card stagger-2 flex-align-center gap-15" style={{ padding: '1.5rem' }}>
                     <div style={{ padding: '1rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '50%', color: '#f64f59' }}>
                         <TrendingDown size={28} />
                     </div>
                     <div>
-                        <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>Saídas</p>
+                        <p className="text-muted text-small">Saídas</p>
                         <h2 style={{ color: '#f64f59' }}>R$ {stats.expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h2>
                     </div>
                 </Card>
 
-                <Card className="glass-card stagger-3" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                <Card className="glass-card stagger-3 flex-align-center gap-15" style={{ padding: '1.5rem' }}>
                     <div style={{ padding: '1rem', background: 'rgba(196, 113, 237, 0.15)', borderRadius: '50%', color: '#c471ed' }}>
                         <Wallet size={28} />
                     </div>
                     <div>
-                        <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>Saldo Mensal</p>
+                        <p className="text-muted text-small">Saldo Mensal</p>
                         <h2 style={{ color: balance >= 0 ? '#00ebc7' : '#f64f59' }}>
                             R$ {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </h2>
@@ -189,8 +190,9 @@ export default function Analysis() {
                 </Card>
             </div>
 
+
             {/* Charts & Breakdown */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+            <div className="grid-responsive">
 
                 {/* Chart Area */}
                 <Card className="glass-card fade-in stagger-1" style={{ minHeight: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -251,9 +253,9 @@ export default function Analysis() {
                 </Card>
 
                 {/* Breakdown List */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div className="flex-column gap-1">
                     {chartData.map((item, index) => (
-                        <Card key={item.name} className={`glass-card fade-in stagger-${index + 1}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Card key={item.name} className={`glass-card fade-in stagger-${index + 1} flex-between`}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: item.color, boxShadow: `0 0 10px ${item.color}` }} />
                                 <div>
@@ -279,23 +281,23 @@ export default function Analysis() {
 
             {/* Detailed Transaction List for Selected Type */}
             {selectedType && (
-                <div className="fade-in" style={{ marginTop: '2rem', animationDuration: '0.4s' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <div className="fade-in mt-2" style={{ animationDuration: '0.4s' }}>
+                    <div className="flex-between mb-1">
                         <h3>Detalhes: {selectedType === 'fixed' ? 'Gastos Fixos' : selectedType === 'variable' ? 'Gastos Variáveis' : 'Lazer'}</h3>
-                        <button onClick={() => setSelectedType(null)} className="btn-ghost" style={{ fontSize: '0.9rem' }}>Fechar X</button>
+                        <button onClick={() => setSelectedType(null)} className="btn-ghost text-small">Fechar X</button>
                     </div>
 
-                    <div style={{ display: 'grid', gap: '1rem' }}>
+                    <div className="grid-responsive gap-1" style={{ gridTemplateColumns: '1fr' }}>
                         {monthlyData
                             .filter(t => t.type === 'expense' && (t.expense_type === selectedType || (!t.expense_type && selectedType === 'variable')))
                             .sort((a, b) => b.amount - a.amount)
                             .map((tx, i) => (
-                                <Card key={tx.id} className="glass-card" style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Card key={tx.id} className="glass-card flex-between" style={{ padding: '1rem' }}>
                                     <div>
-                                        <div style={{ fontWeight: 600 }}>{tx.description}</div>
-                                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</div>
+                                        <div className="text-bold">{tx.description}</div>
+                                        <div className="text-muted text-small">{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</div>
                                     </div>
-                                    <div style={{ fontWeight: 700, color: '#f64f59' }}>
+                                    <div className="text-bold" style={{ color: '#f64f59' }}>
                                         - R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
                                     </div>
                                 </Card>

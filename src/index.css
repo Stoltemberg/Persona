@@ -466,9 +466,17 @@ p {
 }
 
 .full-white .btn-primary {
-  color: white;
-  /* Ensure text remains white on gradient buttons if they are used, or adjust if buttons change */
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #000000;
+  /* Force black background for contrast against white text */
+  color: #ffffff;
+  border: 1px solid transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.full-white .btn-primary:hover {
+  background: #333333;
+  /* Dark gray on hover */
+  transform: translateY(-2px);
 }
 
 /* Custom Scrollbar */
@@ -790,8 +798,8 @@ p {
 
 /* Full White Mode Active State */
 .full-white .nav-item.active {
-  background: #f0f0f0;
-  border-color: #e0e0e0;
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
   color: #000000 !important;
   font-weight: 700;
 }
@@ -800,9 +808,34 @@ p {
   color: #000000 !important;
 }
 
-/* Full White Mode Overrides */
+/* Clean Theme Generic Visibility Fixes */
+.full-white .text-muted,
+.full-white p {
+  color: #444444 !important;
+}
+
+.full-white h1,
+.full-white h2,
+.full-white h3,
+.full-white h4,
+.full-white h5,
+.full-white h6 {
+  color: #000000 !important;
+}
+
+.full-white label {
+  color: #333333 !important;
+}
+
+.full-white .glass-card,
+.full-white .glass-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
 .full-white h3 {
-  color: #333333;
+  color: #000000;
 }
 
 .full-white .btn-ghost {
@@ -1035,4 +1068,198 @@ p {
 .content-wrapper {
   max-width: 1200px;
   margin: 0 auto;
+}
+
+/* =========================================
+   Global Utility Classes (Refactoring)
+   ========================================= */
+
+/* Flexbox Utils */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-start {
+  display: flex;
+  align-items: flex-start;
+}
+
+.flex-align-center {
+  display: flex;
+  align-items: center;
+}
+
+.gap-1 {
+  gap: 1rem;
+}
+
+.gap-05 {
+  gap: 0.5rem;
+}
+
+.gap-2 {
+  gap: 2rem;
+}
+
+.mb-1 {
+  margin-bottom: 1rem;
+}
+
+.mb-15 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 2rem;
+}
+
+.mt-1 {
+  margin-top: 1rem;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+/* Text Utils */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-bold {
+  font-weight: 700;
+}
+
+.text-muted {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.text-small {
+  font-size: 0.85rem;
+}
+
+/* Grid Utils */
+.grid-responsive {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Theme Toggle Button */
+.theme-btn {
+  flex: 1;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--text-main);
+  transition: all 0.2s;
+}
+
+.theme-btn.active {
+  border: 2px solid var(--color-2);
+  background: var(--glass-border-highlight);
+}
+
+.theme-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Avatar Selection */
+.avatar-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-option {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 2px solid transparent;
+}
+
+.avatar-option.selected {
+  border-color: white;
+  transform: scale(1.1);
+}
+
+/* Login Page Styles */
+.login-container {
+  min-height: 100vh;
+  padding: 1rem;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 10;
+}
+
+.login-title {
+  font-size: 4rem;
+  background: linear-gradient(135deg, #fff 0%, #c471ed 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(196, 113, 237, 0.3));
+}
+
+.login-subtitle {
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: #c471ed;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
 }

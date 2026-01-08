@@ -114,7 +114,7 @@ export default function Settings() {
                 <p>Gerencie sua conta e preferências</p>
             </header>
 
-            <div style={{ display: 'grid', gap: '2rem', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+            <div className="grid-responsive">
 
                 {/* Plan Settings */}
                 <Card className="glass-card fade-in stagger-1" style={{ border: isPro ? '1px solid #38ef7d' : '1px solid var(--glass-border)' }}>
@@ -164,46 +164,27 @@ export default function Settings() {
 
                     <form onSubmit={handleUpdateProfile}>
                         <div style={{ display: 'grid', gap: '1rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                                <div style={{
-                                    width: '80px',
-                                    height: '80px',
-                                    borderRadius: '50%',
-                                    background: selectedAvatar,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '2rem',
-                                    fontWeight: 700,
-                                    color: 'white',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                                }}>
+                            <div className="flex-start gap-1">
+                                <div className="avatar-preview" style={{ background: selectedAvatar }}>
                                     {profile?.full_name?.[0] || user?.email?.[0]?.toUpperCase()}
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem', fontWeight: 500 }}>Estilo do Avatar</p>
-                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                    <p className="text-small mb-05" style={{ fontWeight: 500 }}>Estilo do Avatar</p>
+                                    <div className="flex-align-center gap-05" style={{ flexWrap: 'wrap' }}>
                                         {AVATAR_PRESETS.map((grad, i) => (
                                             <button
                                                 key={i}
                                                 type="button"
                                                 onClick={() => setSelectedAvatar(grad)}
-                                                style={{
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    borderRadius: '50%',
-                                                    background: grad,
-                                                    border: selectedAvatar === grad ? '2px solid white' : '2px solid transparent',
-                                                    cursor: 'pointer',
-                                                    transition: 'transform 0.2s',
-                                                    transform: selectedAvatar === grad ? 'scale(1.1)' : 'scale(1)'
-                                                }}
+                                                className={`avatar-option ${selectedAvatar === grad ? 'selected' : ''}`}
+                                                style={{ background: grad }}
                                                 aria-label={`Select avatar style ${i + 1}`}
                                             />
                                         ))}
                                     </div>
                                 </div>
                             </div>
+
 
                             <Input
                                 label="Nome Completo"
@@ -233,7 +214,7 @@ export default function Settings() {
                         <h3>Aparência</h3>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div className="grid-2">
                         {[
                             { id: 'light', icon: Sun, label: 'Claro' },
                             { id: 'dark', icon: Moon, label: 'Escuro' },
@@ -243,24 +224,10 @@ export default function Settings() {
                             <button
                                 key={t.id}
                                 onClick={() => changeTheme(t.id)}
-                                style={{
-                                    flex: 1,
-                                    padding: '1rem',
-                                    borderRadius: '12px',
-                                    border: theme === t.id ? '2px solid var(--color-2)' : '1px solid var(--glass-border)',
-                                    background: theme === t.id ? 'var(--glass-border-highlight)' : 'rgba(255,255,255,0.03)',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem',
-                                    color: 'var(--text-main)',
-                                    transition: 'all 0.2s'
-                                }}
+                                className={`theme-btn ${theme === t.id ? 'active' : ''}`}
                             >
                                 <t.icon size={24} />
-                                <span style={{ fontSize: '0.9rem' }}>{t.label}</span>
+                                <span className="text-small">{t.label}</span>
                             </button>
                         ))}
                     </div>
@@ -323,7 +290,7 @@ export default function Settings() {
                                 Gerenciar Categorias
                             </Button>
                         </Link>
-                        <p style={{ opacity: 0.7, fontSize: '0.85rem' }}>Organize suas contas, cartões e categorias.</p>
+                        <p className="text-muted text-small">Organize suas contas, cartões e categorias.</p>
                     </Card>
 
                     <Card className="glass-card fade-in stagger-3">

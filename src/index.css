@@ -808,6 +808,15 @@ p {
   color: #000000 !important;
 }
 
+.full-white .nav-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000000 !important;
+}
+
+.full-white .nav-item:hover span {
+  color: #000000 !important;
+}
+
 /* Clean Theme Generic Visibility Fixes */
 .full-white .text-muted,
 .full-white p {

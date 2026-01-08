@@ -11,7 +11,14 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
     const cat = categories.find(c => c.name === transaction.category && c.type === transaction.type);
 
     return (
-        <div className="fade-in" style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', marginBottom: '10px', animationDelay: `${index * 0.05}s` }}>
+        <motion.div
+            layout
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, height: 0, marginBottom: 0, scale: 0.9 }}
+            transition={{ duration: 0.2 }}
+            style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', marginBottom: '10px' }}
+        >
             {/* Background Actions Layer */}
             <motion.div
                 style={{

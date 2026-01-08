@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
@@ -313,41 +314,43 @@ export default function Transactions() {
                     />
                 ) : (
 
-                    transactions
-                        .filter(tx => {
-                            if (!startDate && !endDate) return true;
-                            const txDate = new Date(tx.date);
-                            txDate.setHours(0, 0, 0, 0);
+                    <AnimatePresence mode="popLayout">
+                        {transactions
+                            .filter(tx => {
+                                if (!startDate && !endDate) return true;
+                                const txDate = new Date(tx.date);
+                                txDate.setHours(0, 0, 0, 0);
 
-                            let start = null;
-                            let end = null;
+                                let start = null;
+                                let end = null;
 
-                            if (startDate) {
-                                const [y, m, d] = startDate.split('-');
-                                start = new Date(Number(y), Number(m) - 1, Number(d));
-                            }
+                                if (startDate) {
+                                    const [y, m, d] = startDate.split('-');
+                                    start = new Date(Number(y), Number(m) - 1, Number(d));
+                                }
 
-                            if (endDate) {
-                                const [y, m, d] = endDate.split('-');
-                                end = new Date(Number(y), Number(m) - 1, Number(d));
-                                end.setHours(23, 59, 59, 999);
-                            }
+                                if (endDate) {
+                                    const [y, m, d] = endDate.split('-');
+                                    end = new Date(Number(y), Number(m) - 1, Number(d));
+                                    end.setHours(23, 59, 59, 999);
+                                }
 
-                            if (start && txDate < start) return false;
-                            if (end && txDate > end) return false;
+                                if (start && txDate < start) return false;
+                                if (end && txDate > end) return false;
 
-                            return true;
-                        })
-                        .map((tx, index) => (
-                            <TransactionItem
-                                key={tx.id}
-                                transaction={tx}
-                                categories={categories}
-                                onEdit={handleOpenEdit}
-                                onDelete={handleDeleteTransaction}
-                                index={index}
-                            />
-                        ))
+                                return true;
+                            })
+                            .map((tx, index) => (
+                                <TransactionItem
+                                    key={tx.id}
+                                    transaction={tx}
+                                    categories={categories}
+                                    onEdit={handleOpenEdit}
+                                    onDelete={handleDeleteTransaction}
+                                    index={index}
+                                />
+                            ))}
+                    </AnimatePresence>
                 )}
             </div>
 
@@ -499,6 +502,6 @@ export default function Transactions() {
                     </Button>
                 </form>
             </Modal>
-        </div>
+        </div >
     );
 }

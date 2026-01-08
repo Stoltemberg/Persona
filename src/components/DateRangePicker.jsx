@@ -92,8 +92,8 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
                         style={{
                             position: 'absolute',
                             top: '120%',
-                            right: 0, // Align right usually better for filters on right side
-                            zIndex: 50,
+                            right: 0,
+                            zIndex: 101, // Higher than sidebar (usually 100) or mobile overlays
                             padding: '1rem',
                             minWidth: '300px',
                             boxShadow: '0 10px 40px rgba(0,0,0,0.5)'

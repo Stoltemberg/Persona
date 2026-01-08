@@ -44,15 +44,15 @@ export function Calendar({ startDate, endDate, onChange }) {
     const renderHeader = () => {
         return (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <button onClick={prevMonth} className="btn-ghost" style={{ padding: '0.4rem' }}>
+                <Button onClick={prevMonth} variant="ghost" style={{ padding: '0.4rem' }}>
                     <ChevronLeft size={20} />
-                </button>
+                </Button>
                 <div style={{ fontWeight: 600, textTransform: 'capitalize' }}>
                     {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
                 </div>
-                <button onClick={nextMonth} className="btn-ghost" style={{ padding: '0.4rem' }}>
+                <Button onClick={nextMonth} variant="ghost" style={{ padding: '0.4rem' }}>
                     <ChevronRight size={20} />
-                </button>
+                </Button>
             </div>
         );
     };

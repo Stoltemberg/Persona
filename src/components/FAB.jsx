@@ -7,7 +7,7 @@ import { useHaptic } from '../hooks/useHaptic';
 import { Modal } from './Modal';
 import { Button } from './Button';
 import { Input } from './Input';
-import { Input } from './Input';
+
 import { usePrivacy } from '../context/PrivacyContext';
 import { getSmartCategory } from '../utils/smartCategories';
 

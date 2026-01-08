@@ -357,7 +357,7 @@ export default function Goals() {
                                     </div>
                                 </div>
 
-                                <div style={{ height: '220px', width: '100%', margin: '0.5rem 0' }}>
+                                <div style={{ height: '220px', width: '100%', margin: '0.5rem 0', position: 'relative' }}>
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie

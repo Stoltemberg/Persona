@@ -14,6 +14,7 @@ import { EmptyState } from '../components/EmptyState';
 import { exportTransactionsToExcel } from '../lib/exportUtils';
 import { getSmartCategory } from '../utils/smartCategories';
 import { TransactionItem } from '../components/TransactionItem';
+import { DateRangePicker } from '../components/DateRangePicker';
 
 export default function Transactions() {
     const { user } = useAuth();
@@ -253,48 +254,32 @@ export default function Transactions() {
                 </div>
 
                 {/* Date Filters */}
+                {/* Date Filters */}
                 <div className="date-filters">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>De:</span>
-                        <input
-                            type="date"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            style={{
-                                background: 'transparent',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                color: 'var(--text-main)',
-                                padding: '0.3rem 0.5rem',
-                                borderRadius: '6px',
-                                fontSize: '0.85rem'
-                            }}
-                        />
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Até:</span>
-                        <input
-                            type="date"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            style={{
-                                background: 'transparent',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                color: 'var(--text-main)',
-                                padding: '0.3rem 0.5rem',
-                                borderRadius: '6px',
-                                fontSize: '0.85rem'
-                            }}
-                        />
-                    </div>
-                    {(startDate || endDate) && (
-                        <Button
-                            variant="ghost"
-                            onClick={() => { setStartDate(''); setEndDate(''); }}
-                            style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', height: 'auto', minHeight: 'unset' }}
-                        >
-                            Limpar
-                        </Button>
-                    )}
+                    <DateRangePicker
+                        startDate={startDate ? new Date(startDate.split('-')[0], startDate.split('-')[1] - 1, startDate.split('-')[2]) : null}
+                        endDate={endDate ? new Date(endDate.split('-')[0], endDate.split('-')[1] - 1, endDate.split('-')[2]) : null}
+                        onChange={({ start, end }) => {
+                            if (start) {
+                                // Formatting to YYYY-MM-DD manually to avoid timezone issues or use format from date-fns
+                                const y = start.getFullYear();
+                                const m = String(start.getMonth() + 1).padStart(2, '0');
+                                const d = String(start.getDate()).padStart(2, '0');
+                                setStartDate(`${y}-${m}-${d}`);
+                            } else {
+                                setStartDate('');
+                            }
+
+                            if (end) {
+                                const y = end.getFullYear();
+                                const m = String(end.getMonth() + 1).padStart(2, '0');
+                                const d = String(end.getDate()).padStart(2, '0');
+                                setEndDate(`${y}-${m}-${d}`);
+                            } else {
+                                setEndDate('');
+                            }
+                        }}
+                    />
                 </div>
             </header>
 

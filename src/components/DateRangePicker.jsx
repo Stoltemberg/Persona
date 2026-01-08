@@ -10,7 +10,7 @@ import { Button } from './Button';
 export function DateRangePicker({ startDate, endDate, onChange }) {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
-    const [coords, setCoords] = useState({ top: 0, left: 0 });
+    const [coords, setCoords] = useState({ top: 0, left: 0, transform: 'none', width: 'auto' });
 
     // Close on click outside
     useEffect(() => {
@@ -118,12 +118,14 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
                             transition={{ duration: 0.15 }}
                             className="glass-card"
                             style={{
-                                position: 'absolute',
                                 top: coords.top,
                                 left: coords.left,
+                                transform: coords.transform, // Add transform
+                                width: coords.width, // Add width
+                                maxWidth: '350px', // Ensure max width
                                 zIndex: 9999, // Super high z-index
                                 padding: '1rem',
-                                minWidth: '330px',
+                                minWidth: 'unset', // Allow it to shrink on mobile
                                 boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
                                 border: '1px solid var(--glass-border)'
                             }}

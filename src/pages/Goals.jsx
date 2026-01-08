@@ -340,20 +340,20 @@ export default function Goals() {
                                         )}
                                     </div>
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <button onClick={() => handleOpenEdit(goal)} className="btn-ghost" style={{ padding: '0.5rem' }} title="Editar">
+                                        <Button onClick={() => handleOpenEdit(goal)} variant="ghost" style={{ padding: '0.5rem' }} title="Editar">
                                             <Edit2 size={18} />
-                                        </button>
-                                        <button
+                                        </Button>
+                                        <Button
                                             onClick={() => handleSetPrimary(goal.id)}
-                                            className="btn-ghost"
+                                            variant="ghost"
                                             style={{ padding: '0.5rem', color: goal.is_primary ? '#c471ed' : 'var(--text-muted)' }}
                                             title={goal.is_primary ? "Principal" : "Definir como Principal"}
                                         >
                                             <Star size={18} fill={goal.is_primary ? '#c471ed' : 'none'} />
-                                        </button>
-                                        <button onClick={() => handleDeleteGoal(goal.id)} className="btn-ghost" style={{ padding: '0.5rem', color: '#f64f59' }} title="Excluir">
+                                        </Button>
+                                        <Button onClick={() => handleDeleteGoal(goal.id)} variant="ghost" style={{ padding: '0.5rem', color: '#f64f59' }} title="Excluir">
                                             <Trash2 size={18} />
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
 

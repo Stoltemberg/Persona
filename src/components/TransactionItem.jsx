@@ -132,6 +132,6 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                     </div>
                 </Card>
             </motion.div>
-        </div>
+        </motion.div>
     );
 }

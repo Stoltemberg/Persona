@@ -133,21 +133,56 @@ export default function Analysis() {
                 </div>
 
                 {/* Month Selector */}
-                <div className="glass-panel flex-center gap-1" style={{ padding: '0.5rem', borderRadius: '12px', flex: 1, maxWidth: '400px' }}>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '50px', // Pill shape
+                    padding: '0.4rem 0.6rem',
+                    minWidth: '260px',
+                    backdropFilter: 'blur(10px)',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+                }}>
                     <button
                         onClick={() => changeMonth(-1)}
                         className="btn-ghost"
-                        style={{ padding: '0.5rem' }}
+                        style={{
+                            padding: '0.6rem',
+                            borderRadius: '50%',
+                            color: 'var(--text-muted)',
+                            transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--text-main)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
                     >
                         <ChevronLeft size={20} />
                     </button>
-                    <div className="text-center text-bold" style={{ fontSize: '1.1rem', textTransform: 'capitalize', minWidth: '140px' }}>
-                        {formatMonth(currentDate)}
+
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        lineHeight: 1.2
+                    }}>
+                        <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.6 }}>Mês de Referência</span>
+                        <span style={{ fontSize: '1rem', fontWeight: 700, textTransform: 'capitalize', letterSpacing: '0.02em' }}>
+                            {formatMonth(currentDate)}
+                        </span>
                     </div>
+
                     <button
                         onClick={() => changeMonth(1)}
                         className="btn-ghost"
-                        style={{ padding: '0.5rem' }}
+                        style={{
+                            padding: '0.6rem',
+                            borderRadius: '50%',
+                            color: 'var(--text-muted)',
+                            transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--text-main)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
                     >
                         <ChevronRight size={20} />
                     </button>

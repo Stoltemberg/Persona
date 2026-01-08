@@ -143,13 +143,18 @@ export default function Budgets() {
                                         <Save size={14} style={{ marginRight: '4px' }} /> Salvar
                                     </Button>
                                 ) : (
-                                    <button
+                                    <Button
                                         onClick={() => { setEditingId(cat.id); setTempLimit(limit); }}
-                                        className="btn-ghost"
-                                        style={{ fontSize: '0.8rem', padding: '0.4rem' }}
+                                        className="btn-primary"
+                                        style={{
+                                            fontSize: '0.8rem',
+                                            padding: '0.4rem 0.8rem',
+                                            background: 'rgba(255,255,255,0.1)',
+                                            border: '1px solid rgba(255,255,255,0.1)'
+                                        }}
                                     >
                                         {limit === 0 ? 'Definir Limite' : 'Editar'}
-                                    </button>
+                                    </Button>
                                 )}
                             </div>
 

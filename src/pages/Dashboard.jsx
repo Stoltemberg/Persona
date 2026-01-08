@@ -8,7 +8,9 @@ import { Skeleton } from '../components/Skeleton';
 import { InsightsCard } from '../components/InsightsCard';
 import { LogOut, Wallet, TrendingUp, PiggyBank, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { usePrivacy } from '../context/PrivacyContext';
+import { CountUp } from '../components/CountUp';
 
 export default function Dashboard() {
     const { user, profile, signOut } = useAuth();
@@ -194,7 +196,7 @@ export default function Dashboard() {
             {!loading && <InsightsCard transactions={allTransactions} />}
 
             <div className="cards-scroll-container fade-in">
-                <Card className="stagger-1 card-min-width" hover>
+                <Card className="stagger-1 card-min-width glow-on-hover" hover>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                         <div style={{ padding: '0.8rem', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '14px', color: '#12c2e9' }}>
                             <Wallet size={28} />
@@ -202,13 +204,15 @@ export default function Dashboard() {
                         <h3>Saldo Total</h3>
                     </div>
                     <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                        {loading ? <Skeleton width="200px" height="60px" /> : (isPrivacyMode ? '****' : `R$ ${balance.toFixed(2).replace('.', ',')}`)}
+                        {loading ? <Skeleton width="200px" height="60px" /> : (
+                            isPrivacyMode ? '****' : <CountUp end={balance} prefix="R$ " />
+                        )}
                     </h2>
                     <p style={{ color: '#12c2e9', fontWeight: 500 }}>Atualizado agora</p>
                 </Card>
 
                 <Link to="/analysis" style={{ textDecoration: 'none', color: 'inherit' }} className="card-min-width">
-                    <Card className="stagger-2" hover style={{ height: '100%' }}>
+                    <Card className="stagger-2 glow-on-hover" hover style={{ height: '100%' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                             <div style={{ padding: '0.8rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '14px', color: '#f64f59' }}>
                                 <TrendingUp size={28} />
@@ -216,14 +220,16 @@ export default function Dashboard() {
                             <h3>Despesas (Mês)</h3>
                         </div>
                         <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                            {loading ? <Skeleton width="180px" height="60px" /> : (isPrivacyMode ? '****' : `R$ ${expenses.toFixed(2).replace('.', ',')}`)}
+                            {loading ? <Skeleton width="180px" height="60px" /> : (
+                                isPrivacyMode ? '****' : <CountUp end={expenses} prefix="R$ " />
+                            )}
                         </h2>
                         <p style={{ color: '#f64f59', fontWeight: 500 }}>Este mês &rarr;</p>
                     </Card>
                 </Link>
 
                 <Link to="/goals" style={{ textDecoration: 'none', color: 'inherit' }} className="card-min-width">
-                    <Card id="tour-goals" className="stagger-3" hover style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <Card id="tour-goals" className="stagger-3 glow-on-hover" hover style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                         <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                                 <div style={{ padding: '0.8rem', background: 'rgba(196, 113, 237, 0.15)', borderRadius: '14px', color: '#c471ed' }}>
@@ -234,7 +240,9 @@ export default function Dashboard() {
                                 </h3>
                             </div>
                             <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                                {loading ? <Skeleton width="180px" height="60px" /> : (isPrivacyMode ? '****' : `R$ ${primaryGoal ? parseFloat(primaryGoal.current_amount).toFixed(2).replace('.', ',') : savings.toFixed(2).replace('.', ',')}`)}
+                                {loading ? <Skeleton width="180px" height="60px" /> : (
+                                    isPrivacyMode ? '****' : <CountUp end={primaryGoal ? primaryGoal.current_amount : savings} prefix="R$ " />
+                                )}
                             </h2>
                             {primaryGoal && (
                                 <div style={{ marginTop: '0.5rem' }}>
@@ -242,7 +250,8 @@ export default function Dashboard() {
                                         <div style={{
                                             width: `${Math.min((primaryGoal.current_amount / primaryGoal.target_amount) * 100, 100)}%`,
                                             height: '100%',
-                                            background: '#c471ed'
+                                            background: '#c471ed',
+                                            transition: 'width 1.5s ease-out' // Added smooth transition
                                         }} />
                                     </div>
                                     <p style={{ fontSize: '0.8rem', marginTop: '0.25rem', color: 'rgba(255,255,255,0.5)' }}>
@@ -260,7 +269,7 @@ export default function Dashboard() {
                 {/* Display Wallets */}
                 <div id="tour-wallets" style={{ display: 'contents' }}>
                     {wallets.map((w, index) => (
-                        <Card key={w.id} className="stagger-4 card-min-width" hover style={{ height: '100%', minWidth: '260px' }}>
+                        <Card key={w.id} className="stagger-4 card-min-width glow-on-hover" hover style={{ height: '100%', minWidth: '260px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                                 <div style={{ padding: '0.8rem', background: `${w.color}20`, borderRadius: '14px', color: w.color }}>
                                     <Wallet size={28} />
@@ -271,7 +280,9 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>
-                                {loading ? <Skeleton width="160px" height="50px" /> : (isPrivacyMode ? '****' : `R$ ${w.current_balance.toFixed(2).replace('.', ',')}`)}
+                                {loading ? <Skeleton width="160px" height="50px" /> : (
+                                    isPrivacyMode ? '****' : <CountUp end={w.current_balance} prefix="R$ " />
+                                )}
                             </h2>
                             <p style={{ color: w.color, fontWeight: 500, fontSize: '0.9rem' }}>Saldo Atual</p>
                         </Card>

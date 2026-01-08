@@ -211,7 +211,9 @@ export default function Analysis() {
                                         paddingAngle={5}
                                         dataKey="value"
                                         onClick={(data) => setSelectedType(prev => prev === data.key ? null : data.key)}
-                                        style={{ cursor: 'pointer' }}
+                                        style={{ cursor: 'pointer', filter: 'drop-shadow(0px 0px 10px rgba(255,255,255,0.1))' }}
+                                        animationBegin={0}
+                                        animationDuration={1500}
                                     >
                                         {chartData.map((entry, index) => (
                                             <Cell

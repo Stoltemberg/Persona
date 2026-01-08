@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -35,33 +36,89 @@ const Home = () => {
 function App() {
   return (
     <Router>
-      <Routes>
+      <AnimatedRoutes />
+    </Router>
+  );
+}
+
+const AnimatedRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
 
         <Route element={<ProtectedRoute />}>
-          {/* ... existing routes ... */}
           <Route element={<Layout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/analysis" element={<Analysis />} />
-            <Route path="/recurring" element={<Recurring />} />
-            <Route path="/budgets" element={<Budgets />} />
-            <Route path="/goals" element={<Goals />} />
-            <Route path="/wallets" element={<Wallets />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/dashboard" element={
+              <PageTransition>
+                <Dashboard />
+              </PageTransition>
+            } />
+            <Route path="/transactions" element={
+              <PageTransition>
+                <Transactions />
+              </PageTransition>
+            } />
+            <Route path="/categories" element={
+              <PageTransition>
+                <Categories />
+              </PageTransition>
+            } />
+            <Route path="/analysis" element={
+              <PageTransition>
+                <Analysis />
+              </PageTransition>
+            } />
+            <Route path="/recurring" element={
+              <PageTransition>
+                <Recurring />
+              </PageTransition>
+            } />
+            <Route path="/budgets" element={
+              <PageTransition>
+                <Budgets />
+              </PageTransition>
+            } />
+            <Route path="/goals" element={
+              <PageTransition>
+                <Goals />
+              </PageTransition>
+            } />
+            <Route path="/wallets" element={
+              <PageTransition>
+                <Wallets />
+              </PageTransition>
+            } />
+            <Route path="/settings" element={
+              <PageTransition>
+                <Settings />
+              </PageTransition>
+            } />
           </Route>
         </Route>
 
-        {/* Catch all redirect */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </Router>
+    </AnimatePresence>
   );
-}
+};
+
+const PageTransition = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.3 }}
+    style={{ width: '100%' }}
+  >
+    {children}
+  </motion.div>
+);
 
 
 export default App;

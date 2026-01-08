@@ -118,6 +118,7 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
                             transition={{ duration: 0.15 }}
                             className="glass-card"
                             style={{
+                                position: 'absolute',
                                 top: coords.top,
                                 left: coords.left,
                                 transform: coords.transform, // Add transform

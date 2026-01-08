@@ -8,7 +8,7 @@ import { Skeleton } from '../components/Skeleton';
 import { InsightsCard } from '../components/InsightsCard';
 import { LogOut, Wallet, TrendingUp, PiggyBank, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+
 import { usePrivacy } from '../context/PrivacyContext';
 import { CountUp } from '../components/CountUp';
 

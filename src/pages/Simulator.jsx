@@ -54,7 +54,7 @@ export default function Simulator() {
                 </div>
             </header>
 
-            <div className="grid-responsive mb-2" style={{ gridTemplateColumns: 'minmax(300px, 1fr) 2fr', gap: '2rem' }}>
+            <div className="simulator-grid mb-2">
 
                 {/* Inputs */}
                 <Card className="glass-card" style={{ padding: '1.5rem', height: 'fit-content' }}>

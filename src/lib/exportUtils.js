@@ -297,3 +297,91 @@ export const exportDataToExcel = async (profileName, transactions, wallets, goal
     anchor.click();
     window.URL.revokeObjectURL(url);
 };
+
+
+export const exportTransactionsToExcel = async (transactions) => {
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'Persona App';
+    workbook.lastModifiedBy = 'Persona App';
+
+    const headerFill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF4f29f0' } // Primary Brand Color
+    };
+    const headerFont = {
+        name: 'Segoe UI',
+        color: { argb: 'FFFFFFFF' },
+        size: 11,
+        bold: true
+    };
+    const protectionSettings = {
+        autoFilter: true,
+        sort: true,
+        selectLockedCells: true,
+        selectUnlockedCells: true,
+        formatCells: true,
+        formatColumns: true
+    };
+
+    const sheet = workbook.addWorksheet('Transações');
+
+    // Improve column widths
+    sheet.columns = [
+        { header: 'Data', key: 'date', width: 14 },
+        { header: 'Descrição', key: 'description', width: 40 },
+        { header: 'Categoria', key: 'category', width: 20 },
+        { header: 'Tipo', key: 'type', width: 15 },
+        { header: 'Subtipo', key: 'subtype', width: 15 },
+        { header: 'Valor', key: 'amount', width: 18 }
+    ];
+
+    // Style Header
+    sheet.getRow(1).font = headerFont;
+    sheet.getRow(1).fill = headerFill;
+    sheet.getRow(1).height = 25; // Taller header
+    sheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+
+    transactions.forEach(tx => {
+        const subtype = tx.expense_type === 'fixed' ? 'Fixo' :
+            tx.expense_type === 'variable' ? 'Variável' :
+                tx.expense_type === 'lifestyle' ? 'Lazer' : '-';
+
+        const row = sheet.addRow({
+            date: new Date(tx.date),
+            description: tx.description,
+            category: tx.category || 'Geral',
+            type: tx.type === 'income' ? 'Receita' : 'Despesa',
+            subtype: subtype,
+            amount: parseFloat(tx.amount || 0)
+        });
+
+        // Color coding for amounts
+        if (tx.type === 'income') {
+            row.getCell('amount').font = { color: { argb: 'FF0000FF' } };
+        } else {
+            row.getCell('amount').font = { color: { argb: 'FFFF0000' } };
+        }
+
+        // Align date and currency content
+        row.getCell('date').alignment = { horizontal: 'center' };
+        // Description left aligned (default)
+        row.getCell('type').alignment = { horizontal: 'center' };
+        row.getCell('subtype').alignment = { horizontal: 'center' };
+    });
+
+    // Formatting
+    sheet.getColumn('amount').numFmt = '"R$ "#,##0.00';
+    sheet.getColumn('date').numFmt = 'dd/mm/yyyy';
+
+    await sheet.protect('persona123', protectionSettings);
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `Transacoes_Persona_${new Date().toISOString().split('T')[0]}.xlsx`;
+    anchor.click();
+    window.URL.revokeObjectURL(url);
+};

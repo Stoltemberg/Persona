@@ -10,6 +10,7 @@ import { Skeleton } from '../components/Skeleton';
 
 import { useToast } from '../context/ToastContext';
 import { EmptyState } from '../components/EmptyState';
+import { exportTransactionsToExcel } from '../lib/exportUtils';
 
 export default function Transactions() {
     const { user } = useAuth();
@@ -195,31 +196,39 @@ export default function Transactions() {
             return;
         }
 
-        const headers = ['Data', 'Descrição', 'Valor', 'Tipo', 'Categoria', 'Tipo de Gasto'];
-        const rows = transactions.map(tx => [
-            new Date(tx.date).toLocaleDateString('pt-BR'),
-            `"${tx.description.replace(/"/g, '""')}"`, // Escape quotes
-            parseFloat(tx.amount).toFixed(2).replace('.', ','),
-            tx.type === 'income' ? 'Receita' : 'Despesa',
-            tx.category,
-            tx.expense_type === 'fixed' ? 'Fixo' :
-                tx.expense_type === 'variable' ? 'Variável' :
-                    tx.expense_type === 'lifestyle' ? 'Lazer' : ''
-        ]);
+        // Use the filtered transactions if needed, but usually export all is preferred or explicitly filtered.
+        // Let's filter based on the current date filters if active.
+        const filteredTransactions = transactions.filter(tx => {
+            if (!startDate && !endDate) return true;
+            const txDate = new Date(tx.date);
+            txDate.setHours(0, 0, 0, 0);
 
-        const csvContent = [
-            headers.join(','),
-            ...rows.map(row => row.join(','))
-        ].join('\n');
+            let start = null;
+            let end = null;
 
-        const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `transacoes_persona_${new Date().toISOString().split('T')[0]}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+            if (startDate) {
+                const [y, m, d] = startDate.split('-');
+                start = new Date(Number(y), Number(m) - 1, Number(d));
+            }
+
+            if (endDate) {
+                const [y, m, d] = endDate.split('-');
+                end = new Date(Number(y), Number(m) - 1, Number(d));
+                end.setHours(23, 59, 59, 999);
+            }
+
+            if (start && txDate < start) return false;
+            if (end && txDate > end) return false;
+
+            return true;
+        });
+
+        if (filteredTransactions.length === 0) {
+            addToast('Nenhuma transação encontrada no período selecionado.', 'error');
+            return;
+        }
+
+        exportTransactionsToExcel(filteredTransactions);
     };
 
     // Filter categories for the modal based on current type

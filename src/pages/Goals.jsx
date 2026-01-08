@@ -393,7 +393,7 @@ export default function Goals() {
                                         position: 'absolute',
                                         top: '50%',
                                         left: '50%',
-                                        transform: 'translate(-50%, -40%)',
+                                        transform: 'translate(-50%, -50%)',
                                         textAlign: 'center',
                                         pointerEvents: 'none'
                                     }}>

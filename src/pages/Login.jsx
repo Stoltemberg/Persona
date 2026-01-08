@@ -38,24 +38,16 @@ export default function Login() {
     };
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '2rem',
-            position: 'relative',
-            overflow: 'hidden'
-        }}>
+        <div className="login-container">
 
             {/* Background Effects */}
             <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, var(--color-1) 0%, transparent 70%)', opacity: 0.2, filter: 'blur(80px)', zIndex: -1 }} />
             <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, var(--color-2) 0%, transparent 70%)', opacity: 0.2, filter: 'blur(80px)', zIndex: -1 }} />
 
-            <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '4rem', alignItems: 'center', maxWidth: '1200px' }}>
+            <div className="container login-grid">
 
                 {/* Hero Section */}
-                <div className="fade-in">
+                <div className="fade-in login-hero">
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.1)', borderRadius: '50px', marginBottom: '1.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
                         <Star size={14} fill="#FFD700" stroke="#FFD700" />
                         <span style={{ fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.05em' }}>O FUTURO DAS FINANÇAS</span>
@@ -70,8 +62,8 @@ export default function Login() {
                         Persona não é apenas uma planilha. É um sistema inteligente que categoriza, prevê e otimiza sua vida financeira.
                     </p>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem' }}>
-                        <div className="flex-center" style={{ justifyContent: 'flex-start', gap: '1rem' }}>
+                    <div className="login-features-grid">
+                        <div className="login-feature-item">
                             <div style={{ padding: '0.8rem', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '12px', color: '#12c2e9' }}>
                                 <Zap size={24} />
                             </div>
@@ -81,7 +73,7 @@ export default function Login() {
                             </div>
                         </div>
 
-                        <div className="flex-center" style={{ justifyContent: 'flex-start', gap: '1rem' }}>
+                        <div className="login-feature-item">
                             <div style={{ padding: '0.8rem', background: 'rgba(196, 113, 237, 0.15)', borderRadius: '12px', color: '#c471ed' }}>
                                 <TrendingUp size={24} />
                             </div>
@@ -91,7 +83,7 @@ export default function Login() {
                             </div>
                         </div>
 
-                        <div className="flex-center" style={{ justifyContent: 'flex-start', gap: '1rem' }}>
+                        <div className="login-feature-item">
                             <div style={{ padding: '0.8rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '12px', color: '#f64f59' }}>
                                 <Plane size={24} />
                             </div>
@@ -101,7 +93,7 @@ export default function Login() {
                             </div>
                         </div>
 
-                        <div className="flex-center" style={{ justifyContent: 'flex-start', gap: '1rem' }}>
+                        <div className="login-feature-item">
                             <div style={{ padding: '0.8rem', background: 'rgba(0, 235, 199, 0.15)', borderRadius: '12px', color: '#00ebc7' }}>
                                 <Shield size={24} />
                             </div>
@@ -114,7 +106,7 @@ export default function Login() {
                 </div>
 
                 {/* Login Form with Animation */}
-                <div className="fade-in stagger-1" style={{ display: 'flex', justifyContent: 'center' }}>
+                <div className="fade-in stagger-1 login-card-container">
                     <motion.div
                         layout
                         className="glass-card"

@@ -1417,3 +1417,87 @@ p {
     letter-spacing: 0.02em;
   }
 }
+
+/* --- Mobile Login Fixes --- */
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 4rem;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.login-hero {
+  padding-right: 2rem;
+}
+
+.login-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.login-features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+.login-card-container {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 1rem !important;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .login-grid {
+    grid-template-columns: 1fr !important;
+    gap: 3rem;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+
+  .login-hero {
+    padding-right: 0;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .login-hero h1 {
+    font-size: 2.2rem !important;
+  }
+
+  /* Center the hero items/badges on mobile */
+  .login-hero .flex-center {
+    justify-content: center;
+    /* If we strictly want centered text */
+  }
+
+  /* Actually, for the features grid, we probably want left aligned or centered blocks? 
+     Let's keep them left aligned but maybe the grid itself centers?
+  */
+
+  .login-features-grid {
+    gap: 1rem !important;
+    text-align: left;
+  }
+
+  /* Fix specific flex-center usage in hero which was inline styled to justify-start */
+  /* We will remove the inline style in Login.jsx and let CSS handle it */
+}

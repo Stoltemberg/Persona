@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Calendar as CalendarIcon, X } from 'lucide-react';
@@ -9,22 +10,47 @@ import { Button } from './Button';
 export function DateRangePicker({ startDate, endDate, onChange }) {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
+    const [coords, setCoords] = useState({ top: 0, left: 0 });
 
     // Close on click outside
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (containerRef.current && !containerRef.current.contains(event.target)) {
+            // Check if click is inside the container (trigger) OR inside the portal (dropdown)
+            const dropdown = document.getElementById('date-range-dropdown');
+            if (
+                containerRef.current &&
+                !containerRef.current.contains(event.target) &&
+                dropdown &&
+                !dropdown.contains(event.target)
+            ) {
                 setIsOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        document.addEventListener('scroll', () => setIsOpen(false), true); // Close on scroll
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('scroll', () => setIsOpen(false), true);
+        }
     }, []);
+
+    // Calculate position
+    useEffect(() => {
+        if (isOpen && containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            // Align right edge of dropdown with right edge of trigger
+            // Dropdown typical width ~330px
+            const dropdownWidth = 330;
+
+            setCoords({
+                top: rect.bottom + window.scrollY + 8, // 8px gap
+                left: rect.right + window.scrollX - dropdownWidth
+            });
+        }
+    }, [isOpen]);
 
     const handleDateChange = (range) => {
         onChange(range);
-        // Auto close if both dates selected (optional, maybe better not to for UX)
-        // if (range.start && range.end) setIsOpen(false);
     };
 
     const displayText = () => {
@@ -80,64 +106,69 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
                 )}
             </div>
 
-            {/* Dropdown Content */}
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        className="glass-card"
-                        style={{
-                            position: 'absolute',
-                            top: '120%',
-                            right: 0,
-                            zIndex: 101, // Higher than sidebar (usually 100) or mobile overlays
-                            padding: '1rem',
-                            minWidth: '300px',
-                            boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
-                        }}
-                    >
-                        <Calendar
-                            startDate={startDate}
-                            endDate={endDate}
-                            onChange={handleDateChange}
-                        />
+            {/* Dropdown Content via Portal */}
+            {createPortal(
+                <AnimatePresence>
+                    {isOpen && (
+                        <motion.div
+                            id="date-range-dropdown"
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            transition={{ duration: 0.15 }}
+                            className="glass-card"
+                            style={{
+                                position: 'absolute',
+                                top: coords.top,
+                                left: coords.left,
+                                zIndex: 9999, // Super high z-index
+                                padding: '1rem',
+                                minWidth: '330px',
+                                boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+                                border: '1px solid var(--glass-border)'
+                            }}
+                        >
+                            <Calendar
+                                startDate={startDate}
+                                endDate={endDate}
+                                onChange={handleDateChange}
+                            />
 
-                        {/* Quick Actions Footer */}
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            marginTop: '1rem',
-                            paddingTop: '0.8rem',
-                            borderTop: '1px solid var(--glass-border)'
-                        }}>
-                            <Button
-                                variant="ghost"
-                                style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}
-                                onClick={() => {
-                                    const now = new Date();
-                                    const start = new Date(now.getFullYear(), now.getMonth(), 1);
-                                    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of month
-                                    end.setHours(23, 59, 59, 999);
-                                    onChange({ start, end });
-                                    setIsOpen(false);
-                                }}
-                            >
-                                Este Mês
-                            </Button>
-                            <Button
-                                className="btn-primary"
-                                style={{ fontSize: '0.75rem', padding: '0.3rem 0.8rem' }}
-                                onClick={() => setIsOpen(false)}
-                            >
-                                Aplicar
-                            </Button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                            {/* Quick Actions Footer */}
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                marginTop: '1rem',
+                                paddingTop: '0.8rem',
+                                borderTop: '1px solid var(--glass-border)'
+                            }}>
+                                <Button
+                                    variant="ghost"
+                                    style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}
+                                    onClick={() => {
+                                        const now = new Date();
+                                        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+                                        const end = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of month
+                                        end.setHours(23, 59, 59, 999);
+                                        onChange({ start, end });
+                                        setIsOpen(false);
+                                    }}
+                                >
+                                    Este Mês
+                                </Button>
+                                <Button
+                                    className="btn-primary"
+                                    style={{ fontSize: '0.75rem', padding: '0.3rem 0.8rem' }}
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    Aplicar
+                                </Button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     );
 }

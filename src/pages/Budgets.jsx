@@ -145,12 +145,12 @@ export default function Budgets() {
                                 ) : (
                                     <Button
                                         onClick={() => { setEditingId(cat.id); setTempLimit(limit); }}
-                                        className="btn-primary"
+                                        className="btn-ghost"
                                         style={{
                                             fontSize: '0.8rem',
                                             padding: '0.4rem 0.8rem',
-                                            background: 'rgba(255,255,255,0.1)',
-                                            border: '1px solid rgba(255,255,255,0.1)'
+                                            border: '1px solid var(--glass-border)',
+                                            color: 'var(--text-main)'
                                         }}
                                     >
                                         {limit === 0 ? 'Definir Limite' : 'Editar'}

@@ -125,10 +125,10 @@ export function MobileNav() {
                                 onClick={() => setIsMenuOpen(false)}
                                 className="mobile-menu-item"
                             >
-                                <div style={{ color: item.color }}>
-                                    <item.icon size={28} />
+                                <div className="mobile-menu-icon-container" style={{ background: `${item.color}20`, color: item.color }}>
+                                    <item.icon size={26} strokeWidth={2.2} />
                                 </div>
-                                <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{item.label}</span>
+                                <span className="mobile-menu-label">{item.label}</span>
                             </NavLink>
                         ))}
                     </div>

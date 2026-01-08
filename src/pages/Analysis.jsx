@@ -131,63 +131,64 @@ export default function Analysis() {
                     <h1 className="text-gradient">Análise Mensal</h1>
                     <p className="text-muted">Resumo financeiro completo</p>
                 </div>
+            </header>
 
-                {/* Month Selector */}
+            {/* Month Selector */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '50px', // Pill shape
+                padding: '0.4rem 0.6rem',
+                minWidth: '260px',
+                marginBottom: '1.5rem',
+                backdropFilter: 'blur(10px)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+            }}>
+                <button
+                    onClick={() => changeMonth(-1)}
+                    className="btn-ghost"
+                    style={{
+                        padding: '0.6rem',
+                        borderRadius: '50%',
+                        color: 'var(--text-muted)',
+                        transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--text-main)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+                >
+                    <ChevronLeft size={20} />
+                </button>
+
                 <div style={{
                     display: 'flex',
+                    flexDirection: 'column',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '50px', // Pill shape
-                    padding: '0.4rem 0.6rem',
-                    minWidth: '260px',
-                    backdropFilter: 'blur(10px)',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+                    lineHeight: 1.2
                 }}>
-                    <button
-                        onClick={() => changeMonth(-1)}
-                        className="btn-ghost"
-                        style={{
-                            padding: '0.6rem',
-                            borderRadius: '50%',
-                            color: 'var(--text-muted)',
-                            transition: 'all 0.2s'
-                        }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--text-main)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
-                    >
-                        <ChevronLeft size={20} />
-                    </button>
-
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        lineHeight: 1.2
-                    }}>
-                        <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.6 }}>Mês de Referência</span>
-                        <span style={{ fontSize: '1rem', fontWeight: 700, textTransform: 'capitalize', letterSpacing: '0.02em' }}>
-                            {formatMonth(currentDate)}
-                        </span>
-                    </div>
-
-                    <button
-                        onClick={() => changeMonth(1)}
-                        className="btn-ghost"
-                        style={{
-                            padding: '0.6rem',
-                            borderRadius: '50%',
-                            color: 'var(--text-muted)',
-                            transition: 'all 0.2s'
-                        }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--text-main)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
-                    >
-                        <ChevronRight size={20} />
-                    </button>
+                    <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.6 }}>Mês de Referência</span>
+                    <span style={{ fontSize: '1rem', fontWeight: 700, textTransform: 'capitalize', letterSpacing: '0.02em' }}>
+                        {formatMonth(currentDate)}
+                    </span>
                 </div>
-            </header>
+
+                <button
+                    onClick={() => changeMonth(1)}
+                    className="btn-ghost"
+                    style={{
+                        padding: '0.6rem',
+                        borderRadius: '50%',
+                        color: 'var(--text-muted)',
+                        transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--text-main)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+                >
+                    <ChevronRight size={20} />
+                </button>
+            </div>
 
 
             {/* Summary Cards */}

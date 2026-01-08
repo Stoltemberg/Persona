@@ -180,12 +180,15 @@ body {
 }
 
 /* Hover Effect */
+/* Hover Effect */
 .glass-card-hover:hover {
-  transform: translateY(-6px) scale(1.01);
+  transform: translateY(-3px);
+  /* Reduced from -6px */
   box-shadow:
-    0 12px 40px -4px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
-  border-color: rgba(255, 255, 255, 0.25);
+    0 8px 25px -4px rgba(0, 0, 0, 0.25),
+    /* Reduced shadow opacity and blur */
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Shine Effect on Hover */

@@ -52,9 +52,12 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                     className="transaction-card"
                     style={{
                         margin: 0,
-                        background: 'var(--glass-bg)', // Glass effect needs to be on top of solid or handled carefully
+                        background: 'var(--glass-bg)',
                         backdropFilter: 'blur(10px)',
-                        padding: '0.75rem 1rem'
+                        padding: '0.75rem 1rem',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
                     }}
                 >
                     <div className="transaction-left">

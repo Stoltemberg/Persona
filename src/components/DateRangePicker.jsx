@@ -38,14 +38,41 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
     useEffect(() => {
         if (isOpen && containerRef.current) {
             const rect = containerRef.current.getBoundingClientRect();
-            // Align right edge of dropdown with right edge of trigger
-            // Dropdown typical width ~330px
-            const dropdownWidth = 330;
+            const isMobile = window.innerWidth < 768; // Mobile breakpoint
 
-            setCoords({
-                top: rect.bottom + window.scrollY + 8, // 8px gap
-                left: rect.right + window.scrollX - dropdownWidth
-            });
+            if (isMobile) {
+                // Centered modal style for mobile (Fixed)
+                setCoords({
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '90%',
+                    maxWidth: '350px'
+                });
+            } else {
+                // Desktop: Smart Positioning
+                const dropdownWidth = 330;
+
+                // Default: Align Right edge of dropdown to Right edge of trigger
+                let leftPos = rect.right - dropdownWidth;
+
+                // If this pushes it off-screen to the left (negative left), align to Left edge instead
+                if (leftPos < 10) {
+                    leftPos = rect.left;
+                }
+
+                // If aligning Left pushes it off-screen to the right, clamp it
+                if (leftPos + dropdownWidth > window.innerWidth) {
+                    leftPos = window.innerWidth - dropdownWidth - 20;
+                }
+
+                setCoords({
+                    top: rect.bottom + 8,
+                    left: leftPos,
+                    transform: 'none',
+                    width: 'auto'
+                });
+            }
         }
     }, [isOpen]);
 

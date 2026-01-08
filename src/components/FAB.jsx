@@ -133,7 +133,13 @@ export function FAB() {
                         <Button
                             type="button"
                             className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--color-3)' : undefined, border: type === 'expense' ? 'none' : undefined }}
+                            style={{
+                                flex: 1,
+                                justifyContent: 'center',
+                                background: type === 'expense' ? '#f64f59' : undefined, // Force vivid red
+                                border: type === 'expense' ? 'none' : undefined,
+                                color: type === 'expense' ? 'white' : undefined
+                            }}
                             onClick={() => { setType('expense'); setCategory(''); setSelectedCategory(null); medium(); }}
                         >
                             <ArrowDownLeft size={18} style={{ marginRight: '0.5rem' }} />
@@ -142,7 +148,13 @@ export function FAB() {
                         <Button
                             type="button"
                             className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--color-4)' : undefined, border: type === 'income' ? 'none' : undefined }}
+                            style={{
+                                flex: 1,
+                                justifyContent: 'center',
+                                background: type === 'income' ? '#12c2e9' : undefined, // Force vivid cyan
+                                border: type === 'income' ? 'none' : undefined,
+                                color: type === 'income' ? 'white' : undefined
+                            }}
                             onClick={() => { setType('income'); setCategory(''); setSelectedCategory(null); medium(); }}
                         >
                             <ArrowUpRight size={18} style={{ marginRight: '0.5rem' }} />

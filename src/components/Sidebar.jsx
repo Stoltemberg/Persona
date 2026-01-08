@@ -1,18 +1,22 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart, Wallet, Repeat, Eye, EyeOff } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart, Wallet, Repeat, Eye, EyeOff, Calendar, TrendingUp, Plane } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { usePrivacy } from '../context/PrivacyContext';
+import { useEvent } from '../context/EventContext';
 import clsx from 'clsx';
 
 export function Sidebar() {
     const { signOut } = useAuth();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
+    const { isEventMode, toggleEventMode } = useEvent();
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
         { icon: Receipt, label: 'Transações', path: '/transactions' },
         { icon: Target, label: 'Metas', path: '/goals' },
         { icon: PieChart, label: 'Análise', path: '/analysis' },
+        { icon: Calendar, label: 'Assinaturas', path: '/subscriptions' },
+        { icon: TrendingUp, label: 'Simulador', path: '/simulator' },
         { icon: Repeat, label: 'Recorrentes', path: '/recurring' },
         { icon: Wallet, label: 'Orçamentos', path: '/budgets' },
         { icon: Settings, label: 'Configurações', path: '/settings' },
@@ -29,6 +33,13 @@ export function Sidebar() {
                         title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
                     >
                         {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                    <button
+                        onClick={() => toggleEventMode(!isEventMode)}
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: isEventMode ? '#f64f59' : 'var(--text-muted)' }}
+                        title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
+                    >
+                        <Plane size={20} />
                     </button>
                 </div>
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Professional Finance</p>

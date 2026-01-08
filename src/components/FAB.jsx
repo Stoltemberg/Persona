@@ -7,7 +7,9 @@ import { useHaptic } from '../hooks/useHaptic';
 import { Modal } from './Modal';
 import { Button } from './Button';
 import { Input } from './Input';
+import { Input } from './Input';
 import { usePrivacy } from '../context/PrivacyContext';
+import { getSmartCategory } from '../utils/smartCategories';
 
 export function FAB() {
     const { user } = useAuth();
@@ -205,7 +207,20 @@ export function FAB() {
                         label="Descrição"
                         placeholder="Ex: Almoço"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setDescription(val);
+
+                            // Smart Category Logic
+                            if (val.length > 2 && !category) {
+                                const smartMatch = getSmartCategory(val, categories);
+                                if (smartMatch) {
+                                    if (smartMatch.type !== type) setType(smartMatch.type);
+                                    setCategory(smartMatch.name);
+                                    setSelectedCategory(smartMatch);
+                                }
+                            }
+                        }}
                         required
                     />
 

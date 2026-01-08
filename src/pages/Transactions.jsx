@@ -11,6 +11,7 @@ import { Skeleton } from '../components/Skeleton';
 import { useToast } from '../context/ToastContext';
 import { EmptyState } from '../components/EmptyState';
 import { exportTransactionsToExcel } from '../lib/exportUtils';
+import { getSmartCategory } from '../utils/smartCategories';
 
 export default function Transactions() {
     const { user } = useAuth();
@@ -549,7 +550,20 @@ export default function Transactions() {
                         label="Descrição"
                         placeholder="Ex: Supermercado"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            setDescription(val);
+
+                            // Smart Category (Only if adding new or category is empty)
+                            if (!transactionToEdit && val.length > 2 && !category) {
+                                const smartMatch = getSmartCategory(val, categories);
+                                if (smartMatch) {
+                                    if (smartMatch.type !== type) setType(smartMatch.type);
+                                    setCategory(smartMatch.name);
+                                    setSelectedCategory(smartMatch);
+                                }
+                            }
+                        }}
                         required
                     />
 

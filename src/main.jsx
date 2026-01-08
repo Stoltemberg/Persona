@@ -6,15 +6,18 @@ import { AuthProvider } from './hooks/useAuth'
 import { ThemeProvider } from './context/ThemeContext'
 import { PrivacyProvider } from './context/PrivacyContext'
 import { ToastProvider } from './context/ToastContext'
+import { EventProvider } from './context/EventContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
       <ThemeProvider>
         <ToastProvider>
-          <PrivacyProvider>
-            <App />
-          </PrivacyProvider>
+          <EventProvider>
+            <PrivacyProvider>
+              <App />
+            </PrivacyProvider>
+          </EventProvider>
         </ToastProvider>
       </ThemeProvider>
     </AuthProvider>

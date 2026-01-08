@@ -11,6 +11,8 @@ import Wallets from './pages/Wallets';
 import Settings from './pages/Settings';
 import Budgets from './pages/Budgets';
 import Recurring from './pages/Recurring';
+import Subscriptions from './pages/Subscriptions';
+import Simulator from './pages/Simulator';
 import Landing from './pages/Landing';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
@@ -79,6 +81,11 @@ const AnimatedRoutes = () => {
                 <Recurring />
               </PageTransition>
             } />
+            <Route path="/subscriptions" element={
+              <PageTransition>
+                <Subscriptions />
+              </PageTransition>
+            } />
             <Route path="/budgets" element={
               <PageTransition>
                 <Budgets />
@@ -92,6 +99,11 @@ const AnimatedRoutes = () => {
             <Route path="/wallets" element={
               <PageTransition>
                 <Wallets />
+              </PageTransition>
+            } />
+            <Route path="/simulator" element={
+              <PageTransition>
+                <Simulator />
               </PageTransition>
             } />
             <Route path="/settings" element={

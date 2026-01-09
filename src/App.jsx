@@ -16,7 +16,7 @@ import Simulator from './pages/Simulator';
 import Landing from './pages/Landing';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
-import Privacy from './pages/Privacy';
+
 import NotFound from './pages/NotFound';
 import Admin from './pages/Admin';
 import { Layout } from './components/Layout';

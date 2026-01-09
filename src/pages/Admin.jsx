@@ -22,7 +22,6 @@ export default function Admin() {
 
     // Coupons State
     const [coupons, setCoupons] = useState([]);
-    const [users, setUsers] = useState([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
 
     // New Coupon Form
@@ -38,7 +37,6 @@ export default function Admin() {
         if (role === 'admin') {
             fetchStats();
             fetchCoupons();
-            fetchUsers();
         }
     }, [role]);
 
@@ -70,22 +68,7 @@ export default function Admin() {
         }
     };
 
-    const fetchUsers = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .select('*')
-                // .order('created_at', { ascending: false }) // created_at might not exist in profiles
-                ;
 
-            if (error) throw error;
-            setUsers(data || []);
-        } catch (error) {
-            console.error('Error fetching users:', error);
-            addToast('Erro ao carregar usuários', 'error');
-        }
-    };
 
     const fetchCoupons = async () => {
         try {
@@ -188,64 +171,7 @@ export default function Admin() {
                 </Card>
             </div>
 
-            {/* Users Management */}
-            <h2 style={{ marginBottom: '1.5rem', marginTop: '3rem' }}>Usuários</h2>
-            <Card style={{ overflow: 'hidden', padding: 0 }}>
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead>
-                            <tr style={{ background: 'rgba(255,255,255,0.05)', borderBottom: '1px solid var(--glass-border)' }}>
-                                <th style={{ padding: '1rem', fontWeight: 600 }}>Nome</th>
-                                <th style={{ padding: '1rem', fontWeight: 600 }}>Role</th>
-                                <th style={{ padding: '1rem', fontWeight: 600 }}>Plano</th>
-                                <th style={{ padding: '1rem', fontWeight: 600 }}>Criado em</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map((u, i) => (
-                                <tr key={u.id} style={{ borderBottom: i !== users.length - 1 ? '1px solid var(--glass-border)' : 'none' }}>
-                                    <td style={{ padding: '1rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                                            <div style={{
-                                                width: '32px', height: '32px', borderRadius: '50%',
-                                                background: `linear-gradient(135deg, ${['#c471ed', '#12c2e9', '#f64f59'][i % 3]}, #f7797d)`,
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold'
-                                            }}>
-                                                {u.full_name?.[0]?.toUpperCase() || 'U'}
-                                            </div>
-                                            <span>{u.full_name || 'Sem nome'}</span>
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '1rem' }}>
-                                        <span style={{
-                                            padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem',
-                                            background: u.role === 'admin' ? 'rgba(246, 79, 89, 0.2)' : 'rgba(255,255,255,0.1)',
-                                            color: u.role === 'admin' ? '#f64f59' : 'inherit'
-                                        }}>
-                                            {u.role || 'user'}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '1rem' }}>
-                                        {['intermediate', 'complete'].includes(u.plan_tier) ? (
-                                            <span style={{
-                                                padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 600,
-                                                background: 'linear-gradient(to right, #FFD700, #FDB931)', color: '#000'
-                                            }}>
-                                                PRO ({u.plan_tier})
-                                            </span>
-                                        ) : (
-                                            <span style={{ color: 'var(--text-muted)' }}>Grátis</span>
-                                        )}
-                                    </td>
-                                    <td style={{ padding: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                                        {u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
+
 
             {/* Coupons Management */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start', marginTop: '3rem' }} className="admin-grid">

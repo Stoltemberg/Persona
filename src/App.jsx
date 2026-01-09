@@ -16,7 +16,9 @@ import Simulator from './pages/Simulator';
 import Landing from './pages/Landing';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import Privacy from './pages/Privacy';
 import NotFound from './pages/NotFound';
+import Admin from './pages/Admin';
 import { Layout } from './components/Layout';
 
 // Protected Route Wrapper
@@ -109,6 +111,11 @@ const AnimatedRoutes = () => {
             <Route path="/settings" element={
               <PageTransition>
                 <Settings />
+              </PageTransition>
+            } />
+            <Route path="/admin" element={
+              <PageTransition>
+                <Admin />
               </PageTransition>
             } />
           </Route>

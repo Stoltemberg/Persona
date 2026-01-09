@@ -6,7 +6,7 @@ import { useEvent } from '../context/EventContext';
 import clsx from 'clsx';
 
 export function Sidebar() {
-    const { signOut } = useAuth();
+    const { signOut, role } = useAuth();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
     const { isEventMode, toggleEventMode } = useEvent();
 
@@ -21,6 +21,10 @@ export function Sidebar() {
         { icon: Wallet, label: 'Orçamentos', path: '/budgets' },
         { icon: Settings, label: 'Configurações', path: '/settings' },
     ];
+
+    if (role === 'admin') {
+        navItems.push({ icon: Receipt, label: 'Admin', path: '/admin' }); // Reusing Receipt icon or import Shield?
+    }
 
     return (
         <aside className="glass-panel sidebar-panel">

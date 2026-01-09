@@ -1,132 +1,163 @@
-
 import { Modal } from './Modal';
 import { Button } from './Button';
-import { X, Check, Star } from 'lucide-react'; // Keep Star as it's used, add X if intended
+import { X, Check, Star, Zap, Shield, Crown } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
 import { useState } from 'react';
+import { Input } from './Input';
 
 export function UpgradeModal({ isOpen, onClose }) {
-    const { user } = useAuth();
+    const { user, fetchProfile } = useAuth(); // fetchProfile needed to refresh after coupon
     const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
+    const [couponCode, setCouponCode] = useState('');
+    const [redeeming, setRedeeming] = useState(false);
+    const [selectedTier, setSelectedTier] = useState('complete'); // Default to best
 
-    const handleUpgrade = async () => {
+    const tiers = [
+        {
+            id: 'free',
+            name: 'Grátis',
+            price: 'R$ 0',
+            features: ['5 Carteiras', '10 Orçamentos', 'Análise Básica'],
+            icon: Zap,
+            color: '#4ade80'
+        },
+        {
+            id: 'intermediate',
+            name: 'Intermediário',
+            price: 'R$ 14,90',
+            features: ['Carteiras Ilimitadas', 'Orçamentos Ilimitados', 'Sem Anúncios'],
+            icon: Shield,
+            color: '#12c2e9'
+        },
+        {
+            id: 'complete',
+            name: 'Completo',
+            price: 'R$ 29,90',
+            features: ['Tudo do Intermediário', 'IA Financeira', 'Exportação Excel', 'Suporte VIP'],
+            icon: Crown,
+            color: '#FFD700'
+        }
+    ];
+
+    const handleUpgrade = async (tierId) => {
+        if (tierId === 'free') {
+            onClose();
+            return;
+        }
+
         setLoading(true);
         try {
-            // Explicitly get session to ensure we have a valid token
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) {
-                console.error('Sessão não encontrada no frontend.');
-                throw new Error('Você precisa estar logado para assinar.');
-            }
+            if (!session) throw new Error('Sessão inválida.');
 
-            console.log('Iniciando checkout com token:', session.access_token.substring(0, 10) + '...');
-
+            // Call function to create checkout preference
+            // Note: You would likely pass the price/tier to the backend function
             const { data, error } = await supabase.functions.invoke('create-checkout', {
-                headers: {
-                    Authorization: `Bearer ${session.access_token}`
-                }
+                body: { tier: tierId },
+                headers: { Authorization: `Bearer ${session.access_token}` }
             });
 
-            console.log('Resultado da função:', { data, error });
-
             if (error) throw error;
-            if (!data?.init_point) throw new Error('Link de pagamento não gerado.');
-
-            // Redireciona para o Mercado Pago
-            window.open(data.init_point, '_blank');
+            if (data?.init_point) window.open(data.init_point, '_blank');
             onClose();
         } catch (error) {
-            console.error('Erro no checkout:', error);
-
-            let msg = 'Erro ao iniciar pagamento.';
-            if (error && error.context && typeof error.context.json === 'function') {
-                try {
-                    const body = await error.context.json();
-                    if (body && body.error) {
-                        msg = `Erro do Servidor: ${body.error}`;
-                    }
-                } catch (e) {
-                    console.error('Erro ao ler corpo do erro:', e);
-                }
-            }
-
-            addToast(msg, 'error');
+            console.error('Checkout error:', error);
+            addToast('Erro ao iniciar pagamento.', 'error');
         } finally {
             setLoading(false);
         }
     };
 
+    const handleRedeemCoupon = async (e) => {
+        e.preventDefault();
+        if (!couponCode) return;
+        setRedeeming(true);
+        try {
+            const { data, error } = await supabase.rpc('redeem_coupon', { coupon_code: couponCode.toUpperCase() });
+
+            if (error) throw error;
+
+            if (data.success) {
+                addToast(`Cupom aplicado! Plano: ${data.tier}`, 'success');
+                await fetchProfile(user.id); // Refresh local state
+                onClose();
+            }
+        } catch (error) {
+            console.error('Redeem error:', error);
+            addToast(error.message || 'Erro ao resgatar cupom.', 'error');
+        } finally {
+            setRedeeming(false);
+        }
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Sessão Exclusiva ✨">
-            <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-                <div style={{
-                    marginBottom: '1.5rem',
-                    display: 'inline-flex',
-                    padding: '1rem',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #FFD700, #FDB931)',
-                    boxShadow: '0 0 20px rgba(253, 185, 49, 0.3)'
-                }}>
-                    <Star size={40} color="white" fill="white" />
+        <Modal isOpen={isOpen} onClose={onClose} title="Escolha seu Plano">
+            <div className="upgrade-modal-content">
+
+                {/* Coupon Section */}
+                <div style={{ marginBottom: '2rem', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
+                    <form onSubmit={handleRedeemCoupon} style={{ display: 'flex', gap: '0.5rem' }}>
+                        <Input
+                            placeholder="Tem um cupom?"
+                            value={couponCode}
+                            onChange={e => setCouponCode(e.target.value)}
+                            style={{ margin: 0 }}
+                        />
+                        <Button type="submit" loading={redeeming} className="btn-ghost" style={{ border: '1px solid var(--glass-border)' }}>
+                            Aplicar
+                        </Button>
+                    </form>
                 </div>
 
-                <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', background: 'linear-gradient(to right, #fff, #FFD700)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 800 }}>
-                    Seja Persona PRO
-                </h2>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-                    Desbloqueie todo o potencial da sua gestão financeira.
-                </p>
+                {/* Tiers Grid */}
+                <div className="tiers-grid" style={{ display: 'grid', gap: '1rem' }}>
+                    {tiers.map(tier => (
+                        <div
+                            key={tier.id}
+                            onClick={() => setSelectedTier(tier.id)}
+                            style={{
+                                padding: '1rem',
+                                border: `1px solid ${selectedTier === tier.id ? tier.color : 'var(--glass-border)'}`,
+                                borderRadius: '12px',
+                                background: selectedTier === tier.id ? `rgba(${tier.color === '#FFD700' ? '255, 215, 0' : '255,255,255'}, 0.05)` : 'transparent',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                position: 'relative'
+                            }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <tier.icon size={20} color={tier.color} />
+                                    <h3 style={{ margin: 0, fontSize: '1.1rem' }}>{tier.name}</h3>
+                                </div>
+                                <span style={{ fontWeight: 700 }}>{tier.price}</span>
+                            </div>
 
-                <div style={{ textAlign: 'left', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem' }}>
-                    <div style={{ display: 'flex', gap: '0.8rem', marginBottom: '1rem' }}>
-                        <Check size={20} color="#4ade80" />
-                        <span>Carteiras Ilimitadas</span>
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.8rem', marginBottom: '1rem' }}>
-                        <Check size={20} color="#4ade80" />
-                        <span>Orçamentos Ilimitados</span>
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.8rem', marginBottom: '1rem' }}>
-                        <Check size={20} color="#4ade80" />
-                        <span>Exportação para Excel (Contadores)</span>
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.8rem' }}>
-                        <Check size={20} color="#4ade80" />
-                        <span>Suporte Prioritário</span>
-                    </div>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                {tier.features.map((feat, i) => (
+                                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                                        <Check size={12} color={tier.color} /> {feat}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
                 </div>
 
-                <Button
-                    className="btn-primary"
-                    style={{
-                        width: '100%',
-                        justifyContent: 'center',
-                        padding: '1rem',
-                        fontSize: '1.1rem',
-                        background: 'linear-gradient(135deg, #00B1EA, #00E5FF)' // Mercado Pago Blue-ish or Gold? Let's go Gold/Premium
-                        // Actually use brand primary or gold
-                    }}
-                    onClick={handleUpgrade}
-                >
-                    Assinar Agora - R$ 29,90/mês
-                </Button>
-                <button
-                    onClick={onClose}
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--text-muted)',
-                        marginTop: '1rem',
-                        fontSize: '0.9rem',
-                        cursor: 'pointer',
-                        textDecoration: 'underline'
-                    }}
-                >
-                    Continuar no plano Grátis
-                </button>
+                <div style={{ marginTop: '2rem' }}>
+                    <Button
+                        className="btn-primary"
+                        style={{ width: '100%', justifyContent: 'center' }}
+                        onClick={() => handleUpgrade(selectedTier)}
+                        loading={loading}
+                    >
+                        {selectedTier === 'free' ? 'Manter Grátis' : `Assinar ${tiers.find(t => t.id === selectedTier)?.name}`}
+                    </Button>
+                </div>
+
             </div>
         </Modal>
     );

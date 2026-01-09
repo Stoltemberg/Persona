@@ -75,7 +75,9 @@ export default function Admin() {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .select('*')
+                // .order('created_at', { ascending: false }) // created_at might not exist in profiles
+                ;
 
             if (error) throw error;
             setUsers(data || []);

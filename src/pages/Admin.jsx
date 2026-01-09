@@ -45,16 +45,22 @@ export default function Admin() {
             // Count users
             const { count: userCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
 
-            // Count pro users (using plan_tier)
-            const { count: proCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true })
+            // Count pro users (Coupons/New Logic)
+            const { count: tierCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true })
                 .in('plan_tier', ['intermediate', 'complete']);
+
+            // Count pro users (Legacy Subscriptions)
+            const now = new Date().toISOString();
+            const { count: subCount } = await supabase.from('subscriptions')
+                .select('*', { count: 'exact', head: true })
+                .gt('current_period_end', now);
 
             // Count active coupons
             const { count: couponCount } = await supabase.from('coupons').select('*', { count: 'exact', head: true }).eq('active', true);
 
             setStats({
                 totalUsers: userCount || 0,
-                proUsers: proCount || 0,
+                proUsers: (tierCount || 0) + (subCount || 0),
                 activeCoupons: couponCount || 0
             });
         } catch (error) {

@@ -102,16 +102,25 @@ export default function Landing() {
 
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
                     <PricingCard
-                        title="Free"
+                        title="Grátis"
                         price="R$ 0"
-                        features={['1 Carteira', '1 Orçamento', 'Dashboard Básico']}
+                        features={['5 Carteiras', '10 Orçamentos', 'Análise Básica']}
                     />
                     <PricingCard
-                        title="PRO"
+                        title="Intermediário"
+                        price="R$ 14,90"
+                        features={['Carteiras Ilimitadas', 'Orçamentos Ilimitados', 'Sem Anúncios']}
+                        buttonText="Assinar Intermediário"
+                        color="#12c2e9"
+                    // featured removed so it doesn't fight for attention
+                    />
+                    <PricingCard
+                        title="Completo"
                         price="R$ 29,90"
                         featured
-                        features={['Tudo do Free', 'Carteiras Ilimitadas', 'Orçamentos Ilimitados', 'Exportação Excel', 'Suporte Prioritário']}
-                        buttonText="Assinar Pro"
+                        features={['Tudo do Intermediário', 'IA Financeira', 'Exportação Excel', 'Suporte VIP']}
+                        buttonText="Assinar Completo"
+                        color="#FFD700"
                     />
                 </div>
             </section>
@@ -140,28 +149,51 @@ function FeatureCard({ icon: Icon, title, text }) {
     );
 }
 
-function PricingCard({ title, price, features, featured, buttonText = "Começar" }) {
+function PricingCard({ title, price, features, featured, buttonText = "Começar", color = "#38ef7d" }) {
     return (
         <div className="glass-card" style={{
             padding: '2rem',
             width: '100%',
             maxWidth: '350px',
-            border: featured ? '1px solid #38ef7d' : '1px solid var(--glass-border)',
+            border: featured ? `1px solid ${color}` : '1px solid var(--glass-border)',
             position: 'relative',
-            overflow: 'visible'
+            overflow: 'visible',
+            boxShadow: featured ? `0 0 20px ${color}20` : 'none'
         }}>
-            {featured && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: '#38ef7d', color: '#000', padding: '0.2rem 1rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' }}>RECOMENDADO</div>}
+            {featured && (
+                <div style={{
+                    position: 'absolute',
+                    top: -12,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: color,
+                    color: '#000',
+                    padding: '0.2rem 1rem',
+                    borderRadius: '20px',
+                    fontSize: '0.8rem',
+                    fontWeight: 'bold',
+                    whiteSpace: 'nowrap'
+                }}>
+                    MAIS POPULAR
+                </div>
+            )}
             <h3>{title}</h3>
             <div style={{ fontSize: '3rem', fontWeight: 700, margin: '1rem 0' }}>{price}<span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-muted)' }}>/mês</span></div>
             <ul style={{ listStyle: 'none', padding: 0, textAlign: 'left', marginBottom: '2rem' }}>
                 {features.map((f, i) => (
                     <li key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem', color: 'var(--text-secondary)' }}>
-                        <Check size={18} color="#38ef7d" /> {f}
+                        <Check size={18} color={color} /> {f}
                     </li>
                 ))}
             </ul>
             <Link to="/login">
-                <Button className={featured ? 'btn-primary' : 'btn-ghost'} style={{ width: '100%', justifyContent: 'center' }}>
+                <Button className={featured ? 'btn-primary' : 'btn-ghost'} style={{
+                    width: '100%',
+                    justifyContent: 'center',
+                    background: featured ? color : 'transparent',
+                    borderColor: featured ? color : 'var(--glass-border)',
+                    color: featured ? '#000' : 'inherit'
+                }}>
                     {buttonText}
                 </Button>
             </Link>

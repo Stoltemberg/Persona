@@ -8,6 +8,7 @@ import { Modal } from '../components/Modal';
 import { Plus, Trash2, Edit2, TrendingUp, Lightbulb, AlertTriangle, Star } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { EmptyState } from '../components/EmptyState';
+import { PageHeader } from '../components/PageHeader';
 
 export default function Goals() {
     const { user } = useAuth();
@@ -267,9 +268,7 @@ export default function Goals() {
     return (
         <div className="container fade-in" style={{ paddingBottom: '80px' }}>
             {/* ... header ... */}
-            import {PageHeader} from '../components/PageHeader';
 
-            // ... inside component ...
 
             <PageHeader
                 title={<span>Metas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Financeiras</span></span>}

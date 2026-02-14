@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import { PageHeader } from '../components/PageHeader';
 
 export default function Analysis() {
     const { user } = useAuth();
@@ -126,9 +127,7 @@ export default function Analysis() {
 
     return (
         <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-            import {PageHeader} from '../components/PageHeader';
 
-            // ... inside component ...
 
             <PageHeader
                 title={<span>Análise <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Mensal</span></span>}

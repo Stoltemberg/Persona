@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 
 import { usePrivacy } from '../context/PrivacyContext';
 import { CountUp } from '../components/CountUp';
+import { PageHeader } from '../components/PageHeader';
 
 export default function Dashboard() {
     const { user, profile, signOut } = useAuth();
@@ -198,9 +199,7 @@ export default function Dashboard() {
         <div className="container fade-in" style={{ paddingBottom: '80px' }}>
             <OnboardingTour />
 
-            import {PageHeader} from '../components/PageHeader';
 
-            // ... inside component ...
 
             <PageHeader
                 title={<span>Olá, <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{profile?.full_name?.split(' ')[0] || 'Usuário'}</span></span>}

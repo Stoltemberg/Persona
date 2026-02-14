@@ -210,7 +210,7 @@ export default function Dashboard() {
                     transition: 'opacity 0.3s ease'
                 }}>
                     {loading ? <Skeleton width="200px" height="80px" style={{ margin: '0 auto' }} /> : (
-                        isPrivacyMode ? '****' : <CountUp end={balance} prefix="R$ " duration={0} />
+                        isPrivacyMode ? '****' : <CountUp end={balance} prefix="R$ " duration={1.5} />
                     )}
                 </div>
             </section>

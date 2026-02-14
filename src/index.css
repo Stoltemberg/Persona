@@ -1827,9 +1827,9 @@ p {
   position: fixed;
   bottom: calc(90px + env(safe-area-inset-bottom));
   right: 20px;
-  width: 43px;
+  width: 40px;
   /* Reduced 15% from 50px */
-  height: 43px;
+  height: 40px;
   border-radius: 50%;
   background: var(--color-brand);
   color: #000000;

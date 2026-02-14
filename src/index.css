@@ -1392,45 +1392,58 @@ p {
   align-items: center;
   padding: 0 1rem;
 
-  /* TRUE Translucent Liquid Glass - "Water Drop" Effect */
+  /* Transparent Center - Blur applied via ::before */
   background: rgba(255, 255, 255, 0.01);
-  /* Almost zero opacity */
-  backdrop-filter: blur(4px) saturate(180%);
-  /* Slight blur for refraction illusion */
-  -webkit-backdrop-filter: blur(4px) saturate(180%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 
   /* Liquid Volume Construction */
   border-radius: 28px;
-  /* Slightly more organic curve */
 
   /* Complex Shadow Layering for "Lens" Effect */
   box-shadow:
-    /* 1. Outer definition shadow */
     0 20px 40px rgba(0, 0, 0, 0.2),
-    /* 2. Top-inner highlight (light reflecting on liquid curve) */
     inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    /* 3. Bottom-inner shadow (thickness) */
     inset 0 -1px 0 rgba(255, 255, 255, 0.1),
-    /* 4. Subtle inner glow */
     inset 0 0 20px rgba(255, 255, 255, 0.05);
 
-  /* Border for surface tension */
   border: 1px solid rgba(255, 255, 255, 0.15);
-
   z-index: 100;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+  /* Clip the pseudo-element blur */
+}
+
+/* Edge-Only Distortion Pseudo-element */
+.mobile-bottom-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+
+  /* Strong Blur for Edges */
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(15px) saturate(180%);
+
+  /* Mask to keep center clear */
+  mask-image: radial-gradient(ellipse at center, transparent 40%, black 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, transparent 40%, black 100%);
 }
 
 .light .mobile-bottom-bar {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(6px) saturate(180%);
-  /* Slightly more blur on light mode for contrast */
-  -webkit-backdrop-filter: blur(6px) saturate(180%);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.8),
     inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Light mode pseudo adjustment */
+.light .mobile-bottom-bar::before {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
 .mobile-nav-item {

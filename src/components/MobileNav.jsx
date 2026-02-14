@@ -22,9 +22,9 @@ export function MobileNav() {
     const menuItems = [
         { icon: Target, label: 'Metas', path: '/goals' },
         { icon: Repeat, label: 'Fixos', path: '/recurring' },
-        { icon: Calendar, label: 'Assinaturas', path: '/subscriptions' },
-        { icon: TrendingUp, label: 'Simulação', path: '/simulator' },
-        { icon: PiggyBank, label: 'Orçamentos', path: '/budgets' },
+        { icon: Calendar, label: 'Assinantes', path: '/subscriptions' },
+        { icon: TrendingUp, label: 'Simular', path: '/simulator' },
+        { icon: PiggyBank, label: 'Limites', path: '/budgets' },
         { icon: Settings, label: 'Config', path: '/settings' },
     ];
 
@@ -106,15 +106,13 @@ export function MobileNav() {
                             display: 'grid',
                             gridTemplateColumns: '1fr 1fr',
                             gap: '1rem',
-                            marginBottom: '1.5rem',
-                            paddingBottom: '1.5rem',
-                            borderBottom: '1px solid var(--glass-border)'
+                            marginBottom: '2rem'
                         }}>
                             <button
                                 onClick={togglePrivacy}
                                 className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`}
                             >
-                                {isPrivacyMode ? <EyeOff size={20} strokeWidth={1.5} /> : <Eye size={20} strokeWidth={1.5} />}
+                                {isPrivacyMode ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
                                 <span>{isPrivacyMode ? 'Oculto' : 'Visível'}</span>
                             </button>
 
@@ -122,7 +120,7 @@ export function MobileNav() {
                                 onClick={() => toggleEventMode(!isEventMode)}
                                 className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`}
                             >
-                                <Plane size={20} strokeWidth={1.5} />
+                                <Plane size={18} strokeWidth={1.5} />
                                 <span>Viagem</span>
                             </button>
                         </div>
@@ -134,7 +132,7 @@ export function MobileNav() {
                                 className="mobile-menu-item"
                             >
                                 <div className="mobile-menu-icon-container">
-                                    <item.icon size={20} strokeWidth={1.5} />
+                                    <item.icon size={18} strokeWidth={1.5} />
                                 </div>
                                 <span className="mobile-menu-label">{item.label}</span>
                             </NavLink>

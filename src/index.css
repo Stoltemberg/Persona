@@ -1484,25 +1484,25 @@ p {
   border-top-right-radius: 24px;
   border: none;
   /* No visible borders */
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
-  /* Imperceptible shadow */
+  box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.04);
+  /* Almost invisible */
 
   /* Layout with more breathing room */
-  padding: 3rem 2rem 2.5rem 2rem;
+  padding: 3rem 2.5rem 2.5rem 2.5rem;
   padding-bottom: calc(2.5rem + env(safe-area-inset-bottom));
 
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  column-gap: 1rem;
-  row-gap: 2rem;
-  /* Increased spacing */
+  column-gap: 1.25rem;
+  row-gap: 2.5rem;
+  /* More space */
 
   animation: slideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .light .mobile-menu-grid {
   background: rgba(248, 248, 248, 0.95);
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.03);
 }
 
 /* Drag Handle Pill */
@@ -1537,12 +1537,12 @@ p {
 
 /* Icon Container - Smaller and Cleaner */
 .mobile-menu-icon-container {
-  width: 48px;
+  width: 46px;
   /* Smaller icons */
-  height: 48px;
+  height: 46px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  /* Subtle background */
+  background: rgba(255, 255, 255, 0.02);
+  /* Almost transparent */
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -1552,17 +1552,17 @@ p {
 }
 
 .light .mobile-menu-icon-container {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(0, 0, 0, 0.02);
   color: #000000;
 }
 
 .mobile-menu-item:active .mobile-menu-icon-container {
   transform: scale(0.95);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .light .mobile-menu-item:active .mobile-menu-icon-container {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.06);
 }
 
 /* Label Typography - Lighter and Cleaner */

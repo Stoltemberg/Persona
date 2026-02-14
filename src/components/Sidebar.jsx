@@ -5,6 +5,8 @@ import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
 import clsx from 'clsx';
 
+import { createPortal } from 'react-dom';
+
 export function Sidebar() {
     const { signOut, role } = useAuth();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
@@ -23,10 +25,10 @@ export function Sidebar() {
     ];
 
     if (role === 'admin') {
-        navItems.push({ icon: Receipt, label: 'Admin', path: '/admin' }); // Reusing Receipt icon or import Shield?
+        navItems.push({ icon: Receipt, label: 'Admin', path: '/admin' });
     }
 
-    return (
+    const sidebarContent = (
         <aside className="glass-panel sidebar-panel">
             <div className="sidebar-header">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -79,8 +81,16 @@ export function Sidebar() {
                 className="logout-btn"
             >
                 <LogOut size={22} />
-                <span>Sair da Conta</span>
+                <span>Sair</span>
             </button>
         </aside>
+    );
+
+    // Use Portal to render outside of the app root (avoiding transforms)
+    return createPortal(
+        <div className="sidebar-container">
+            {sidebarContent}
+        </div>,
+        document.body
     );
 }

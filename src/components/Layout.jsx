@@ -9,12 +9,8 @@ export function Layout() {
 
     return (
         <div className="app-layout">
-            {/* Sidebar Area - Desktop */}
-            <div className="sidebar-container">
-                <div className="sidebar-wrapper">
-                    <Sidebar />
-                </div>
-            </div>
+            {/* Sidebar Area - Desktop (Portal) */}
+            <Sidebar />
 
             {/* Main Content Area */}
             <main className="main-content">

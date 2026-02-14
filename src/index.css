@@ -1462,7 +1462,12 @@ p {
   text-decoration: none;
   padding: 0.5rem;
   flex: 1;
+  color: var(--text-main);
   /* Distribute evenly */
+}
+
+.light .mobile-nav-item {
+  color: #000000;
 }
 
 /* =========================================

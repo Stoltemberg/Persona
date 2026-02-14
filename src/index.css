@@ -185,11 +185,12 @@ body {
 
 .light .btn-ghost {
   background: rgba(0, 0, 0, 0.05);
-  color: var(--text-main);
+  color: #000000 !important;
 }
 
 .light .btn-ghost:hover {
   background: rgba(0, 0, 0, 0.1);
+  color: #000000 !important;
 }
 
 /* Inputs */

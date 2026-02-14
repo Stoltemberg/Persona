@@ -153,11 +153,8 @@ export default function Analysis() {
                     style={{
                         padding: '0.6rem',
                         borderRadius: '50%',
-                        color: 'var(--text-muted)',
                         transition: 'all 0.2s'
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--text-main)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
                 >
                     <ChevronLeft size={20} />
                 </button>
@@ -180,11 +177,8 @@ export default function Analysis() {
                     style={{
                         padding: '0.6rem',
                         borderRadius: '50%',
-                        color: 'var(--text-muted)',
                         transition: 'all 0.2s'
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--text-main)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
                 >
                     <ChevronRight size={20} />
                 </button>

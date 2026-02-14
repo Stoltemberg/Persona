@@ -47,7 +47,7 @@
 }
 
 /* Light Mode Overrides - Minimalist Light */
-:root.light {
+html.light {
   --bg-deep: #ffffff;
   --bg-card: #f8f8f8;
 

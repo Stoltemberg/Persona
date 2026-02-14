@@ -2,13 +2,10 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart, Wallet, Repeat, Eye, EyeOff, Calendar, TrendingUp, Plane } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { usePrivacy } from '../context/PrivacyContext';
-import { useEvent } from '../context/EventContext';
-import clsx from 'clsx';
 
 export function Sidebar() {
-    const { signOut, role } = useAuth();
+    const { signOut } = useAuth();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
-    const { isEventMode, toggleEventMode } = useEvent();
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -22,78 +19,83 @@ export function Sidebar() {
         { icon: Settings, label: 'Configurações', path: '/settings' },
     ];
 
-    if (role === 'admin') {
-        navItems.push({ icon: Receipt, label: 'Admin', path: '/admin' }); // Reusing Receipt icon or import Shield?
-    }
-
     return (
-        <aside className="glass-panel sidebar-panel">
-            <div className="sidebar-header">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                    <h1 style={{ fontSize: '2rem', marginBottom: 0 }} className="text-gradient">Persona</h1>
-                    <button
-                        onClick={togglePrivacy}
-                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
-                        title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
-                    >
-                        {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
-                    <button
-                        onClick={() => toggleEventMode(!isEventMode)}
-                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: isEventMode ? '#f64f59' : 'var(--text-muted)' }}
-                        title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
-                    >
-                        <Plane size={20} />
-                    </button>
-                </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Professional Finance</p>
+        <aside style={{
+            height: '100vh',
+            background: 'var(--bg-primary)',
+            borderRight: '1px solid var(--divider)',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '2rem 1rem'
+        }}>
+            <div style={{ marginBottom: '3rem', paddingLeft: '1rem' }}>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>Persona</h1>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Finance</p>
             </div>
 
-            <nav className="sidebar-nav">
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
                 {navItems.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
-                        className={({ isActive }) => clsx(
-                            'nav-item',
-                            isActive ? 'active' : ''
-                        )}
+                        style={({ isActive }) => ({
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1rem',
+                            padding: '0.75rem 1rem',
+                            borderRadius: '10px',
+                            textDecoration: 'none',
+                            color: isActive ? 'var(--color-blue)' : 'var(--text-secondary)',
+                            background: isActive ? 'var(--bg-secondary)' : 'transparent',
+                            fontWeight: isActive ? '600' : '500',
+                            transition: 'all 0.2s'
+                        })}
                     >
-                        {({ isActive }) => (
-                            <>
-                                <div style={{
-                                    color: isActive ? '#c471ed' : 'inherit'
-                                }}>
-                                    <item.icon size={22} />
-                                </div>
-                                <span style={{
-                                    fontWeight: isActive ? 600 : 500
-                                }}>
-                                    {item.label}
-                                </span>
-                                {isActive && (
-                                    <div style={{
-                                        marginLeft: 'auto',
-                                        width: '6px',
-                                        height: '6px',
-                                        borderRadius: '50%',
-                                        background: '#c471ed',
-                                        boxShadow: '0 0 10px #c471ed'
-                                    }} />
-                                )}
-                            </>
-                        )}
+                        <item.icon size={20} />
+                        <span>{item.label}</span>
                     </NavLink>
                 ))}
             </nav>
 
-            <button
-                onClick={signOut}
-                className="logout-btn"
-            >
-                <LogOut size={22} />
-                <span>Sair da Conta</span>
-            </button>
+            <div style={{ borderTop: '1px solid var(--divider)', paddingTop: '1rem' }}>
+                <button
+                    onClick={togglePrivacy}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        padding: '0.75rem 1rem',
+                        width: '100%',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-secondary)',
+                        cursor: 'pointer',
+                        fontSize: '0.9rem'
+                    }}
+                >
+                    {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
+                    <span>{isPrivacyMode ? 'Mostrar Valores' : 'Ocultar Valores'}</span>
+                </button>
+                <button
+                    onClick={signOut}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        padding: '0.75rem 1rem',
+                        width: '100%',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--color-red)',
+                        cursor: 'pointer',
+                        marginTop: '0.5rem',
+                        fontSize: '0.9rem'
+                    }}
+                >
+                    <LogOut size={20} />
+                    <span>Sair</span>
+                </button>
+            </div>
         </aside>
     );
 }

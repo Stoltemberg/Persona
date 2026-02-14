@@ -1,16 +1,13 @@
 import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, PieChart, Wallet, Menu as MenuIcon, X, PiggyBank, Repeat, Calendar, TrendingUp, Eye, EyeOff, Plane } from 'lucide-react';
-import clsx from 'clsx';
+import { NavLink } from 'react-router-dom';
+import { LayoutDashboard, Receipt, Target, Settings, PieChart, Menu, X, PiggyBank, Repeat, Calendar, TrendingUp, Eye, EyeOff, Plane } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
 
 export function MobileNav() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const location = useLocation();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
-    const { isEventMode, toggleEventMode } = useEvent();
 
     const mainItems = [
         { icon: LayoutDashboard, label: 'Início', path: '/dashboard' },
@@ -19,118 +16,119 @@ export function MobileNav() {
     ];
 
     const menuItems = [
-        { icon: Target, label: 'Metas', path: '/goals', color: '#c471ed' },
-        { icon: Repeat, label: 'Recorrentes', path: '/recurring', color: '#00ebc7' },
-        { icon: Calendar, label: 'Assinaturas', path: '/subscriptions', color: '#f64f59' },
-        { icon: TrendingUp, label: 'Simulador', path: '/simulator', color: '#12c2e9' },
-        { icon: PiggyBank, label: 'Orçamentos', path: '/budgets', color: '#f64f59' },
-        { icon: Wallet, label: 'Carteiras', path: '/wallets', color: '#12c2e9' },
-        { icon: Settings, label: 'Config', path: '/settings', color: 'var(--text-secondary)' },
+        { icon: Target, label: 'Metas', path: '/goals' },
+        { icon: Repeat, label: 'Recorrentes', path: '/recurring' },
+        { icon: Calendar, label: 'Assinaturas', path: '/subscriptions' },
+        { icon: Wallet, label: 'Carteiras', path: '/wallets' },
+        { icon: Settings, label: 'Config', path: '/settings' },
     ];
 
     return (
         <>
-            {/* Main Bottom Bar */}
-            <nav className="mobile-bottom-bar">
+            <nav style={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(20px)',
+                borderTop: '1px solid var(--divider)',
+                display: 'flex',
+                justifyContent: 'space-around',
+                padding: '0.75rem 0.5rem',
+                zIndex: 100
+            }}>
                 {mainItems.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
                         onClick={() => setIsMenuOpen(false)}
-                        className="mobile-nav-item"
+                        style={({ isActive }) => ({
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            textDecoration: 'none',
+                            color: isActive ? 'var(--color-blue)' : 'var(--text-tertiary)',
+                            fontSize: '0.7rem',
+                            gap: '0.25rem'
+                        })}
                     >
-                        {({ isActive }) => (
-                            <>
-                                <div className={`mobile-nav-icon ${isActive ? 'active' : ''}`} style={{
-                                    color: isActive ? 'var(--color-2)' : 'inherit',
-                                    transform: isActive ? 'translateY(-2px)' : 'none'
-                                }}>
-                                    <item.icon size={26} strokeWidth={isActive ? 2.5 : 2} />
-                                </div>
-                            </>
-                        )}
+                        <item.icon size={24} strokeWidth={2} />
+                        <span>{item.label}</span>
                     </NavLink>
                 ))}
 
-                {/* Menu Toggle */}
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="mobile-nav-item"
-                    style={{ color: isMenuOpen ? 'var(--color-2)' : 'var(--text-muted)' }}
+                    style={{
+                        background: 'none',
+                        border: 'none',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        color: isMenuOpen ? 'var(--color-blue)' : 'var(--text-tertiary)',
+                        fontSize: '0.7rem',
+                        gap: '0.25rem'
+                    }}
                 >
-                    {isMenuOpen ? <X size={26} /> : <MenuIcon size={26} />}
+                    {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    <span>Menu</span>
                 </button>
             </nav>
 
-            {/* Menu Overlay */}
             {isMenuOpen && createPortal(
-                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)}>
-                    <div
-                        className="mobile-menu-grid"
-                        onClick={e => e.stopPropagation()}
-                    >
-                        {/* Quick Settings Toggles */}
-                        <div style={{
-                            gridColumn: '1 / -1',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            marginBottom: '1rem',
-                            paddingBottom: '1rem',
-                            borderBottom: '1px solid rgba(255,255,255,0.1)'
-                        }}>
-                            <button
-                                onClick={togglePrivacy}
-                                style={{
-                                    background: 'rgba(255,255,255,0.05)',
-                                    border: 'none',
-                                    padding: '0.8rem',
-                                    borderRadius: '12px',
-                                    color: 'var(--text-main)',
-                                    flex: 1,
-                                    marginRight: '0.5rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem'
-                                }}
-                            >
-                                {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
-                                <span style={{ fontSize: '0.9rem' }}>{isPrivacyMode ? 'Visível' : 'Oculto'}</span>
-                            </button>
-
-                            <button
-                                onClick={() => toggleEventMode(!isEventMode)}
-                                style={{
-                                    background: isEventMode ? 'rgba(246, 79, 89, 0.15)' : 'rgba(255,255,255,0.05)',
-                                    border: isEventMode ? '1px solid #f64f59' : 'none',
-                                    padding: '0.8rem',
-                                    borderRadius: '12px',
-                                    color: isEventMode ? '#f64f59' : 'var(--text-main)',
-                                    flex: 1,
-                                    marginLeft: '0.5rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem'
-                                }}
-                            >
-                                <Plane size={20} />
-                                <span style={{ fontSize: '0.9rem' }}>Viagem</span>
+                <div onClick={() => setIsMenuOpen(false)} style={{
+                    position: 'fixed',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.2)',
+                    zIndex: 99
+                }}>
+                    <div onClick={e => e.stopPropagation()} style={{
+                        position: 'absolute',
+                        bottom: '80px',
+                        right: '1rem',
+                        left: '1rem',
+                        background: 'var(--bg-primary)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '1rem',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
+                    }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <button onClick={togglePrivacy} className="btn" style={{ background: 'var(--bg-secondary)', color: 'var(--text-primary)', justifyContent: 'flex-start', fontSize: '0.9rem' }}>
+                                {isPrivacyMode ? <EyeOff size={18} style={{ marginRight: '0.5rem' }} /> : <Eye size={18} style={{ marginRight: '0.5rem' }} />}
+                                {isPrivacyMode ? 'Visível' : 'Oculto'}
                             </button>
                         </div>
-                        {menuItems.map((item) => (
-                            <NavLink
-                                key={item.path}
-                                to={item.path}
-                                onClick={() => setIsMenuOpen(false)}
-                                className="mobile-menu-item"
-                            >
-                                <div className="mobile-menu-icon-container" style={{ background: `${item.color}20`, color: item.color }}>
-                                    <item.icon size={26} strokeWidth={2.2} />
-                                </div>
-                                <span className="mobile-menu-label">{item.label}</span>
-                            </NavLink>
-                        ))}
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                            {menuItems.map((item) => (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        textDecoration: 'none',
+                                        color: 'var(--text-secondary)',
+                                        fontSize: '0.8rem',
+                                        gap: '0.5rem',
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    <div style={{
+                                        background: 'var(--bg-secondary)',
+                                        padding: '0.75rem',
+                                        borderRadius: '12px',
+                                        color: 'var(--color-blue)'
+                                    }}>
+                                        <item.icon size={20} />
+                                    </div>
+                                    <span>{item.label}</span>
+                                </NavLink>
+                            ))}
+                        </div>
                     </div>
                 </div>,
                 document.body
@@ -138,3 +136,5 @@ export function MobileNav() {
         </>
     );
 }
+// Helper for missing import
+import { Wallet } from 'lucide-react';

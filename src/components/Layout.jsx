@@ -28,7 +28,7 @@ export function Layout() {
                 <MobileNav />
             </div>
 
-            <FAB />
+            {/* FAB Removed */}
             <InstallPrompt />
 
         </div>

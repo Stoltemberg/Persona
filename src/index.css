@@ -1530,6 +1530,8 @@ p {
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
+  /* Standard property for compatibility */
   /* Allow 2 lines max */
   -webkit-box-orient: vertical;
   word-wrap: break-word;

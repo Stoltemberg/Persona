@@ -1384,44 +1384,36 @@ p {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 64px;
+  height: auto;
+  min-height: 84px;
+  /* Ensure substantial touch target */
   display: flex;
   justify-content: space-around;
   align-items: center;
+  padding-top: 12px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  /* Dynamic padding for iOS home bar */
 
-  /* True Apple Liquid Glass */
-  background: rgba(22, 22, 24, 0.2);
-  /* Ultra-low opacity for max translucency */
-  background: linear-gradient(180deg,
-      rgba(30, 30, 32, 0.2) 0%,
-      rgba(22, 22, 24, 0.3) 100%);
-  /* Subtle gradient for liquid feel */
-
-  backdrop-filter: blur(40px) saturate(210%);
-  /* Balanced blur */
-  -webkit-backdrop-filter: blur(40px) saturate(210%);
+  /* True Apple Liquid Glass Matches */
+  background: rgba(22, 22, 24, 0.65);
+  /* More opacity for legibility */
+  backdrop-filter: blur(50px) saturate(210%);
+  -webkit-backdrop-filter: blur(50px) saturate(210%);
 
   /* Reflection Border (Top/Inner) */
-  border: none;
-  box-shadow:
-    0 -1px 0 rgba(255, 255, 255, 0.1) inset,
-    /* Fainter top light */
-    0 10px 40px rgba(0, 0, 0, 0.4);
+  border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
 
-  border-radius: 3rem;
-  margin: 0 1rem 1rem 1rem;
   z-index: 100;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .light .mobile-bottom-bar {
-  background: rgba(255, 255, 255, 0.2);
-  background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(240, 240, 240, 0.35) 100%);
-  box-shadow:
-    0 -1px 0 rgba(255, 255, 255, 0.4) inset,
-    0 10px 30px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.65);
+  /* More opacity for light mode */
+  border-top: 0.5px solid rgba(0, 0, 0, 0.05);
+  /* Very subtle border */
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05);
 }
 
 .mobile-nav-item {
@@ -1434,6 +1426,8 @@ p {
   cursor: pointer;
   text-decoration: none;
   padding: 0.5rem;
+  flex: 1;
+  /* Distribute evenly */
 }
 
 /* =========================================

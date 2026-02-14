@@ -50,7 +50,6 @@ export default function Dashboard() {
                 console.log(`Processing ${templates.length} recurring transactions...`);
 
                 for (const tmpl of templates) {
-                    // 1. Create Transaction
                     const { error: txError } = await supabase.from('transactions').insert([{
                         description: tmpl.description,
                         amount: tmpl.amount,
@@ -62,9 +61,7 @@ export default function Dashboard() {
                     }]);
 
                     if (!txError) {
-                        // 2. Update Next Due Date
                         const nextDate = new Date(tmpl.next_due_date);
-                        // Simple monthly logic
                         if (tmpl.frequency === 'monthly') {
                             nextDate.setMonth(nextDate.getMonth() + 1);
                         } else if (tmpl.frequency === 'weekly') {
@@ -77,7 +74,6 @@ export default function Dashboard() {
                         }).eq('id', tmpl.id);
                     }
                 }
-                // Refresh data after processing
                 fetchFinancialData();
             }
         } catch (error) {
@@ -87,13 +83,11 @@ export default function Dashboard() {
 
     const fetchFinancialData = async () => {
         try {
-            // Fetch all transactions for the user
-            // We need more fields now for the list
             const { data, error } = await supabase
                 .from('transactions')
                 .select('*')
                 .eq('profile_id', user.id)
-                .order('date', { ascending: false }); // Latest first
+                .order('date', { ascending: false });
 
             if (error) throw error;
 
@@ -112,14 +106,13 @@ export default function Dashboard() {
                     totalIncome += amount;
                 } else {
                     totalExpense += amount;
-                    // Check if it's this month's expense
                     if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
                         monthlyExpense += amount;
                     }
                 }
             });
 
-            // Fetch Goals for Savings Card
+            // Fetch Goals
             const { data: goalsData } = await supabase
                 .from('goals')
                 .select('*')
@@ -143,8 +136,6 @@ export default function Dashboard() {
             if (walletsData) {
                 walletsWithBalance = walletsData.map(w => {
                     const walletTxs = data.filter(tx => tx.wallet_id === w.id);
-                    // If transactions don't have wallet_id (legacy), we shouldn't assume they belong to a specific wallet 
-                    // unless we want a default. For now, strict matching.
                     const income = walletTxs.filter(t => t.type === 'income').reduce((acc, t) => acc + parseFloat(t.amount), 0);
                     const expense = walletTxs.filter(t => t.type === 'expense').reduce((acc, t) => acc + parseFloat(t.amount), 0);
                     return {
@@ -157,16 +148,9 @@ export default function Dashboard() {
             setBalance(totalIncome - totalExpense);
             setExpenses(monthlyExpense);
             setSavings(totalSavings);
-            // We can store primaryGoal in a state if we want to display it specifically,
-            // or just use totalSavings for now as the base requirement.
-            // Let's add a state for it to use in the UI.
             setPrimaryGoal(primaryGoal);
             setWallets(walletsWithBalance);
 
-            setPrimaryGoal(primaryGoal);
-            setWallets(walletsWithBalance);
-
-            // Set the first 5 for the recent list
             setRecentTransactions(data.slice(0, 5));
             setAllTransactions(data);
 
@@ -178,7 +162,7 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="container fade-in">
+        <div className="container" style={{ animation: 'fadeIn 0.5s ease-out' }}>
             <OnboardingTour />
             <header id="tour-welcome" style={{
                 display: 'flex',
@@ -188,155 +172,177 @@ export default function Dashboard() {
                 paddingTop: '0.5rem'
             }}>
                 <div>
-                    <h1 className="text-gradient">Dashboard</h1>
-                    <p style={{ fontSize: '1.1rem', marginTop: '0.5rem' }}>Bem-vindo de volta, {profile?.full_name || user?.email}</p>
+                    <h1 style={{ fontSize: '28px', marginBottom: '4px' }}>Dashboard</h1>
+                    <p style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>Visão geral</p>
                 </div>
             </header>
 
             {!loading && <InsightsCard transactions={allTransactions} />}
 
-            <div className="cards-scroll-container fade-in">
-                <Card className="stagger-1 card-min-width glow-on-hover" hover>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <div style={{ padding: '0.8rem', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '14px', color: '#12c2e9' }}>
-                            <Wallet size={28} />
+            {/* Main Stats Grid */}
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: '20px',
+                marginBottom: '32px'
+            }}>
+                {/* Balance Card */}
+                <Card className="glass-card-hover" style={{ height: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                        <div style={{ padding: '8px', background: 'rgba(10, 132, 255, 0.1)', borderRadius: '10px', color: 'var(--color-blue)' }}>
+                            <Wallet size={20} />
                         </div>
-                        <h3>Saldo Total</h3>
+                        <h3 style={{ fontSize: '15px', fontWeight: 600, margin: 0 }}>Saldo Total</h3>
                     </div>
-                    <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                        {loading ? <Skeleton width="200px" height="60px" /> : (
+                    <h2 style={{ fontSize: '32px', fontWeight: 700, margin: 0, letterSpacing: '-0.5px' }}>
+                        {loading ? <Skeleton width="150px" height="40px" /> : (
                             isPrivacyMode ? '****' : <CountUp end={balance} prefix="R$ " />
                         )}
                     </h2>
-                    <p style={{ color: '#12c2e9', fontWeight: 500 }}>Atualizado agora</p>
+                    <p style={{ color: 'var(--color-blue)', fontSize: '13px', fontWeight: 500, marginTop: '8px' }}>Disponível</p>
                 </Card>
 
-                <Link to="/analysis" style={{ textDecoration: 'none', color: 'inherit' }} className="card-min-width">
-                    <Card className="stagger-2 glow-on-hover" hover style={{ height: '100%' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                            <div style={{ padding: '0.8rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '14px', color: '#f64f59' }}>
-                                <TrendingUp size={28} />
+                {/* Expenses Card */}
+                <Link to="/analysis" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Card className="glass-card-hover" style={{ height: '100%' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                            <div style={{ padding: '8px', background: 'rgba(255, 69, 58, 0.1)', borderRadius: '10px', color: 'var(--color-red)' }}>
+                                <TrendingUp size={20} />
                             </div>
-                            <h3>Despesas (Mês)</h3>
+                            <h3 style={{ fontSize: '15px', fontWeight: 600, margin: 0 }}>Despesas (Mês)</h3>
                         </div>
-                        <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                            {loading ? <Skeleton width="180px" height="60px" /> : (
+                        <h2 style={{ fontSize: '32px', fontWeight: 700, margin: 0, letterSpacing: '-0.5px' }}>
+                            {loading ? <Skeleton width="150px" height="40px" /> : (
                                 isPrivacyMode ? '****' : <CountUp end={expenses} prefix="R$ " />
                             )}
                         </h2>
-                        <p style={{ color: '#f64f59', fontWeight: 500 }}>Este mês &rarr;</p>
+                        <p style={{ color: 'var(--color-red)', fontSize: '13px', fontWeight: 500, marginTop: '8px' }}>Ver detalhes &rarr;</p>
                     </Card>
                 </Link>
 
-                <Link to="/goals" style={{ textDecoration: 'none', color: 'inherit' }} className="card-min-width">
-                    <Card id="tour-goals" className="stagger-3 glow-on-hover" hover style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                {/* Goals Card */}
+                <Link to="/goals" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Card id="tour-goals" className="glass-card-hover" style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                         <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                                <div style={{ padding: '0.8rem', background: 'rgba(196, 113, 237, 0.15)', borderRadius: '14px', color: '#c471ed' }}>
-                                    <PiggyBank size={28} />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                                <div style={{ padding: '8px', background: 'rgba(191, 90, 242, 0.1)', borderRadius: '10px', color: 'var(--color-purple)' }}>
+                                    <PiggyBank size={20} />
                                 </div>
-                                <h3 style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                    {primaryGoal ? primaryGoal.title : 'Total Economizado'}
+                                <h3 style={{ fontSize: '15px', fontWeight: 600, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    {primaryGoal ? primaryGoal.title : 'Economias'}
                                 </h3>
                             </div>
-                            <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                                {loading ? <Skeleton width="180px" height="60px" /> : (
+                            <h2 style={{ fontSize: '32px', fontWeight: 700, margin: 0, letterSpacing: '-0.5px' }}>
+                                {loading ? <Skeleton width="150px" height="40px" /> : (
                                     isPrivacyMode ? '****' : <CountUp end={primaryGoal ? primaryGoal.current_amount : savings} prefix="R$ " />
                                 )}
                             </h2>
                             {primaryGoal && (
-                                <div style={{ marginTop: '0.5rem' }}>
-                                    <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                                <div style={{ marginTop: '12px' }}>
+                                    <div style={{ width: '100%', height: '6px', background: 'var(--system-gray5)', borderRadius: '3px', overflow: 'hidden' }}>
                                         <div style={{
                                             width: `${Math.min((primaryGoal.current_amount / primaryGoal.target_amount) * 100, 100)}%`,
                                             height: '100%',
-                                            background: '#c471ed',
-                                            transition: 'width 1.5s ease-out' // Added smooth transition
+                                            background: 'var(--color-purple)',
+                                            borderRadius: '3px',
+                                            transition: 'width 1s ease-out'
                                         }} />
                                     </div>
-                                    <p style={{ fontSize: '0.8rem', marginTop: '0.25rem', color: 'rgba(255,255,255,0.5)' }}>
+                                    <p style={{ fontSize: '12px', marginTop: '6px', color: 'var(--text-tertiary)' }}>
                                         Meta: R$ {parseFloat(primaryGoal.target_amount).toFixed(2).replace('.', ',')}
                                     </p>
                                 </div>
                             )}
                         </div>
-                        <p style={{ color: '#c471ed', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: primaryGoal ? '1rem' : 0 }}>
-                            Ver Metas <span style={{ fontSize: '1.2rem' }}>&rarr;</span>
-                        </p>
                     </Card>
                 </Link>
-
-                {/* Display Wallets */}
-                <div id="tour-wallets" style={{ display: 'contents' }}>
-                    {wallets.map((w, index) => (
-                        <Card key={w.id} className="stagger-4 card-min-width glow-on-hover" hover style={{ height: '100%', minWidth: '260px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                                <div style={{ padding: '0.8rem', background: `${w.color}20`, borderRadius: '14px', color: w.color }}>
-                                    <Wallet size={28} />
-                                </div>
-                                <div>
-                                    <h3 style={{ fontSize: '1.1rem' }}>{w.name}</h3>
-                                    <p style={{ fontSize: '0.8rem', opacity: 0.7, textTransform: 'capitalize' }}>{w.type?.replace('_', ' ') || 'Carteira'}</p>
-                                </div>
-                            </div>
-                            <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>
-                                {loading ? <Skeleton width="160px" height="50px" /> : (
-                                    isPrivacyMode ? '****' : <CountUp end={w.current_balance} prefix="R$ " />
-                                )}
-                            </h2>
-                            <p style={{ color: w.color, fontWeight: 500, fontSize: '0.9rem' }}>Saldo Atual</p>
-                        </Card>
-                    ))}
-                </div>
-
             </div>
 
-            <div className="fade-in" style={{ animationDelay: '0.4s' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                    <h2 style={{ fontSize: '2rem' }}>Transações Recentes</h2>
-                    <Link to="/transactions">
-                        <Button variant="ghost">Ver Todas</Button>
+            {/* Wallets Section */}
+            {wallets.length > 0 && (
+                <div style={{ marginBottom: '32px' }}>
+                    <h3 style={{ fontSize: '18px', marginBottom: '16px' }}>Carteiras</h3>
+                    <div className="cards-scroll-container" style={{
+                        display: 'flex',
+                        gap: '16px',
+                        overflowX: 'auto',
+                        paddingBottom: '16px',
+                        scrollSnapType: 'x mandatory'
+                    }}>
+                        {wallets.map((w) => (
+                            <Card key={w.id} className="glass-card-hover" style={{ minWidth: '240px', scrollSnapAlign: 'start' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                                    <div style={{ padding: '8px', background: `${w.color}20`, borderRadius: '10px', color: w.color }}>
+                                        <Wallet size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 style={{ fontSize: '15px', margin: 0 }}>{w.name}</h4>
+                                        <p style={{ fontSize: '12px', opacity: 0.6, margin: 0, textTransform: 'capitalize' }}>{w.type?.replace('_', ' ') || 'Carteira'}</p>
+                                    </div>
+                                </div>
+                                <h3 style={{ fontSize: '22px', fontWeight: 700 }}>
+                                    {isPrivacyMode ? '****' : <CountUp end={w.current_balance} prefix="R$ " />}
+                                </h3>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <div style={{ animation: 'fadeIn 0.5s ease-out 0.2s backwards' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h2 style={{ fontSize: '18px', margin: 0 }}>Transações Recentes</h2>
+                    <Link to="/transactions" style={{ fontSize: '14px', color: 'var(--color-blue)', fontWeight: 500 }}>
+                        Ver todas
                     </Link>
                 </div>
 
-                <div id="tour-transactions" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div id="tour-transactions" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {loading ? (
                         Array(3).fill(0).map((_, i) => (
-                            <Skeleton key={i} width="100%" height="80px" borderRadius="20px" />
+                            <Skeleton key={i} width="100%" height="70px" borderRadius="16px" />
                         ))
                     ) : recentTransactions.length === 0 ? (
-                        <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                            <p style={{ fontSize: '1.1rem' }}>Nenhuma transação encontrada</p>
-                            <Button style={{ marginTop: '1rem' }} onClick={() => window.location.href = '/transactions'}>
-                                Adicionar primeira
+                        <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                            <p style={{ fontSize: '15px' }}>Nenhuma transação encontrada</p>
+                            <Button className="btn-primary" style={{ marginTop: '16px' }} onClick={() => window.location.href = '/transactions'}>
+                                Adicionar
                             </Button>
                         </div>
                     ) : (
-                        recentTransactions.map((tx, index) => (
-                            <Card key={tx.id} hover className="fade-in transaction-card" style={{
-                                animationDelay: `${0.1 * index}s`,
-                                padding: '0.75rem 1rem'
+                        recentTransactions.map((tx) => (
+                            <Card key={tx.id} className="transaction-card glass-card-hover" style={{
+                                padding: '16px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                borderRadius: '16px',
+                                border: '1px solid var(--glass-border)',
+                                background: 'var(--bg-secondary)'
                             }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                                     <div style={{
-                                        padding: '1rem',
+                                        padding: '10px',
                                         borderRadius: '50%',
-                                        background: tx.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
-                                        color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
+                                        background: tx.type === 'income' ? 'rgba(48, 209, 88, 0.1)' : 'rgba(255, 69, 58, 0.1)',
+                                        color: tx.type === 'income' ? 'var(--color-green)' : 'var(--color-red)',
                                         display: 'flex'
                                     }}>
-                                        {tx.type === 'income' ? <ArrowDownLeft size={24} /> : <ArrowUpRight size={24} />}
+                                        {tx.type === 'income' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
                                     </div>
                                     <div>
-                                        <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>{tx.description}</h4>
-                                        <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
+                                        <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 600 }}>{tx.description}</h4>
+                                        <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
+                                            {tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}
+                                        </p>
                                     </div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <h3 style={{
-                                        color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
-                                        fontWeight: 700,
-                                        fontSize: '1.25rem'
+                                        color: tx.type === 'income' ? 'var(--color-green)' : 'var(--text-main)',
+                                        fontWeight: 600,
+                                        fontSize: '15px',
+                                        margin: 0
                                     }}>
                                         {isPrivacyMode ? '****' : (tx.type === 'income' ? '+ ' : '- ') + `R$ ${parseFloat(tx.amount).toFixed(2).replace('.', ',')}`}
                                     </h3>
@@ -349,4 +355,3 @@ export default function Dashboard() {
         </div >
     );
 }
-

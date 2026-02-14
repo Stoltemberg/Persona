@@ -5,15 +5,15 @@ import { Card } from './Card';
 export function TransactionItem({ transaction, categories, onEdit, onDelete, index }) {
     const x = useMotionValue(0);
     const backgroundOpacity = useTransform(x, [-100, 0, 100], [1, 0, 1]);
-    const backgroundColor = useTransform(x, [-100, 0, 100], ['#f64f59', 'transparent', '#12c2e9']);
+    const backgroundColor = useTransform(x, [-100, 0, 100], ['var(--color-red)', 'transparent', 'var(--color-blue)']);
 
-    // Determine Category Logic (duplicated from Transactions.jsx for now)
+    // Determine Category Logic
     const cat = categories.find(c => c.name === transaction.category && c.type === transaction.type);
 
     return (
         <motion.div
             layout
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, height: 0, marginBottom: 0, scale: 0.9 }}
             transition={{ duration: 0.2 }}
@@ -32,13 +32,13 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '0 20px',
+                    padding: '0 24px',
                     borderRadius: '16px',
                     zIndex: 0
                 }}
             >
-                <Edit2 color="white" size={24} />
-                <Trash2 color="white" size={24} />
+                <Edit2 color="white" size={20} />
+                <Trash2 color="white" size={20} />
             </motion.div>
 
             {/* Foreground Card Layer */}
@@ -52,44 +52,45 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                         onEdit(transaction);
                     }
                 }}
-                style={{ x, position: 'relative', zIndex: 1, background: 'var(--bg-panel)', borderRadius: '16px' }} // Ensure background is solid
+                style={{ x, position: 'relative', zIndex: 1, background: 'var(--bg-deep)', borderRadius: '16px' }}
             >
                 <Card
-                    hover={false} // Disable default hover scale as it conflicts with drag
+                    hover={false}
                     className="transaction-card"
                     style={{
                         margin: 0,
-                        background: 'var(--glass-bg)',
-                        backdropFilter: 'blur(10px)',
-                        padding: '0.75rem 1rem',
+                        background: 'var(--bg-secondary)',
+                        border: '1px solid var(--glass-border)',
+                        padding: '16px',
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
                     }}
                 >
                     <div className="transaction-left">
                         <div style={{
-                            padding: '0.6rem',
+                            padding: '10px',
                             borderRadius: '50%',
-                            background: cat ? `${cat.color}20` : (transaction.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)'),
-                            color: cat ? cat.color : (transaction.type === 'income' ? '#12c2e9' : '#f64f59'),
-                            display: 'flex', alignItems: 'center', justifyItems: 'center',
-                            fontSize: '1rem'
+                            background: cat ? `${cat.color}20` : (transaction.type === 'income' ? 'rgba(48, 209, 88, 0.1)' : 'rgba(255, 69, 58, 0.1)'),
+                            color: cat ? cat.color : (transaction.type === 'income' ? 'var(--color-green)' : 'var(--color-red)'),
+                            display: 'flex', alignItems: 'center', justifyItems: 'center'
                         }}>
-                            {cat ? cat.icon : (transaction.type === 'income' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />)}
+                            {cat ? cat.icon : (transaction.type === 'income' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />)}
                         </div>
 
                         <div>
-                            <h4 style={{ marginBottom: '0.1rem', fontSize: '0.95rem' }}>{transaction.description}</h4>
-                            <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+                            <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 600 }}>{transaction.description}</h4>
+                            <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
                                 {transaction.category} • {new Date(transaction.date).toLocaleDateString('pt-BR')}
                                 {transaction.expense_type && (
                                     <span style={{
-                                        marginLeft: '0.5rem',
-                                        padding: '0.1rem 0.4rem',
+                                        marginLeft: '6px',
+                                        padding: '2px 6px',
                                         borderRadius: '4px',
-                                        background: 'rgba(255,255,255,0.1)',
-                                        fontSize: '0.75rem'
+                                        background: 'var(--system-gray5)',
+                                        fontSize: '11px',
+                                        color: 'var(--text-secondary)'
                                     }}>
                                         {transaction.expense_type === 'fixed' && 'Fixo'}
                                         {transaction.expense_type === 'variable' && 'Variável'}
@@ -103,31 +104,13 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                     <div className="transaction-right">
                         <div style={{ textAlign: 'right' }}>
                             <h3 style={{
-                                color: transaction.type === 'income' ? '#12c2e9' : '#f64f59',
+                                color: transaction.type === 'income' ? 'var(--color-green)' : 'var(--text-main)',
                                 fontWeight: 600,
-                                fontSize: '1rem'
+                                fontSize: '15px',
+                                margin: 0
                             }}>
                                 {transaction.type === 'income' ? '+ ' : '- '}R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}
                             </h3>
-                        </div>
-                        {/* Desktop Actions (Hidden on mobile via CSS ideally, or kept as backup) */}
-                        <div className="desktop-actions" style={{ display: 'flex', gap: '0.5rem', marginLeft: '1rem' }}>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); onEdit(transaction); }}
-                                className="btn-ghost"
-                                style={{ padding: '0.6rem' }}
-                                title="Editar"
-                            >
-                                <Edit2 size={16} />
-                            </button>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); onDelete(transaction.id); }}
-                                className="btn-ghost"
-                                style={{ color: '#f64f59', padding: '0.6rem' }}
-                                title="Excluir"
-                            >
-                                <Trash2 size={16} />
-                            </button>
                         </div>
                     </div>
                 </Card>

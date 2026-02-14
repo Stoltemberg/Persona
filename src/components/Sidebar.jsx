@@ -11,45 +11,51 @@ export function Sidebar() {
     const { isEventMode, toggleEventMode } = useEvent();
 
     const navItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-        { icon: Receipt, label: 'Transações', path: '/transactions' },
+        { icon: LayoutDashboard, label: 'Início', path: '/dashboard' },
+        { icon: Receipt, label: 'Extrato', path: '/transactions' },
         { icon: Target, label: 'Metas', path: '/goals' },
         { icon: PieChart, label: 'Análise', path: '/analysis' },
         { icon: Calendar, label: 'Assinaturas', path: '/subscriptions' },
         { icon: TrendingUp, label: 'Simulador', path: '/simulator' },
         { icon: Repeat, label: 'Recorrentes', path: '/recurring' },
-        { icon: Wallet, label: 'Orçamentos', path: '/budgets' },
-        { icon: Settings, label: 'Configurações', path: '/settings' },
+        { icon: Wallet, label: 'Carteiras', path: '/budgets' }, // Budgets actually wallets in nav
+        { icon: Settings, label: 'Ajustes', path: '/settings' },
     ];
 
     if (role === 'admin') {
-        navItems.push({ icon: Receipt, label: 'Admin', path: '/admin' }); // Reusing Receipt icon or import Shield?
+        navItems.push({ icon: Receipt, label: 'Admin', path: '/admin' });
     }
 
     return (
-        <aside className="glass-panel sidebar-panel">
-            <div className="sidebar-header">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                    <h1 style={{ fontSize: '2rem', marginBottom: 0 }} className="text-gradient">Persona</h1>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            {/* Header */}
+            <div style={{ padding: '0 12px 24px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                    <h2 style={{ fontSize: '18px', fontWeight: 600, margin: 0 }}>Persona</h2>
+                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Finanças</span>
+                </div>
+
+                {/* Quick Toggles */}
+                <div style={{ display: 'flex', gap: '8px' }}>
                     <button
                         onClick={togglePrivacy}
-                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
-                        title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
+                        style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px' }}
+                        title={isPrivacyMode ? "Mostrar" : "Ocultar"}
                     >
-                        {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
+                        {isPrivacyMode ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                     <button
                         onClick={() => toggleEventMode(!isEventMode)}
-                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: isEventMode ? '#f64f59' : 'var(--text-muted)' }}
-                        title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
+                        style={{ background: 'none', border: 'none', color: isEventMode ? 'var(--color-pink)' : 'var(--text-secondary)', cursor: 'pointer', padding: '4px' }}
+                        title="Modo Viagem"
                     >
-                        <Plane size={20} />
+                        <Plane size={16} />
                     </button>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Professional Finance</p>
             </div>
 
-            <nav className="sidebar-nav">
+            {/* Navigation */}
+            <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 {navItems.map((item) => (
                     <NavLink
                         key={item.path}
@@ -61,39 +67,40 @@ export function Sidebar() {
                     >
                         {({ isActive }) => (
                             <>
-                                <div style={{
-                                    color: isActive ? '#c471ed' : 'inherit'
-                                }}>
-                                    <item.icon size={22} />
-                                </div>
-                                <span style={{
-                                    fontWeight: isActive ? 600 : 500
-                                }}>
-                                    {item.label}
-                                </span>
-                                {isActive && (
-                                    <div style={{
-                                        marginLeft: 'auto',
-                                        width: '6px',
-                                        height: '6px',
-                                        borderRadius: '50%',
-                                        background: '#c471ed',
-                                        boxShadow: '0 0 10px #c471ed'
-                                    }} />
-                                )}
+                                <item.icon size={18} strokeWidth={isActive ? 2.5 : 2} style={{ opacity: isActive ? 1 : 0.7 }} />
+                                <span>{item.label}</span>
                             </>
                         )}
                     </NavLink>
                 ))}
             </nav>
 
-            <button
-                onClick={signOut}
-                className="logout-btn"
-            >
-                <LogOut size={22} />
-                <span>Sair da Conta</span>
-            </button>
-        </aside>
+            {/* Footer / Logout */}
+            <div style={{ paddingTop: '16px', borderTop: '1px solid var(--glass-border)' }}>
+                <button
+                    onClick={signOut}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        width: '100%',
+                        padding: '10px 12px',
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--color-red)',
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        borderRadius: '10px',
+                        transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.target.style.background = 'rgba(255, 59, 48, 0.1)'}
+                    onMouseLeave={(e) => e.target.style.background = 'none'}
+                >
+                    <LogOut size={18} />
+                    <span>Sair</span>
+                </button>
+            </div>
+        </div>
     );
 }

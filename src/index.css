@@ -1392,47 +1392,50 @@ p {
   align-items: center;
   padding: 0 1rem;
 
-  /* Refraction Base */
+  /* Refraction Base - Clearer */
   background: radial-gradient(circle at 50% 0%,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.01) 70%);
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.01) 80%);
 
-  /* Clean Glass Blur */
-  backdrop-filter: blur(12px) saturate(160%);
-  /* Moderate blur for classy feel */
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  /* Minimal Blur for Clarity (Glass, not Fog) */
+  backdrop-filter: blur(4px) saturate(140%);
+  -webkit-backdrop-filter: blur(4px) saturate(140%);
 
   /* Liquid Volume Construction */
   border-radius: 28px;
 
   /* Refraction Simulation (Lighting) */
   box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.25),
+    0 20px 40px rgba(0, 0, 0, 0.2),
     /* Lift */
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    /* Top Highlight (Surface) */
-    inset 0 -2px 5px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    /* Top Highlight */
+    inset 0 -2px 5px rgba(0, 0, 0, 0.05),
     /* Bottom Depth */
-    inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
   /* Bottom Caustic Reflection */
 
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   z-index: 100;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   overflow: hidden;
 }
 
-/* Remove Pseudo-element Blur Mask (Clean Look) */
+/* Remove Pseudo-element Blur Mask (Clean Look), ensure it stays gone */
 .mobile-bottom-bar::before {
   display: none;
 }
 
 .light .mobile-bottom-bar {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: radial-gradient(circle at 50% 0%,
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0.1) 80%);
+  backdrop-filter: blur(6px) saturate(140%);
+  -webkit-backdrop-filter: blur(6px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
     inset 0 -1px 0 rgba(0, 0, 0, 0.05);
 }
 

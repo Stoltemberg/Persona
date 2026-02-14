@@ -193,6 +193,12 @@ body {
   color: #000000 !important;
 }
 
+/* Garantir que o texto dentro de botões ghost seja visível no modo claro */
+.light button.btn-ghost,
+.light .btn-ghost * {
+  color: #000000 !important;
+}
+
 /* Inputs */
 .input-group label {
   font-weight: 500;

@@ -198,12 +198,13 @@ export default function Dashboard() {
         <div className="container fade-in" style={{ paddingBottom: '80px' }}>
             <OnboardingTour />
 
-            {/* Minimal Header */}
-            <header style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                    Olá, <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{profile?.full_name?.split(' ')[0] || 'Usuário'}</span>
-                </h1>
-            </header>
+            import {PageHeader} from '../components/PageHeader';
+
+            // ... inside component ...
+
+            <PageHeader
+                title={<span>Olá, <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{profile?.full_name?.split(' ')[0] || 'Usuário'}</span></span>}
+            />
 
             {/* Hero Balance Section - The Core Focus */}
             <section style={{ marginBottom: '5rem', textAlign: 'center' }}>

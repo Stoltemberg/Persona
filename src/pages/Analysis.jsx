@@ -126,29 +126,17 @@ export default function Analysis() {
 
     return (
         <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-            <header className="flex-between mb-2 flex-wrap gap-1" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
-                <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                        Análise <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Mensal</span>
-                    </h1>
-                    <p className="text-muted" style={{ opacity: 0.6 }}>Resumo financeiro completo</p>
-                </div>
-            </header>
+            import {PageHeader} from '../components/PageHeader';
+
+            // ... inside component ...
+
+            <PageHeader
+                title={<span>Análise <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Mensal</span></span>}
+                subtitle="Resumo financeiro completo"
+            />
 
             {/* Month Selector */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '50px', // Pill shape
-                padding: '0.4rem 0.6rem',
-                minWidth: '260px',
-                marginBottom: '1.5rem',
-                backdropFilter: 'blur(10px)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
-            }}>
+            <div className="glass-pill-nav">
                 <button
                     onClick={() => changeMonth(-1)}
                     className="btn-ghost"

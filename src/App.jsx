@@ -1,31 +1,41 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from './hooks/useAuth';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Transactions from './pages/Transactions';
-import Categories from './pages/Categories';
-import Goals from './pages/Goals';
-import Analysis from './pages/Analysis';
-import Wallets from './pages/Wallets';
-import Settings from './pages/Settings';
-import Budgets from './pages/Budgets';
-import Recurring from './pages/Recurring';
-import Subscriptions from './pages/Subscriptions';
-import Simulator from './pages/Simulator';
-import Landing from './pages/Landing';
-import Terms from './pages/Terms';
-import Privacy from './pages/Privacy';
-
-import NotFound from './pages/NotFound';
-import Admin from './pages/Admin';
+import React, { Suspense } from 'react';
 import { Layout } from './components/Layout';
+
+// Lazy Load Pages
+const Login = React.lazy(() => import('./pages/Login'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const Transactions = React.lazy(() => import('./pages/Transactions'));
+const Categories = React.lazy(() => import('./pages/Categories'));
+const Goals = React.lazy(() => import('./pages/Goals'));
+const Analysis = React.lazy(() => import('./pages/Analysis'));
+const Wallets = React.lazy(() => import('./pages/Wallets'));
+const Settings = React.lazy(() => import('./pages/Settings'));
+const Budgets = React.lazy(() => import('./pages/Budgets'));
+const Recurring = React.lazy(() => import('./pages/Recurring'));
+const Subscriptions = React.lazy(() => import('./pages/Subscriptions'));
+const Simulator = React.lazy(() => import('./pages/Simulator'));
+const Landing = React.lazy(() => import('./pages/Landing'));
+const Terms = React.lazy(() => import('./pages/Terms'));
+const Privacy = React.lazy(() => import('./pages/Privacy'));
+const NotFound = React.lazy(() => import('./pages/NotFound'));
+const Admin = React.lazy(() => import('./pages/Admin'));
+
+// Loading Fallback
+const LoadingScreen = () => (
+  <div className="flex-center" style={{ height: '100vh', width: '100%', flexDirection: 'column', gap: '1rem' }}>
+    <div className="spinner"></div>
+    <p style={{ opacity: 0.5 }}>Carregando...</p>
+  </div>
+);
 
 // Protected Route Wrapper
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
 
-  if (loading) return <div className="flex-center" style={{ height: '100vh' }}>Loading...</div>;
+  if (loading) return <LoadingScreen />;
 
   return user ? <Outlet /> : <Navigate to="/login" />;
 };
@@ -33,14 +43,16 @@ const ProtectedRoute = () => {
 // Root Route Logic
 const Home = () => {
   const { user, loading } = useAuth();
-  if (loading) return <div className="flex-center" style={{ height: '100vh' }}>Loading...</div>;
+  if (loading) return <LoadingScreen />;
   return user ? <Navigate to="/dashboard" /> : <Landing />;
 }
 
 function App() {
   return (
     <Router>
-      <AnimatedRoutes />
+      <Suspense fallback={<LoadingScreen />}>
+        <AnimatedRoutes />
+      </Suspense>
     </Router>
   );
 }

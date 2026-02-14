@@ -267,24 +267,23 @@ export default function Goals() {
     return (
         <div className="container fade-in" style={{ paddingBottom: '80px' }}>
             {/* ... header ... */}
-            <header className="page-header" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
-                <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                        Metas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Financeiras</span>
-                    </h1>
-                    <p style={{ opacity: 0.6 }}>Acompanhe e realize seus sonhos</p>
-                </div>
+            import {PageHeader} from '../components/PageHeader';
+
+            // ... inside component ...
+
+            <PageHeader
+                title={<span>Metas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Financeiras</span></span>}
+                subtitle="Acompanhe e realize seus sonhos"
+            >
                 <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
                     Nova Meta
                 </Button>
-            </header>
+            </PageHeader>
 
             {/* Smart Tips Section - Global */}
-            <div className="glass-panel" style={{
+            <div className="glass-panel panel-gradient-purple" style={{
                 marginBottom: '2rem',
                 padding: '1.5rem',
-                background: 'linear-gradient(to right, rgba(79, 41, 240, 0.1), rgba(196, 113, 237, 0.1))',
-                borderLeft: '4px solid #c471ed',
                 display: 'flex',
                 gap: '1rem',
                 alignItems: 'start'

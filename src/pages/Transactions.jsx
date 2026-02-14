@@ -15,6 +15,7 @@ import { exportTransactionsToExcel } from '../lib/exportUtils';
 import { getSmartCategory } from '../utils/smartCategories';
 import { TransactionItem } from '../components/TransactionItem';
 import { DateRangePicker } from '../components/DateRangePicker';
+import { PageHeader } from '../components/PageHeader';
 
 export default function Transactions() {
     const { user } = useAuth();
@@ -253,50 +254,44 @@ export default function Transactions() {
 
     return (
         <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-            <header className="page-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem', marginBottom: '3rem', paddingTop: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                        Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Transações</span>
-                    </h1>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <Button onClick={handleExport} variant="ghost" icon={Download}>
-                            <span className="responsive-btn-text">Exportar</span>
-                        </Button>
-                        <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
-                            <span className="responsive-btn-text">Nova Transação</span>
-                        </Button>
-                    </div>
+            <PageHeader
+                title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Transações</span></span>}
+            >
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <Button onClick={handleExport} variant="ghost" icon={Download} title="Exportar para Excel" style={{ padding: '0.6rem' }} />
+                    <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
+                        Nova
+                    </Button>
                 </div>
+            </PageHeader>      {/* Date Filters */}
 
-                {/* Date Filters */}
-                {/* Date Filters */}
-                <div className="date-filters">
-                    <DateRangePicker
-                        startDate={startDate ? new Date(startDate.split('-')[0], startDate.split('-')[1] - 1, startDate.split('-')[2]) : null}
-                        endDate={endDate ? new Date(endDate.split('-')[0], endDate.split('-')[1] - 1, endDate.split('-')[2]) : null}
-                        onChange={({ start, end }) => {
-                            if (start) {
-                                // Formatting to YYYY-MM-DD manually to avoid timezone issues or use format from date-fns
-                                const y = start.getFullYear();
-                                const m = String(start.getMonth() + 1).padStart(2, '0');
-                                const d = String(start.getDate()).padStart(2, '0');
-                                setStartDate(`${y}-${m}-${d}`);
-                            } else {
-                                setStartDate('');
-                            }
+            {/* Date Filters */}
+            <div className="date-filters">
+                <DateRangePicker
+                    startDate={startDate ? new Date(startDate.split('-')[0], startDate.split('-')[1] - 1, startDate.split('-')[2]) : null}
+                    endDate={endDate ? new Date(endDate.split('-')[0], endDate.split('-')[1] - 1, endDate.split('-')[2]) : null}
+                    onChange={({ start, end }) => {
+                        if (start) {
+                            // Formatting to YYYY-MM-DD manually to avoid timezone issues or use format from date-fns
+                            const y = start.getFullYear();
+                            const m = String(start.getMonth() + 1).padStart(2, '0');
+                            const d = String(start.getDate()).padStart(2, '0');
+                            setStartDate(`${y}-${m}-${d}`);
+                        } else {
+                            setStartDate('');
+                        }
 
-                            if (end) {
-                                const y = end.getFullYear();
-                                const m = String(end.getMonth() + 1).padStart(2, '0');
-                                const d = String(end.getDate()).padStart(2, '0');
-                                setEndDate(`${y}-${m}-${d}`);
-                            } else {
-                                setEndDate('');
-                            }
-                        }}
-                    />
-                </div>
-            </header>
+                        if (end) {
+                            const y = end.getFullYear();
+                            const m = String(end.getMonth() + 1).padStart(2, '0');
+                            const d = String(end.getDate()).padStart(2, '0');
+                            setEndDate(`${y}-${m}-${d}`);
+                        } else {
+                            setEndDate('');
+                        }
+                    }}
+                />
+            </div>
 
             {/* Transaction List */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

@@ -217,9 +217,7 @@ export default function Settings() {
                     <div className="grid-2">
                         {[
                             { id: 'light', icon: Sun, label: 'Claro' },
-                            { id: 'dark', icon: Moon, label: 'Escuro' },
-                            { id: 'amoled', icon: Zap, label: 'Amoled' },
-                            { id: 'full-white', icon: Maximize, label: 'Clean' }
+                            { id: 'dark', icon: Moon, label: 'Escuro' }
                         ].map((t) => (
                             <button
                                 key={t.id}

@@ -1476,37 +1476,33 @@ p {
   right: 0;
   z-index: 101;
 
-  /* Sheet Appearance */
-  background: rgba(22, 22, 24, 0.92);
-  /* iOS Dark */
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  border-top-left-radius: 20px;
-  /* Reduced radius for cleaner look */
-  border-top-right-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-bottom: none;
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.4);
+  /* Clean Sheet Appearance - Apple Style */
+  background: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  border: none;
+  /* No visible borders */
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  /* Imperceptible shadow */
 
-  /* Layout */
-  padding: 3rem 1.5rem 2.5rem 1.5rem;
+  /* Layout with more breathing room */
+  padding: 3rem 2rem 2.5rem 2rem;
   padding-bottom: calc(2.5rem + env(safe-area-inset-bottom));
 
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  column-gap: 12px;
-  /* Fixed gap to prevent squeezing */
-  row-gap: 24px;
-  /* More breathing room vertically */
+  column-gap: 1rem;
+  row-gap: 2rem;
+  /* Increased spacing */
 
   animation: slideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .light .mobile-menu-grid {
-  background: rgba(250, 250, 250, 0.92);
-  /* iOS Light */
-  border-color: rgba(0, 0, 0, 0.05);
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.15);
+  background: rgba(248, 248, 248, 0.95);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
 }
 
 /* Drag Handle Pill */
@@ -1539,14 +1535,14 @@ p {
   width: 100%;
 }
 
-/* Icon Squircle */
+/* Icon Container - Smaller and Cleaner */
 .mobile-menu-icon-container {
-  width: 52px;
-  /* iOS standard is ~60px, going slightly smaller for fit */
-  height: 52px;
-  border-radius: 14px;
-  /* Perfect squircle ratio */
-  background: rgba(255, 255, 255, 0.08);
+  width: 48px;
+  /* Smaller icons */
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  /* Subtle background */
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -1556,45 +1552,44 @@ p {
 }
 
 .light .mobile-menu-icon-container {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.04);
   color: #000000;
 }
 
 .mobile-menu-item:active .mobile-menu-icon-container {
   transform: scale(0.95);
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .light .mobile-menu-item:active .mobile-menu-icon-container {
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.08);
 }
 
-/* Label Typography */
+/* Label Typography - Lighter and Cleaner */
 .mobile-menu-label {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 11px;
-  /* iOS Home Screen size */
-  font-weight: 500;
-  line-height: 1.15;
+  font-size: 10px;
+  /* Smaller */
+  font-weight: 400;
+  /* Lighter */
+  line-height: 1.2;
   color: inherit;
-  opacity: 0.9;
+  opacity: 0.7;
+  /* More subdued */
 
-  /* Text Wrapping Logic */
+  /* Text Wrapping */
   width: 100%;
-  max-width: 80px;
-  /* Constrain width to force wrap near icon width */
+  max-width: 72px;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
-  /* Standard property for compatibility */
-  /* Allow 2 lines max */
   -webkit-box-orient: vertical;
   word-wrap: break-word;
 }
 
-/* Quick Settings Toggles Area */
+/* Quick Settings Toggles - Lighter Style */
 .menu-toggle-btn {
   display: flex;
   flex-direction: column;
@@ -1602,29 +1597,33 @@ p {
   justify-content: center;
   gap: 6px;
   padding: 12px;
-  border-radius: 16px;
+  border-radius: 14px;
   border: none;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+  /* Subtle */
   color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 400;
+  /* Lighter */
   transition: all 0.2s;
 }
 
 .menu-toggle-btn:active {
   transform: scale(0.96);
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .menu-toggle-btn.active {
-  background: #ffffff;
-  color: #000000;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  box-shadow: none;
+  /* No shadow */
 }
 
 .light .menu-toggle-btn.active {
-  background: #000000;
-  color: #ffffff;
+  background: rgba(0, 0, 0, 0.08);
+  color: #000000;
+  box-shadow: none;
 }
 
 @keyframes slideUp {

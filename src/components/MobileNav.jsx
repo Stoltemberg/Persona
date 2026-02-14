@@ -21,11 +21,10 @@ export function MobileNav() {
 
     const menuItems = [
         { icon: Target, label: 'Metas', path: '/goals' },
-        { icon: Repeat, label: 'Recorrentes', path: '/recurring' },
+        { icon: Repeat, label: 'Fixos', path: '/recurring' },
         { icon: Calendar, label: 'Assinaturas', path: '/subscriptions' },
-        { icon: TrendingUp, label: 'Simulador', path: '/simulator' },
+        { icon: TrendingUp, label: 'Simulação', path: '/simulator' },
         { icon: PiggyBank, label: 'Orçamentos', path: '/budgets' },
-        { icon: Wallet, label: 'Carteiras', path: '/wallets' },
         { icon: Settings, label: 'Config', path: '/settings' },
     ];
 
@@ -115,7 +114,7 @@ export function MobileNav() {
                                 onClick={togglePrivacy}
                                 className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`}
                             >
-                                {isPrivacyMode ? <EyeOff size={24} /> : <Eye size={24} />}
+                                {isPrivacyMode ? <EyeOff size={20} strokeWidth={1.5} /> : <Eye size={20} strokeWidth={1.5} />}
                                 <span>{isPrivacyMode ? 'Oculto' : 'Visível'}</span>
                             </button>
 
@@ -123,7 +122,7 @@ export function MobileNav() {
                                 onClick={() => toggleEventMode(!isEventMode)}
                                 className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`}
                             >
-                                <Plane size={24} />
+                                <Plane size={20} strokeWidth={1.5} />
                                 <span>Viagem</span>
                             </button>
                         </div>
@@ -135,7 +134,7 @@ export function MobileNav() {
                                 className="mobile-menu-item"
                             >
                                 <div className="mobile-menu-icon-container">
-                                    <item.icon size={24} strokeWidth={1.5} />
+                                    <item.icon size={20} strokeWidth={1.5} />
                                 </div>
                                 <span className="mobile-menu-label">{item.label}</span>
                             </NavLink>

@@ -2040,12 +2040,46 @@ p {
 
   /* Logout Button in Dock */
   .logout-btn {
-    width: auto;
-    margin-top: 0;
-    padding: 0.6rem;
-    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: 0.6rem 0.8rem;
+    min-width: 64px;
+    height: auto;
+    border-radius: 16px;
     background: rgba(246, 79, 89, 0.1);
     color: #f64f59;
+
+    /* Simulate visual balance */
+    margin-left: 0.5rem;
+    position: relative;
+  }
+
+  /* Add separator before logout */
+  .logout-btn::before {
+    content: '';
+    position: absolute;
+    left: -0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 24px;
+    width: 1px;
+    background: var(--glass-border);
+  }
+
+  .logout-btn span {
+    display: block;
+    /* Show text "Sair" strictly or icon only? Let's hide text to match others if they hide it, but others show it. Others show span. */
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+
+  .logout-btn:hover {
+    background: rgba(246, 79, 89, 0.2);
+    transform: translateY(-4px);
   }
 
   .logout-btn span {

@@ -158,13 +158,13 @@ export default function Categories() {
                     <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                         <Button type="button"
                             className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? '#f64f59' : undefined }}
+                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? '#f64f59' : undefined, color: type === 'expense' ? '#fff' : undefined }}
                             onClick={() => setType('expense')}>
                             Despesa
                         </Button>
                         <Button type="button"
                             className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? '#12c2e9' : undefined }}
+                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? '#12c2e9' : undefined, color: type === 'income' ? '#fff' : undefined }}
                             onClick={() => setType('income')}>
                             Receita
                         </Button>

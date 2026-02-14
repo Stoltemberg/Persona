@@ -346,7 +346,7 @@ export default function Transactions() {
                         <Button
                             type="button"
                             className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--color-3)' : undefined, border: type === 'expense' ? 'none' : undefined }}
+                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--color-3)' : undefined, border: type === 'expense' ? 'none' : undefined, color: type === 'expense' ? '#fff' : undefined }}
                             onClick={() => { setType('expense'); setCategory(''); setSelectedCategory(null); }}
                         >
                             Despesa
@@ -354,7 +354,7 @@ export default function Transactions() {
                         <Button
                             type="button"
                             className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--color-4)' : undefined, border: type === 'income' ? 'none' : undefined }}
+                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--color-4)' : undefined, border: type === 'income' ? 'none' : undefined, color: type === 'income' ? '#fff' : undefined }}
                             onClick={() => { setType('income'); setCategory(''); setSelectedCategory(null); }}
                         >
                             Receita

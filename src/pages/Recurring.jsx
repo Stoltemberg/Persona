@@ -231,7 +231,7 @@ export default function Recurring() {
                         <Button
                             type="button"
                             className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--color-3)' : undefined }}
+                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--color-3)' : undefined, color: type === 'expense' ? '#fff' : undefined }}
                             onClick={() => setType('expense')}
                         >
                             Despesa
@@ -239,7 +239,7 @@ export default function Recurring() {
                         <Button
                             type="button"
                             className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--color-4)' : undefined }}
+                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--color-4)' : undefined, color: type === 'income' ? '#fff' : undefined }}
                             onClick={() => setType('income')}
                         >
                             Receita

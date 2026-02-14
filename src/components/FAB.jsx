@@ -11,7 +11,7 @@ import { Input } from './Input';
 import { usePrivacy } from '../context/PrivacyContext';
 import { getSmartCategory } from '../utils/smartCategories';
 
-export function FAB() {
+export function FAB({ className, style }) {
     const { user } = useAuth();
     const { addToast } = useToast();
     const { medium, success } = useHaptic();
@@ -100,7 +100,8 @@ export function FAB() {
         <>
             <button
                 onClick={handleOpen}
-                className="fab-btn"
+                className={`fab-btn ${className || ''}`}
+                style={style}
                 aria-label="Adicionar Transação"
             >
                 <Plus size={28} strokeWidth={2.5} />

@@ -28,7 +28,7 @@ export function Layout() {
                 <MobileNav />
             </div>
 
-            <FAB />
+            <FAB className="desktop-fab" />
             <InstallPrompt />
 
         </div>

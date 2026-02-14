@@ -3,6 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Receipt, Target, Settings, PieChart, Wallet, Menu as MenuIcon, X, PiggyBank, Repeat, Calendar, TrendingUp, Eye, EyeOff, Plane } from 'lucide-react';
 import clsx from 'clsx';
 import { createPortal } from 'react-dom';
+import { FAB } from './FAB';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
 
@@ -32,7 +33,39 @@ export function MobileNav() {
         <>
             {/* Main Bottom Bar */}
             <nav className="mobile-bottom-bar">
-                {mainItems.map((item) => (
+                {mainItems.slice(0, 2).map((item) => (
+                    <NavLink
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setIsMenuOpen(false)}
+                        className="mobile-nav-item"
+                    >
+                        {({ isActive }) => (
+                            <div className={`mobile-nav-icon`} style={{
+                                color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
+                                transform: isActive ? 'scale(1.1)' : 'none',
+                                transition: 'all 0.2s ease'
+                            }}>
+                                <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                            </div>
+                        )}
+                    </NavLink>
+                ))}
+
+                {/* Center FAB */}
+                <FAB
+                    className="mobile-center-fab"
+                    style={{
+                        position: 'relative',
+                        bottom: '24px',
+                        right: 'auto',
+                        width: '64px',
+                        height: '64px',
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.5)'
+                    }}
+                />
+
+                {mainItems.slice(2).map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}

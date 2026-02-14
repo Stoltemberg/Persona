@@ -1514,12 +1514,7 @@ p {
   background: #333333;
 }
 
-@media (min-width: 1024px) {
-  .fab-btn {
-    bottom: 2rem;
-    right: 2rem;
-  }
-}
+
 
 /* Category Selection Grid Items */
 .category-item {

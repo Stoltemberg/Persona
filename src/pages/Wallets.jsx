@@ -247,3 +247,5 @@ export default function Wallets() {
                 onTransferSuccess={fetchWallets}
             />
         </div>
+    );
+}

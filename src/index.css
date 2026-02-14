@@ -1392,16 +1392,15 @@ p {
   align-items: center;
   padding: 0 1rem;
 
-  /* True Apple Liquid Glass Matches */
-  background: rgba(22, 22, 24, 0.5);
-  /* Increase transparency for liquid feel */
-  backdrop-filter: blur(25px) saturate(210%);
-  -webkit-backdrop-filter: blur(25px) saturate(210%);
+  /* TRUE Translucent Liquid Glass */
+  background: rgba(22, 22, 24, 0.2);
+  /* Very low opacity for max transparency */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 
   /* Soft Border & Shadow */
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  /* Full border for floating */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 
   border-radius: 24px;
   z-index: 100;
@@ -1409,12 +1408,11 @@ p {
 }
 
 .light .mobile-bottom-bar {
-  background: rgba(255, 255, 255, 0.5);
-  /* Light mode transparency */
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
 }
 
 .mobile-nav-item {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, PieChart, Menu, X, PiggyBank, Repeat, Calendar, TrendingUp, Eye, EyeOff, Plane } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, PieChart, Menu, X, PiggyBank, Repeat, Calendar, TrendingUp, Eye, EyeOff, Plane, Wallet } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
@@ -25,7 +25,7 @@ export function MobileNav() {
 
     return (
         <>
-            <nav style={{
+            <nav role="navigation" aria-label="Mobile Navigation" style={{
                 position: 'fixed',
                 bottom: 0,
                 left: 0,
@@ -43,6 +43,7 @@ export function MobileNav() {
                         key={item.path}
                         to={item.path}
                         onClick={() => setIsMenuOpen(false)}
+                        aria-label={item.label}
                         style={({ isActive }) => ({
                             display: 'flex',
                             flexDirection: 'column',
@@ -53,13 +54,15 @@ export function MobileNav() {
                             gap: '0.25rem'
                         })}
                     >
-                        <item.icon size={24} strokeWidth={2} />
+                        <item.icon size={24} strokeWidth={2} aria-hidden="true" />
                         <span>{item.label}</span>
                     </NavLink>
                 ))}
 
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
+                    aria-expanded={isMenuOpen}
                     style={{
                         background: 'none',
                         border: 'none',
@@ -68,21 +71,28 @@ export function MobileNav() {
                         alignItems: 'center',
                         color: isMenuOpen ? 'var(--color-blue)' : 'var(--text-tertiary)',
                         fontSize: '0.7rem',
-                        gap: '0.25rem'
+                        gap: '0.25rem',
+                        cursor: 'pointer'
                     }}
                 >
-                    {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    {isMenuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
                     <span>Menu</span>
                 </button>
             </nav>
 
             {isMenuOpen && createPortal(
-                <div onClick={() => setIsMenuOpen(false)} style={{
-                    position: 'fixed',
-                    inset: 0,
-                    background: 'rgba(0,0,0,0.2)',
-                    zIndex: 99
-                }}>
+                <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Menu Adicional"
+                    onClick={() => setIsMenuOpen(false)}
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(0,0,0,0.2)',
+                        zIndex: 99
+                    }}
+                >
                     <div onClick={e => e.stopPropagation()} style={{
                         position: 'absolute',
                         bottom: '80px',
@@ -106,6 +116,7 @@ export function MobileNav() {
                                     key={item.path}
                                     to={item.path}
                                     onClick={() => setIsMenuOpen(false)}
+                                    aria-label={item.label}
                                     style={{
                                         display: 'flex',
                                         flexDirection: 'column',
@@ -123,7 +134,7 @@ export function MobileNav() {
                                         borderRadius: '12px',
                                         color: 'var(--color-blue)'
                                     }}>
-                                        <item.icon size={20} />
+                                        <item.icon size={20} aria-hidden="true" />
                                     </div>
                                     <span>{item.label}</span>
                                 </NavLink>
@@ -136,5 +147,3 @@ export function MobileNav() {
         </>
     );
 }
-// Helper for missing import
-import { Wallet } from 'lucide-react';

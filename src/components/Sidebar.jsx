@@ -33,11 +33,12 @@ export function Sidebar() {
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Finance</p>
             </div>
 
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
+            <nav role="navigation" aria-label="Main Navigation" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
                 {navItems.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
+                        aria-label={item.label}
                         style={({ isActive }) => ({
                             display: 'flex',
                             alignItems: 'center',
@@ -48,10 +49,11 @@ export function Sidebar() {
                             color: isActive ? 'var(--color-blue)' : 'var(--text-secondary)',
                             background: isActive ? 'var(--bg-secondary)' : 'transparent',
                             fontWeight: isActive ? '600' : '500',
-                            transition: 'all 0.2s'
+                            transition: 'all 0.2s',
+                            outline: 'none' // We will handle focus via global CSS or :focus-visible
                         })}
                     >
-                        <item.icon size={20} />
+                        <item.icon size={20} aria-hidden="true" />
                         <span>{item.label}</span>
                     </NavLink>
                 ))}

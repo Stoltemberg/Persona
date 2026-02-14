@@ -20,12 +20,14 @@ import Privacy from './pages/Privacy';
 import NotFound from './pages/NotFound';
 import Admin from './pages/Admin';
 import { Layout } from './components/Layout';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { LoadingScreen } from './components/LoadingScreen';
 
 // Protected Route Wrapper
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
 
-  if (loading) return <div className="flex-center" style={{ height: '100vh' }}>Loading...</div>;
+  if (loading) return <LoadingScreen />;
 
   return user ? <Outlet /> : <Navigate to="/login" />;
 };
@@ -33,15 +35,17 @@ const ProtectedRoute = () => {
 // Root Route Logic
 const Home = () => {
   const { user, loading } = useAuth();
-  if (loading) return <div className="flex-center" style={{ height: '100vh' }}>Loading...</div>;
+  if (loading) return <LoadingScreen />;
   return user ? <Navigate to="/dashboard" /> : <Landing />;
 }
 
 function App() {
   return (
-    <Router>
-      <AnimatedRoutes />
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <AnimatedRoutes />
+      </Router>
+    </ErrorBoundary>
   );
 }
 

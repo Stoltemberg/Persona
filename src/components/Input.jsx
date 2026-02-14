@@ -19,19 +19,6 @@ export const Input = forwardRef(({ className, error, label, ...props }, ref) => 
             <input
                 ref={ref}
                 className={clsx('input-field', className)}
-                style={{
-                    width: '100%',
-                    padding: '1rem',
-                    backgroundColor: 'var(--bg-secondary)', // #F2F2F7
-                    border: 'none',
-                    borderRadius: '12px',
-                    fontSize: '1rem',
-                    color: 'var(--text-primary)',
-                    outline: 'none',
-                    transition: 'background-color 0.2s'
-                }}
-                onFocus={(e) => e.target.style.backgroundColor = '#E5E5EA'}
-                onBlur={(e) => e.target.style.backgroundColor = 'var(--bg-secondary)'}
                 {...props}
             />
             {error && (

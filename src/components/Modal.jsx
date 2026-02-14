@@ -6,17 +6,27 @@ export function Modal({ isOpen, onClose, title, children }) {
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
+
+            const handleEsc = (e) => {
+                if (e.key === 'Escape') onClose();
+            };
+            window.addEventListener('keydown', handleEsc);
+            return () => {
+                window.removeEventListener('keydown', handleEsc);
+                document.body.style.overflow = 'unset';
+            };
         }
         return () => { document.body.style.overflow = 'unset'; };
-    }, [isOpen]);
+    }, [isOpen, onClose]);
 
     if (!isOpen) return null;
 
     return createPortal(
         <div
             className="modal-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
             onClick={onClose}
             style={{
                 position: 'fixed',

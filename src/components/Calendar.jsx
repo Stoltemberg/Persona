@@ -110,11 +110,11 @@ export function Calendar({ startDate, endDate, onChange }) {
                             justifyContent: 'center',
                             cursor: 'pointer',
                             borderRadius: '50%', // Circle shape for selection
-                            background: isSelected ? 'var(--color-1)' : (isInRange ? 'rgba(79, 41, 240, 0.15)' : 'transparent'),
+                            background: isSelected ? 'var(--color-blue)' : (isInRange ? 'rgba(0, 122, 255, 0.15)' : 'transparent'),
                             color: isSelected ? 'white' : (isCurrentMonth ? 'var(--text-main)' : 'var(--text-muted)'),
                             opacity: isCurrentMonth ? 1 : 0.3,
                             fontWeight: isSelected ? 600 : 400,
-                            border: isSameDay(day, new Date()) && !isSelected ? '1px solid var(--color-1)' : 'none',
+                            border: isSameDay(day, new Date()) && !isSelected ? '1px solid var(--color-blue)' : 'none',
                         }}
                     >
                         {/* Connecting strip for range */}

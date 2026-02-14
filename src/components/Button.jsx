@@ -22,7 +22,7 @@ export function Button({
             {...props}
         >
             {loading ? (
-                <span className="loader">Loading...</span> // Simple loader text for now
+                <div className="loader"></div>
             ) : (
                 <>
                     {Icon && <Icon size={18} />}

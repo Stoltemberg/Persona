@@ -85,17 +85,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Minimal Add Button */}
-                <Link to="/transactions" style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: 'var(--bg-secondary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--color-blue)',
-                    textDecoration: 'none'
-                }}>
+                <Link to="/transactions" className="btn-icon-add" aria-label="Nova Transação">
                     <Plus size={20} />
                 </Link>
             </header>

@@ -25,7 +25,7 @@ export function MobileNav() {
 
     return (
         <>
-            <nav 
+            <nav
                 role="navigation"
                 aria-label="Mobile Navigation"
                 style={{
@@ -69,8 +69,12 @@ export function MobileNav() {
                             background: isActive ? 'var(--bg-secondary)' : 'transparent'
                         })}
                     >
-                        <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} aria-hidden="true" />
-                        <span>{item.label}</span>
+                        {({ isActive }) => (
+                            <>
+                                <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} aria-hidden="true" />
+                                <span>{item.label}</span>
+                            </>
+                        )}
                     </NavLink>
                 ))}
 
@@ -103,11 +107,11 @@ export function MobileNav() {
             </nav>
 
             {isMenuOpen && createPortal(
-                <div 
+                <div
                     role="dialog"
                     aria-modal="true"
                     aria-label="Menu Adicional"
-                    onClick={() => setIsMenuOpen(false)} 
+                    onClick={() => setIsMenuOpen(false)}
                     style={{
                         position: 'fixed',
                         inset: 0,
@@ -117,8 +121,8 @@ export function MobileNav() {
                         animation: 'fadeIn 0.2s ease-out'
                     }}
                 >
-                    <div 
-                        onClick={e => e.stopPropagation()} 
+                    <div
+                        onClick={e => e.stopPropagation()}
                         className="slide-up"
                         style={{
                             position: 'absolute',
@@ -133,17 +137,17 @@ export function MobileNav() {
                             margin: '0 auto'
                         }}
                     >
-                        <div style={{ 
-                            display: 'grid', 
-                            gridTemplateColumns: '1fr 1fr', 
-                            gap: 'var(--spacing-sm)', 
-                            marginBottom: 'var(--spacing-md)' 
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr',
+                            gap: 'var(--spacing-sm)',
+                            marginBottom: 'var(--spacing-md)'
                         }}>
-                            <button 
-                                onClick={togglePrivacy} 
-                                className="btn btn-ghost" 
-                                style={{ 
-                                    justifyContent: 'flex-start', 
+                            <button
+                                onClick={togglePrivacy}
+                                className="btn btn-ghost"
+                                style={{
+                                    justifyContent: 'flex-start',
                                     fontSize: '0.875rem',
                                     padding: '10px var(--spacing-md)'
                                 }}
@@ -153,10 +157,10 @@ export function MobileNav() {
                             </button>
                         </div>
 
-                        <div style={{ 
-                            display: 'grid', 
-                            gridTemplateColumns: 'repeat(3, 1fr)', 
-                            gap: 'var(--spacing-md)' 
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(3, 1fr)',
+                            gap: 'var(--spacing-md)'
                         }}>
                             {menuItems.map((item) => (
                                 <NavLink

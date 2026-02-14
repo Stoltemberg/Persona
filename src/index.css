@@ -1379,41 +1379,42 @@ p {
 }
 
 /* Mobile Navigation */
+/* Mobile Navigation */
 .mobile-bottom-bar {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: auto;
-  min-height: 84px;
-  /* Ensure substantial touch target */
+  bottom: 2rem;
+  /* Floating */
+  left: 1.5rem;
+  right: 1.5rem;
+  height: 72px;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding-top: 12px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom));
-  /* Dynamic padding for iOS home bar */
+  padding: 0 1rem;
 
   /* True Apple Liquid Glass Matches */
-  background: rgba(22, 22, 24, 0.65);
-  /* More opacity for legibility */
-  backdrop-filter: blur(50px) saturate(210%);
-  -webkit-backdrop-filter: blur(50px) saturate(210%);
+  background: rgba(22, 22, 24, 0.5);
+  /* Increase transparency for liquid feel */
+  backdrop-filter: blur(25px) saturate(210%);
+  -webkit-backdrop-filter: blur(25px) saturate(210%);
 
-  /* Reflection Border (Top/Inner) */
-  border-top: 0.5px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+  /* Soft Border & Shadow */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* Full border for floating */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 
+  border-radius: 24px;
   z-index: 100;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .light .mobile-bottom-bar {
-  background: rgba(255, 255, 255, 0.65);
-  /* More opacity for light mode */
-  border-top: 0.5px solid rgba(0, 0, 0, 0.05);
-  /* Very subtle border */
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.5);
+  /* Light mode transparency */
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-nav-item {

@@ -24,55 +24,85 @@ export function Modal({ isOpen, onClose, title, children }) {
     return createPortal(
         <div
             className="modal-overlay"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-title"
-            onClick={onClose}
             style={{
                 position: 'fixed',
                 inset: 0,
-                zIndex: 1000,
-                backgroundColor: 'rgba(0, 0, 0, 0.4)', // Dimmer overlay
-                backdropFilter: 'blur(5px)',
+                zIndex: 'var(--z-modal)',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                backdropFilter: 'blur(12px)',
                 display: 'flex',
-                alignItems: 'flex-end', // Bottom sheet on mobile default
+                alignItems: 'flex-end',
                 justifyContent: 'center',
-                padding: '0',
+                padding: 0,
+                animation: 'fadeIn 0.25s ease-out'
             }}
         >
+            {/* Clickable overlay as semantic button */}
+            <button
+                onClick={onClose}
+                aria-label="Fechar modal"
+                style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'default',
+                    outline: 'none'
+                }}
+            />
+            
             <div
-                className="modal-content fade-in"
+                className="modal-content slide-up"
                 onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="modal-title"
                 style={{
                     width: '100%',
                     maxWidth: '500px',
-                    backgroundColor: 'var(--bg-primary)',
-                    borderTopLeftRadius: '24px',
-                    borderTopRightRadius: '24px',
-                    borderBottomLeftRadius: window.innerWidth > 600 ? '24px' : '0',
-                    borderBottomRightRadius: window.innerWidth > 600 ? '24px' : '0',
+                    backgroundColor: 'var(--bg-elevated)',
+                    borderTopLeftRadius: 'var(--radius-xl)',
+                    borderTopRightRadius: 'var(--radius-xl)',
+                    borderBottomLeftRadius: window.innerWidth > 600 ? 'var(--radius-xl)' : '0',
+                    borderBottomRightRadius: window.innerWidth > 600 ? 'var(--radius-xl)' : '0',
                     padding: '2rem',
                     position: 'relative',
                     maxHeight: '90vh',
                     overflowY: 'auto',
-                    boxShadow: '0 -10px 40px rgba(0,0,0,0.1)',
-                    marginBottom: window.innerWidth > 600 ? 'auto' : '0', // Center on desktop
+                    boxShadow: 'var(--shadow-xl)',
+                    marginBottom: window.innerWidth > 600 ? 'auto' : '0',
                     marginTop: window.innerWidth > 600 ? 'auto' : '0',
+                    zIndex: 1
                 }}
             >
                 {/* Drag Handle for mobile feel */}
                 <div style={{
                     width: '40px',
                     height: '5px',
-                    backgroundColor: 'var(--bg-secondary)',
-                    borderRadius: '100px',
+                    backgroundColor: 'var(--divider)',
+                    borderRadius: 'var(--radius-full)',
                     margin: '0 auto 1.5rem auto'
                 }} />
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: '700' }}>{title}</h3>
+                <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    marginBottom: '2rem' 
+                }}>
+                    <h3 
+                        id="modal-title"
+                        style={{ 
+                            fontSize: '1.5rem', 
+                            fontWeight: '700',
+                            margin: 0
+                        }}
+                    >
+                        {title}
+                    </h3>
                     <button
                         onClick={onClose}
+                        aria-label="Fechar"
                         style={{
                             background: 'var(--bg-secondary)',
                             border: 'none',
@@ -83,7 +113,16 @@ export function Modal({ isOpen, onClose, title, children }) {
                             alignItems: 'center',
                             justifyContent: 'center',
                             cursor: 'pointer',
-                            color: 'var(--text-secondary)'
+                            color: 'var(--text-secondary)',
+                            transition: 'all var(--transition-base)'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'var(--bg-tertiary)';
+                            e.currentTarget.style.transform = 'scale(1.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'var(--bg-secondary)';
+                            e.currentTarget.style.transform = 'scale(1)';
                         }}
                     >
                         <X size={18} />

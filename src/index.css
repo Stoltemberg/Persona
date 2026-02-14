@@ -1389,18 +1389,20 @@ p {
   justify-content: space-around;
   align-items: center;
 
-  /* Liquid Glass Effect */
-  background: rgba(18, 18, 20, 0.5);
-  /* Significantly more transparent */
-  /* More transparent */
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  /* True Apple Liquid Glass */
+  background: rgba(22, 22, 24, 0.4);
+  /* Much lower opacity */
+  backdrop-filter: blur(50px) saturate(220%);
+  /* High blur & vibrancy */
+  -webkit-backdrop-filter: blur(50px) saturate(220%);
 
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  /* Subtle highlight on top */
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  /* Reflection Border (Top/Inner) */
+  border: none;
+  box-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.15) inset,
+    /* Top inner light */
+    0 10px 40px rgba(0, 0, 0, 0.4);
+  /* Deep ambient shadow */
 
   border-radius: 3rem;
   margin: 0 1rem 1rem 1rem;
@@ -1409,11 +1411,10 @@ p {
 }
 
 .light .mobile-bottom-bar {
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-top: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .mobile-nav-item {

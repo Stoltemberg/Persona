@@ -1392,51 +1392,58 @@ p {
   align-items: center;
   padding: 0 1rem;
 
-  /* Refraction Base - Clearer */
-  background: radial-gradient(circle at 50% 0%,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.01) 80%);
-
-  /* Minimal Blur for Clarity (Glass, not Fog) */
+  /* Base Glass */
+  background: rgba(255, 255, 255, 0.01);
   backdrop-filter: blur(2px) saturate(140%);
   -webkit-backdrop-filter: blur(2px) saturate(140%);
 
   /* Liquid Volume Construction */
   border-radius: 28px;
-
-  /* Refraction Simulation (Lighting) */
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.2),
-    /* Lift */
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    /* Top Highlight */
-    inset 0 -2px 5px rgba(0, 0, 0, 0.05),
-    /* Bottom Depth */
-    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
-  /* Bottom Caustic Reflection */
-
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  /* Clip the pseudo-element */
+  overflow: hidden;
   z-index: 100;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  overflow: hidden;
+
+  /* Initial Subtle Border */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
 }
 
-/* Remove Pseudo-element Blur Mask (Clean Look), ensure it stays gone */
+/* "Liquid Meniscus" Pseudo-element for Edge Refraction */
 .mobile-bottom-bar::before {
-  display: none;
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  /* Let clicks pass through */
+  z-index: 2;
+
+  /* Complex Edge Refraction (Simulating thick glass/water edge) */
+  box-shadow:
+    /* Top Highlight (Light hitting curved surface) */
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    /* Bottom Refraction (Caustic light gathering at bottom) */
+    inset 0 -2px 1px rgba(255, 255, 255, 0.3),
+    /* Inner Depth Shadow (Thickness of the glass) */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    /* Subtle Glow */
+    inset 0 0 20px rgba(255, 255, 255, 0.02);
 }
 
 .light .mobile-bottom-bar {
-  background: radial-gradient(circle at 50% 0%,
-      rgba(255, 255, 255, 0.4) 0%,
-      rgba(255, 255, 255, 0.1) 80%);
-  backdrop-filter: blur(6px) saturate(140%);
-  -webkit-backdrop-filter: blur(6px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px) saturate(140%);
+  -webkit-backdrop-filter: blur(4px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.light .mobile-bottom-bar::before {
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    inset 0 -2px 1px rgba(255, 255, 255, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 /* Light mode pseudo adjustment */

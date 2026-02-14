@@ -108,10 +108,10 @@ export default function Settings() {
     };
 
     return (
-        <div className="fade-in">
-            <header style={{ marginBottom: '3rem' }}>
-                <h1 className="text-gradient">Configurações</h1>
-                <p>Gerencie sua conta e preferências</p>
+        <div className="fade-in" style={{ paddingBottom: '100px' }}>
+            <header style={{ marginBottom: '5rem' }}>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Configurações</h1>
+                <p style={{ opacity: 0.6 }}>Gerencie sua conta e preferências</p>
             </header>
 
             <div className="grid-responsive">

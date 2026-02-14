@@ -132,11 +132,11 @@ export default function Wallets() {
     };
 
     return (
-        <div className="container fade-in">
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+        <div className="container fade-in" style={{ paddingBottom: '100px' }}>
+            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5rem' }}>
                 <div>
-                    <h1 className="text-gradient">Minhas Carteiras</h1>
-                    <p>Gerencie suas contas bancárias e dinheiro físico</p>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Minhas Carteiras</h1>
+                    <p style={{ opacity: 0.6 }}>Gerencie suas contas bancárias e dinheiro físico</p>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                     <Button onClick={() => setIsTransferOpen(true)} variant="ghost" icon={ArrowRightLeft} disabled={wallets.length < 2} title={wallets.length < 2 ? "Precisa de pelo menos 2 carteiras" : "Transferir"}>

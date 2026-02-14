@@ -84,11 +84,11 @@ export default function Budgets() {
     const totalProgress = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
     return (
-        <div className="container fade-in">
-            <header className="flex-between mb-2 flex-wrap gap-1">
+        <div className="container fade-in" style={{ paddingBottom: '100px' }}>
+            <header className="flex-between mb-2 flex-wrap gap-1" style={{ marginBottom: '5rem' }}>
                 <div>
-                    <h1 className="text-gradient">Orçamentos</h1>
-                    <p className="text-muted">Defina limites e economize</p>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Orçamentos</h1>
+                    <p className="text-muted" style={{ opacity: 0.6 }}>Defina limites e economize</p>
                 </div>
             </header>
 

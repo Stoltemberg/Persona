@@ -104,50 +104,27 @@ export function MobileNav() {
                         {/* Quick Settings Toggles */}
                         <div style={{
                             gridColumn: '1 / -1',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            marginBottom: '1rem',
-                            paddingBottom: '1rem',
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr',
+                            gap: '1rem',
+                            marginBottom: '1.5rem',
+                            paddingBottom: '1.5rem',
                             borderBottom: '1px solid var(--glass-border)'
                         }}>
                             <button
                                 onClick={togglePrivacy}
-                                style={{
-                                    background: 'var(--input-bg)',
-                                    border: '1px solid var(--glass-border)',
-                                    padding: '0.8rem',
-                                    borderRadius: '12px',
-                                    color: 'var(--text-main)',
-                                    flex: 1,
-                                    marginRight: '0.5rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem'
-                                }}
+                                className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`}
                             >
-                                {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
-                                <span style={{ fontSize: '0.85rem' }}>{isPrivacyMode ? 'Visível' : 'Oculto'}</span>
+                                {isPrivacyMode ? <EyeOff size={24} /> : <Eye size={24} />}
+                                <span>{isPrivacyMode ? 'Oculto' : 'Visível'}</span>
                             </button>
 
                             <button
                                 onClick={() => toggleEventMode(!isEventMode)}
-                                style={{
-                                    background: isEventMode ? 'var(--text-main)' : 'var(--input-bg)',
-                                    border: '1px solid var(--glass-border)',
-                                    padding: '0.8rem',
-                                    borderRadius: '12px',
-                                    color: isEventMode ? 'var(--bg-deep)' : 'var(--text-main)',
-                                    flex: 1,
-                                    marginLeft: '0.5rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem'
-                                }}
+                                className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`}
                             >
-                                <Plane size={18} />
-                                <span style={{ fontSize: '0.85rem' }}>Viagem</span>
+                                <Plane size={24} />
+                                <span>Viagem</span>
                             </button>
                         </div>
                         {menuItems.map((item) => (

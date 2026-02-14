@@ -193,7 +193,17 @@ export default function Dashboard() {
                 <p style={{ fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.65, marginBottom: '0.5rem' }}>
                     Saldo Total
                 </p>
-                <div style={{ fontSize: '3.5rem', fontWeight: 500, letterSpacing: '0.01em', lineHeight: 1.1, transition: 'opacity 0.3s ease' }}>
+                <div style={{
+                    fontSize: '3.5rem',
+                    fontWeight: 500,
+                    letterSpacing: '0.01em',
+                    lineHeight: 1.1,
+                    minHeight: '80px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'opacity 0.3s ease'
+                }}>
                     {loading ? <Skeleton width="200px" height="80px" style={{ margin: '0 auto' }} /> : (
                         isPrivacyMode ? '****' : <CountUp end={balance} prefix="R$ " />
                     )}

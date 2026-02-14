@@ -178,6 +178,23 @@ body {
 }
 
 /* Light Mode Buttons override */
+.light .btn-primary {
+  background: #000000;
+  color: #ffffff !important;
+}
+
+.light .btn-primary:hover {
+  background: #1a1a1a;
+  color: #ffffff !important;
+}
+
+/* Garantir que títulos de página sejam visíveis no modo claro */
+.light h1,
+.light h2,
+.light h3,
+.light .page-header h1 {
+  color: #000000 !important;
+}
 
 .light .btn-ghost {
   background: rgba(0, 0, 0, 0.05);

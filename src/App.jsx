@@ -5,19 +5,22 @@ import React, { Suspense } from 'react';
 import { Layout } from './components/Layout';
 
 // Lazy Load Pages
+// Eager Load Pages (Core App)
+import Dashboard from './pages/Dashboard';
+import Transactions from './pages/Transactions';
+import Categories from './pages/Categories';
+import Goals from './pages/Goals';
+import Analysis from './pages/Analysis';
+import Wallets from './pages/Wallets';
+import Budgets from './pages/Budgets';
+import Recurring from './pages/Recurring';
+import Subscriptions from './pages/Subscriptions';
+import Simulator from './pages/Simulator';
+
+// Lazy Load Pages (Secondary / Auth)
 const Login = React.lazy(() => import('./pages/Login'));
-const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const Transactions = React.lazy(() => import('./pages/Transactions'));
-const Categories = React.lazy(() => import('./pages/Categories'));
-const Goals = React.lazy(() => import('./pages/Goals'));
-const Analysis = React.lazy(() => import('./pages/Analysis'));
-const Wallets = React.lazy(() => import('./pages/Wallets'));
-const Settings = React.lazy(() => import('./pages/Settings'));
-const Budgets = React.lazy(() => import('./pages/Budgets'));
-const Recurring = React.lazy(() => import('./pages/Recurring'));
-const Subscriptions = React.lazy(() => import('./pages/Subscriptions'));
-const Simulator = React.lazy(() => import('./pages/Simulator'));
 const Landing = React.lazy(() => import('./pages/Landing'));
+const Settings = React.lazy(() => import('./pages/Settings'));
 const Terms = React.lazy(() => import('./pages/Terms'));
 const Privacy = React.lazy(() => import('./pages/Privacy'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));

@@ -1484,42 +1484,42 @@ p {
   border-top-right-radius: 24px;
   border: none;
   /* No visible borders */
-  box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.04);
-  /* Almost invisible */
+  box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.02);
+  /* Ultra subtle */
 
-  /* Layout with more breathing room */
-  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  /* Layout with maximum breathing room */
+  padding: 3.5rem 2.5rem 2.5rem 2.5rem;
   padding-bottom: calc(2.5rem + env(safe-area-inset-bottom));
 
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  column-gap: 1.25rem;
-  row-gap: 2.5rem;
-  /* More space */
+  column-gap: 1.5rem;
+  row-gap: 3rem;
+  /* Maximum space */
 
   animation: slideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .light .mobile-menu-grid {
   background: rgba(248, 248, 248, 0.95);
-  box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.015);
 }
 
-/* Drag Handle Pill */
+/* Drag Handle Pill - More Subtle */
 .mobile-menu-grid::before {
   content: '';
   position: absolute;
-  top: 10px;
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
   width: 36px;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.25);
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 100px;
 }
 
 .light .mobile-menu-grid::before {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.12);
 }
 
 /* Menu Item Container */
@@ -1541,8 +1541,8 @@ p {
   /* Smaller icons */
   height: 46px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  /* Almost transparent */
+  background: rgba(255, 255, 255, 0.015);
+  /* Ultra transparent */
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -1552,7 +1552,7 @@ p {
 }
 
 .light .mobile-menu-icon-container {
-  background: rgba(0, 0, 0, 0.02);
+  background: rgba(0, 0, 0, 0.015);
   color: #000000;
 }
 

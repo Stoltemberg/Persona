@@ -57,11 +57,11 @@ export function MobileNav() {
                     className="mobile-center-fab"
                     style={{
                         position: 'relative',
-                        bottom: '16px',
-                        right: 'auto',
-                        width: '64px',
-                        height: '64px',
-                        boxShadow: '0 8px 30px rgba(0,0,0,0.5)'
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '18px', // Squircle for modern look? Or keep circle? keeping circle for now but maybe less floating
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                        flexShrink: 0
                     }}
                 />
 

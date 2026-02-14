@@ -1423,7 +1423,8 @@ p {
   padding: 2.5rem 1.5rem 2rem 1.5rem;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem 1rem;
+  gap: 1.5rem 0.5rem;
+  /* Reduced horizontal gap */
   z-index: 101;
   border: 1px solid var(--glass-border);
   border-bottom: none;

@@ -135,7 +135,7 @@ export default function Wallets() {
         <div className="container fade-in" style={{ paddingBottom: '100px' }}>
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '5rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Minhas Carteiras</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Minhas Carteiras</h1>
                     <p style={{ opacity: 0.6 }}>Gerencie suas contas bancárias e dinheiro físico</p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: '100%', maxWidth: '300px' }}>

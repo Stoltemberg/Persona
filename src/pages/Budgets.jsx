@@ -87,7 +87,7 @@ export default function Budgets() {
         <div className="container fade-in" style={{ paddingBottom: '100px' }}>
             <header className="flex-between mb-2 flex-wrap gap-1" style={{ marginBottom: '5rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Orçamentos</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Orçamentos</h1>
                     <p className="text-muted" style={{ opacity: 0.6 }}>Defina limites e economize</p>
                 </div>
             </header>

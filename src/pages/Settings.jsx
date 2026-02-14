@@ -110,7 +110,7 @@ export default function Settings() {
     return (
         <div className="fade-in" style={{ paddingBottom: '100px' }}>
             <header style={{ marginBottom: '5rem' }}>
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Configurações</h1>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Configurações</h1>
                 <p style={{ opacity: 0.6 }}>Gerencie sua conta e preferências</p>
             </header>
 

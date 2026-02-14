@@ -269,7 +269,7 @@ export default function Goals() {
             {/* ... header ... */}
             <header className="page-header" style={{ marginBottom: '5rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Metas Financeiras</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Metas Financeiras</h1>
                     <p style={{ opacity: 0.6 }}>Acompanhe e realize seus sonhos</p>
                 </div>
                 <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">

@@ -58,7 +58,7 @@ export default function Subscriptions() {
         <div className="container fade-in" style={{ paddingBottom: '100px' }}>
             <header className="page-header" style={{ marginBottom: '5rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Assinaturas</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Assinaturas</h1>
                     <p className="text-muted" style={{ opacity: 0.6 }}>Gerencie seus serviços e custos fixos</p>
                 </div>
                 <Link to="/recurring">

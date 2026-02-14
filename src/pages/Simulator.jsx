@@ -49,7 +49,7 @@ export default function Simulator() {
         <div className="container fade-in" style={{ paddingBottom: '100px' }}>
             <header className="page-header" style={{ marginBottom: '5rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Simulador de Futuro</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Simulador de Futuro</h1>
                     <p style={{ opacity: 0.6 }}>Veja o poder dos juros compostos</p>
                 </div>
             </header>

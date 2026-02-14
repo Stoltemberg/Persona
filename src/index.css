@@ -47,7 +47,9 @@
 }
 
 /* Light Mode Overrides - Minimalist Light */
-html.light {
+:root.light,
+html.light,
+.light {
   --bg-deep: #ffffff;
   --bg-card: #f8f8f8;
 
@@ -84,6 +86,24 @@ body {
   font-smooth: always;
   -webkit-font-smoothing: antialiased;
   transition: color 0.3s, background-color 0.3s;
+}
+
+/* Forçar cores corretas no modo claro */
+html.light body,
+.light body {
+  color: #000000;
+  background-color: #ffffff;
+}
+
+html.light h1,
+html.light h2,
+html.light h3,
+html.light p,
+html.light span,
+html.light div,
+html.light a,
+html.light label {
+  color: inherit;
 }
 
 /* --- Advanced Components --- */

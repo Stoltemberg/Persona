@@ -242,7 +242,7 @@ export default function Transactions() {
         <div className="container fade-in" style={{ paddingBottom: '100px' }}>
             <header className="page-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem', marginBottom: '5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Transações</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Transações</h1>
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         <Button onClick={handleExport} variant="ghost" icon={Download}>
                             <span className="responsive-btn-text">Exportar</span>

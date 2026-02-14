@@ -1398,8 +1398,8 @@ p {
       rgba(255, 255, 255, 0.01) 80%);
 
   /* Minimal Blur for Clarity (Glass, not Fog) */
-  backdrop-filter: blur(4px) saturate(140%);
-  -webkit-backdrop-filter: blur(4px) saturate(140%);
+  backdrop-filter: blur(2px) saturate(140%);
+  -webkit-backdrop-filter: blur(2px) saturate(140%);
 
   /* Liquid Volume Construction */
   border-radius: 28px;

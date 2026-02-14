@@ -125,10 +125,12 @@ export default function Analysis() {
     const totalExpenses = chartData.reduce((acc, curr) => acc + curr.value, 0);
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '100px' }}>
-            <header className="flex-between mb-2 flex-wrap gap-1" style={{ marginBottom: '5rem' }}>
+        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
+            <header className="flex-between mb-2 flex-wrap gap-1" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Análise Mensal</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
+                        Análise <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Mensal</span>
+                    </h1>
                     <p className="text-muted" style={{ opacity: 0.6 }}>Resumo financeiro completo</p>
                 </div>
             </header>

@@ -46,10 +46,12 @@ export default function Simulator() {
     const totalInterest = finalAmount - totalInvested;
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '100px' }}>
-            <header className="page-header" style={{ marginBottom: '5rem' }}>
+        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
+            <header className="page-header" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Simulador de Futuro</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
+                        Simulador de <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Futuro</span>
+                    </h1>
                     <p style={{ opacity: 0.6 }}>Veja o poder dos juros compostos</p>
                 </div>
             </header>

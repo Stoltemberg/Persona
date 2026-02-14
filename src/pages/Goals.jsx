@@ -265,11 +265,13 @@ export default function Goals() {
     // ... existing imports/code ...
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '100px' }}>
+        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
             {/* ... header ... */}
-            <header className="page-header" style={{ marginBottom: '5rem' }}>
+            <header className="page-header" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Metas Financeiras</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
+                        Metas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Financeiras</span>
+                    </h1>
                     <p style={{ opacity: 0.6 }}>Acompanhe e realize seus sonhos</p>
                 </div>
                 <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">

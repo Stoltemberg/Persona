@@ -154,10 +154,12 @@ export default function Recurring() {
     };
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '100px' }}>
-            <header className="page-header" style={{ marginBottom: '5rem' }}>
+        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
+            <header className="page-header" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
                 <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Recorrências</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
+                        Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Recorrências</span>
+                    </h1>
                     <p style={{ opacity: 0.6 }}>Gerencie seus gastos e ganhos fixos</p>
                 </div>
                 <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">

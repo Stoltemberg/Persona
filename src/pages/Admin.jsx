@@ -130,13 +130,15 @@ export default function Admin() {
     }
 
     return (
-        <div className="container fade-in">
-            <div className="page-header">
+        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
+            <header className="page-header" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
                 <div>
-                    <h1>Painel Admin</h1>
-                    <p style={{ color: 'var(--text-secondary)' }}>Gerencie usuários e promoções</p>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
+                        Painel <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Admin</span>
+                    </h1>
+                    <p style={{ opacity: 0.6 }}>Gerencie usuários e promoções</p>
                 </div>
-            </div>
+            </header>
 
             {/* Stats Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>

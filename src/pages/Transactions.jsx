@@ -239,10 +239,12 @@ export default function Transactions() {
     const availableCategories = categories.filter(c => c.type === type);
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '100px' }}>
-            <header className="page-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem', marginBottom: '5rem' }}>
+        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
+            <header className="page-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem', marginBottom: '3rem', paddingTop: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500 }}>Transações</h1>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
+                        Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Transações</span>
+                    </h1>
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         <Button onClick={handleExport} variant="ghost" icon={Download}>
                             <span className="responsive-btn-text">Exportar</span>

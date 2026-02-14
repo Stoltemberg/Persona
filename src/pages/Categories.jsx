@@ -114,11 +114,13 @@ export default function Categories() {
     const incomeCategories = categories.filter(c => c.type === 'income');
 
     return (
-        <div className="container fade-in">
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
+            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem', paddingTop: '1rem' }}>
                 <div>
-                    <h1 className="text-gradient">Categorias</h1>
-                    <p>Personalize como você organiza seu dinheiro</p>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
+                        Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Categorias</span>
+                    </h1>
+                    <p style={{ opacity: 0.6 }}>Personalize como você organiza seu dinheiro</p>
                 </div>
                 <Button onClick={handleOpenNew} icon={Plus}>Nova Categoria</Button>
             </header>

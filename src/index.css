@@ -1408,6 +1408,194 @@ p {
   padding: 0.5rem;
 }
 
+/* =========================================
+   Mobile Menu Sheet v2 (Apple Style Refined)
+   ========================================= */
+
+.mobile-menu-grid {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 101;
+
+  /* Sheet Appearance */
+  background: rgba(22, 22, 24, 0.92);
+  /* iOS Dark */
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border-top-left-radius: 20px;
+  /* Reduced radius for cleaner look */
+  border-top-right-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: none;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.4);
+
+  /* Layout */
+  padding: 3rem 1.5rem 2.5rem 1.5rem;
+  padding-bottom: calc(2.5rem + env(safe-area-inset-bottom));
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 12px;
+  /* Fixed gap to prevent squeezing */
+  row-gap: 24px;
+  /* More breathing room vertically */
+
+  animation: slideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.light .mobile-menu-grid {
+  background: rgba(250, 250, 250, 0.92);
+  /* iOS Light */
+  border-color: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Drag Handle Pill */
+.mobile-menu-grid::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 36px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 100px;
+}
+
+.light .mobile-menu-grid::before {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Menu Item Container */
+.mobile-menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  /* Space between icon and text */
+  text-decoration: none;
+  color: var(--text-main);
+  text-align: center;
+  width: 100%;
+}
+
+/* Icon Squircle */
+.mobile-menu-icon-container {
+  width: 52px;
+  /* iOS standard is ~60px, going slightly smaller for fit */
+  height: 52px;
+  border-radius: 14px;
+  /* Perfect squircle ratio */
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease, background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.light .mobile-menu-icon-container {
+  background: rgba(0, 0, 0, 0.06);
+  color: #000000;
+}
+
+.mobile-menu-item:active .mobile-menu-icon-container {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.light .mobile-menu-item:active .mobile-menu-icon-container {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* Label Typography */
+.mobile-menu-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 11px;
+  /* iOS Home Screen size */
+  font-weight: 500;
+  line-height: 1.15;
+  color: inherit;
+  opacity: 0.9;
+
+  /* Text Wrapping Logic */
+  width: 100%;
+  max-width: 80px;
+  /* Constrain width to force wrap near icon width */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  /* Allow 2 lines max */
+  -webkit-box-orient: vertical;
+  word-wrap: break-word;
+}
+
+/* Quick Settings Toggles Area */
+.menu-toggle-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 16px;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.menu-toggle-btn:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menu-toggle-btn.active {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.light .menu-toggle-btn.active {
+  background: #000000;
+  color: #ffffff;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Small Screen Adjustments (iPhone SE / Mini) */
+@media (max-width: 370px) {
+  .mobile-menu-grid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    column-gap: 8px;
+  }
+
+  .mobile-menu-icon-container {
+    width: 48px;
+    height: 48px;
+  }
+
+  .mobile-menu-label {
+    font-size: 10px;
+  }
+}
+
 /* Mobile Menu Sheet (iOS Style) */
 .mobile-menu-grid {
   position: fixed;
@@ -1433,13 +1621,7 @@ p {
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
 }
 
-/* Small screen optimization */
-@media (max-width: 380px) {
-  .mobile-menu-grid {
-    padding: 2rem 1rem;
-    gap: 1rem 0.5rem;
-  }
-}
+
 
 .light .mobile-menu-grid {
   background: rgba(255, 255, 255, 0.95);

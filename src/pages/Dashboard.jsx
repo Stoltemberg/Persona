@@ -178,175 +178,105 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="container fade-in">
+        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
             <OnboardingTour />
-            <header id="tour-welcome" style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '2rem',
-                paddingTop: '0.5rem'
-            }}>
-                <div>
-                    <h1 className="text-gradient">Dashboard</h1>
-                    <p style={{ fontSize: '1.1rem', marginTop: '0.5rem' }}>Bem-vindo de volta, {profile?.full_name || user?.email}</p>
-                </div>
+
+            {/* Minimal Header */}
+            <header style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
+                    Olá, <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{profile?.full_name?.split(' ')[0] || 'Usuário'}</span>
+                </h1>
             </header>
 
-            {!loading && <InsightsCard transactions={allTransactions} />}
-
-            <div className="cards-scroll-container fade-in">
-                <Card className="stagger-1 card-min-width glow-on-hover" hover>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <div style={{ padding: '0.8rem', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '14px', color: '#12c2e9' }}>
-                            <Wallet size={28} />
-                        </div>
-                        <h3>Saldo Total</h3>
-                    </div>
-                    <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                        {loading ? <Skeleton width="200px" height="60px" /> : (
-                            isPrivacyMode ? '****' : <CountUp end={balance} prefix="R$ " />
-                        )}
-                    </h2>
-                    <p style={{ color: '#12c2e9', fontWeight: 500 }}>Atualizado agora</p>
-                </Card>
-
-                <Link to="/analysis" style={{ textDecoration: 'none', color: 'inherit' }} className="card-min-width">
-                    <Card className="stagger-2 glow-on-hover" hover style={{ height: '100%' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                            <div style={{ padding: '0.8rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '14px', color: '#f64f59' }}>
-                                <TrendingUp size={28} />
-                            </div>
-                            <h3>Despesas (Mês)</h3>
-                        </div>
-                        <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                            {loading ? <Skeleton width="180px" height="60px" /> : (
-                                isPrivacyMode ? '****' : <CountUp end={expenses} prefix="R$ " />
-                            )}
-                        </h2>
-                        <p style={{ color: '#f64f59', fontWeight: 500 }}>Este mês &rarr;</p>
-                    </Card>
-                </Link>
-
-                <Link to="/goals" style={{ textDecoration: 'none', color: 'inherit' }} className="card-min-width">
-                    <Card id="tour-goals" className="stagger-3 glow-on-hover" hover style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                        <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                                <div style={{ padding: '0.8rem', background: 'rgba(196, 113, 237, 0.15)', borderRadius: '14px', color: '#c471ed' }}>
-                                    <PiggyBank size={28} />
-                                </div>
-                                <h3 style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                    {primaryGoal ? primaryGoal.title : 'Total Economizado'}
-                                </h3>
-                            </div>
-                            <h2 style={{ fontSize: '3rem', fontWeight: 800 }}>
-                                {loading ? <Skeleton width="180px" height="60px" /> : (
-                                    isPrivacyMode ? '****' : <CountUp end={primaryGoal ? primaryGoal.current_amount : savings} prefix="R$ " />
-                                )}
-                            </h2>
-                            {primaryGoal && (
-                                <div style={{ marginTop: '0.5rem' }}>
-                                    <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-                                        <div style={{
-                                            width: `${Math.min((primaryGoal.current_amount / primaryGoal.target_amount) * 100, 100)}%`,
-                                            height: '100%',
-                                            background: '#c471ed',
-                                            transition: 'width 1.5s ease-out' // Added smooth transition
-                                        }} />
-                                    </div>
-                                    <p style={{ fontSize: '0.8rem', marginTop: '0.25rem', color: 'rgba(255,255,255,0.5)' }}>
-                                        Meta: R$ {parseFloat(primaryGoal.target_amount).toFixed(2).replace('.', ',')}
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                        <p style={{ color: '#c471ed', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: primaryGoal ? '1rem' : 0 }}>
-                            Ver Metas <span style={{ fontSize: '1.2rem' }}>&rarr;</span>
-                        </p>
-                    </Card>
-                </Link>
-
-                {/* Display Wallets */}
-                <div id="tour-wallets" style={{ display: 'contents' }}>
-                    {wallets.map((w, index) => (
-                        <Card key={w.id} className="stagger-4 card-min-width glow-on-hover" hover style={{ height: '100%', minWidth: '260px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                                <div style={{ padding: '0.8rem', background: `${w.color}20`, borderRadius: '14px', color: w.color }}>
-                                    <Wallet size={28} />
-                                </div>
-                                <div>
-                                    <h3 style={{ fontSize: '1.1rem' }}>{w.name}</h3>
-                                    <p style={{ fontSize: '0.8rem', opacity: 0.7, textTransform: 'capitalize' }}>{w.type?.replace('_', ' ') || 'Carteira'}</p>
-                                </div>
-                            </div>
-                            <h2 style={{ fontSize: '2.5rem', fontWeight: 800 }}>
-                                {loading ? <Skeleton width="160px" height="50px" /> : (
-                                    isPrivacyMode ? '****' : <CountUp end={w.current_balance} prefix="R$ " />
-                                )}
-                            </h2>
-                            <p style={{ color: w.color, fontWeight: 500, fontSize: '0.9rem' }}>Saldo Atual</p>
-                        </Card>
-                    ))}
+            {/* Hero Balance Section - The Core Focus */}
+            <section style={{ marginBottom: '3rem', textAlign: 'center' }}>
+                <p style={{ fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.5, marginBottom: '0.5rem' }}>
+                    Saldo Total
+                </p>
+                <div style={{ fontSize: '4rem', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+                    {loading ? <Skeleton width="200px" height="80px" style={{ margin: '0 auto' }} /> : (
+                        isPrivacyMode ? '****' : <CountUp end={balance} prefix="R$ " />
+                    )}
                 </div>
+            </section>
 
+            {/* Quick Stats Grid */}
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '1rem',
+                marginBottom: '3rem'
+            }}>
+                <Link to="/analysis" style={{ textDecoration: 'none' }}>
+                    <div className="glass-card zoom-on-hover" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                        <div style={{ marginBottom: '0.5rem', opacity: 0.7 }}>Saídas (Mês)</div>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                            {loading ? '...' : (isPrivacyMode ? '****' : `R$ ${expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
+                        </div>
+                    </div>
+                </Link>
+
+                <Link to="/goals" style={{ textDecoration: 'none' }}>
+                    <div className="glass-card zoom-on-hover" style={{ padding: '1.2rem', textAlign: 'center' }}>
+                        <div style={{ marginBottom: '0.5rem', opacity: 0.7 }}>Economias</div>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                            {loading ? '...' : (isPrivacyMode ? '****' : `R$ ${savings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
+                        </div>
+                    </div>
+                </Link>
             </div>
 
-            <div className="fade-in" style={{ animationDelay: '0.4s' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                    <h2 style={{ fontSize: '2rem' }}>Transações Recentes</h2>
-                    <Link to="/transactions">
-                        <Button variant="ghost">Ver Todas</Button>
-                    </Link>
+            {/* Recent Transactions - Simplified List */}
+            <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Últimas movimentações</h3>
+                    <Link to="/transactions" style={{ fontSize: '0.9rem', color: 'var(--text-main)', textDecoration: 'none' }}>Ver tudo</Link>
                 </div>
 
-                <div id="tour-transactions" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     {loading ? (
                         Array(3).fill(0).map((_, i) => (
-                            <Skeleton key={i} width="100%" height="80px" borderRadius="20px" />
+                            <Skeleton key={i} width="100%" height="70px" style={{ borderRadius: '12px' }} />
                         ))
                     ) : recentTransactions.length === 0 ? (
-                        <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                            <p style={{ fontSize: '1.1rem' }}>Nenhuma transação encontrada</p>
-                            <Button style={{ marginTop: '1rem' }} onClick={() => window.location.href = '/transactions'}>
-                                Adicionar primeira
-                            </Button>
-                        </div>
+                        <p style={{ textAlign: 'center', opacity: 0.5, padding: '2rem' }}>Sem movimentações recentes</p>
                     ) : (
                         recentTransactions.map((tx, index) => (
-                            <Card key={tx.id} hover className="fade-in transaction-card" style={{
-                                animationDelay: `${0.1 * index}s`,
-                                padding: '0.75rem 1rem'
+                            <div key={tx.id} className="glass-card" style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '1rem',
+                                marginBottom: index === recentTransactions.length - 1 ? 0 : '0.5rem',
+                                animationDelay: `${index * 0.05}s`
                             }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                     <div style={{
-                                        padding: '1rem',
+                                        width: '40px',
+                                        height: '40px',
                                         borderRadius: '50%',
-                                        background: tx.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
-                                        color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
-                                        display: 'flex'
+                                        background: tx.type === 'income' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: tx.type === 'income' ? 'var(--text-main)' : 'var(--text-secondary)'
                                     }}>
-                                        {tx.type === 'income' ? <ArrowDownLeft size={24} /> : <ArrowUpRight size={24} />}
+                                        {tx.type === 'income' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
                                     </div>
                                     <div>
-                                        <h4 style={{ marginBottom: '0.25rem', fontSize: '1.1rem' }}>{tx.description}</h4>
-                                        <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
+                                        <div style={{ fontWeight: 500 }}>{tx.description}</div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.5 }}>{new Date(tx.date).toLocaleDateString('pt-BR')}</div>
                                     </div>
                                 </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <h3 style={{
-                                        color: tx.type === 'income' ? '#12c2e9' : '#f64f59',
-                                        fontWeight: 700,
-                                        fontSize: '1.25rem'
-                                    }}>
-                                        {isPrivacyMode ? '****' : (tx.type === 'income' ? '+ ' : '- ') + `R$ ${parseFloat(tx.amount).toFixed(2).replace('.', ',')}`}
-                                    </h3>
+                                <div style={{ fontWeight: 600, color: tx.type === 'income' ? 'var(--text-main)' : 'var(--text-secondary)' }}>
+                                    {isPrivacyMode ? '****' : (tx.type === 'income' ? '+' : '-') + ` R$ ${parseFloat(tx.amount).toFixed(2).replace('.', ',')}`}
                                 </div>
-                            </Card>
+                            </div>
                         ))
                     )}
                 </div>
             </div>
-        </div >
+        </div>
     );
 }
 

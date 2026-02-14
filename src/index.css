@@ -1,125 +1,68 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Dynamic Palette - Default Dark */
-  --bg-deep: #0a0a0a;
+  /* Dynamic Palette - Minimalist Dark */
+  --bg-deep: #050505;
+  /* Pitch black/deep gray */
+  --bg-card: #0a0a0a;
+  /* Slightly lighter for cards */
 
-  /* Mesh Gradient Colors */
-  --color-1: #4f29f0;
-  /* Deep Purple */
-  --color-2: #c471ed;
-  /* Soft Purple */
-  --color-3: #f64f59;
-  /* Soft Red/Orange */
-  --color-4: #12c2e9;
-  /* Cyan */
-  --color-5: #00ebc7;
-  /* Teal */
+  /* Minimalist Accents - Single primary color */
+  --color-brand: #ffffff;
+  /* Stark white for primary actions/text */
+  --color-accent: #2a2a2a;
+  /* Subtle gray for secondary elements */
 
-  /* Glass Variables */
-  --glass-bg: rgba(255, 255, 255, 0.03);
+  /* Semantic Colors (Muted) */
+  --color-success: #2ecc71;
+  --color-danger: #e74c3c;
+  --color-warning: #f1c40f;
+  --color-info: #3498db;
+
+  /* Glass Variables -> Solid Minimalist Panels */
+  --glass-bg: #0a0a0a;
   --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-highlight: rgba(255, 255, 255, 0.2);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-  --glass-blur: blur(20px);
-  --glass-saturation: saturate(180%);
-  --glass-panel-bg: rgba(15, 15, 20, 0.4);
+  /* Very subtle border */
+  --glass-border-highlight: rgba(255, 255, 255, 0.15);
+  --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --glass-blur: none;
+  /* Removed blur for performance and clean look */
+  --glass-saturation: saturate(100%);
+  --glass-panel-bg: #0a0a0a;
 
   /* Text */
   --text-main: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.85);
-  --text-muted: rgba(255, 255, 255, 0.5);
-  --input-bg: rgba(0, 0, 0, 0.2);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --input-bg: rgba(255, 255, 255, 0.05);
 
   /* UI Metrics */
-  --radius-xs: 8px;
-  --radius-sm: 12px;
-  --radius-md: 20px;
-  --radius-lg: 32px;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
 
   font-family: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color-scheme: dark;
 }
 
-/* Light Mode Overrides */
+/* Light Mode Overrides - Minimalist Light */
 :root.light {
-  --bg-deep: #f0f2f5;
-
-  /* Adjust mesh colors for light mode (softer pastel) */
-  --color-1: #6a82fb;
-  --color-2: #fc5c7d;
-  --color-3: #ffecd2;
-  /* Subtle bg */
-  --color-4: #12c2e9;
-
-  /* Glass Variables (Needs to be darker glass on light bg) */
-  --glass-bg: rgba(255, 255, 255, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-border-highlight: rgba(255, 255, 255, 0.8);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  --glass-panel-bg: rgba(255, 255, 255, 0.65);
-
-  /* Text */
-  --text-main: #1a1a1a;
-  --text-secondary: rgba(0, 0, 0, 0.7);
-  --text-muted: rgba(0, 0, 0, 0.5);
-  --input-bg: rgba(255, 255, 255, 0.5);
-
-  color-scheme: light;
-}
-
-/* Amoled Mode (Pitch Black) */
-:root.amoled {
-  --bg-deep: #000000;
-
-  /* Minimalist monochrome/dark colors */
-  --color-1: #000000;
-  --color-2: #1a1a1a;
-  --color-3: #000000;
-  --color-4: #333333;
-  --color-5: #111111;
-
-  /* Glass Variables (High Contrast) */
-  --glass-bg: rgba(20, 20, 20, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.15);
-  --glass-border-highlight: rgba(255, 255, 255, 0.3);
-  --glass-shadow: none;
-  --glass-blur: blur(0px);
-  /* Sharp */
-  --glass-saturation: saturate(100%);
-  --glass-panel-bg: rgba(10, 10, 10, 0.9);
-
-  /* Text */
-  --text-main: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.9);
-  --text-muted: rgba(255, 255, 255, 0.6);
-  --input-bg: #111111;
-
-  color-scheme: dark;
-}
-
-/* Full White Mode (Minimalist Light) */
-:root.full-white {
   --bg-deep: #ffffff;
+  --bg-card: #f8f8f8;
 
-  /* Pure white/gray scale */
-  --color-1: #ffffff;
-  --color-2: #f5f5f5;
-  --color-3: #ffffff;
-  --color-4: #eeeeee;
+  --color-brand: #000000;
+  --color-accent: #e5e5e5;
 
-  /* Glass Variables (Flat borders) */
   --glass-bg: #ffffff;
-  --glass-border: #e0e0e0;
-  --glass-border-highlight: #d0d0d0;
-  --glass-shadow: none;
-  --glass-blur: blur(0px);
+  --glass-border: #e5e5e5;
+  --glass-border-highlight: #d1d1d1;
+  --glass-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   --glass-panel-bg: #ffffff;
 
-  /* Text */
   --text-main: #000000;
-  --text-secondary: #333333;
-  --text-muted: #666666;
+  --text-secondary: rgba(0, 0, 0, 0.6);
+  --text-muted: rgba(0, 0, 0, 0.4);
   --input-bg: #f5f5f5;
 
   color-scheme: light;
@@ -136,87 +79,47 @@ body {
   min-height: 100vh;
   color: var(--text-main);
   background-color: var(--bg-deep);
-  /* Mesh gradient uses variables, so it auto-updates */
-  background-image:
-    radial-gradient(at 0% 0%, var(--color-1) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, var(--color-4) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, var(--color-3) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, var(--color-5) 0px, transparent 50%);
-  background-size: 150% 150%;
-  background-attachment: fixed;
-  animation: bg-shift 25s ease-in-out infinite alternate;
+  /* Removed mesh gradient & animation */
+  background-image: none;
   font-smooth: always;
   -webkit-font-smoothing: antialiased;
   transition: color 0.3s, background-color 0.3s;
 }
 
-@keyframes bg-shift {
-  0% {
-    background-position: 0% 0%;
-  }
-
-  100% {
-    background-position: 100% 100%;
-  }
-}
-
 /* --- Advanced Components --- */
 
-/* 1. Glass Card - The Core Block */
-/* 1. Glass Card - The Core Block */
+/* 1. Minimal Card - The Core Block */
 .glass-card {
   position: relative;
-  background: var(--glass-bg);
-  /* Use variable for adaptability */
-  backdrop-filter: var(--glass-blur) var(--glass-saturation);
-  -webkit-backdrop-filter: var(--glass-blur) var(--glass-saturation);
+  background: var(--bg-card);
   border: 1px solid var(--glass-border);
-  border-top-color: var(--glass-border-highlight);
   border-radius: var(--radius-md);
   padding: 1.5rem;
-  box-shadow: var(--glass-shadow);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  /* subtle shadow */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   overflow: hidden;
 }
 
-/* Hover Effect */
-/* Hover Effect */
+/* Hover Effect - Subtle lift */
 .glass-card-hover:hover {
-  transform: translateY(-3px);
-  /* Reduced from -6px */
-  box-shadow:
-    0 8px 25px -4px rgba(0, 0, 0, 0.25),
-    /* Reduced shadow opacity and blur */
-    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
-  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  border-color: var(--glass-border-highlight);
+  box-shadow: var(--glass-shadow);
 }
 
-/* Shine Effect on Hover */
+/* Removed Shine Effect */
 .glass-card-hover::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
-  transform: skewX(-25deg);
-  transition: 0.5s;
-  pointer-events: none;
+  display: none;
 }
 
-.glass-card-hover:hover::after {
-  left: 150%;
-  transition: 0.7s ease-in-out;
-}
-
-/* 2. Glass Panel (Less interactive, usually for containers) */
-/* 2. Glass Panel (Less interactive, usually for containers) */
+/* 2. Glass Panel (Container) */
 .glass-panel {
-  background: var(--glass-panel-bg);
-  backdrop-filter: blur(16px);
+  background: var(--bg-card);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
+  /* Ensure no blur artifacts */
+  backdrop-filter: none;
 }
 
 /* Buttons */
@@ -242,22 +145,24 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-2), var(--color-1));
-  color: white;
-  box-shadow: 0 4px 15px rgba(110, 60, 230, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--color-brand);
+  color: #000000;
+  /* High contrast black text on white button */
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+  /* Subtle white glow */
+  border: 1px solid transparent;
 }
 
 .amoled .btn-primary {
-  background: #333;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: none;
+  background: #ffffff;
+  color: #000000;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(110, 60, 230, 0.5);
-  filter: brightness(1.1);
+  background: #f0f0f0;
+  /* Slight dim on hover */
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary:active {
@@ -446,10 +351,9 @@ p {
 }
 
 .text-gradient {
-  background: linear-gradient(to right, var(--color-3), var(--color-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-main);
+  background: none;
+  -webkit-text-fill-color: initial;
 }
 
 /* Fix for Amoled mode where gradient colors are black */
@@ -1262,11 +1166,10 @@ p {
 
 .login-title {
   font-size: 4rem;
-  background: linear-gradient(135deg, #fff 0%, #c471ed 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 20px rgba(196, 113, 237, 0.3));
+  color: var(--text-main);
+  background: none;
+  -webkit-text-fill-color: initial;
+  filter: none;
 }
 
 .login-subtitle {
@@ -1297,19 +1200,12 @@ p {
 }
 
 .glow-on-hover::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  background: linear-gradient(45deg, #12c2e9, #c471ed, #f64f59);
-  opacity: 0;
-  z-index: -1;
-  transition: opacity 0.3s ease;
-  filter: blur(8px);
+  display: none;
+  /* Remove colorful glow */
 }
 
 .glow-on-hover:hover::after {
-  opacity: 0.6;
+  display: none;
 }
 
 .glow-on-hover:hover {

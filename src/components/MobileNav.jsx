@@ -19,19 +19,25 @@ export function MobileNav() {
     ];
 
     const menuItems = [
-        { icon: Target, label: 'Metas', path: '/goals', color: '#c471ed' },
-        { icon: Repeat, label: 'Recorrentes', path: '/recurring', color: '#00ebc7' },
-        { icon: Calendar, label: 'Assinaturas', path: '/subscriptions', color: '#f64f59' },
-        { icon: TrendingUp, label: 'Simulador', path: '/simulator', color: '#12c2e9' },
-        { icon: PiggyBank, label: 'Orçamentos', path: '/budgets', color: '#f64f59' },
-        { icon: Wallet, label: 'Carteiras', path: '/wallets', color: '#12c2e9' },
-        { icon: Settings, label: 'Config', path: '/settings', color: 'var(--text-secondary)' },
+        { icon: Target, label: 'Metas', path: '/goals' },
+        { icon: Repeat, label: 'Recorrentes', path: '/recurring' },
+        { icon: Calendar, label: 'Assinaturas', path: '/subscriptions' },
+        { icon: TrendingUp, label: 'Simulador', path: '/simulator' },
+        { icon: PiggyBank, label: 'Orçamentos', path: '/budgets' },
+        { icon: Wallet, label: 'Carteiras', path: '/wallets' },
+        { icon: Settings, label: 'Config', path: '/settings' },
     ];
 
     return (
         <>
             {/* Main Bottom Bar */}
-            <nav className="mobile-bottom-bar">
+            <nav className="mobile-bottom-bar" style={{
+                background: 'rgba(5, 5, 5, 0.8)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid var(--glass-border)',
+                borderRadius: '3rem',
+                margin: '0 1rem 1rem 1rem'
+            }}>
                 {mainItems.map((item) => (
                     <NavLink
                         key={item.path}
@@ -40,14 +46,13 @@ export function MobileNav() {
                         className="mobile-nav-item"
                     >
                         {({ isActive }) => (
-                            <>
-                                <div className={`mobile-nav-icon ${isActive ? 'active' : ''}`} style={{
-                                    color: isActive ? 'var(--color-2)' : 'inherit',
-                                    transform: isActive ? 'translateY(-2px)' : 'none'
-                                }}>
-                                    <item.icon size={26} strokeWidth={isActive ? 2.5 : 2} />
-                                </div>
-                            </>
+                            <div className={`mobile-nav-icon`} style={{
+                                color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
+                                transform: isActive ? 'scale(1.1)' : 'none',
+                                transition: 'all 0.2s ease'
+                            }}>
+                                <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                            </div>
                         )}
                     </NavLink>
                 ))}
@@ -56,18 +61,19 @@ export function MobileNav() {
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="mobile-nav-item"
-                    style={{ color: isMenuOpen ? 'var(--color-2)' : 'var(--text-muted)' }}
+                    style={{ color: isMenuOpen ? 'var(--text-main)' : 'var(--text-muted)' }}
                 >
-                    {isMenuOpen ? <X size={26} /> : <MenuIcon size={26} />}
+                    {isMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
                 </button>
             </nav>
 
             {/* Menu Overlay */}
             {isMenuOpen && createPortal(
-                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)}>
+                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)} style={{ background: 'rgba(0,0,0,0.8)' }}>
                     <div
                         className="mobile-menu-grid"
                         onClick={e => e.stopPropagation()}
+                        style={{ background: '#0a0a0a', border: '1px solid var(--glass-border)' }}
                     >
                         {/* Quick Settings Toggles */}
                         <div style={{
@@ -76,13 +82,13 @@ export function MobileNav() {
                             justifyContent: 'space-between',
                             marginBottom: '1rem',
                             paddingBottom: '1rem',
-                            borderBottom: '1px solid rgba(255,255,255,0.1)'
+                            borderBottom: '1px solid var(--glass-border)'
                         }}>
                             <button
                                 onClick={togglePrivacy}
                                 style={{
-                                    background: 'rgba(255,255,255,0.05)',
-                                    border: 'none',
+                                    background: 'var(--bg-deep)',
+                                    border: '1px solid var(--glass-border)',
                                     padding: '0.8rem',
                                     borderRadius: '12px',
                                     color: 'var(--text-main)',
@@ -94,18 +100,18 @@ export function MobileNav() {
                                     gap: '0.5rem'
                                 }}
                             >
-                                {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
-                                <span style={{ fontSize: '0.9rem' }}>{isPrivacyMode ? 'Visível' : 'Oculto'}</span>
+                                {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
+                                <span style={{ fontSize: '0.85rem' }}>{isPrivacyMode ? 'Visível' : 'Oculto'}</span>
                             </button>
 
                             <button
                                 onClick={() => toggleEventMode(!isEventMode)}
                                 style={{
-                                    background: isEventMode ? 'rgba(246, 79, 89, 0.15)' : 'rgba(255,255,255,0.05)',
-                                    border: isEventMode ? '1px solid #f64f59' : 'none',
+                                    background: isEventMode ? 'var(--text-main)' : 'var(--bg-deep)',
+                                    border: '1px solid var(--glass-border)',
                                     padding: '0.8rem',
                                     borderRadius: '12px',
-                                    color: isEventMode ? '#f64f59' : 'var(--text-main)',
+                                    color: isEventMode ? '#000' : 'var(--text-main)',
                                     flex: 1,
                                     marginLeft: '0.5rem',
                                     display: 'flex',
@@ -114,8 +120,8 @@ export function MobileNav() {
                                     gap: '0.5rem'
                                 }}
                             >
-                                <Plane size={20} />
-                                <span style={{ fontSize: '0.9rem' }}>Viagem</span>
+                                <Plane size={18} />
+                                <span style={{ fontSize: '0.85rem' }}>Viagem</span>
                             </button>
                         </div>
                         {menuItems.map((item) => (
@@ -124,11 +130,16 @@ export function MobileNav() {
                                 to={item.path}
                                 onClick={() => setIsMenuOpen(false)}
                                 className="mobile-menu-item"
+                                style={{
+                                    background: 'var(--bg-deep)',
+                                    border: '1px solid var(--glass-border)',
+                                    color: 'var(--text-main)'
+                                }}
                             >
-                                <div className="mobile-menu-icon-container" style={{ background: `${item.color}20`, color: item.color }}>
-                                    <item.icon size={26} strokeWidth={2.2} />
+                                <div className="mobile-menu-icon-container" style={{ background: 'transparent', color: 'var(--text-main)' }}>
+                                    <item.icon size={24} strokeWidth={1.5} />
                                 </div>
-                                <span className="mobile-menu-label">{item.label}</span>
+                                <span className="mobile-menu-label" style={{ fontWeight: 400, fontSize: '0.85rem' }}>{item.label}</span>
                             </NavLink>
                         ))}
                     </div>

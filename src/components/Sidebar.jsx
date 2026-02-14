@@ -30,23 +30,23 @@ export function Sidebar() {
         <aside className="glass-panel sidebar-panel">
             <div className="sidebar-header">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                    <h1 style={{ fontSize: '2rem', marginBottom: 0 }} className="text-gradient">Persona</h1>
+                    <h1 style={{ fontSize: '1.5rem', marginBottom: 0, fontWeight: 600, color: 'var(--text-main)' }}>Persona</h1>
                     <button
                         onClick={togglePrivacy}
                         style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
                         title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
                     >
-                        {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
+                        {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                     <button
                         onClick={() => toggleEventMode(!isEventMode)}
-                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: isEventMode ? '#f64f59' : 'var(--text-muted)' }}
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: isEventMode ? 'var(--text-main)' : 'var(--text-muted)' }}
                         title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
                     >
-                        <Plane size={20} />
+                        <Plane size={18} />
                     </button>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Professional Finance</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Professional Finance</p>
             </div>
 
             <nav className="sidebar-nav">
@@ -58,29 +58,22 @@ export function Sidebar() {
                             'nav-item',
                             isActive ? 'active' : ''
                         )}
+                        style={({ isActive }) => ({
+                            background: isActive ? 'var(--color-brand)' : 'transparent',
+                            color: isActive ? '#000' : 'var(--text-secondary)',
+                            fontWeight: isActive ? 600 : 500
+                        })}
                     >
                         {({ isActive }) => (
                             <>
                                 <div style={{
-                                    color: isActive ? '#c471ed' : 'inherit'
+                                    color: 'inherit'
                                 }}>
-                                    <item.icon size={22} />
+                                    <item.icon size={20} />
                                 </div>
-                                <span style={{
-                                    fontWeight: isActive ? 600 : 500
-                                }}>
+                                <span>
                                     {item.label}
                                 </span>
-                                {isActive && (
-                                    <div style={{
-                                        marginLeft: 'auto',
-                                        width: '6px',
-                                        height: '6px',
-                                        borderRadius: '50%',
-                                        background: '#c471ed',
-                                        boxShadow: '0 0 10px #c471ed'
-                                    }} />
-                                )}
                             </>
                         )}
                     </NavLink>

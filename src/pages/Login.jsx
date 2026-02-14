@@ -40,22 +40,20 @@ export default function Login() {
     return (
         <div className="login-container">
 
-            {/* Background Effects */}
-            <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: '600px', height: '600px', background: 'radial-gradient(circle, var(--color-1) 0%, transparent 70%)', opacity: 0.2, filter: 'blur(80px)', zIndex: -1 }} />
-            <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, var(--color-2) 0%, transparent 70%)', opacity: 0.2, filter: 'blur(80px)', zIndex: -1 }} />
+            {/* Background Effects - Removed for Minimalism */}
 
             <div className="container login-grid">
 
                 {/* Hero Section */}
                 <div className="fade-in login-hero">
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.1)', borderRadius: '50px', marginBottom: '1.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <Star size={14} fill="#FFD700" stroke="#FFD700" />
-                        <span style={{ fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.05em' }}>O FUTURO DAS FINANÇAS</span>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '50px', marginBottom: '1.5rem', border: '1px solid var(--glass-border)' }}>
+                        <Star size={14} fill="var(--color-brand)" stroke="var(--color-brand)" />
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.05em', color: 'var(--text-secondary)' }}>O FUTURO DAS FINANÇAS</span>
                     </div>
 
                     <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1.1, marginBottom: '1.5rem' }}>
                         Domine seu dinheiro <br />
-                        <span className="text-gradient">com elegância.</span>
+                        <span style={{ color: 'var(--text-muted)' }}>com elegância.</span>
                     </h1>
 
                     <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '3rem', maxWidth: '500px', lineHeight: 1.6 }}>
@@ -64,7 +62,7 @@ export default function Login() {
 
                     <div className="login-features-grid">
                         <div className="login-feature-item">
-                            <div style={{ padding: '0.8rem', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '12px', color: '#12c2e9' }}>
+                            <div style={{ padding: '0.8rem', background: 'var(--bg-card)', borderRadius: '12px', color: 'var(--text-main)', border: '1px solid var(--glass-border)' }}>
                                 <Zap size={24} />
                             </div>
                             <div>
@@ -74,7 +72,7 @@ export default function Login() {
                         </div>
 
                         <div className="login-feature-item">
-                            <div style={{ padding: '0.8rem', background: 'rgba(196, 113, 237, 0.15)', borderRadius: '12px', color: '#c471ed' }}>
+                            <div style={{ padding: '0.8rem', background: 'var(--bg-card)', borderRadius: '12px', color: 'var(--text-main)', border: '1px solid var(--glass-border)' }}>
                                 <TrendingUp size={24} />
                             </div>
                             <div>
@@ -84,7 +82,7 @@ export default function Login() {
                         </div>
 
                         <div className="login-feature-item">
-                            <div style={{ padding: '0.8rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '12px', color: '#f64f59' }}>
+                            <div style={{ padding: '0.8rem', background: 'var(--bg-card)', borderRadius: '12px', color: 'var(--text-main)', border: '1px solid var(--glass-border)' }}>
                                 <Plane size={24} />
                             </div>
                             <div>
@@ -94,7 +92,7 @@ export default function Login() {
                         </div>
 
                         <div className="login-feature-item">
-                            <div style={{ padding: '0.8rem', background: 'rgba(0, 235, 199, 0.15)', borderRadius: '12px', color: '#00ebc7' }}>
+                            <div style={{ padding: '0.8rem', background: 'var(--bg-card)', borderRadius: '12px', color: 'var(--text-main)', border: '1px solid var(--glass-border)' }}>
                                 <Shield size={24} />
                             </div>
                             <div>

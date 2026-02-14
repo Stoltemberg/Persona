@@ -1,11 +1,14 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart, Wallet, Repeat, Eye, EyeOff, Calendar, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart, Wallet, Repeat, Eye, EyeOff, Calendar, TrendingUp, Plane } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { usePrivacy } from '../context/PrivacyContext';
+import { useEvent } from '../context/EventContext';
+import clsx from 'clsx';
 
 export function Sidebar() {
-    const { signOut } = useAuth();
+    const { signOut, role } = useAuth();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
+    const { isEventMode, toggleEventMode } = useEvent();
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -19,144 +22,78 @@ export function Sidebar() {
         { icon: Settings, label: 'Configurações', path: '/settings' },
     ];
 
+    if (role === 'admin') {
+        navItems.push({ icon: Receipt, label: 'Admin', path: '/admin' }); // Reusing Receipt icon or import Shield?
+    }
+
     return (
-        <aside style={{
-            height: '100vh',
-            background: 'var(--bg-elevated)',
-            borderRight: '1px solid var(--divider)',
-            display: 'flex',
-            flexDirection: 'column',
-            padding: 'var(--spacing-xl) var(--spacing-md)'
-        }}>
-            {/* Logo */}
-            <div style={{ marginBottom: 'var(--spacing-2xl)', paddingLeft: 'var(--spacing-md)' }}>
-                <h1 style={{ 
-                    fontSize: '1.75rem', 
-                    fontWeight: '800', 
-                    marginBottom: 'var(--spacing-xs)',
-                    background: 'var(--gradient-primary)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
-                }}>
-                    Persona
-                </h1>
-                <p style={{ 
-                    fontSize: '0.75rem', 
-                    color: 'var(--text-secondary)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    fontWeight: '600'
-                }}>
-                    Finance
-                </p>
+        <aside className="glass-panel sidebar-panel">
+            <div className="sidebar-header">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                    <h1 style={{ fontSize: '2rem', marginBottom: 0 }} className="text-gradient">Persona</h1>
+                    <button
+                        onClick={togglePrivacy}
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
+                        title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
+                    >
+                        {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                    <button
+                        onClick={() => toggleEventMode(!isEventMode)}
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: isEventMode ? '#f64f59' : 'var(--text-muted)' }}
+                        title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
+                    >
+                        <Plane size={20} />
+                    </button>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Professional Finance</p>
             </div>
 
-            {/* Navigation */}
-            <nav 
-                role="navigation" 
-                aria-label="Main Navigation"
-                style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    gap: 'var(--spacing-xs)', 
-                    flex: 1 
-                }}
-            >
+            <nav className="sidebar-nav">
                 {navItems.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
-                        aria-label={item.label}
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 'var(--spacing-md)',
-                            padding: '10px var(--spacing-md)',
-                            borderRadius: 'var(--radius-md)',
-                            textDecoration: 'none',
-                            color: isActive ? 'var(--color-blue)' : 'var(--text-secondary)',
-                            background: isActive ? 'var(--bg-secondary)' : 'transparent',
-                            fontWeight: isActive ? '600' : '500',
-                            fontSize: '0.9375rem',
-                            transition: 'all var(--transition-base)'
-                        })}
-                        onMouseEnter={(e) => {
-                            if (!e.currentTarget.style.background.includes('--bg-secondary')) {
-                                e.currentTarget.style.background = 'var(--bg-secondary)';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            const isActive = e.currentTarget.classList.contains('active');
-                            if (!isActive) {
-                                e.currentTarget.style.background = 'transparent';
-                            }
-                        }}
+                        className={({ isActive }) => clsx(
+                            'nav-item',
+                            isActive ? 'active' : ''
+                        )}
                     >
-                        <item.icon size={20} strokeWidth={2} aria-hidden="true" />
-                        <span>{item.label}</span>
+                        {({ isActive }) => (
+                            <>
+                                <div style={{
+                                    color: isActive ? '#c471ed' : 'inherit'
+                                }}>
+                                    <item.icon size={22} />
+                                </div>
+                                <span style={{
+                                    fontWeight: isActive ? 600 : 500
+                                }}>
+                                    {item.label}
+                                </span>
+                                {isActive && (
+                                    <div style={{
+                                        marginLeft: 'auto',
+                                        width: '6px',
+                                        height: '6px',
+                                        borderRadius: '50%',
+                                        background: '#c471ed',
+                                        boxShadow: '0 0 10px #c471ed'
+                                    }} />
+                                )}
+                            </>
+                        )}
                     </NavLink>
                 ))}
             </nav>
 
-            {/* Footer Actions */}
-            <div style={{ 
-                borderTop: '1px solid var(--divider)', 
-                paddingTop: 'var(--spacing-md)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--spacing-xs)'
-            }}>
-                <button
-                    onClick={togglePrivacy}
-                    aria-label={isPrivacyMode ? 'Mostrar valores' : 'Ocultar valores'}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 'var(--spacing-md)',
-                        padding: '10px var(--spacing-md)',
-                        width: '100%',
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--text-secondary)',
-                        cursor: 'pointer',
-                        fontSize: '0.9375rem',
-                        fontWeight: '500',
-                        borderRadius: 'var(--radius-md)',
-                        transition: 'all var(--transition-base)',
-                        textAlign: 'left'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                >
-                    {isPrivacyMode ? <EyeOff size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
-                    <span>{isPrivacyMode ? 'Mostrar Valores' : 'Ocultar Valores'}</span>
-                </button>
-                <button
-                    onClick={signOut}
-                    aria-label="Sair da conta"
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 'var(--spacing-md)',
-                        padding: '10px var(--spacing-md)',
-                        width: '100%',
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--color-red)',
-                        cursor: 'pointer',
-                        fontSize: '0.9375rem',
-                        fontWeight: '500',
-                        borderRadius: 'var(--radius-md)',
-                        transition: 'all var(--transition-base)',
-                        textAlign: 'left'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 59, 48, 0.1)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                >
-                    <LogOut size={20} aria-hidden="true" />
-                    <span>Sair</span>
-                </button>
-            </div>
+            <button
+                onClick={signOut}
+                className="logout-btn"
+            >
+                <LogOut size={22} />
+                <span>Sair da Conta</span>
+            </button>
         </aside>
     );
 }

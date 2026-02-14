@@ -80,7 +80,7 @@ export default function Landing() {
                     >
                         <img
                             src="/dashboard-preview.png"
-                            alt="Prévia do Dashboard Persona exibindo gráficos de receitas e despesas"
+                            alt="Persona Dashboard"
                             style={{ width: '100%', height: 'auto', display: 'block' }}
                         />
                     </div>

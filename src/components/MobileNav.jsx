@@ -1,12 +1,16 @@
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, PieChart, Menu, X, Repeat, Calendar, TrendingUp, Eye, EyeOff, Wallet } from 'lucide-react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { LayoutDashboard, Receipt, Target, Settings, PieChart, Wallet, Menu as MenuIcon, X, PiggyBank, Repeat, Calendar, TrendingUp, Eye, EyeOff, Plane } from 'lucide-react';
+import clsx from 'clsx';
 import { createPortal } from 'react-dom';
 import { usePrivacy } from '../context/PrivacyContext';
+import { useEvent } from '../context/EventContext';
 
 export function MobileNav() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const location = useLocation();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
+    const { isEventMode, toggleEventMode } = useEvent();
 
     const mainItems = [
         { icon: LayoutDashboard, label: 'Início', path: '/dashboard' },
@@ -15,192 +19,118 @@ export function MobileNav() {
     ];
 
     const menuItems = [
-        { icon: Target, label: 'Metas', path: '/goals' },
-        { icon: Repeat, label: 'Recorrentes', path: '/recurring' },
-        { icon: Calendar, label: 'Assinaturas', path: '/subscriptions' },
-        { icon: Wallet, label: 'Orçamentos', path: '/budgets' },
-        { icon: TrendingUp, label: 'Simulador', path: '/simulator' },
-        { icon: Settings, label: 'Config', path: '/settings' },
+        { icon: Target, label: 'Metas', path: '/goals', color: '#c471ed' },
+        { icon: Repeat, label: 'Recorrentes', path: '/recurring', color: '#00ebc7' },
+        { icon: Calendar, label: 'Assinaturas', path: '/subscriptions', color: '#f64f59' },
+        { icon: TrendingUp, label: 'Simulador', path: '/simulator', color: '#12c2e9' },
+        { icon: PiggyBank, label: 'Orçamentos', path: '/budgets', color: '#f64f59' },
+        { icon: Wallet, label: 'Carteiras', path: '/wallets', color: '#12c2e9' },
+        { icon: Settings, label: 'Config', path: '/settings', color: 'var(--text-secondary)' },
     ];
 
     return (
         <>
-            <nav
-                role="navigation"
-                aria-label="Mobile Navigation"
-                style={{
-                    position: 'fixed',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    background: 'var(--glass-bg-strong)',
-                    backdropFilter: 'blur(24px) saturate(180%)',
-                    WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                    borderTop: '1px solid var(--glass-border)',
-                    display: 'flex',
-                    justifyContent: 'space-around',
-                    alignItems: 'center',
-                    padding: '8px 4px calc(8px + env(safe-area-inset-bottom))',
-                    zIndex: 'var(--z-elevated)',
-                    boxShadow: '0 -4px 16px rgba(0, 0, 0, 0.08)'
-                }}
-            >
+            {/* Main Bottom Bar */}
+            <nav className="mobile-bottom-bar">
                 {mainItems.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
                         onClick={() => setIsMenuOpen(false)}
-                        aria-label={item.label}
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            textDecoration: 'none',
-                            color: isActive ? 'var(--color-blue)' : 'var(--text-tertiary)',
-                            fontSize: '0.6875rem',
-                            gap: '4px',
-                            padding: '8px 12px',
-                            borderRadius: 'var(--radius-md)',
-                            minWidth: '64px',
-                            minHeight: '52px',
-                            transition: 'all var(--transition-base)',
-                            fontWeight: isActive ? '600' : '500',
-                            background: isActive ? 'var(--bg-secondary)' : 'transparent'
-                        })}
+                        className="mobile-nav-item"
                     >
                         {({ isActive }) => (
                             <>
-                                <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} aria-hidden="true" />
-                                <span>{item.label}</span>
+                                <div className={`mobile-nav-icon ${isActive ? 'active' : ''}`} style={{
+                                    color: isActive ? 'var(--color-2)' : 'inherit',
+                                    transform: isActive ? 'translateY(-2px)' : 'none'
+                                }}>
+                                    <item.icon size={26} strokeWidth={isActive ? 2.5 : 2} />
+                                </div>
                             </>
                         )}
                     </NavLink>
                 ))}
 
+                {/* Menu Toggle */}
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
-                    aria-expanded={isMenuOpen}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'transparent',
-                        border: 'none',
-                        color: isMenuOpen ? 'var(--color-blue)' : 'var(--text-tertiary)',
-                        fontSize: '0.6875rem',
-                        gap: '4px',
-                        padding: '8px 12px',
-                        borderRadius: 'var(--radius-md)',
-                        minWidth: '64px',
-                        minHeight: '52px',
-                        cursor: 'pointer',
-                        transition: 'all var(--transition-base)',
-                        fontWeight: isMenuOpen ? '600' : '500'
-                    }}
+                    className="mobile-nav-item"
+                    style={{ color: isMenuOpen ? 'var(--color-2)' : 'var(--text-muted)' }}
                 >
-                    {isMenuOpen ? <X size={22} strokeWidth={2.5} aria-hidden="true" /> : <Menu size={22} strokeWidth={2} aria-hidden="true" />}
-                    <span>Menu</span>
+                    {isMenuOpen ? <X size={26} /> : <MenuIcon size={26} />}
                 </button>
             </nav>
 
+            {/* Menu Overlay */}
             {isMenuOpen && createPortal(
-                <div
-                    role="dialog"
-                    aria-modal="true"
-                    aria-label="Menu Adicional"
-                    onClick={() => setIsMenuOpen(false)}
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        background: 'rgba(0, 0, 0, 0.4)',
-                        backdropFilter: 'blur(4px)',
-                        zIndex: 'var(--z-popover)',
-                        animation: 'fadeIn 0.2s ease-out'
-                    }}
-                >
+                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)}>
                     <div
+                        className="mobile-menu-grid"
                         onClick={e => e.stopPropagation()}
-                        className="slide-up"
-                        style={{
-                            position: 'absolute',
-                            bottom: '70px',
-                            right: 'var(--spacing-md)',
-                            left: 'var(--spacing-md)',
-                            background: 'var(--bg-elevated)',
-                            borderRadius: 'var(--radius-xl)',
-                            padding: 'var(--spacing-lg)',
-                            boxShadow: 'var(--shadow-xl)',
-                            maxWidth: '400px',
-                            margin: '0 auto'
-                        }}
                     >
+                        {/* Quick Settings Toggles */}
                         <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: '1fr 1fr',
-                            gap: 'var(--spacing-sm)',
-                            marginBottom: 'var(--spacing-md)'
+                            gridColumn: '1 / -1',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            marginBottom: '1rem',
+                            paddingBottom: '1rem',
+                            borderBottom: '1px solid rgba(255,255,255,0.1)'
                         }}>
                             <button
                                 onClick={togglePrivacy}
-                                className="btn btn-ghost"
                                 style={{
-                                    justifyContent: 'flex-start',
-                                    fontSize: '0.875rem',
-                                    padding: '10px var(--spacing-md)'
+                                    background: 'rgba(255,255,255,0.05)',
+                                    border: 'none',
+                                    padding: '0.8rem',
+                                    borderRadius: '12px',
+                                    color: 'var(--text-main)',
+                                    flex: 1,
+                                    marginRight: '0.5rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem'
                                 }}
                             >
-                                {isPrivacyMode ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
-                                <span>{isPrivacyMode ? 'Visível' : 'Oculto'}</span>
+                                {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
+                                <span style={{ fontSize: '0.9rem' }}>{isPrivacyMode ? 'Visível' : 'Oculto'}</span>
+                            </button>
+
+                            <button
+                                onClick={() => toggleEventMode(!isEventMode)}
+                                style={{
+                                    background: isEventMode ? 'rgba(246, 79, 89, 0.15)' : 'rgba(255,255,255,0.05)',
+                                    border: isEventMode ? '1px solid #f64f59' : 'none',
+                                    padding: '0.8rem',
+                                    borderRadius: '12px',
+                                    color: isEventMode ? '#f64f59' : 'var(--text-main)',
+                                    flex: 1,
+                                    marginLeft: '0.5rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem'
+                                }}
+                            >
+                                <Plane size={20} />
+                                <span style={{ fontSize: '0.9rem' }}>Viagem</span>
                             </button>
                         </div>
-
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(3, 1fr)',
-                            gap: 'var(--spacing-md)'
-                        }}>
-                            {menuItems.map((item) => (
-                                <NavLink
-                                    key={item.path}
-                                    to={item.path}
-                                    onClick={() => setIsMenuOpen(false)}
-                                    aria-label={item.label}
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        textDecoration: 'none',
-                                        color: 'var(--text-secondary)',
-                                        fontSize: '0.75rem',
-                                        gap: 'var(--spacing-sm)',
-                                        textAlign: 'center',
-                                        padding: 'var(--spacing-sm)',
-                                        borderRadius: 'var(--radius-md)',
-                                        transition: 'all var(--transition-base)'
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-secondary)'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                                >
-                                    <div style={{
-                                        background: 'var(--bg-secondary)',
-                                        padding: '12px',
-                                        borderRadius: 'var(--radius-md)',
-                                        color: 'var(--color-blue)',
-                                        width: '48px',
-                                        height: '48px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}>
-                                        <item.icon size={20} aria-hidden="true" />
-                                    </div>
-                                    <span style={{ fontWeight: '500' }}>{item.label}</span>
-                                </NavLink>
-                            ))}
-                        </div>
+                        {menuItems.map((item) => (
+                            <NavLink
+                                key={item.path}
+                                to={item.path}
+                                onClick={() => setIsMenuOpen(false)}
+                                className="mobile-menu-item"
+                            >
+                                <div className="mobile-menu-icon-container" style={{ background: `${item.color}20`, color: item.color }}>
+                                    <item.icon size={26} strokeWidth={2.2} />
+                                </div>
+                                <span className="mobile-menu-label">{item.label}</span>
+                            </NavLink>
+                        ))}
                     </div>
                 </div>,
                 document.body

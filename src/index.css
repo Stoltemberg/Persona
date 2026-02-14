@@ -1382,11 +1382,11 @@ p {
 /* Mobile Navigation */
 .mobile-bottom-bar {
   position: fixed;
-  bottom: 2rem;
+  bottom: 1rem;
   /* Floating */
   left: 1.5rem;
   right: 1.5rem;
-  height: 64px;
+  height: 72px;
   display: flex;
   justify-content: space-around;
   align-items: center;

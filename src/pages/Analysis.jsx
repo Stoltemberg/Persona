@@ -125,11 +125,11 @@ export default function Analysis() {
     const totalExpenses = chartData.reduce((acc, curr) => acc + curr.value, 0);
 
     return (
-        <div className="container fade-in">
-            <header className="flex-between mb-2 flex-wrap gap-1">
+        <div className="container fade-in" style={{ paddingBottom: '100px' }}>
+            <header className="flex-between mb-2 flex-wrap gap-1" style={{ marginBottom: '5rem' }}>
                 <div>
-                    <h1 className="text-gradient">Análise Mensal</h1>
-                    <p className="text-muted">Resumo financeiro completo</p>
+                    <h1 style={{ fontSize: '1.5rem', fontWeight: 500, color: 'var(--text-main)' }}>Análise Mensal</h1>
+                    <p className="text-muted" style={{ opacity: 0.6 }}>Resumo financeiro completo</p>
                 </div>
             </header>
 
@@ -193,7 +193,7 @@ export default function Analysis() {
 
             {/* Summary Cards */}
             <div className="grid-responsive mb-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
-                <Card className="glass-card stagger-1 flex-align-center gap-15" style={{ padding: '1.5rem' }}>
+                <Card className="glass-card stagger-1 flex-align-center gap-15" style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
                     <div style={{ padding: '1rem', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '50%', color: '#12c2e9' }}>
                         <TrendingUp size={28} />
                     </div>

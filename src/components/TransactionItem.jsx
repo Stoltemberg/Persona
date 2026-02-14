@@ -55,13 +55,14 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                 style={{ x, position: 'relative', zIndex: 1, background: 'var(--bg-panel)', borderRadius: '16px' }} // Ensure background is solid
             >
                 <Card
-                    hover={false} // Disable default hover scale as it conflicts with drag
+                    hover={false}
                     className="transaction-card"
                     style={{
                         margin: 0,
-                        background: 'var(--glass-bg)',
+                        background: 'rgba(255,255,255,0.02)',
+                        border: '1px solid rgba(255,255,255,0.05)',
                         backdropFilter: 'blur(10px)',
-                        padding: '0.75rem 1rem',
+                        padding: '1rem 1.25rem',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center'
@@ -104,7 +105,7 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                         <div style={{ textAlign: 'right' }}>
                             <h3 style={{
                                 color: transaction.type === 'income' ? '#12c2e9' : '#f64f59',
-                                fontWeight: 600,
+                                fontWeight: 500,
                                 fontSize: '1rem'
                             }}>
                                 {transaction.type === 'income' ? '+ ' : '- '}R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}

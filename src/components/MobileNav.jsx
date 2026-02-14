@@ -127,7 +127,7 @@ export function MobileNav() {
                                 <div className="mobile-menu-icon-container">
                                     <item.icon size={24} strokeWidth={1.5} />
                                 </div>
-                                <span className="mobile-menu-label" style={{ fontWeight: 400, fontSize: '0.85rem' }}>{item.label}</span>
+                                <span className="mobile-menu-label">{item.label}</span>
                             </NavLink>
                         ))}
                     </div>

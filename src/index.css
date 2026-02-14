@@ -1418,8 +1418,8 @@ p {
   border-top-right-radius: 24px;
   padding: 2rem 1.5rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
   z-index: 101;
   border: 1px solid var(--glass-border);
   border-bottom: none;
@@ -1450,6 +1450,12 @@ p {
   text-decoration: none;
   color: var(--text-main);
   text-align: center;
+  word-break: break-word;
+}
+
+.mobile-menu-label {
+  font-size: 0.8rem;
+  line-height: 1.2;
 }
 
 .mobile-menu-icon-container {

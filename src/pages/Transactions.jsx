@@ -2,18 +2,14 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
-import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
-import { Plus, ArrowUpRight, ArrowDownLeft, Trash2, Edit2, Download } from 'lucide-react';
+import { Plus, Download, ChevronRight, Filter } from 'lucide-react';
 import { Skeleton } from '../components/Skeleton';
-
 import { useToast } from '../context/ToastContext';
-import { EmptyState } from '../components/EmptyState';
 import { exportTransactionsToExcel } from '../lib/exportUtils';
 import { getSmartCategory } from '../utils/smartCategories';
-import { TransactionItem } from '../components/TransactionItem';
 import { DateRangePicker } from '../components/DateRangePicker';
 
 export default function Transactions() {
@@ -36,33 +32,14 @@ export default function Transactions() {
     // Filter State
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-
-    // Wallets State
-    const [wallets, setWallets] = useState([]);
-    const [selectedWalletId, setSelectedWalletId] = useState('');
-
-    // Category State
     const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState(null); // Stores the full object
 
     useEffect(() => {
         if (user) {
             fetchTransactions();
             fetchCategories();
-            fetchWallets();
         }
     }, [user]);
-
-    // ... fetchTransactions ...
-
-    const fetchWallets = async () => {
-        const { data } = await supabase.from('wallets').select('*');
-        setWallets(data || []);
-        // Set default wallet if none selected or available
-        if (data && data.length > 0 && !selectedWalletId) {
-            setSelectedWalletId(data[0].id);
-        }
-    };
 
     const fetchTransactions = async () => {
         try {
@@ -98,13 +75,7 @@ export default function Transactions() {
         setType(tx.type);
         setCategory(tx.category || '');
         setExpenseType(tx.expense_type || 'variable');
-        setSelectedWalletId(tx.wallet_id || (wallets.length > 0 ? wallets[0].id : ''));
         setIsRecurring(false);
-
-        // Try to match existing string category to a category object for UI highlight
-        const match = categories.find(c => c.name === tx.category && c.type === tx.type);
-        setSelectedCategory(match || null);
-
         setIsModalOpen(true);
     };
 
@@ -117,9 +88,6 @@ export default function Transactions() {
                 amount: parseFloat(amount),
                 type,
                 category,
-                // If editing, keep original date or update? Let's keep original date for now unless we add a date picker
-                // Actually, let's allow updating date if we had a field, but we don't. 
-                // Creating new: use now(). Editing: keep existing date.
                 date: transactionToEdit ? transactionToEdit.date : new Date().toISOString(),
                 profile_id: user.id,
                 expense_type: type === 'expense' ? expenseType : null
@@ -127,47 +95,44 @@ export default function Transactions() {
 
             let error;
             if (transactionToEdit) {
-                const { error: updateError } = await supabase
-                    .from('transactions')
-                    .update(payload)
-                    .eq('id', transactionToEdit.id);
+                const { error: updateError } = await supabase.from('transactions').update(payload).eq('id', transactionToEdit.id);
                 error = updateError;
             } else {
-                const { error: insertError } = await supabase
-                    .from('transactions')
-                    .insert([payload]);
+                const { error: insertError } = await supabase.from('transactions').insert([payload]);
                 error = insertError;
 
-                // Handle Recurring Creation (Only for new transactions for now)
                 if (!error && isRecurring) {
-                    const nextDate = new Date(date);
+                    // Recurring logic simplified for this snippet
+                    const nextDate = new Date();
                     nextDate.setMonth(nextDate.getMonth() + 1);
-
-                    const { error: recurError } = await supabase.from('recurring_templates').insert([{
-                        description,
-                        amount: parseFloat(amount),
-                        type,
-                        category,
-                        expense_type: type === 'expense' ? expenseType : null,
-                        frequency: 'monthly',
-                        next_due_date: nextDate.toISOString(),
-                        profile_id: user.id
+                    await supabase.from('recurring_templates').insert([{
+                        description, amount: parseFloat(amount), type, category,
+                        frequency: 'monthly', next_due_date: nextDate.toISOString(), profile_id: user.id
                     }]);
-
-                    if (recurError) console.error("Error creating recurring template:", recurError);
                 }
             }
 
             if (error) throw error;
-
             await fetchTransactions();
             setIsModalOpen(false);
             resetForm();
-            addToast(transactionToEdit ? 'Transação atualizada!' : 'Transação criada!', 'success');
+            addToast(transactionToEdit ? 'Atualizado' : 'Criado', 'success');
         } catch (error) {
             addToast(error.message, 'error');
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleDeleteTransaction = async () => {
+        if (!transactionToEdit) return;
+        if (!confirm('Excluir?')) return;
+        try {
+            await supabase.from('transactions').delete().eq('id', transactionToEdit.id);
+            setTransactions(transactions.filter(t => t.id !== transactionToEdit.id));
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -178,187 +143,151 @@ export default function Transactions() {
         setCategory('');
         setExpenseType('variable');
         setTransactionToEdit(null);
-        setSelectedCategory(null);
         setIsRecurring(false);
     };
 
-    const handleDeleteTransaction = async (id) => {
-        if (!confirm('Tem certeza que deseja excluir esta transação?')) return;
-        try {
-            const { error } = await supabase.from('transactions').delete().eq('id', id);
-            if (error) throw error;
-            setTransactions(transactions.filter(t => t.id !== id));
-        } catch (error) {
-            console.error('Erro ao excluir:', error);
-            alert('Erro ao excluir transação.');
+    // Filter Logic
+    const filteredTransactions = transactions.filter(tx => {
+        if (!startDate && !endDate) return true;
+        const txDate = new Date(tx.date);
+        txDate.setHours(0, 0, 0, 0);
+
+        if (startDate) {
+            const [y, m, d] = startDate.split('-');
+            if (txDate < new Date(y, m - 1, d)) return false;
         }
-    };
-
-    const handleExport = () => {
-        if (transactions.length === 0) {
-            addToast('Sem transações para exportar.', 'error');
-            return;
+        if (endDate) {
+            const [y, m, d] = endDate.split('-');
+            const end = new Date(y, m - 1, d);
+            end.setHours(23, 59, 59, 999);
+            if (txDate > end) return false;
         }
+        return true;
+    });
 
-        // Use the filtered transactions if needed, but usually export all is preferred or explicitly filtered.
-        // Let's filter based on the current date filters if active.
-        const filteredTransactions = transactions.filter(tx => {
-            if (!startDate && !endDate) return true;
-            const txDate = new Date(tx.date);
-            txDate.setHours(0, 0, 0, 0);
-
-            let start = null;
-            let end = null;
-
-            if (startDate) {
-                const [y, m, d] = startDate.split('-');
-                start = new Date(Number(y), Number(m) - 1, Number(d));
-            }
-
-            if (endDate) {
-                const [y, m, d] = endDate.split('-');
-                end = new Date(Number(y), Number(m) - 1, Number(d));
-                end.setHours(23, 59, 59, 999);
-            }
-
-            if (start && txDate < start) return false;
-            if (end && txDate > end) return false;
-
-            return true;
-        });
-
-        if (filteredTransactions.length === 0) {
-            addToast('Nenhuma transação encontrada no período selecionado.', 'error');
-            return;
-        }
-
-        exportTransactionsToExcel(filteredTransactions);
-    };
-
-    // Filter categories for the modal based on current type
     const availableCategories = categories.filter(c => c.type === type);
 
     return (
         <div className="container fade-in">
-            <header className="page-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                    <h1 className="text-gradient">Transações</h1>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <Button onClick={handleExport} variant="ghost" icon={Download}>
-                            <span className="responsive-btn-text">Exportar</span>
-                        </Button>
-                        <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
-                            <span className="responsive-btn-text">Nova Transação</span>
-                        </Button>
-                    </div>
+            <header style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <h1 style={{ fontSize: '2rem', fontWeight: '700' }}>Transações</h1>
+                    <Button onClick={handleOpenNew} style={{ borderRadius: '50%', width: '40px', height: '40px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="btn-primary">
+                        <Plus size={24} />
+                    </Button>
                 </div>
 
-                {/* Date Filters */}
-                {/* Date Filters */}
-                <div className="date-filters">
-                    <DateRangePicker
-                        startDate={startDate ? new Date(startDate.split('-')[0], startDate.split('-')[1] - 1, startDate.split('-')[2]) : null}
-                        endDate={endDate ? new Date(endDate.split('-')[0], endDate.split('-')[1] - 1, endDate.split('-')[2]) : null}
-                        onChange={({ start, end }) => {
-                            if (start) {
-                                // Formatting to YYYY-MM-DD manually to avoid timezone issues or use format from date-fns
-                                const y = start.getFullYear();
-                                const m = String(start.getMonth() + 1).padStart(2, '0');
-                                const d = String(start.getDate()).padStart(2, '0');
-                                setStartDate(`${y}-${m}-${d}`);
-                            } else {
-                                setStartDate('');
-                            }
-
-                            if (end) {
-                                const y = end.getFullYear();
-                                const m = String(end.getMonth() + 1).padStart(2, '0');
-                                const d = String(end.getDate()).padStart(2, '0');
-                                setEndDate(`${y}-${m}-${d}`);
-                            } else {
-                                setEndDate('');
-                            }
-                        }}
-                    />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ flex: 1 }}>
+                        <DateRangePicker
+                            startDate={startDate ? new Date(startDate) : null}
+                            endDate={endDate ? new Date(endDate) : null}
+                            onChange={({ start, end }) => {
+                                setStartDate(start ? start.toISOString().split('T')[0] : '');
+                                setEndDate(end ? end.toISOString().split('T')[0] : '');
+                            }}
+                        />
+                    </div>
+                    <Button
+                        variant="ghost"
+                        onClick={() => exportTransactionsToExcel(filteredTransactions)}
+                        style={{ padding: '0.6rem', color: 'var(--color-blue)' }}
+                    >
+                        <Download size={20} />
+                    </Button>
                 </div>
             </header>
 
-            {/* Transaction List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className="list-group">
                 {loading ? (
                     Array(5).fill(0).map((_, i) => (
-                        <Skeleton key={i} width="100%" height="72px" borderRadius="16px" />
+                        <div key={i} className="list-item" style={{ padding: '1rem 0' }}>
+                            <Skeleton width="100%" height="50px" />
+                        </div>
                     ))
-                ) : transactions.length === 0 ? (
-                    <EmptyState
-                        icon={ArrowUpRight}
-                        title="Nenhuma transação ainda"
-                        description="Comece registrando seus ganhos e gastos para ver o poder do dashboard."
-                        actionText="Nova Transação"
-                        onAction={handleOpenNew}
-                    />
+                ) : filteredTransactions.length === 0 ? (
+                    <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>Nenhuma transação.</p>
                 ) : (
-
-                    <AnimatePresence mode="popLayout">
-                        {transactions
-                            .filter(tx => {
-                                if (!startDate && !endDate) return true;
-                                const txDate = new Date(tx.date);
-                                txDate.setHours(0, 0, 0, 0);
-
-                                let start = null;
-                                let end = null;
-
-                                if (startDate) {
-                                    const [y, m, d] = startDate.split('-');
-                                    start = new Date(Number(y), Number(m) - 1, Number(d));
-                                }
-
-                                if (endDate) {
-                                    const [y, m, d] = endDate.split('-');
-                                    end = new Date(Number(y), Number(m) - 1, Number(d));
-                                    end.setHours(23, 59, 59, 999);
-                                }
-
-                                if (start && txDate < start) return false;
-                                if (end && txDate > end) return false;
-
-                                return true;
-                            })
-                            .map((tx, index) => (
-                                <TransactionItem
-                                    key={tx.id}
-                                    transaction={tx}
-                                    categories={categories}
-                                    onEdit={handleOpenEdit}
-                                    onDelete={handleDeleteTransaction}
-                                    index={index}
-                                />
-                            ))}
-                    </AnimatePresence>
+                    filteredTransactions.map((tx) => (
+                        <div
+                            key={tx.id}
+                            className="list-item"
+                            onClick={() => handleOpenEdit(tx)}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                <div style={{
+                                    width: '36px',
+                                    height: '36px',
+                                    borderRadius: '10px',
+                                    background: tx.type === 'income' ? 'rgba(52, 199, 89, 0.1)' : 'rgba(255, 59, 48, 0.1)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: tx.type === 'income' ? 'var(--color-green)' : 'var(--color-red)',
+                                    fontSize: '1.2rem'
+                                }}>
+                                    {/* Icon based on category or type */}
+                                    {categories.find(c => c.name === tx.category)?.icon || (tx.type === 'income' ? '+' : '-')}
+                                </div>
+                                <div>
+                                    <h4 style={{ fontSize: '1rem', fontWeight: '500', marginBottom: '0.1rem' }}>{tx.description}</h4>
+                                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
+                                        {new Date(tx.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} • {tx.category}
+                                    </p>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{
+                                    fontWeight: '600',
+                                    color: tx.type === 'income' ? 'var(--color-green)' : 'var(--text-primary)'
+                                }}>
+                                    {tx.type === 'income' ? '+' : '-'} R$ {parseFloat(tx.amount).toFixed(2)}
+                                </span>
+                                <ChevronRight size={16} color="var(--text-tertiary)" />
+                            </div>
+                        </div>
+                    ))
                 )}
             </div>
 
-            {/* Add/Edit Transaction Modal */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={transactionToEdit ? "Editar Transação" : "Nova Transação"}>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={transactionToEdit ? "Editar" : "Nova Transação"}>
                 <form onSubmit={handleSaveTransaction}>
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <Button
+                    <div style={{ background: 'var(--bg-secondary)', padding: '0.25rem', borderRadius: '10px', display: 'flex', marginBottom: '1.5rem' }}>
+                        <button
                             type="button"
-                            className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--color-3)' : undefined, border: type === 'expense' ? 'none' : undefined }}
-                            onClick={() => { setType('expense'); setCategory(''); setSelectedCategory(null); }}
+                            onClick={() => setType('expense')}
+                            style={{
+                                flex: 1,
+                                padding: '0.6rem',
+                                borderRadius: '8px',
+                                border: 'none',
+                                background: type === 'expense' ? 'white' : 'transparent',
+                                boxShadow: type === 'expense' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+                                fontWeight: '600',
+                                color: type === 'expense' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                                transition: 'all 0.2s'
+                            }}
                         >
                             Despesa
-                        </Button>
-                        <Button
+                        </button>
+                        <button
                             type="button"
-                            className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--color-4)' : undefined, border: type === 'income' ? 'none' : undefined }}
-                            onClick={() => { setType('income'); setCategory(''); setSelectedCategory(null); }}
+                            onClick={() => setType('income')}
+                            style={{
+                                flex: 1,
+                                padding: '0.6rem',
+                                borderRadius: '8px',
+                                border: 'none',
+                                background: type === 'income' ? 'white' : 'transparent',
+                                boxShadow: type === 'income' ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+                                fontWeight: '600',
+                                color: type === 'income' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                                transition: 'all 0.2s'
+                            }}
                         >
                             Receita
-                        </Button>
+                        </button>
                     </div>
 
                     <Input
@@ -367,126 +296,77 @@ export default function Transactions() {
                         type="number"
                         step="0.01"
                         value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
+                        onChange={e => setAmount(e.target.value)}
                         required
+                        style={{ fontSize: '1.5rem', fontWeight: '700', color: type === 'income' ? 'var(--color-green)' : 'var(--color-red)' }}
                     />
-
-                    {/* Category Selection Grid */}
-                    <div className="input-group" style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                            Categoria
-                        </label>
-                        {availableCategories.length > 0 ? (
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '0.5rem' }}>
-                                {availableCategories.map(cat => (
-                                    <div
-                                        key={cat.id}
-                                        onClick={() => {
-                                            setCategory(cat.name);
-                                            setSelectedCategory(cat);
-                                        }}
-                                        style={{
-                                            padding: '0.5rem',
-                                            borderRadius: '8px',
-                                            background: selectedCategory?.id === cat.id ? `${cat.color}40` : 'rgba(255,255,255,0.05)',
-                                            border: selectedCategory?.id === cat.id ? `1px solid ${cat.color}` : '1px solid transparent',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: '0.2rem',
-                                            transition: 'all 0.2s',
-                                            textAlign: 'center'
-                                        }}
-                                    >
-                                        <div style={{ fontSize: '1.5rem' }}>{cat.icon}</div>
-                                        <div style={{ fontSize: '0.7rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>{cat.name}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                                <p>Nenhuma categoria criada.</p>
-                                <Button type="button" variant="ghost" className="btn-primary" style={{ marginTop: '0.5rem', fontSize: '0.8rem' }} onClick={() => window.location.href = '/categories'}>Criar Agora</Button>
-                            </div>
-                        )}
-                        {/* Fallback Input if needed (hidden or optional? Let's hide it if categories exist) */}
-                    </div>
-
-                    {/* Mandatory Expense Type Selection */}
-                    {type === 'expense' && (
-                        <div className="input-group" style={{ marginBottom: '1rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 500 }}>
-                                Tipo de Gasto <span style={{ color: '#f64f59' }}>*</span>
-                            </label>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
-                                {[
-                                    { value: 'fixed', label: 'Fixo', icon: '🔒' },
-                                    { value: 'variable', label: 'Variável', icon: '💳' },
-                                    { value: 'lifestyle', label: 'Lazer', icon: '🍿' }
-                                ].map((opt) => (
-                                    <div
-                                        key={opt.value}
-                                        onClick={() => setExpenseType(opt.value)}
-                                        style={{
-                                            padding: '0.75rem 0.5rem',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            textAlign: 'center',
-                                            background: expenseType === opt.value ? 'rgba(246, 79, 89, 0.2)' : 'rgba(255,255,255,0.05)',
-                                            border: expenseType === opt.value ? '1px solid #f64f59' : '1px solid transparent',
-                                            transition: 'all 0.2s'
-                                        }}
-                                    >
-                                        <div style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>{opt.icon}</div>
-                                        <div style={{ fontSize: '0.8rem', fontWeight: expenseType === opt.value ? 600 : 400 }}>{opt.label}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {!transactionToEdit && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-                            <input
-                                type="checkbox"
-                                id="recurring"
-                                checked={isRecurring}
-                                onChange={(e) => setIsRecurring(e.target.checked)}
-                                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                            />
-                            <label htmlFor="recurring" style={{ cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
-                                Repetir mensalmente?
-                            </label>
-                        </div>
-                    )}
 
                     <Input
                         label="Descrição"
-                        placeholder="Ex: Supermercado"
+                        placeholder="Ex: Almoço"
                         value={description}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            setDescription(val);
-
-                            // Smart Category (Only if adding new or category is empty)
-                            if (!transactionToEdit && val.length > 2 && !category) {
-                                const smartMatch = getSmartCategory(val, categories);
-                                if (smartMatch) {
-                                    if (smartMatch.type !== type) setType(smartMatch.type);
-                                    setCategory(smartMatch.name);
-                                    setSelectedCategory(smartMatch);
-                                }
-                            }
-                        }}
+                        onChange={e => setDescription(e.target.value)}
                         required
                     />
 
-                    <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} loading={submitting}>
-                        {transactionToEdit ? "Salvar Alterações" : "Salvar"}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>Categoria</label>
+                        <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }} className="no-scrollbar">
+                            {availableCategories.map(cat => (
+                                <button
+                                    key={cat.id}
+                                    type="button"
+                                    onClick={() => setCategory(cat.name)}
+                                    style={{
+                                        minWidth: '70px',
+                                        padding: '0.6rem 0.4rem',
+                                        borderRadius: '12px',
+                                        border: category === cat.name ? `1px solid ${cat.color}` : '1px solid var(--bg-secondary)',
+                                        background: category === cat.name ? `${cat.color}10` : 'transparent',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: '0.25rem'
+                                    }}
+                                >
+                                    <span style={{ fontSize: '1.2rem' }}>{cat.icon}</span>
+                                    <span style={{ fontSize: '0.7rem' }}>{cat.name}</span>
+                                </button>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => window.location.href = '/categories'}
+                                style={{
+                                    minWidth: '70px',
+                                    padding: '0.6rem 0.4rem',
+                                    borderRadius: '12px',
+                                    border: '1px dashed var(--text-tertiary)',
+                                    background: 'transparent',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.25rem',
+                                    color: 'var(--text-tertiary)'
+                                }}
+                            >
+                                <Plus size={20} />
+                                <span style={{ fontSize: '0.7rem' }}>Novo</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <Button type="submit" className="btn-primary" style={{ width: '100%', borderRadius: '14px', padding: '1rem', justifyContent: 'center' }} loading={submitting}>
+                        {transactionToEdit ? 'Salvar' : 'Criar Transação'}
                     </Button>
+
+                    {transactionToEdit && (
+                        <Button type="button" variant="ghost" onClick={handleDeleteTransaction} style={{ width: '100%', marginTop: '0.5rem', color: 'var(--color-red)', justifyContent: 'center' }}>
+                            Excluir Transação
+                        </Button>
+                    )}
                 </form>
             </Modal>
-        </div >
+        </div>
     );
 }

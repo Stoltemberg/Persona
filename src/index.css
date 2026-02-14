@@ -1386,7 +1386,7 @@ p {
   /* Floating */
   left: 1.5rem;
   right: 1.5rem;
-  height: 72px;
+  height: 70px;
   display: flex;
   justify-content: space-around;
   align-items: center;

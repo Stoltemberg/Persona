@@ -225,7 +225,7 @@ export default function Dashboard() {
                 <Link to="/analysis" style={{ textDecoration: 'none' }}>
                     <div className="glass-card zoom-on-hover" style={{ padding: '1rem', textAlign: 'center', border: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}>
                         <div style={{ marginBottom: '0.5rem', opacity: 0.6, fontSize: '0.85rem' }}>Saídas (Mês)</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 500, color: 'var(--text-main)' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 500, color: 'var(--color-danger)' }}>
                             {loading ? '...' : (isPrivacyMode ? '****' : `R$ ${expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
                         </div>
                     </div>
@@ -234,7 +234,7 @@ export default function Dashboard() {
                 <Link to="/goals" style={{ textDecoration: 'none' }}>
                     <div className="glass-card zoom-on-hover" style={{ padding: '1rem', textAlign: 'center', border: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}>
                         <div style={{ marginBottom: '0.5rem', opacity: 0.6, fontSize: '0.85rem' }}>Economias</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 500, color: 'var(--text-main)' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 500, color: 'var(--color-success)' }}>
                             {loading ? '...' : (isPrivacyMode ? '****' : `R$ ${savings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
                         </div>
                     </div>
@@ -270,7 +270,7 @@ export default function Dashboard() {
                                     <div style={{ fontWeight: 500, marginBottom: '0.25rem' }}>{tx.description}</div>
                                     <div style={{ fontSize: '0.8rem', opacity: 0.5 }}>{new Date(tx.date).toLocaleDateString('pt-BR')}</div>
                                 </div>
-                                <div style={{ fontWeight: 600, color: tx.type === 'income' ? 'var(--text-main)' : 'var(--text-secondary)' }}>
+                                <div style={{ fontWeight: 600, color: tx.type === 'income' ? 'var(--color-success)' : 'var(--text-main)' }}>
                                     {isPrivacyMode ? '****' : (tx.type === 'income' ? '+' : '-') + ` R$ ${parseFloat(tx.amount).toFixed(2).replace('.', ',')}`}
                                 </div>
                             </div>

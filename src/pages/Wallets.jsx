@@ -25,7 +25,6 @@ export default function Wallets() {
     const [walletToEdit, setWalletToEdit] = useState(null);
     const [name, setName] = useState('');
     const [type, setType] = useState('checking');
-    const [color, setColor] = useState('#12c2e9');
     const [initialBalance, setInitialBalance] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [showUpgrade, setShowUpgrade] = useState(false);
@@ -61,7 +60,6 @@ export default function Wallets() {
         setWalletToEdit(null);
         setName('');
         setType('checking');
-        setColor('#12c2e9');
         setInitialBalance('');
         setIsModalOpen(true);
     };
@@ -70,7 +68,6 @@ export default function Wallets() {
         setWalletToEdit(wallet);
         setName(wallet.name);
         setType(wallet.type);
-        setColor(wallet.color || '#12c2e9');
         setInitialBalance(wallet.initial_balance);
         setIsModalOpen(true);
     };
@@ -82,7 +79,7 @@ export default function Wallets() {
             const payload = {
                 name,
                 type,
-                color,
+                // color: 'neutral', // Deprecated
                 initial_balance: parseFloat(initialBalance) || 0,
                 profile_id: user.id
             };
@@ -164,8 +161,9 @@ export default function Wallets() {
                                 <div style={{
                                     padding: '1rem',
                                     borderRadius: '14px',
-                                    background: `${wallet.color}20`,
-                                    color: wallet.color
+                                    background: 'rgba(255,255,255,0.05)',
+                                    color: 'var(--text-main)',
+                                    border: '1px solid rgba(255,255,255,0.1)'
                                 }}>
                                     {getIcon(wallet.type)}
                                 </div>
@@ -197,8 +195,7 @@ export default function Wallets() {
                         </div>
                     )}
                 </div>
-            )
-            }
+            )}
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={walletToEdit ? "Editar Carteira" : "Nova Carteira"}>
                 <form onSubmit={handleSaveWallet}>
@@ -234,26 +231,7 @@ export default function Wallets() {
                         onChange={(e) => setInitialBalance(e.target.value)}
                     />
 
-                    <div className="input-group" style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Cor</label>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            {['#12c2e9', '#c471ed', '#f64f59', '#11998e', '#F2994A', '#8E2DE2'].map(c => (
-                                <div
-                                    key={c}
-                                    onClick={() => setColor(c)}
-                                    style={{
-                                        width: '32px',
-                                        height: '32px',
-                                        borderRadius: '50%',
-                                        background: c,
-                                        cursor: 'pointer',
-                                        border: color === c ? '2px solid white' : '2px solid transparent',
-                                        transition: 'all 0.2s'
-                                    }}
-                                />
-                            ))}
-                        </div>
-                    </div>
+                    {/* Color Picker Removed for Apple Style */}
 
                     <Button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem' }} loading={submitting}>
                         {walletToEdit ? "Salvar Alterações" : "Criar Carteira"}
@@ -269,5 +247,3 @@ export default function Wallets() {
                 onTransferSuccess={fetchWallets}
             />
         </div>
-    );
-}

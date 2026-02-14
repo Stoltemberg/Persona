@@ -84,9 +84,9 @@ export default function Analysis() {
         });
 
         return [
-            { name: 'Fixo', value: totals.fixed, color: '#f64f59', key: 'fixed' },
-            { name: 'Variável', value: totals.variable, color: '#12c2e9', key: 'variable' },
-            { name: 'Lazer', value: totals.lifestyle, color: '#c471ed', key: 'lifestyle' }
+            { name: 'Fixo', value: totals.fixed, color: '#0a84ff', key: 'fixed' },     // Apple Blue
+            { name: 'Variável', value: totals.variable, color: '#ff9f0a', key: 'variable' }, // Apple Orange
+            { name: 'Lazer', value: totals.lifestyle, color: '#bf5af2', key: 'lifestyle' }  // Apple Purple
         ].filter(d => d.value > 0);
     };
 
@@ -190,32 +190,32 @@ export default function Analysis() {
             {/* Summary Cards */}
             <div className="grid-responsive mb-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
                 <Card className="glass-card stagger-1 flex-align-center gap-15" style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div style={{ padding: '1rem', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '50%', color: '#12c2e9' }}>
-                        <TrendingUp size={28} />
+                    <div style={{ padding: '1rem', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', color: 'var(--color-success)' }}>
+                        <TrendingUp size={24} />
                     </div>
                     <div>
                         <p className="text-muted text-small">Entradas</p>
-                        <h2 style={{ color: '#12c2e9' }}>R$ {stats.income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h2>
+                        <h2 style={{ color: 'var(--color-success)' }}>R$ {stats.income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h2>
                     </div>
                 </Card>
 
                 <Card className="glass-card stagger-2 flex-align-center gap-15" style={{ padding: '1.5rem' }}>
-                    <div style={{ padding: '1rem', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '50%', color: '#f64f59' }}>
-                        <TrendingDown size={28} />
+                    <div style={{ padding: '1rem', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', color: 'var(--color-danger)' }}>
+                        <TrendingDown size={24} />
                     </div>
                     <div>
                         <p className="text-muted text-small">Saídas</p>
-                        <h2 style={{ color: '#f64f59' }}>R$ {stats.expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h2>
+                        <h2 style={{ color: 'var(--color-danger)' }}>R$ {stats.expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h2>
                     </div>
                 </Card>
 
                 <Card className="glass-card stagger-3 flex-align-center gap-15" style={{ padding: '1.5rem' }}>
-                    <div style={{ padding: '1rem', background: 'rgba(196, 113, 237, 0.15)', borderRadius: '50%', color: '#c471ed' }}>
-                        <Wallet size={28} />
+                    <div style={{ padding: '1rem', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)' }}>
+                        <Wallet size={24} />
                     </div>
                     <div>
                         <p className="text-muted text-small">Saldo Mensal</p>
-                        <h2 style={{ color: balance >= 0 ? '#00ebc7' : '#f64f59' }}>
+                        <h2 style={{ color: balance >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
                             R$ {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </h2>
                     </div>
@@ -291,7 +291,7 @@ export default function Analysis() {
                     {chartData.map((item, index) => (
                         <Card key={item.name} className={`glass-card fade-in stagger-${index + 1} flex-between`}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: item.color, boxShadow: `0 0 10px ${item.color}` }} />
+                                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: item.color }} />
                                 <div>
                                     <h4 style={{ fontSize: '1.1rem' }}>{item.name}</h4>
                                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>

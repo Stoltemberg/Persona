@@ -7,17 +7,21 @@
   --bg-card: #0a0a0a;
   /* Slightly lighter for cards */
 
-  /* Minimalist Accents - Single primary color */
+  /* Minimalist Accents - Apple Style */
   --color-brand: #ffffff;
-  /* Stark white for primary actions/text */
-  --color-accent: #2a2a2a;
-  /* Subtle gray for secondary elements */
+  /* Stark white */
+  --color-accent: #8e8e93;
+  /* Apple Gray */
 
-  /* Semantic Colors (Muted) */
-  --color-success: #2ecc71;
-  --color-danger: #e74c3c;
-  --color-warning: #f1c40f;
-  --color-info: #3498db;
+  /* Semantic Colors (Apple System Colors) */
+  --color-success: #30d158;
+  /* Apple Green */
+  --color-danger: #ff453a;
+  /* Apple Red */
+  --color-warning: #ff9f0a;
+  /* Apple Orange */
+  --color-info: #0a84ff;
+  /* Apple Blue */
 
   /* Glass Variables -> Solid Minimalist Panels */
   --glass-bg: #0a0a0a;
@@ -122,10 +126,12 @@ html.light label {
 .glass-card {
   position: relative;
   background: var(--bg-card);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* Subtle uniform border */
   border-radius: var(--radius-md);
   padding: 1.5rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  /* Softer shadow */
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   overflow: hidden;
 }
@@ -313,13 +319,11 @@ option {
 
 h1 {
   font-size: 3rem;
-  font-weight: 800;
-  background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.7));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  color: var(--text-main);
+  /* Solid color, no gradient */
   line-height: 1.1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 h2 {

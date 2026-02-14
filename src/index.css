@@ -1514,6 +1514,13 @@ p {
   background: #333333;
 }
 
+/* Hide desktop FAB on mobile */
+@media (max-width: 1024px) {
+  .desktop-fab {
+    display: none !important;
+  }
+}
+
 
 
 /* Category Selection Grid Items */

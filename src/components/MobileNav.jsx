@@ -57,7 +57,7 @@ export function MobileNav() {
                     className="mobile-center-fab"
                     style={{
                         position: 'relative',
-                        bottom: '24px',
+                        bottom: '16px',
                         right: 'auto',
                         width: '64px',
                         height: '64px',

@@ -1472,3 +1472,81 @@ p {
 .mobile-menu-item:active .mobile-menu-icon-container {
   transform: scale(0.95);
 }
+
+/* Floating Action Button (FAB) */
+.fab-btn {
+  position: fixed;
+  bottom: calc(90px + env(safe-area-inset-bottom));
+  /* Above mobile nav */
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: #000000;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.fab-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
+.fab-btn:active {
+  transform: scale(0.95);
+}
+
+/* Light Mode FAB Override */
+.light .fab-btn {
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.light .fab-btn:hover {
+  background: #333333;
+}
+
+@media (min-width: 1024px) {
+  .fab-btn {
+    bottom: 2rem;
+    right: 2rem;
+  }
+}
+
+/* Category Selection Grid Items */
+.category-item {
+  min-width: 70px;
+  padding: 0.8rem 0.5rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.category-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.light .category-item {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-main);
+}
+
+.light .category-item:hover {
+  background: rgba(0, 0, 0, 0.1);
+}

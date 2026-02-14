@@ -100,28 +100,8 @@ export function FAB() {
         <>
             <button
                 onClick={handleOpen}
-                style={{
-                    position: 'fixed',
-                    bottom: 'calc(80px + env(safe-area-inset-bottom))', // Above mobile nav
-                    right: '20px',
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #c471ed, #f64f59)',
-                    color: 'white',
-                    border: 'none',
-                    boxShadow: '0 4px 15px rgba(196, 113, 237, 0.4)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 50,
-                    cursor: 'pointer',
-                    transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-                }}
                 className="fab-btn"
-                onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
-                onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                aria-label="Adicionar Transação"
             >
                 <Plus size={28} strokeWidth={2.5} />
             </button>
@@ -136,9 +116,9 @@ export function FAB() {
                             style={{
                                 flex: 1,
                                 justifyContent: 'center',
-                                background: type === 'expense' ? '#f64f59' : undefined, // Force vivid red
-                                border: type === 'expense' ? 'none' : undefined,
-                                color: type === 'expense' ? 'white' : undefined
+                                border: type === 'expense' ? '1px solid #f64f59' : '1px solid var(--glass-border)',
+                                background: type === 'expense' ? 'rgba(246, 79, 89, 0.1)' : 'transparent',
+                                color: type === 'expense' ? '#f64f59' : 'var(--text-muted)'
                             }}
                             onClick={() => { setType('expense'); setCategory(''); setSelectedCategory(null); medium(); }}
                         >
@@ -151,9 +131,9 @@ export function FAB() {
                             style={{
                                 flex: 1,
                                 justifyContent: 'center',
-                                background: type === 'income' ? '#12c2e9' : undefined, // Force vivid cyan
-                                border: type === 'income' ? 'none' : undefined,
-                                color: type === 'income' ? 'white' : undefined
+                                border: type === 'income' ? '1px solid #12c2e9' : '1px solid var(--glass-border)',
+                                background: type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'transparent',
+                                color: type === 'income' ? '#12c2e9' : 'var(--text-muted)'
                             }}
                             onClick={() => { setType('income'); setCategory(''); setSelectedCategory(null); medium(); }}
                         >
@@ -188,19 +168,10 @@ export function FAB() {
                                         setSelectedCategory(cat);
                                         medium();
                                     }}
+                                    className="category-item"
                                     style={{
-                                        minWidth: '70px',
-                                        padding: '0.8rem 0.5rem',
-                                        borderRadius: '12px',
-                                        background: selectedCategory?.id === cat.id ? `${cat.color}40` : 'rgba(255,255,255,0.05)',
-                                        border: selectedCategory?.id === cat.id ? `1px solid ${cat.color}` : '1px solid transparent',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        gap: '0.4rem',
-                                        transition: 'all 0.2s',
-                                        textAlign: 'center'
+                                        background: selectedCategory?.id === cat.id ? `${cat.color}40` : undefined,
+                                        border: selectedCategory?.id === cat.id ? `1px solid ${cat.color}` : undefined,
                                     }}
                                 >
                                     <div style={{ fontSize: '1.4rem' }}>{cat.icon}</div>

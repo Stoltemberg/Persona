@@ -70,6 +70,16 @@ html.light,
   color-scheme: light;
 }
 
+/* Fix visible white text on gradient H1 in light mode */
+html.light h1,
+.light h1 {
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-text-fill-color: initial;
+  color: #000000 !important;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

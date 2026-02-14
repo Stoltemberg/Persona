@@ -46,7 +46,7 @@ export function MobileNav() {
                                 transform: isActive ? 'scale(1.1)' : 'none',
                                 transition: 'all 0.2s ease'
                             }}>
-                                <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                                <item.icon size={24} strokeWidth={isActive ? 2 : 1.5} />
                             </div>
                         )}
                     </NavLink>
@@ -78,7 +78,7 @@ export function MobileNav() {
                                 transform: isActive ? 'scale(1.1)' : 'none',
                                 transition: 'all 0.2s ease'
                             }}>
-                                <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                                <item.icon size={24} strokeWidth={isActive ? 2 : 1.5} />
                             </div>
                         )}
                     </NavLink>
@@ -90,7 +90,7 @@ export function MobileNav() {
                     className="mobile-nav-item"
                     style={{ color: isMenuOpen ? 'var(--text-main)' : 'var(--text-muted)' }}
                 >
-                    {isMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
+                    {isMenuOpen ? <X size={24} strokeWidth={1.5} /> : <MenuIcon size={24} strokeWidth={1.5} />}
                 </button>
             </nav>
 

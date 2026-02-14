@@ -1385,7 +1385,7 @@ p {
   /* Floating */
   left: 1.5rem;
   right: 1.5rem;
-  height: 70px;
+  height: 66px;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -1405,7 +1405,7 @@ p {
 
   /* Initial Subtle Border */
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 /* "Liquid Meniscus" Pseudo-element for Edge Refraction */
@@ -1828,13 +1828,13 @@ p {
   position: fixed;
   bottom: calc(90px + env(safe-area-inset-bottom));
   right: 20px;
-  width: 54px;
-  height: 54px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   background: var(--color-brand);
   color: #000000;
   border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1845,7 +1845,7 @@ p {
 
 .fab-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
 }
 
 .fab-btn:active {
@@ -1879,12 +1879,12 @@ p {
 .light .fab-btn {
   background: #000000;
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .light .fab-btn:hover {
   background: #1a1a1a;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
 
 /* Hide desktop FAB on mobile */

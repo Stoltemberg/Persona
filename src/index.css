@@ -507,22 +507,101 @@ p {
 
 /* media query for desktop, switching to grid */
 /* Desktop Grid Layout */
+/* Desktop Dock Layout (Floating Glass Bar) */
 @media (min-width: 1024px) {
   .app-layout {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    max-width: 1600px;
+    display: flex;
+    justify-content: center;
+    max-width: 100%;
+    /* Remove grid */
   }
 
+  /* Floating Dock Container */
   .sidebar-container {
     display: block;
-    height: 100vh;
-    position: relative;
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    height: auto;
+    width: auto;
+    z-index: 100;
   }
 
+  /* Dock Panel (Glass) */
+  .sidebar-panel {
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Hide Desktop Header in Dock */
+  .sidebar-header {
+    display: none;
+  }
+
+  /* Horizontal Navigation */
+  .sidebar-nav {
+    flex-direction: row;
+    gap: 0.5rem;
+    border-right: 1px solid var(--glass-border);
+    padding-right: 1rem;
+    margin-right: 0.5rem;
+  }
+
+  /* Dock Icons */
+  .nav-item {
+    flex-direction: column;
+    gap: 4px;
+    padding: 0.6rem 0.8rem;
+    min-width: 64px;
+    justify-content: center;
+    border-radius: 16px;
+    text-align: center;
+  }
+
+  .nav-item span {
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+
+  .nav-item:hover {
+    transform: translateY(-4px);
+  }
+
+  /* Logout Button in Dock */
+  .logout-btn {
+    width: auto;
+    margin-top: 0;
+    padding: 0.6rem;
+    border-radius: 14px;
+    background: rgba(246, 79, 89, 0.1);
+    color: #f64f59;
+  }
+
+  .logout-btn span {
+    display: none;
+    /* Hide text to save space */
+  }
+
+  /* Main Content Centered */
   .main-content {
     padding: 2rem;
-    overflow-y: auto;
+    padding-bottom: 9rem;
+    /* Space for Dock */
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    overflow-y: visible;
   }
 
   .mobile-header,
@@ -534,6 +613,8 @@ p {
     display: flex !important;
   }
 }
+
+
 
 .desktop-actions {
   display: none !important;

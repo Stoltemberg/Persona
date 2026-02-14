@@ -1973,7 +1973,7 @@ p {
     display: flex;
     justify-content: center;
     position: fixed;
-    bottom: 3rem;
+    bottom: 6rem;
     left: 50%;
     transform: translateX(-50%);
     width: auto;

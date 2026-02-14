@@ -680,10 +680,73 @@ p {
 }
 
 /* Light Mode Active State */
-.light .nav-item.active {
+/* Navigation Item - Core Style */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  transform: translateX(4px);
+}
+
+/* Active State - Dark Mode (Default) */
+.nav-item.active {
+  background: var(--color-brand);
+  color: #000000 !important;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active svg {
+  stroke-width: 2.5px;
+}
+
+/* Light Mode Overrides */
+.light .nav-item:hover {
   background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.1);
-  color: var(--color-2) !important;
+  color: #000000;
+}
+
+.light .nav-item.active {
+  background: #000000;
+  /* Black pill in light mode */
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Sidebar Header Buttons */
+.sidebar-header-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-header-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+
+.light .sidebar-header-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000000;
 }
 
 
@@ -1306,4 +1369,100 @@ p {
 
   /* Fix specific flex-center usage in hero which was inline styled to justify-start */
   /* We will remove the inline style in Login.jsx and let CSS handle it */
+}
+
+/* Mobile Navigation */
+.mobile-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(5, 5, 5, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 3rem;
+  margin: 0 1rem 1rem 1rem;
+  z-index: 100;
+  transition: background 0.3s ease, is-color 0.3s ease;
+}
+
+.light .mobile-bottom-bar {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0.5rem;
+}
+
+.mobile-menu-grid {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 2rem 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  z-index: 101;
+  border: 1px solid var(--glass-border);
+  border-bottom: none;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+}
+
+.light .mobile-menu-grid {
+  background: #ffffff;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--text-main);
+  text-align: center;
+}
+
+.mobile-menu-icon-container {
+  padding: 0.8rem;
+  border-radius: 16px;
+  background: var(--input-bg);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.mobile-menu-item:active .mobile-menu-icon-container {
+  transform: scale(0.95);
 }

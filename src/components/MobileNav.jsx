@@ -31,13 +31,7 @@ export function MobileNav() {
     return (
         <>
             {/* Main Bottom Bar */}
-            <nav className="mobile-bottom-bar" style={{
-                background: 'rgba(5, 5, 5, 0.8)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid var(--glass-border)',
-                borderRadius: '3rem',
-                margin: '0 1rem 1rem 1rem'
-            }}>
+            <nav className="mobile-bottom-bar">
                 {mainItems.map((item) => (
                     <NavLink
                         key={item.path}
@@ -69,11 +63,10 @@ export function MobileNav() {
 
             {/* Menu Overlay */}
             {isMenuOpen && createPortal(
-                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)} style={{ background: 'rgba(0,0,0,0.8)' }}>
+                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)} style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', position: 'fixed', inset: 0, zIndex: 100 }}>
                     <div
                         className="mobile-menu-grid"
                         onClick={e => e.stopPropagation()}
-                        style={{ background: '#0a0a0a', border: '1px solid var(--glass-border)' }}
                     >
                         {/* Quick Settings Toggles */}
                         <div style={{
@@ -87,7 +80,7 @@ export function MobileNav() {
                             <button
                                 onClick={togglePrivacy}
                                 style={{
-                                    background: 'var(--bg-deep)',
+                                    background: 'var(--input-bg)',
                                     border: '1px solid var(--glass-border)',
                                     padding: '0.8rem',
                                     borderRadius: '12px',
@@ -107,11 +100,11 @@ export function MobileNav() {
                             <button
                                 onClick={() => toggleEventMode(!isEventMode)}
                                 style={{
-                                    background: isEventMode ? 'var(--text-main)' : 'var(--bg-deep)',
+                                    background: isEventMode ? 'var(--text-main)' : 'var(--input-bg)',
                                     border: '1px solid var(--glass-border)',
                                     padding: '0.8rem',
                                     borderRadius: '12px',
-                                    color: isEventMode ? '#000' : 'var(--text-main)',
+                                    color: isEventMode ? 'var(--bg-deep)' : 'var(--text-main)',
                                     flex: 1,
                                     marginLeft: '0.5rem',
                                     display: 'flex',
@@ -130,13 +123,8 @@ export function MobileNav() {
                                 to={item.path}
                                 onClick={() => setIsMenuOpen(false)}
                                 className="mobile-menu-item"
-                                style={{
-                                    background: 'var(--bg-deep)',
-                                    border: '1px solid var(--glass-border)',
-                                    color: 'var(--text-main)'
-                                }}
                             >
-                                <div className="mobile-menu-icon-container" style={{ background: 'transparent', color: 'var(--text-main)' }}>
+                                <div className="mobile-menu-icon-container">
                                     <item.icon size={24} strokeWidth={1.5} />
                                 </div>
                                 <span className="mobile-menu-label" style={{ fontWeight: 400, fontSize: '0.85rem' }}>{item.label}</span>

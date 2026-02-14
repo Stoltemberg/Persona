@@ -33,14 +33,15 @@ export function Sidebar() {
                     <h1 style={{ fontSize: '1.5rem', marginBottom: 0, fontWeight: 600, color: 'var(--text-main)' }}>Persona</h1>
                     <button
                         onClick={togglePrivacy}
-                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
+                        className="sidebar-header-btn"
                         title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
                     >
                         {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                     <button
                         onClick={() => toggleEventMode(!isEventMode)}
-                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: isEventMode ? 'var(--text-main)' : 'var(--text-muted)' }}
+                        className="sidebar-header-btn"
+                        style={{ color: isEventMode ? 'var(--text-main)' : undefined }}
                         title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
                     >
                         <Plane size={18} />
@@ -58,17 +59,10 @@ export function Sidebar() {
                             'nav-item',
                             isActive ? 'active' : ''
                         )}
-                        style={({ isActive }) => ({
-                            background: isActive ? 'var(--color-brand)' : 'transparent',
-                            color: isActive ? '#000' : 'var(--text-secondary)',
-                            fontWeight: isActive ? 600 : 500
-                        })}
                     >
                         {({ isActive }) => (
                             <>
-                                <div style={{
-                                    color: 'inherit'
-                                }}>
+                                <div>
                                     <item.icon size={20} />
                                 </div>
                                 <span>

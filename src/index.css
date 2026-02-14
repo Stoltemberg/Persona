@@ -1392,10 +1392,11 @@ p {
   align-items: center;
   padding: 0 1rem;
 
-  /* Transparent Center - Blur applied via ::before */
+  /* Base Layer: Slight Distortion (Center) */
   background: rgba(255, 255, 255, 0.01);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  backdrop-filter: blur(4px);
+  /* Low blur for center clarity */
+  -webkit-backdrop-filter: blur(4px);
 
   /* Liquid Volume Construction */
   border-radius: 28px;
@@ -1422,13 +1423,14 @@ p {
   z-index: -1;
   border-radius: inherit;
 
-  /* Strong Blur for Edges */
-  backdrop-filter: blur(15px) saturate(180%);
-  -webkit-backdrop-filter: blur(15px) saturate(180%);
+  /* Strong Blur for Edges (Progressive) */
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
 
-  /* Mask to keep center clear */
-  mask-image: radial-gradient(ellipse at center, transparent 40%, black 100%);
-  -webkit-mask-image: radial-gradient(ellipse at center, transparent 40%, black 100%);
+  /* Mask to blend strong blur into weak blur */
+  /* Transparent center reveals base blur(4px), Black edges reveal strong blur(20px) */
+  mask-image: radial-gradient(ellipse at center, transparent 30%, black 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, transparent 30%, black 100%);
 }
 
 .light .mobile-bottom-bar {

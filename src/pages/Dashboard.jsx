@@ -199,13 +199,18 @@ export default function Dashboard() {
                     letterSpacing: '0.01em',
                     lineHeight: 1.1,
                     minHeight: '80px',
+                    width: '100%',
+                    maxWidth: '400px',
+                    margin: '0 auto',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
                     transition: 'opacity 0.3s ease'
                 }}>
                     {loading ? <Skeleton width="200px" height="80px" style={{ margin: '0 auto' }} /> : (
-                        isPrivacyMode ? '****' : <CountUp end={balance} prefix="R$ " />
+                        isPrivacyMode ? '****' : <CountUp end={balance} prefix="R$ " duration={0} />
                     )}
                 </div>
             </section>

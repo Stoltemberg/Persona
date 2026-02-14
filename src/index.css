@@ -1381,19 +1381,31 @@ p {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: rgba(5, 5, 5, 0.8);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
+
+  /* Liquid Glass Effect */
+  background: rgba(18, 18, 20, 0.65);
+  /* More transparent */
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  /* Subtle highlight on top */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
   border-radius: 3rem;
   margin: 0 1rem 1rem 1rem;
   z-index: 100;
-  transition: background 0.3s ease, is-color 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .light .mobile-bottom-bar {
-  background: rgba(255, 255, 255, 0.8);
-  border-color: rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .mobile-nav-item {

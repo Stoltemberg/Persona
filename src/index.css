@@ -1489,9 +1489,18 @@ p {
   letter-spacing: 0.01em;
   opacity: 0.9;
   max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  min-height: 2.4em;
+  /* Ensure consistent height for alignment */
+  display: flex;
+  /* Fallback for alignment if line-clamp fails visually or just to center */
+  align-items: flex-start;
+  justify-content: center;
 }
 
 @media (max-width: 380px) {

@@ -61,8 +61,10 @@ export function UpgradeModal({ isOpen, onClose }) {
             });
 
             if (error) throw error;
-            if (data?.init_point) window.open(data.init_point, '_blank');
-            onClose();
+            if (data?.init_point) {
+                window.location.href = data.init_point;
+                // Não precisa onClose() - usuário será redirecionado
+            }
         } catch (error) {
             console.error('Checkout error:', error);
             addToast('Erro ao iniciar pagamento.', 'error');

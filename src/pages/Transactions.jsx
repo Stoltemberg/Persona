@@ -266,7 +266,7 @@ export default function Transactions() {
             </PageHeader>      {/* Date Filters */}
 
             {/* Date Filters */}
-            <div className="date-filters">
+            <div className="date-filters" style={{ marginBottom: '1.5rem' }}>
                 <DateRangePicker
                     startDate={startDate ? new Date(startDate.split('-')[0], startDate.split('-')[1] - 1, startDate.split('-')[2]) : null}
                     endDate={endDate ? new Date(endDate.split('-')[0], endDate.split('-')[1] - 1, endDate.split('-')[2]) : null}

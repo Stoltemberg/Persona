@@ -189,11 +189,11 @@ export default function Dashboard() {
             </header>
 
             {/* Hero Balance Section - The Core Focus */}
-            <section style={{ marginBottom: '3rem', textAlign: 'center' }}>
-                <p style={{ fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.5, marginBottom: '0.5rem' }}>
+            <section style={{ marginBottom: '4rem', textAlign: 'center' }}>
+                <p style={{ fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.65, marginBottom: '0.5rem' }}>
                     Saldo Total
                 </p>
-                <div style={{ fontSize: '4rem', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+                <div style={{ fontSize: '3.5rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
                     {loading ? <Skeleton width="200px" height="80px" style={{ margin: '0 auto' }} /> : (
                         isPrivacyMode ? '****' : <CountUp end={balance} prefix="R$ " />
                     )}
@@ -204,22 +204,22 @@ export default function Dashboard() {
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '1rem',
-                marginBottom: '3rem'
+                gap: '1.5rem',
+                marginBottom: '4rem'
             }}>
                 <Link to="/analysis" style={{ textDecoration: 'none' }}>
-                    <div className="glass-card zoom-on-hover" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                        <div style={{ marginBottom: '0.5rem', opacity: 0.7 }}>Saídas (Mês)</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                    <div className="glass-card zoom-on-hover" style={{ padding: '1rem', textAlign: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ marginBottom: '0.5rem', opacity: 0.6, fontSize: '0.85rem' }}>Saídas (Mês)</div>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 500, color: 'var(--text-main)' }}>
                             {loading ? '...' : (isPrivacyMode ? '****' : `R$ ${expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
                         </div>
                     </div>
                 </Link>
 
                 <Link to="/goals" style={{ textDecoration: 'none' }}>
-                    <div className="glass-card zoom-on-hover" style={{ padding: '1.2rem', textAlign: 'center' }}>
-                        <div style={{ marginBottom: '0.5rem', opacity: 0.7 }}>Economias</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                    <div className="glass-card zoom-on-hover" style={{ padding: '1rem', textAlign: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ marginBottom: '0.5rem', opacity: 0.6, fontSize: '0.85rem' }}>Economias</div>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 500, color: 'var(--text-main)' }}>
                             {loading ? '...' : (isPrivacyMode ? '****' : `R$ ${savings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
                         </div>
                     </div>
@@ -246,27 +246,14 @@ export default function Dashboard() {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
-                                padding: '1rem',
+                                padding: '1rem 1.25rem',
                                 marginBottom: index === recentTransactions.length - 1 ? 0 : '0.5rem',
-                                animationDelay: `${index * 0.05}s`
+                                animationDelay: `${index * 0.05}s`,
+                                border: '1px solid rgba(255,255,255,0.05)'
                             }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: '50%',
-                                        background: tx.type === 'income' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: tx.type === 'income' ? 'var(--text-main)' : 'var(--text-secondary)'
-                                    }}>
-                                        {tx.type === 'income' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
-                                    </div>
-                                    <div>
-                                        <div style={{ fontWeight: 500 }}>{tx.description}</div>
-                                        <div style={{ fontSize: '0.8rem', opacity: 0.5 }}>{new Date(tx.date).toLocaleDateString('pt-BR')}</div>
-                                    </div>
+                                <div>
+                                    <div style={{ fontWeight: 500, marginBottom: '0.25rem' }}>{tx.description}</div>
+                                    <div style={{ fontSize: '0.8rem', opacity: 0.5 }}>{new Date(tx.date).toLocaleDateString('pt-BR')}</div>
                                 </div>
                                 <div style={{ fontWeight: 600, color: tx.type === 'income' ? 'var(--text-main)' : 'var(--text-secondary)' }}>
                                     {isPrivacyMode ? '****' : (tx.type === 'income' ? '+' : '-') + ` R$ ${parseFloat(tx.amount).toFixed(2).replace('.', ',')}`}

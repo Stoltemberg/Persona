@@ -1503,6 +1503,29 @@ p {
   transform: scale(0.95);
 }
 
+/* Helper to utilize the 'style' prop override for position and alignment */
+.fab-btn[style*="position: relative"] {
+  position: relative !important;
+  bottom: auto !important;
+  right: auto !important;
+  left: auto !important;
+  top: auto !important;
+  margin: 0 10px;
+  /* spacing from other icons */
+  z-index: 102;
+  /* Ensure it doesn't float */
+  transform: none !important;
+}
+
+/* Re-apply hover transform since we disabled it above */
+.fab-btn[style*="position: relative"]:hover {
+  transform: scale(1.05) !important;
+}
+
+.fab-btn[style*="position: relative"]:active {
+  transform: scale(0.95) !important;
+}
+
 /* Light Mode FAB Override */
 .light .fab-btn {
   background: #000000;

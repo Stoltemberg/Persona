@@ -59,7 +59,7 @@ export function MobileNav() {
                         position: 'relative',
                         width: '56px',
                         height: '56px',
-                        borderRadius: '18px', // Squircle for modern look? Or keep circle? keeping circle for now but maybe less floating
+                        borderRadius: '18px',
                         boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
                         flexShrink: 0
                     }}

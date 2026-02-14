@@ -63,7 +63,7 @@ export function FAB({ className, style }) {
         e.preventDefault();
         setLoading(true);
         try {
-            const { error } = await supabase.from('transactions').insert([{
+            const { data, error } = await supabase.from('transactions').insert([{
                 description,
                 amount: parseFloat(amount),
                 type,
@@ -71,21 +71,22 @@ export function FAB({ className, style }) {
                 expense_type: type === 'expense' ? expenseType : null,
                 date: new Date().toISOString(),
                 profile_id: user.id
-            }]);
+            }]).select();
 
             if (error) throw error;
 
             success();
-            addToast('Transação registrada!', 'success');
+            // Removed toast for cleaner UI
+            // addToast('Transação registrada!', 'success');
             handleClose();
 
-            // Optional: trigger a global refresh event or just let pages refetch on mount/focus
-            // For now, simpler is better. Dashboard listens to focus? No, but it auto-updates if we force refresh or similar.
-            // React Router navigation usually doesn't unmount, so Dashboard state might be stale.
-            // A simple hack is reloading, but that's bad UX.
-            // Ideally we use a global transaction context, but let's just accept it might not update instantly on the background page until refresh.
-            // OR: we can dispatch a custom event.
-            window.dispatchEvent(new Event('transaction-updated'));
+            // Dispatch event with the new transaction data
+            if (data && data.length > 0) {
+                window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: data[0] }));
+            } else {
+                // Fallback if data isn't returned for some reason (though .select() should return it)
+                window.dispatchEvent(new Event('transaction-updated'));
+            }
 
         } catch (error) {
             addToast(error.message, 'error');

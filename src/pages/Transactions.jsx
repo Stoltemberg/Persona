@@ -126,6 +126,8 @@ export default function Transactions() {
             };
 
             let error;
+            let newTx = null;
+
             if (transactionToEdit) {
                 const { error: updateError } = await supabase
                     .from('transactions')
@@ -133,14 +135,16 @@ export default function Transactions() {
                     .eq('id', transactionToEdit.id);
                 error = updateError;
             } else {
-                const { error: insertError } = await supabase
+                const { data, error: insertError } = await supabase
                     .from('transactions')
-                    .insert([payload]);
+                    .insert([payload])
+                    .select();
                 error = insertError;
+                if (data) newTx = data[0];
 
                 // Handle Recurring Creation (Only for new transactions for now)
                 if (!error && isRecurring) {
-                    const nextDate = new Date(date);
+                    const nextDate = new Date();
                     nextDate.setMonth(nextDate.getMonth() + 1);
 
                     const { error: recurError } = await supabase.from('recurring_templates').insert([{
@@ -163,7 +167,16 @@ export default function Transactions() {
             await fetchTransactions();
             setIsModalOpen(false);
             resetForm();
-            addToast(transactionToEdit ? 'Transação atualizada!' : 'Transação criada!', 'success');
+
+            if (transactionToEdit) {
+                addToast('Transação atualizada!', 'success');
+            } else {
+                // No toast for new, just animation
+                if (newTx) {
+                    window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: newTx }));
+                }
+            }
+
         } catch (error) {
             addToast(error.message, 'error');
         } finally {

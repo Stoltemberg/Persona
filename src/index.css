@@ -1347,12 +1347,17 @@ option {
   right: auto !important;
   left: auto !important;
   top: auto !important;
-  margin: 0 6px;
+  margin: 0;
   z-index: 102;
-  transform: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  color: var(--text-muted) !important;
+  transition: all 0.2s ease;
 }
 
 .fab-btn[style*="position: relative"]:hover {
+  color: var(--text-main) !important;
   transform: scale(1.08) !important;
 }
 

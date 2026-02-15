@@ -122,7 +122,7 @@ export function FAB({ className, style }) {
                 style={style}
                 aria-label="Adicionar Transação"
             >
-                <Plus size={28} strokeWidth={2.5} />
+                <Plus size={24} strokeWidth={2.2} />
             </button>
 
             <Modal isOpen={isOpen} onClose={handleClose} title="Adicionar Rápido">

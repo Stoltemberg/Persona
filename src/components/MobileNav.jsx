@@ -62,11 +62,13 @@ export function MobileNav() {
                     className="mobile-center-fab"
                     style={{
                         position: 'relative',
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '18px',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-                        flexShrink: 0
+                        width: '46px',
+                        height: '46px',
+                        borderRadius: '50%',
+                        background: 'transparent',
+                        boxShadow: 'none',
+                        flexShrink: 0,
+                        color: 'var(--text-muted)'
                     }}
                 />
 

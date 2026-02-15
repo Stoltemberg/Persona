@@ -94,11 +94,7 @@ const AnimatedRoutes = () => {
               </PageTransition>
             } />
 
-            <Route path="/simulator" element={
-              <PageTransition>
-                <Simulator />
-              </PageTransition>
-            } />
+
             <Route path="/settings" element={
               <PageTransition>
                 <Settings />

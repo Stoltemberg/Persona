@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, X, ArrowUpRight, ArrowDownLeft, Wallet } from 'lucide-react';
+import { Plus, X, ArrowUpRight, ArrowDownLeft, Wallet, CheckCircle, Circle, Repeat } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
@@ -27,6 +27,8 @@ export function FAB({ className, style }) {
     const [category, setCategory] = useState('');
     const [expenseType, setExpenseType] = useState('variable');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const [status, setStatus] = useState('paid'); // 'paid' or 'pending'
+    const [isRecurring, setIsRecurring] = useState(false);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -35,6 +37,13 @@ export function FAB({ className, style }) {
             fetchCategories();
             // Reset date to today on open if needed, or keep last selected
             if (!date) setDate(new Date().toISOString().split('T')[0]);
+
+            // Auto set status based on date
+            if (new Date().toISOString().split('T')[0] < date) {
+                setStatus('pending');
+            } else {
+                setStatus('paid');
+            }
         }
     }, [isOpen, user]);
 
@@ -60,6 +69,8 @@ export function FAB({ className, style }) {
         setCategory('');
         setExpenseType('variable');
         setDate(new Date().toISOString().split('T')[0]);
+        setStatus('paid');
+        setIsRecurring(false);
         setSelectedCategory(null);
     };
 
@@ -73,7 +84,9 @@ export function FAB({ className, style }) {
                 type,
                 category,
                 expense_type: type === 'expense' ? expenseType : null,
-                date: date, // Use selected date
+                date: date,
+                status: status, // New field
+                is_recurring: isRecurring, // New field (assuming DB support)
                 profile_id: user.id
             }]).select();
 
@@ -164,10 +177,54 @@ export function FAB({ className, style }) {
                             label="Data"
                             type="date"
                             value={date}
-                            onChange={(e) => setDate(e.target.value)}
+                            onChange={(e) => {
+                                const newDate = e.target.value;
+                                setDate(newDate);
+                                // Auto-update status based on date
+                                if (newDate > new Date().toISOString().split('T')[0]) {
+                                    setStatus('pending');
+                                } else {
+                                    setStatus('paid');
+                                }
+                            }}
                             required
                             style={{ fontSize: '1.1rem', fontWeight: 500, textAlign: 'center' }}
                         />
+                    </div>
+
+                    {/* Status & Recurrence Toggles */}
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+                        <Button
+                            type="button"
+                            className={status === 'paid' ? 'btn-primary' : 'btn-ghost'}
+                            style={{
+                                flex: 1,
+                                justifyContent: 'center',
+                                background: status === 'paid' ? 'rgba(46, 204, 113, 0.2)' : 'rgba(255,255,255,0.05)',
+                                color: status === 'paid' ? '#2ecc71' : 'var(--text-muted)',
+                                border: status === 'paid' ? '1px solid #2ecc71' : '1px solid transparent'
+                            }}
+                            onClick={() => { setStatus(status === 'paid' ? 'pending' : 'paid'); medium(); }}
+                        >
+                            {status === 'paid' ? <CheckCircle size={18} style={{ marginRight: '0.5rem' }} /> : <Circle size={18} style={{ marginRight: '0.5rem' }} />}
+                            {status === 'paid' ? 'Pago' : 'Pendente'}
+                        </Button>
+
+                        <Button
+                            type="button"
+                            className={isRecurring ? 'btn-primary' : 'btn-ghost'}
+                            style={{
+                                flex: 1,
+                                justifyContent: 'center',
+                                background: isRecurring ? 'rgba(52, 152, 219, 0.2)' : 'rgba(255,255,255,0.05)',
+                                color: isRecurring ? '#3498db' : 'var(--text-muted)',
+                                border: isRecurring ? '1px solid #3498db' : '1px solid transparent'
+                            }}
+                            onClick={() => { setIsRecurring(!isRecurring); medium(); }}
+                        >
+                            <Repeat size={18} style={{ marginRight: '0.5rem' }} />
+                            {isRecurring ? 'Fixo' : 'Único'}
+                        </Button>
                     </div>
 
                     {/* Quick Category Grid */}
@@ -188,14 +245,24 @@ export function FAB({ className, style }) {
                                     style={{
                                         background: selectedCategory?.id === cat.id ? `${cat.color}40` : undefined,
                                         border: selectedCategory?.id === cat.id ? `1px solid ${cat.color}` : undefined,
+                                        minWidth: '80px',
+                                        height: '80px',
+                                        borderRadius: '16px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.5rem',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s'
                                     }}
                                 >
-                                    <div style={{ fontSize: '1.4rem' }}>{cat.icon}</div>
-                                    <div style={{ fontSize: '0.7rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>{cat.name}</div>
+                                    <div style={{ fontSize: '1.5rem' }}>{cat.icon}</div>
+                                    <div style={{ fontSize: '0.7rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '90%', textAlign: 'center' }}>{cat.name}</div>
                                 </div>
                             ))}
                             {availableCategories.length === 0 && (
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '1rem', width: '100%', textAlign: 'center' }}>
                                     Nenhuma categoria encontrada.
                                 </div>
                             )}

@@ -46,7 +46,7 @@
   --radius-xs: 6px;
   --radius-sm: 10px;
   /* Small elements */
-  --radius-md: 18px;
+  --radius-md: 24px;
   /* Cards / Modals */
   --radius-lg: 28px;
   /* Large Panels */
@@ -146,13 +146,14 @@ html.light label {
   backdrop-filter: var(--glass-blur) var(--glass-saturation);
   -webkit-backdrop-filter: var(--glass-blur) var(--glass-saturation);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  border-radius: 24px;
+  /* iOS Style smooth corners */
   padding: 1.5rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-  /* Very subtle base shadow */
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-    box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-    background-color 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  /* Deeper, softer shadow */
+  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
+    background-color 0.2s ease;
   overflow: hidden;
 }
 

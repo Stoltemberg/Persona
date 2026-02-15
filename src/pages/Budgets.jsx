@@ -111,7 +111,7 @@ export default function Budgets({ isTab }) {
                     </div>
                 </div>
 
-                <div className="progress-bar-container bg-track" style={{ height: '12px', borderRadius: '6px', overflow: 'hidden' }}>
+                <div className="progress-bar-container bg-track" style={{ height: '12px', borderRadius: '12px', overflow: 'hidden' }}>
                     <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(totalProgress, 100)}%` }}
@@ -119,7 +119,7 @@ export default function Budgets({ isTab }) {
                         style={{
                             height: '100%',
                             background: totalProgress > 100 ? '#f64f59' : 'linear-gradient(90deg, var(--color-4), var(--color-2))',
-                            borderRadius: '6px'
+                            borderRadius: '12px'
                         }}
                     />
                 </div>

@@ -17,7 +17,7 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, height: 0, marginBottom: 0, scale: 0.9 }}
             transition={{ duration: 0.2 }}
-            style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px', marginBottom: '10px' }}
+            style={{ position: 'relative', overflow: 'hidden', borderRadius: '24px', marginBottom: '10px' }}
         >
             {/* Background Actions Layer */}
             <motion.div
@@ -33,7 +33,7 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '0 20px',
-                    borderRadius: '16px',
+                    borderRadius: '24px',
                     zIndex: 0
                 }}
             >
@@ -52,7 +52,7 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                         onEdit(transaction);
                     }
                 }}
-                style={{ x, position: 'relative', zIndex: 1, background: 'var(--bg-panel)', borderRadius: '16px' }} // Ensure background is solid
+                style={{ x, position: 'relative', zIndex: 1, background: 'var(--bg-panel)', borderRadius: '24px' }} // Ensure background is solid
             >
                 <Card
                     hover={false}

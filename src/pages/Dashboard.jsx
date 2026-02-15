@@ -191,8 +191,8 @@ export default function Dashboard() {
             <div className="dashboard-stats-grid">
                 <Link to="/planning" style={{ textDecoration: 'none' }}>
                     <div className="glass-card dashboard-stat-card zoom-on-hover">
-                        <div className="dashboard-stat-icon" style={{ background: 'rgba(255, 69, 58, 0.1)', color: 'var(--color-danger)' }}>
-                            <ArrowUpRight size={18} />
+                        <div className="dashboard-stat-icon" style={{ background: 'rgba(255, 69, 58, 0.08)', color: 'var(--color-danger)' }}>
+                            <ArrowUpRight size={16} />
                         </div>
                         <div>
                             <div className="dashboard-stat-label">Saídas (Mês)</div>
@@ -205,8 +205,8 @@ export default function Dashboard() {
 
                 <Link to="/planning" style={{ textDecoration: 'none' }}>
                     <div className="glass-card dashboard-stat-card zoom-on-hover">
-                        <div className="dashboard-stat-icon" style={{ background: 'rgba(48, 209, 88, 0.1)', color: 'var(--color-success)' }}>
-                            <PiggyBank size={18} />
+                        <div className="dashboard-stat-icon" style={{ background: 'rgba(52, 199, 89, 0.08)', color: 'var(--color-success)' }}>
+                            <PiggyBank size={16} />
                         </div>
                         <div>
                             <div className="dashboard-stat-label">Economias</div>
@@ -242,10 +242,10 @@ export default function Dashboard() {
                             >
                                 <div className="dashboard-tx-left">
                                     <div className="dashboard-tx-icon" style={{
-                                        background: tx.type === 'income' ? 'rgba(48, 209, 88, 0.1)' : 'rgba(255, 69, 58, 0.1)',
+                                        background: tx.type === 'income' ? 'rgba(52, 199, 89, 0.08)' : 'rgba(255, 69, 58, 0.08)',
                                         color: tx.type === 'income' ? 'var(--color-success)' : 'var(--color-danger)'
                                     }}>
-                                        {tx.type === 'income' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
+                                        {tx.type === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
                                     </div>
                                     <div>
                                         <div className="dashboard-tx-desc">{tx.description}</div>

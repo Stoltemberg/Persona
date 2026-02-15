@@ -16,7 +16,7 @@ export default function Landing() {
                 right: 0,
                 zIndex: 100,
                 backdropFilter: 'blur(10px)',
-                background: 'rgba(var(--bg-rgb), 0.7)',
+                background: 'var(--glass-bg)',
                 borderBottom: '1px solid var(--glass-border)'
             }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

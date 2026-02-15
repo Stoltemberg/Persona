@@ -74,9 +74,7 @@ export function UpcomingBills() {
                     category: bill.category,
                     expense_type: bill.expense_type,
                     date: new Date().toISOString(), // Paid "now"
-                    profile_id: user.id,
-                    is_recurring: true,
-                    recurring_template_id: bill.id
+                    profile_id: user.id
                 }])
                 .select();
 

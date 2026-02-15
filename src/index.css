@@ -1,75 +1,88 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Dynamic Palette - Minimalist Dark */
-  --bg-deep: #050505;
-  /* Pitch black/deep gray */
-  --bg-card: #0a0a0a;
-  /* Slightly lighter for cards */
+  /* Apple System Colors - Dark Mode Base */
+  --bg-deep: #000000;
+  /* True black for OLED/Apple aesthetic */
+  --bg-card: #1c1c1e;
+  /* Apple dark gray for cards */
 
-  /* Minimalist Accents - Apple Style */
-  --color-brand: #ffffff;
-  /* Stark white */
-  --color-accent: #8e8e93;
-  /* Apple Gray */
+  /* Apple Semantic Colors */
+  --color-brand: #0A84FF;
+  /* iOS Blue */
+  --color-success: #30D158;
+  /* iOS Green */
+  --color-danger: #FF453A;
+  /* iOS Red */
+  --color-warning: #FF9F0A;
+  /* iOS Orange */
+  --color-info: #64D2FF;
+  /* iOS Light Blue */
+  --color-purple: #BF5AF2;
+  /* iOS Purple */
 
-  /* Semantic Colors (Apple System Colors) */
-  --color-success: #30d158;
-  /* Apple Green */
-  --color-danger: #ff453a;
-  /* Apple Red */
-  --color-warning: #ff9f0a;
-  /* Apple Orange */
-  --color-info: #0a84ff;
-  /* Apple Blue */
+  /* Glass Materials */
+  --glass-bg: rgba(28, 28, 30, 0.65);
+  /* Translucent dark gray */
+  --glass-border: rgba(255, 255, 255, 0.12);
+  /* Subtle separator */
+  --glass-border-highlight: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  --glass-blur: blur(20px);
+  /* Heavy blur for depth */
+  --glass-saturation: saturate(180%);
+  /* Vibrant pass-through */
 
-  /* Glass Variables -> Solid Minimalist Panels */
-  --glass-bg: #0a0a0a;
-  --glass-border: rgba(255, 255, 255, 0.08);
-  /* Very subtle border */
-  --glass-border-highlight: rgba(255, 255, 255, 0.15);
-  --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  --glass-blur: none;
-  /* Removed blur for performance and clean look */
-  --glass-saturation: saturate(100%);
-  --glass-panel-bg: #0a0a0a;
+  /* Text Colors */
+  --text-main: #FFFFFF;
+  --text-secondary: #8E8E93;
+  /* Apple Gray for secondary text */
+  --text-muted: #48484A;
+  /* Apple Dark Gray for tertiary/borders */
+  --input-bg: rgba(118, 118, 128, 0.24);
+  /* Apple search bar style */
 
-  /* Text */
-  --text-main: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.6);
-  --text-muted: rgba(255, 255, 255, 0.4);
-  --input-bg: rgba(255, 255, 255, 0.05);
+  /* Geometry - Apple Human Interface Guidelines */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  /* Small elements */
+  --radius-md: 18px;
+  /* Cards / Modals */
+  --radius-lg: 28px;
+  /* Large Panels */
+  --radius-pill: 9999px;
+  /* Buttons */
 
-  /* UI Metrics */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
+  /* Typography - San Francisco Style */
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  letter-spacing: -0.01em;
+  /* Tighter tracking for SF feel */
 
-  font-family: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color-scheme: dark;
 }
 
 /* Light Mode Overrides - Minimalist Light */
+/* Light Mode - iOS Light */
 :root.light,
 html.light,
 .light {
-  --bg-deep: #ffffff;
-  --bg-card: #f8f8f8;
+  --bg-deep: #F2F2F7;
+  /* iOS System Gray 6 (Grouped Background) */
+  --bg-card: #FFFFFF;
+  /* High contrast cards */
 
-  --color-brand: #000000;
-  --color-accent: #e5e5e5;
+  --color-brand: #007AFF;
+  /* iOS Blue */
 
-  --glass-bg: #ffffff;
-  --glass-border: #e5e5e5;
-  --glass-border-highlight: #d1d1d1;
-  --glass-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  --glass-panel-bg: #ffffff;
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --glass-border-highlight: rgba(0, 0, 0, 0.1);
+  --glass-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
 
   --text-main: #000000;
-  --text-secondary: rgba(0, 0, 0, 0.6);
-  --text-muted: rgba(0, 0, 0, 0.4);
-  --input-bg: #f5f5f5;
+  --text-secondary: #8E8E93;
+  --text-muted: #C7C7CC;
+  --input-bg: rgba(118, 118, 128, 0.12);
 
   color-scheme: light;
 }
@@ -123,24 +136,33 @@ html.light label {
 /* --- Advanced Components --- */
 
 /* 1. Minimal Card - The Core Block */
+/* 1. Minimal Card - The Core Block */
 .glass-card {
   position: relative;
   background: var(--bg-card);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  /* Subtle uniform border */
+  /* Fallback */
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur) var(--glass-saturation);
+  -webkit-backdrop-filter: var(--glass-blur) var(--glass-saturation);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   padding: 1.5rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-  /* Softer shadow */
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  /* Very subtle base shadow */
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    background-color 0.3s ease;
   overflow: hidden;
 }
 
-/* Hover Effect - Subtle lift */
+/* Hover Effect - Apple 'Platter' Lift */
 .glass-card-hover:hover {
-  transform: translateY(-2px);
-  border-color: var(--glass-border-highlight);
+  transform: scale(1.02);
+  /* Slight scale instead of just Y translate */
   box-shadow: var(--glass-shadow);
+  background: var(--bg-card);
+  /* Less transparent on hover for focus */
+  border-color: var(--glass-border-highlight);
 }
 
 /* Removed Shine Effect */
@@ -158,18 +180,22 @@ html.light label {
 }
 
 /* Buttons */
+/* Buttons */
 .btn {
   border: none;
   cursor: pointer;
-  padding: 0.8rem 1.75rem;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-pill);
+  /* Pill shape is key for Apple buttons */
+  font-weight: 500;
+  /* Regular weight, not bold */
   font-size: 0.95rem;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: inherit;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.6rem;
   position: relative;
   overflow: hidden;
@@ -177,40 +203,32 @@ html.light label {
 
 .btn:active {
   transform: scale(0.96);
+  opacity: 0.8;
 }
 
 .btn-primary {
   background: var(--color-brand);
-  color: #000000;
-  /* High contrast black text on white button */
-  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-  /* Subtle white glow */
-  border: 1px solid transparent;
+  color: #FFFFFF;
+  /* Always white text on brand color */
+  box-shadow: 0 2px 12px rgba(10, 132, 255, 0.3);
+  /* Colored glow matches brand */
 }
-
-
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  background: #f0f0f0;
-  /* Slight dim on hover */
-  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(10, 132, 255, 0.4);
 }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-secondary);
-  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-brand);
+  /* Ghost buttons usually use brand color text */
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(10, 132, 255, 0.1);
+  /* Subtle brand-tinted background */
 }
 
 /* Light Mode Buttons override */
@@ -249,20 +267,23 @@ html.light label {
 }
 
 /* Inputs */
+/* Inputs */
 .input-group label {
   font-weight: 500;
-  letter-spacing: 0.03em;
-  font-size: 0.85rem !important;
-  text-transform: uppercase;
-  color: var(--text-muted) !important;
+  font-size: 0.8rem !important;
+  color: var(--text-secondary) !important;
+  margin-bottom: 0.4rem;
+  display: block;
 }
 
 .input-field {
   width: 100%;
-  padding: 0.85rem 1.25rem;
+  padding: 0.8rem 1rem;
   background: var(--input-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-sm);
+  border: none;
+  /* No border for cleaner look */
+  border-radius: 10px;
+  /* Slightly tighter than cards */
   color: var(--text-main);
   font-family: inherit;
   font-size: 1rem;
@@ -270,17 +291,14 @@ html.light label {
 }
 
 .input-field:hover {
-  background-color: rgba(125, 125, 125, 0.15);
-  /* Keep generic or make var */
-  border-color: var(--glass-border-highlight);
+  background-color: rgba(118, 118, 128, 0.3);
 }
 
 .input-field:focus {
   outline: none;
-  border-color: var(--color-2);
-  background-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 0 4px rgba(196, 113, 237, 0.2);
-  transform: translateY(-1px);
+  background-color: var(--bg-card);
+  box-shadow: 0 0 0 2px var(--color-brand);
+  /* Classic focus ring */
 }
 
 /* Select specific styling */
@@ -680,19 +698,23 @@ p {
   max-height: 90vh;
   overflow-y: auto;
 
-  /* Glass Card Style */
-  background: rgba(20, 20, 20, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
+  /* Glass Card Style - Apple Modal */
+  background: var(--bg-card);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur) var(--glass-saturation);
+  -webkit-backdrop-filter: var(--glass-blur) var(--glass-saturation);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  /* Larger radius for modals */
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 
-  animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .light .modal-content {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 @keyframes scaleIn {
@@ -717,58 +739,35 @@ p {
   }
 }
 
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 12px;
-  text-decoration: none;
-  color: var(--text-secondary);
-  transition: all 0.3s ease;
-  font-weight: 500;
-}
 
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: white !important;
-  transform: translateX(4px);
-}
 
-.nav-item.active {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-  /* Default for dark modes */
-}
-
-/* Light Mode Active State */
 /* Navigation Item - Core Style */
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.8rem 1rem;
-  border-radius: 12px;
+  gap: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  /* Compact padding */
+  border-radius: var(--radius-sm);
   text-decoration: none;
   color: var(--text-secondary);
   transition: all 0.2s ease;
   font-weight: 500;
-  border: 1px solid transparent;
+  font-size: 0.95rem;
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.08);
+  /* Subtle highlight */
   color: var(--text-main);
-  transform: translateX(4px);
 }
 
 /* Active State - Dark Mode (Default) */
 .nav-item.active {
   background: var(--color-brand);
-  color: #000000 !important;
+  color: #FFFFFF !important;
   font-weight: 600;
-  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
 }
 
 .nav-item.active svg {
@@ -783,10 +782,12 @@ p {
 
 .light .nav-item.active {
   background: #000000;
-  /* Black pill in light mode */
+  /* Black pill in light mode remains stylish */
   color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
+
+
 
 /* Sidebar Header Buttons */
 .sidebar-header-btn {
@@ -1697,6 +1698,8 @@ html.light .mobile-bottom-bar,
   max-width: 100%;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
+  /* Standard property for compatibility */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;

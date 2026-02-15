@@ -668,7 +668,7 @@ p {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  animation: fadeIn 0.2s ease-out forwards;
+  animation: fadeIn 0.2s ease-out;
 }
 
 .modal-content {

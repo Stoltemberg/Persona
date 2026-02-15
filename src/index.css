@@ -1990,6 +1990,13 @@ html.light .mobile-bottom-bar,
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   }
 
+  /* Light Mode Dock Override */
+  .light .sidebar-panel {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
+
   /* Hide Desktop Header in Dock */
   .sidebar-header {
     display: none;
@@ -2055,6 +2062,10 @@ html.light .mobile-bottom-bar,
     height: 24px;
     width: 1px;
     background: var(--glass-border);
+  }
+
+  .light .logout-btn::before {
+    background: rgba(0, 0, 0, 0.1);
   }
 
   .logout-btn span {

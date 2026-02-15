@@ -5,7 +5,7 @@ import { Button } from '../components/Button';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, DollarSign, Calendar } from 'lucide-react';
 
-export default function Simulator() {
+export default function Simulator({ isTab }) {
     const [monthlySaving, setMonthlySaving] = useState(100);
     const [initialAmount, setInitialAmount] = useState(0);
     const [years, setYears] = useState(10);

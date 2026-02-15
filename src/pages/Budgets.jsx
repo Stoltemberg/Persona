@@ -7,7 +7,7 @@ import { Input } from '../components/Input';
 import { PieChart, Wallet, AlertCircle, CheckCircle, Save } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function Budgets() {
+export default function Budgets({ isTab }) {
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [categories, setCategories] = useState([]);

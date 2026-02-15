@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, PieChart, Wallet, Menu as MenuIcon, X, PiggyBank, Repeat, Calendar, TrendingUp, Eye, EyeOff, Plane } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, PieChart, Wallet, Menu as MenuIcon, X, PiggyBank, Repeat, Calendar, TrendingUp, Eye, EyeOff, Plane, Tag } from 'lucide-react';
 import clsx from 'clsx';
 import { createPortal } from 'react-dom';
 import { FAB } from './FAB';
@@ -14,14 +14,10 @@ export function MobileNav() {
     const { isEventMode, toggleEventMode } = useEvent();
 
     const navItems = [
-        { icon: LayoutDashboard, label: 'Início', path: '/dashboard' },
-        { icon: Receipt, label: 'Extrato', path: '/transactions' },
+        { icon: Settings, label: 'Ajustes', path: '/settings' },
         { icon: Repeat, label: 'Fixos', path: '/recurring' },
-        { icon: Target, label: 'Planos', path: '/planning' },
-        { icon: Calendar, label: 'Assinaturas', path: '/subscriptions' }, // Changed label from 'Planos' to 'Assinaturas' to avoid conflict with 'Planos' above
-        { icon: TrendingUp, label: 'Simular', path: '/simulator' },
-        { icon: PiggyBank, label: 'Limites', path: '/budgets' },
-        { icon: Settings, label: 'Ajustes', path: '/settings' }, // Kept 'Ajustes' from the first Settings entry
+        { icon: Wallet, label: 'Carteiras', path: '/wallets' },
+        { icon: Tag, label: 'Categorias', path: '/categories' },
     ];
 
     return (
@@ -120,8 +116,8 @@ export function MobileNav() {
                                 <span>Viagem</span>
                             </button>
                         </div>
-                        {/* Render Settings in the menu */}
-                        {[navItems[4]].map((item) => (
+                        {/* Render Items not in bottom bar (Fixos) */}
+                        {navItems.slice(4).map((item) => (
                             <NavLink
                                 key={item.path}
                                 to={item.path}

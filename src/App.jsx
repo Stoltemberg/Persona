@@ -8,13 +8,13 @@ import { Layout } from './components/Layout';
 // Eager Load Pages (Core App)
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
-import Categories from './pages/Categories';
-import Goals from './pages/Goals';
-import Analysis from './pages/Analysis';
-import Wallets from './pages/Wallets';
-import Budgets from './pages/Budgets';
 import Recurring from './pages/Recurring';
 import Planning from './pages/Planning';
+import Settings from './pages/Settings';
+import Wallets from './pages/Wallets';
+import Categories from './pages/Categories';
+import Admin from './pages/Admin';
+import Budgets from './pages/Budgets';
 
 // Lazy Load Pages (Secondary / Auth)
 const Login = React.lazy(() => import('./pages/Login'));
@@ -98,6 +98,16 @@ const AnimatedRoutes = () => {
             <Route path="/settings" element={
               <PageTransition>
                 <Settings />
+              </PageTransition>
+            } />
+            <Route path="/wallets" element={
+              <PageTransition>
+                <Wallets />
+              </PageTransition>
+            } />
+            <Route path="/categories" element={
+              <PageTransition>
+                <Categories />
               </PageTransition>
             } />
             <Route path="/admin" element={

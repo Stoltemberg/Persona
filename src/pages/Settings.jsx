@@ -280,12 +280,12 @@ export default function Settings() {
                             </Button>
                         )}
 
-                        <Link to="/wallets" style={{ textDecoration: 'none' }}>
+                        <Link to="/wallets" style={{ textDecoration: 'none' }} className="hide-on-mobile">
                             <Button variant="ghost" className="btn-primary" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
                                 Gerenciar Carteiras
                             </Button>
                         </Link>
-                        <Link to="/categories" style={{ textDecoration: 'none' }}>
+                        <Link to="/categories" style={{ textDecoration: 'none' }} className="hide-on-mobile">
                             <Button variant="ghost" className="btn-ghost" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
                                 Gerenciar Categorias
                             </Button>

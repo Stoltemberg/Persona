@@ -21,7 +21,7 @@ export function Modal({ isOpen, onClose, title, children }) {
             onClick={onClose}
         >
             <div
-                className="glass-panel modal-content fade-in"
+                className="modal-content"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>

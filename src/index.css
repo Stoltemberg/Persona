@@ -455,6 +455,22 @@ p {
   background: rgba(0, 0, 0, 0.05);
 }
 
+.bg-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.light .bg-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.fill-track {
+  fill: rgba(255, 255, 255, 0.1);
+}
+
+.light .fill-track {
+  fill: rgba(0, 0, 0, 0.05);
+}
+
 .text-main {
   color: var(--text-main);
 }

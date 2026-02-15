@@ -274,7 +274,7 @@ export default function Recurring() {
                                     <h3 style={{ fontSize: '1.1rem', marginBottom: '0.3rem' }}>{tmpl.description}</h3>
                                     <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{tmpl.category} • {tmpl.frequency === 'monthly' ? 'Mensal' : 'Semanal'}</p>
 
-                                    <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
                                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Próxima</p>
                                             <p style={{ fontSize: '0.9rem' }}>{new Date(tmpl.next_due_date).toLocaleDateString('pt-BR')}</p>

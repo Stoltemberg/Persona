@@ -155,20 +155,15 @@ export function UpcomingBills() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            borderLeft: isUrgent ? '4px solid var(--color-expense)' : '4px solid transparent',
-                            background: isUrgent ? 'rgba(255, 69, 58, 0.03)' : 'rgba(255, 255, 255, 0.03)',
+                            borderLeft: isUrgent ? '4px solid var(--color-danger)' : '4px solid transparent',
+                            background: isUrgent ? 'rgba(255, 69, 58, 0.05)' : 'var(--bg-card)',
+                            boxShadow: isUrgent ? 'none' : 'var(--glass-shadow)',
                             transition: 'all 0.2s ease'
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '12px',
-                                    background: isUrgent ? 'rgba(255, 69, 58, 0.1)' : 'rgba(255, 255, 255, 0.05)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: isUrgent ? 'var(--color-expense)' : 'var(--text-secondary)'
+                                <div className="icon-container" style={{
+                                    background: isUrgent ? 'rgba(255, 69, 58, 0.1)' : undefined,
+                                    color: isUrgent ? 'var(--color-danger)' : 'var(--text-secondary)'
                                 }}>
                                     {isUrgent ? <AlertCircle size={20} /> : <Clock size={20} />}
                                 </div>
@@ -176,7 +171,7 @@ export function UpcomingBills() {
                                     <h4 style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-main)' }}>
                                         {bill.description}
                                     </h4>
-                                    <p style={{ fontSize: '0.8rem', color: isUrgent ? 'var(--color-expense)' : 'var(--text-muted)' }}>
+                                    <p style={{ fontSize: '0.8rem', color: isUrgent ? 'var(--color-danger)' : 'var(--text-muted)' }}>
                                         {diffDays === 0 ? 'Vence hoje' : diffDays === 1 ? 'Vence amanhã' : `Vence em ${diffDays} dias`}
                                     </p>
                                 </div>
@@ -194,7 +189,7 @@ export function UpcomingBills() {
                                         padding: '0.5rem',
                                         borderRadius: '50%',
                                         background: isUrgent ? 'rgba(255, 69, 58, 0.1)' : 'rgba(48, 209, 88, 0.1)',
-                                        color: isUrgent ? 'var(--color-expense)' : 'var(--color-success)',
+                                        color: isUrgent ? 'var(--color-danger)' : 'var(--color-success)',
                                         opacity: processingId === bill.id ? 0.5 : 1
                                     }}
                                     title="Marcar como pago"

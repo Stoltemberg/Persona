@@ -111,7 +111,7 @@ export default function Budgets({ isTab }) {
                     </div>
                 </div>
 
-                <div className="progress-bar-container" style={{ height: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '6px', overflow: 'hidden' }}>
+                <div className="progress-bar-container bg-track" style={{ height: '12px', borderRadius: '6px', overflow: 'hidden' }}>
                     <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(totalProgress, 100)}%` }}
@@ -181,7 +181,7 @@ export default function Budgets({ isTab }) {
                             </div>
 
                             {/* Progress Bar */}
-                            <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
+                            <div className="bg-track" style={{ height: '8px', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${Math.min(progress, 100)}%` }}

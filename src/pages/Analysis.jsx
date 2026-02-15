@@ -176,8 +176,8 @@ export default function Analysis({ isTab }) {
 
             {/* Summary Cards */}
             <div className="grid-responsive mb-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
-                <Card className="glass-card stagger-1 flex-align-center gap-15" style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div style={{ padding: '1rem', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', color: 'var(--color-success)' }}>
+                <Card className="glass-card stagger-1 flex-align-center gap-15 surface-secondary" style={{ padding: '1.5rem', border: 'none' }}>
+                    <div className="icon-container" style={{ color: 'var(--color-success)' }}>
                         <TrendingUp size={24} />
                     </div>
                     <div>
@@ -186,8 +186,8 @@ export default function Analysis({ isTab }) {
                     </div>
                 </Card>
 
-                <Card className="glass-card stagger-2 flex-align-center gap-15" style={{ padding: '1.5rem' }}>
-                    <div style={{ padding: '1rem', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', color: 'var(--color-danger)' }}>
+                <Card className="glass-card stagger-2 flex-align-center gap-15 surface-secondary" style={{ padding: '1.5rem', border: 'none' }}>
+                    <div className="icon-container" style={{ color: 'var(--color-danger)' }}>
                         <TrendingDown size={24} />
                     </div>
                     <div>
@@ -196,8 +196,8 @@ export default function Analysis({ isTab }) {
                     </div>
                 </Card>
 
-                <Card className="glass-card stagger-3 flex-align-center gap-15" style={{ padding: '1.5rem' }}>
-                    <div style={{ padding: '1rem', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)' }}>
+                <Card className="glass-card stagger-3 flex-align-center gap-15 surface-secondary" style={{ padding: '1.5rem', border: 'none' }}>
+                    <div className="icon-container" style={{ color: 'var(--text-main)' }}>
                         <Wallet size={24} />
                     </div>
                     <div>
@@ -245,8 +245,8 @@ export default function Analysis({ isTab }) {
                                         ))}
                                     </Pie>
                                     <Tooltip
-                                        contentStyle={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                                        itemStyle={{ color: 'white' }}
+                                        contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--glass-border)', borderRadius: '12px', boxShadow: 'var(--glass-shadow)' }}
+                                        itemStyle={{ color: 'var(--text-main)' }}
                                         formatter={(value) => `R$ ${value.toFixed(2)}`}
                                     />
                                     <Legend verticalAlign="bottom" height={36} />
@@ -260,13 +260,13 @@ export default function Analysis({ isTab }) {
                                 textAlign: 'center'
                             }}>
                                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Despesas</span>
-                                <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>R$ {totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</div>
+                                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)' }}>R$ {totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</div>
                             </div>
                         </div>
                     ) : (
                         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', flexDirection: 'column', gap: '1rem' }}>
-                            <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}>
-                                <Wallet size={32} opacity={0.5} />
+                            <div className="icon-container" style={{ opacity: 0.5 }}>
+                                <Wallet size={32} />
                             </div>
                             <p>Sem despesas neste mês</p>
                         </div>

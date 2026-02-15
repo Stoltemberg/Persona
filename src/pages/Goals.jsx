@@ -294,8 +294,8 @@ export default function Goals({ isTab }) {
                 gap: '1rem',
                 alignItems: 'start'
             }}>
-                <div style={{ background: 'rgba(255,255,255,0.1)', padding: '0.8rem', borderRadius: '50%' }}>
-                    <Lightbulb size={24} color="#fff" />
+                <div className="icon-container">
+                    <Lightbulb size={24} />
                 </div>
                 <div>
                     <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>Dica do Persona IA</h3>
@@ -379,7 +379,7 @@ export default function Goals({ isTab }) {
                                                 stroke="none"
                                             >
                                                 <Cell key="cell-0" fill="url(#colorGradient)" />
-                                                <Cell key="cell-1" fill="rgba(255,255,255,0.05)" />
+                                                <Cell key="cell-1" className="fill-track" />
                                             </Pie>
                                             <defs>
                                                 <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="1">
@@ -388,8 +388,8 @@ export default function Goals({ isTab }) {
                                                 </linearGradient>
                                             </defs>
                                             <Tooltip
-                                                contentStyle={{ background: '#0a0a0a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                                                itemStyle={{ color: 'white' }}
+                                                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--glass-border)', borderRadius: '12px', boxShadow: 'var(--glass-shadow)' }}
+                                                itemStyle={{ color: 'var(--text-main)' }}
                                                 formatter={(value) => `R$ ${value.toFixed(2)}`}
                                             />
                                         </PieChart>
@@ -417,9 +417,8 @@ export default function Goals({ isTab }) {
                                 </div>
 
                                 {/* Advisor Footer (Inside Card) */}
-                                <div style={{
+                                <div className="surface-secondary" style={{
                                     padding: '0.8rem',
-                                    background: 'rgba(0,0,0,0.2)',
                                     borderRadius: '12px',
                                     display: 'flex',
                                     alignItems: 'center',

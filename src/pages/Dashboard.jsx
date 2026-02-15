@@ -192,7 +192,7 @@ export default function Dashboard() {
                 <Link to="/planning" style={{ textDecoration: 'none' }}>
                     <div className="glass-card dashboard-stat-card zoom-on-hover">
                         <div className="dashboard-stat-icon" style={{ background: 'rgba(255, 69, 58, 0.08)', color: 'var(--color-danger)' }}>
-                            <ArrowUpRight size={16} />
+                            <ArrowUpRight size={15} />
                         </div>
                         <div>
                             <div className="dashboard-stat-label">Saídas (Mês)</div>
@@ -206,7 +206,7 @@ export default function Dashboard() {
                 <Link to="/planning" style={{ textDecoration: 'none' }}>
                     <div className="glass-card dashboard-stat-card zoom-on-hover">
                         <div className="dashboard-stat-icon" style={{ background: 'rgba(52, 199, 89, 0.08)', color: 'var(--color-success)' }}>
-                            <PiggyBank size={16} />
+                            <PiggyBank size={15} />
                         </div>
                         <div>
                             <div className="dashboard-stat-label">Economias</div>

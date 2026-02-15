@@ -14,7 +14,6 @@ import Analysis from './pages/Analysis';
 import Wallets from './pages/Wallets';
 import Budgets from './pages/Budgets';
 import Recurring from './pages/Recurring';
-import Subscriptions from './pages/Subscriptions';
 import Simulator from './pages/Simulator';
 
 // Lazy Load Pages (Secondary / Auth)
@@ -98,11 +97,7 @@ const AnimatedRoutes = () => {
                 <Recurring />
               </PageTransition>
             } />
-            <Route path="/subscriptions" element={
-              <PageTransition>
-                <Subscriptions />
-              </PageTransition>
-            } />
+
             <Route path="/budgets" element={
               <PageTransition>
                 <Budgets />

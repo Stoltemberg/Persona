@@ -17,11 +17,11 @@ export function Sidebar() {
         { icon: Receipt, label: 'Transações', path: '/transactions' },
         { icon: Target, label: 'Metas', path: '/goals' },
         { icon: PieChart, label: 'Análise', path: '/analysis' },
-        { icon: Calendar, label: 'Assinaturas', path: '/subscriptions' },
-        { icon: TrendingUp, label: 'Simulador', path: '/simulator' },
+        // Subscriptions merged into Recurring
         { icon: Repeat, label: 'Recorrentes', path: '/recurring' },
         { icon: Wallet, label: 'Orçamentos', path: '/budgets' },
         { icon: Settings, label: 'Configurações', path: '/settings' },
+        { icon: TrendingUp, label: 'Simulador', path: '/simulator' },
     ];
 
     if (role === 'admin') {

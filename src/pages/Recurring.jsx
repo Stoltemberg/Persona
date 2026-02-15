@@ -7,7 +7,7 @@ import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { Skeleton } from '../components/Skeleton';
 import { EmptyState } from '../components/EmptyState';
-import { Plus, Trash2, Edit2, Calendar, Check, X, Repeat } from 'lucide-react';
+import { Plus, Trash2, Edit2, Calendar, Check, X, Repeat, Zap, TrendingUp } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { PageHeader } from '../components/PageHeader';
 
@@ -30,6 +30,17 @@ export default function Recurring() {
     const [frequency, setFrequency] = useState('monthly');
     const [nextDueDate, setNextDueDate] = useState('');
     const [expenseType, setExpenseType] = useState('variable');
+    const [filter, setFilter] = useState('all');
+
+    // Metrics
+    const activeTemplates = templates.filter(t => t.active);
+    const monthlyBurn = activeTemplates.filter(t => t.type === 'expense').reduce((acc, t) => acc + parseFloat(t.amount), 0);
+    const monthlyIncome = activeTemplates.filter(t => t.type === 'income').reduce((acc, t) => acc + parseFloat(t.amount), 0);
+
+    const filteredTemplates = templates.filter(t => {
+        if (filter === 'all') return true;
+        return t.type === filter;
+    });
 
     useEffect(() => {
         if (user) {
@@ -173,58 +184,112 @@ export default function Recurring() {
                         <Skeleton key={i} width="100%" height="90px" borderRadius="16px" />
                     ))}
                 </div>
-            ) : templates.length === 0 ? (
-                <EmptyState
-                    icon={Repeat}
-                    title="Nenhuma recorrência"
-                    description="Configure pagamentos automáticos como aluguel, assinaturas ou salário."
-                    actionText="Criar Recorrência"
-                    onAction={handleOpenNew}
-                />
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                    {templates.map((tmpl, index) => (
-                        <Card key={tmpl.id} className="fade-in" style={{ animationDelay: `${index * 0.05}s`, opacity: tmpl.active ? 1 : 0.6 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                                <div style={{
-                                    padding: '0.8rem',
-                                    borderRadius: '12px',
-                                    background: tmpl.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
-                                    color: tmpl.type === 'income' ? '#12c2e9' : '#f64f59'
-                                }}>
-                                    <Repeat size={20} />
+                <>
+                    {/* Metrics Cards - Responsive Grid */}
+                    <div className="grid-responsive mb-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                        <Card className="glass-card glow-on-hover" style={{ padding: '1.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                <div style={{ padding: '10px', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '10px', color: '#f64f59' }}>
+                                    <Zap size={24} />
                                 </div>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <button
-                                        onClick={() => toggleActive(tmpl.id, tmpl.active)}
-                                        className="btn-ghost"
-                                        title={tmpl.active ? "Pausar" : "Ativar"}
-                                        style={{ color: tmpl.active ? '#00ebc7' : 'var(--text-muted)' }}
-                                    >
-                                        {tmpl.active ? <Check size={18} /> : <X size={18} />}
-                                    </button>
-                                    <button onClick={() => handleOpenEdit(tmpl)} className="btn-ghost" title="Editar"><Edit2 size={18} /></button>
-                                    <button onClick={() => handleDelete(tmpl.id)} className="btn-ghost" style={{ color: '#f64f59' }} title="Excluir"><Trash2 size={18} /></button>
-                                </div>
+                                <h3 style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Custo Mensal</h3>
                             </div>
-
-                            <h3 style={{ fontSize: '1.1rem', marginBottom: '0.3rem' }}>{tmpl.description}</h3>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{tmpl.category} • {tmpl.frequency === 'monthly' ? 'Mensal' : 'Semanal'}</p>
-
-                            <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div>
-                                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Próxima</p>
-                                    <p style={{ fontSize: '0.9rem' }}>{new Date(tmpl.next_due_date).toLocaleDateString('pt-BR')}</p>
-                                </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <p style={{ fontSize: '1.2rem', fontWeight: 600, color: tmpl.type === 'income' ? '#12c2e9' : '#f64f59' }}>
-                                        R$ {parseFloat(tmpl.amount).toFixed(2).replace('.', ',')}
-                                    </p>
-                                </div>
-                            </div>
+                            <h2 style={{ fontSize: '2rem', fontWeight: 800 }}>R$ {monthlyBurn.toFixed(2).replace('.', ',')}</h2>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Despesas recorrentes ativas</p>
                         </Card>
-                    ))}
-                </div>
+
+                        <Card className="glass-card glow-on-hover" style={{ padding: '1.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                <div style={{ padding: '10px', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '10px', color: '#12c2e9' }}>
+                                    <TrendingUp size={24} />
+                                </div>
+                                <h3 style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Receita Mensal</h3>
+                            </div>
+                            <h2 style={{ fontSize: '2rem', fontWeight: 800 }}>R$ {monthlyIncome.toFixed(2).replace('.', ',')}</h2>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Ganhos recorrentes ativos</p>
+                        </Card>
+                    </div>
+
+                    {/* Filter Tabs */}
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+                        <Button
+                            variant={filter === 'all' ? 'primary' : 'ghost'}
+                            onClick={() => setFilter('all')}
+                            style={{ borderRadius: '50px', padding: '0.5rem 1.2rem' }}
+                        >
+                            Todos
+                        </Button>
+                        <Button
+                            variant={filter === 'expense' ? 'primary' : 'ghost'}
+                            onClick={() => setFilter('expense')}
+                            style={{ borderRadius: '50px', padding: '0.5rem 1.2rem' }}
+                        >
+                            Despesas
+                        </Button>
+                        <Button
+                            variant={filter === 'income' ? 'primary' : 'ghost'}
+                            onClick={() => setFilter('income')}
+                            style={{ borderRadius: '50px', padding: '0.5rem 1.2rem' }}
+                        >
+                            Receitas
+                        </Button>
+                    </div>
+
+                    {filteredTemplates.length === 0 ? (
+                        <EmptyState
+                            icon={Repeat}
+                            title="Nenhuma recorrência encontrada"
+                            description={filter === 'all' ? "Configure pagamentos automáticos como aluguel, assinaturas ou salário." : "Nenhum item neste filtro."}
+                            actionText="Criar Recorrência"
+                            onAction={handleOpenNew}
+                        />
+                    ) : (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                            {filteredTemplates.map((tmpl, index) => (
+                                <Card key={tmpl.id} className="fade-in glass-card" style={{ animationDelay: `${index * 0.05}s`, opacity: tmpl.active ? 1 : 0.6, borderLeft: tmpl.active && tmpl.type === 'expense' ? '4px solid #f64f59' : (tmpl.active ? '4px solid #12c2e9' : '4px solid transparent') }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                                        <div style={{
+                                            padding: '0.8rem',
+                                            borderRadius: '12px',
+                                            background: tmpl.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
+                                            color: tmpl.type === 'income' ? '#12c2e9' : '#f64f59'
+                                        }}>
+                                            <Repeat size={20} />
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <button
+                                                onClick={() => toggleActive(tmpl.id, tmpl.active)}
+                                                className="btn-ghost"
+                                                title={tmpl.active ? "Pausar" : "Ativar"}
+                                                style={{ color: tmpl.active ? '#00ebc7' : 'var(--text-muted)' }}
+                                            >
+                                                {tmpl.active ? <Check size={18} /> : <X size={18} />}
+                                            </button>
+                                            <button onClick={() => handleOpenEdit(tmpl)} className="btn-ghost" title="Editar"><Edit2 size={18} /></button>
+                                            <button onClick={() => handleDelete(tmpl.id)} className="btn-ghost" style={{ color: '#f64f59' }} title="Excluir"><Trash2 size={18} /></button>
+                                        </div>
+                                    </div>
+
+                                    <h3 style={{ fontSize: '1.1rem', marginBottom: '0.3rem' }}>{tmpl.description}</h3>
+                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{tmpl.category} • {tmpl.frequency === 'monthly' ? 'Mensal' : 'Semanal'}</p>
+
+                                    <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div>
+                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Próxima</p>
+                                            <p style={{ fontSize: '0.9rem' }}>{new Date(tmpl.next_due_date).toLocaleDateString('pt-BR')}</p>
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <p style={{ fontSize: '1.2rem', fontWeight: 600, color: tmpl.type === 'income' ? '#12c2e9' : '#f64f59' }}>
+                                                R$ {parseFloat(tmpl.amount).toFixed(2).replace('.', ',')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
+                </>
             )}
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={templateToEdit ? "Editar Recorrência" : "Nova Recorrência"}>

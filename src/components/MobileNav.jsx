@@ -28,7 +28,7 @@ export function MobileNav() {
         <>
             {/* Main Bottom Bar */}
             <nav className="mobile-bottom-bar">
-                {mainItems.slice(0, 2).map((item) => (
+                {navItems.slice(0, 2).map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
@@ -60,7 +60,7 @@ export function MobileNav() {
                     }}
                 />
 
-                {mainItems.slice(2).map((item) => (
+                {navItems.slice(2, 4).map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
@@ -79,7 +79,7 @@ export function MobileNav() {
                     </NavLink>
                 ))}
 
-                {/* Menu Toggle */}
+                {/* Menu Toggle (for Settings and others) */}
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="mobile-nav-item"
@@ -120,7 +120,8 @@ export function MobileNav() {
                                 <span>Viagem</span>
                             </button>
                         </div>
-                        {menuItems.map((item) => (
+                        {/* Render Settings in the menu */}
+                        {[navItems[4]].map((item) => (
                             <NavLink
                                 key={item.path}
                                 to={item.path}

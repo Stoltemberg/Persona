@@ -1,142 +1,75 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Apple SF System Colors - Dark Mode */
-  --bg-deep: #000000;
-  --bg-card: rgba(28, 28, 30, 0.7);
-  --bg-elevated: rgba(44, 44, 46, 0.7);
+  /* Dynamic Palette - Minimalist Dark */
+  --bg-deep: #050505;
+  /* Pitch black/deep gray */
+  --bg-card: #0a0a0a;
+  /* Slightly lighter for cards */
 
-  /* Brand Colors - Hybrid Approach */
+  /* Minimalist Accents - Apple Style */
   --color-brand: #ffffff;
+  /* Stark white */
   --color-accent: #8e8e93;
-  --color-purple: #bf5af2;
+  /* Apple Gray */
 
-  /* Apple System Colors */
-  --sf-blue: #0a84ff;
-  --sf-blue-dark: #0a7aee;
-  --sf-green: #30d158;
-  --sf-green-dark: #2ec14e;
-  --sf-red: #ff453a;
-  --sf-red-dark: #ff3b30;
-  --sf-orange: #ff9f0a;
-  --sf-orange-dark: #ff9500;
-  --sf-purple: #bf5af2;
-  --sf-purple-dark: #b14de6;
+  /* Semantic Colors (Apple System Colors) */
+  --color-success: #30d158;
+  /* Apple Green */
+  --color-danger: #ff453a;
+  /* Apple Red */
+  --color-warning: #ff9f0a;
+  /* Apple Orange */
+  --color-info: #0a84ff;
+  /* Apple Blue */
 
-  /* Semantic Colors */
-  --color-success: var(--sf-green);
-  --color-danger: var(--sf-red);
-  --color-warning: var(--sf-orange);
-  --color-info: var(--sf-blue);
+  /* Glass Variables -> Solid Minimalist Panels */
+  --glass-bg: #0a0a0a;
+  --glass-border: rgba(255, 255, 255, 0.08);
+  /* Very subtle border */
+  --glass-border-highlight: rgba(255, 255, 255, 0.15);
+  --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --glass-blur: none;
+  /* Removed blur for performance and clean look */
+  --glass-saturation: saturate(100%);
+  --glass-panel-bg: #0a0a0a;
 
-  /* Glassmorphism - Apple Style */
-  --glass-bg: rgba(28, 28, 30, 0.7);
-  --glass-bg-strong: rgba(28, 28, 30, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.15);
-  --glass-border-highlight: rgba(255, 255, 255, 0.25);
-  --glass-blur: blur(20px);
-  --glass-saturation: saturate(180%);
-
-  /* Apple Shadows */
-  --shadow-xs: 0 1px 4px rgba(0, 0, 0, 0.1);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.12);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.16);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.24);
-  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.4);
-
-  /* Text Hierarchy */
+  /* Text */
   --text-main: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.6);
   --text-muted: rgba(255, 255, 255, 0.4);
-  --text-placeholder: rgba(255, 255, 255, 0.3);
+  --input-bg: rgba(255, 255, 255, 0.05);
 
-  /* Input & Interactive */
-  --input-bg: rgba(255, 255, 255, 0.06);
-  --input-border: rgba(255, 255, 255, 0.12);
-  --input-focus-bg: rgba(255, 255, 255, 0.1);
-
-  /* Spacing Scale */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 48px;
-
-  /* Border Radius - Apple Style */
-  --radius-xs: 6px;
-  --radius-sm: 10px;
+  /* UI Metrics */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
   --radius-md: 16px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-lg: 24px;
 
-  /* Typography Scale */
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 2rem;
-  --font-size-4xl: 2.5rem;
-
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   color-scheme: dark;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
-/* Light Mode Overrides - Apple Style */
+/* Light Mode Overrides - Minimalist Light */
 :root.light,
 html.light,
 .light {
   --bg-deep: #ffffff;
-  --bg-card: rgba(255, 255, 255, 0.7);
-  --bg-elevated: rgba(248, 248, 248, 0.7);
+  --bg-card: #f8f8f8;
 
   --color-brand: #000000;
-  --color-accent: #8e8e93;
+  --color-accent: #e5e5e5;
 
-  /* Apple SF Colors - Light Mode */
-  --sf-blue: #007aff;
-  --sf-blue-dark: #0066cc;
-  --sf-green: #34c759;
-  --sf-green-dark: #2eb04a;
-  --sf-red: #ff3b30;
-  --sf-red-dark: #e63428;
-  --sf-orange: #ff9500;
-  --sf-orange-dark: #e68600;
-  --sf-purple: #af52de;
-  --sf-purple-dark: #9b42c8;
+  --glass-bg: #ffffff;
+  --glass-border: #e5e5e5;
+  --glass-border-highlight: #d1d1d1;
+  --glass-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --glass-panel-bg: #ffffff;
 
-  /* Semantic Colors Update */
-  --color-success: var(--sf-green);
-  --color-danger: var(--sf-red);
-  --color-warning: var(--sf-orange);
-  --color-info: var(--sf-blue);
-
-  /* Glassmorphism Light Mode */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-bg-strong: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(0, 0, 0, 0.1);
-  --glass-border-highlight: rgba(0, 0, 0, 0.15);
-
-  /* Apple Shadows - Light Mode */
-  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
-
-  /* Text Light Mode */
   --text-main: #000000;
   --text-secondary: rgba(0, 0, 0, 0.6);
   --text-muted: rgba(0, 0, 0, 0.4);
-  --text-placeholder: rgba(0, 0, 0, 0.3);
-
-  /* Input Light Mode */
-  --input-bg: rgba(0, 0, 0, 0.04);
-  --input-border: rgba(0, 0, 0, 0.1);
-  --input-focus-bg: rgba(0, 0, 0, 0.06);
+  --input-bg: #f5f5f5;
 
   color-scheme: light;
 }
@@ -162,9 +95,10 @@ body {
   min-height: 100vh;
   color: var(--text-main);
   background-color: var(--bg-deep);
+  /* Removed mesh gradient & animation */
   background-image: none;
+  font-smooth: always;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   transition: color 0.3s, background-color 0.3s;
 }
 
@@ -188,122 +122,109 @@ html.light label {
 
 /* --- Advanced Components --- */
 
-/* 1. Glass Card - Apple Style with Glassmorphism */
+/* 1. Minimal Card - The Core Block */
 .glass-card {
   position: relative;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur) var(--glass-saturation);
-  -webkit-backdrop-filter: var(--glass-blur) var(--glass-saturation);
-  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* Subtle uniform border */
   border-radius: var(--radius-md);
-  padding: var(--spacing-lg);
-  box-shadow: var(--shadow-md);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
-              box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
-              border-color 0.2s ease;
+  padding: 1.5rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  /* Softer shadow */
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   overflow: hidden;
-  will-change: transform;
 }
 
-/* Hover Effect - Spring-like lift */
+/* Hover Effect - Subtle lift */
 .glass-card-hover:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   border-color: var(--glass-border-highlight);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--glass-shadow);
 }
 
-.glass-card-hover:active {
-  transform: translateY(-2px) scale(0.99);
-  transition: transform 0.1s ease;
+/* Removed Shine Effect */
+.glass-card-hover::after {
+  display: none;
 }
 
-/* 2. Glass Panel (Container) - Full Glassmorphism */
+/* 2. Glass Panel (Container) */
 .glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur) var(--glass-saturation);
-  -webkit-backdrop-filter: var(--glass-blur) var(--glass-saturation);
+  background: var(--bg-card);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  /* Ensure no blur artifacts */
+  backdrop-filter: none;
 }
 
-/* Buttons - Apple Style */
+/* Buttons */
 .btn {
   border: none;
   cursor: pointer;
-  padding: 0.7rem 1.5rem;
+  padding: 0.8rem 1.75rem;
   border-radius: var(--radius-sm);
   font-weight: 600;
-  font-size: 0.9375rem;
-  letter-spacing: -0.01em;
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: inherit;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   position: relative;
   overflow: hidden;
-  white-space: nowrap;
-}
-
-.btn:hover {
-  transform: scale(1.02);
 }
 
 .btn:active {
-  transform: scale(0.97);
-  transition: transform 0.1s ease;
+  transform: scale(0.96);
 }
 
 .btn-primary {
   background: var(--color-brand);
   color: #000000;
-  box-shadow: var(--shadow-sm);
+  /* High contrast black text on white button */
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+  /* Subtle white glow */
   border: 1px solid transparent;
 }
 
+
+
 .btn-primary:hover {
-  background: var(--color-brand);
-  box-shadow: var(--shadow-md);
-  transform: scale(1.02) translateY(-1px);
+  transform: translateY(-2px);
+  background: #f0f0f0;
+  /* Slight dim on hover */
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary:active {
-  transform: scale(0.97);
-  box-shadow: var(--shadow-xs);
+  transform: translateY(0);
 }
 
 .btn-ghost {
-  background: var(--input-bg);
-  color: var(--text-main);
-  border: 1px solid var(--input-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid transparent;
 }
 
 .btn-ghost:hover {
-  background: var(--input-focus-bg);
-  border-color: var(--glass-border-highlight);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Light Mode Buttons */
+/* Light Mode Buttons override */
 .light .btn-primary {
   background: #000000;
   color: #ffffff !important;
-  box-shadow: var(--shadow-sm);
 }
 
 .light .btn-primary:hover {
   background: #1a1a1a;
   color: #ffffff !important;
-  box-shadow: var(--shadow-md);
 }
 
-.light .btn-primary:active {
-  background: #000000;
-  box-shadow: var(--shadow-xs);
-}
-
-/* Light Mode Typography */
+/* Garantir que títulos de página sejam visíveis no modo claro */
 .light h1,
 .light h2,
 .light h3,
@@ -312,59 +233,54 @@ html.light label {
 }
 
 .light .btn-ghost {
-  background: var(--input-bg);
+  background: rgba(0, 0, 0, 0.05);
   color: #000000 !important;
-  border-color: var(--input-border);
 }
 
 .light .btn-ghost:hover {
-  background: var(--input-focus-bg);
+  background: rgba(0, 0, 0, 0.1);
   color: #000000 !important;
-  border-color: var(--glass-border-highlight);
 }
 
+/* Garantir que o texto dentro de botões ghost seja visível no modo claro */
 .light button.btn-ghost,
 .light .btn-ghost * {
   color: #000000 !important;
 }
 
-/* Inputs - Apple Style */
+/* Inputs */
 .input-group label {
   font-weight: 500;
-  letter-spacing: 0.01em;
-  font-size: var(--font-size-xs) !important;
+  letter-spacing: 0.03em;
+  font-size: 0.85rem !important;
   text-transform: uppercase;
   color: var(--text-muted) !important;
-  margin-bottom: 0.5rem;
-  display: block;
 }
 
 .input-field {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.25rem;
   background: var(--input-bg);
-  border: 1px solid var(--input-border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   color: var(--text-main);
   font-family: inherit;
-  font-size: var(--font-size-base);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.input-field::placeholder {
-  color: var(--text-placeholder);
+  font-size: 1rem;
+  transition: all 0.2s ease;
 }
 
 .input-field:hover {
-  background: var(--input-focus-bg);
+  background-color: rgba(125, 125, 125, 0.15);
+  /* Keep generic or make var */
   border-color: var(--glass-border-highlight);
 }
 
 .input-field:focus {
   outline: none;
-  border-color: var(--sf-blue);
-  background: var(--input-focus-bg);
-  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+  border-color: var(--color-2);
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(196, 113, 237, 0.2);
+  transform: translateY(-1px);
 }
 
 /* Select specific styling */
@@ -740,52 +656,54 @@ p {
   }
 }
 
-/* Modal - Apple Style Glassmorphism */
+/* Global Component Styles */
 .modal-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-md);
-  animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
 }
 
 .modal-content {
   width: 100%;
   max-width: 480px;
   margin: auto;
-  padding: var(--spacing-xl);
+  padding: 2rem;
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
-  background: var(--glass-bg-strong);
-  backdrop-filter: var(--glass-blur) var(--glass-saturation);
-  -webkit-backdrop-filter: var(--glass-blur) var(--glass-saturation);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
-  animation: modalSpring 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Glass Card Style */
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+
+  animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .light .modal-content {
-  background: var(--glass-bg-strong);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-xl);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
 }
 
-@keyframes modalSpring {
+@keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.92) translateY(20px);
+    transform: scale(0.95);
   }
+
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1);
   }
 }
 
@@ -793,6 +711,7 @@ p {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1216,17 +1135,14 @@ p {
 .toggle-btn {
   background: none;
   border: none;
-  color: var(--sf-purple);
+  color: #c471ed;
   font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
   cursor: pointer;
   text-decoration: underline;
   margin-left: 0.5rem;
   font-size: 0.9rem;
-  transition: color 0.2s ease;
-}
-
-.toggle-btn:hover {
-  color: var(--sf-purple-dark);
 }
 
 /* --- VISUAL ENHANCEMENTS --- */

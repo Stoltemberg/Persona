@@ -119,7 +119,7 @@ export function MobileNav() {
                                 className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`}
                             >
                                 <div className="toggle-icon-box">
-                                    {isPrivacyMode ? <EyeOff size={20} strokeWidth={1.5} /> : <Eye size={20} strokeWidth={1.5} />}
+                                    {isPrivacyMode ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                                 </div>
                                 <span>{isPrivacyMode ? 'Oculto' : 'Visível'}</span>
                             </button>
@@ -129,7 +129,7 @@ export function MobileNav() {
                                 className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`}
                             >
                                 <div className="toggle-icon-box">
-                                    <Plane size={20} strokeWidth={1.5} />
+                                    <Plane size={16} strokeWidth={1.5} />
                                 </div>
                                 <span>Viagem</span>
                             </button>

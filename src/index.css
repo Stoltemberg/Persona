@@ -1622,30 +1622,6 @@ p {
   }
 }
 
-/* Mobile Menu Sheet (iOS Style) */
-.mobile-menu-grid {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(10, 10, 10, 0.95);
-  /* Slightly more opaque for better contrast */
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-top-left-radius: 32px;
-  border-top-right-radius: 32px;
-  padding: 2.5rem 1.5rem 2rem 1.5rem;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem 0.5rem;
-  /* Reduced horizontal gap */
-  z-index: 101;
-  border: 1px solid var(--glass-border);
-  border-bottom: none;
-  animation: slideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
-}
 
 
 

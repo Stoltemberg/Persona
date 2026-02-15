@@ -13,19 +13,15 @@ export function MobileNav() {
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
     const { isEventMode, toggleEventMode } = useEvent();
 
-    const mainItems = [
+    const navItems = [
         { icon: LayoutDashboard, label: 'Início', path: '/dashboard' },
         { icon: Receipt, label: 'Extrato', path: '/transactions' },
-        { icon: PieChart, label: 'Análise', path: '/analysis' },
-    ];
-
-    const menuItems = [
-        { icon: Target, label: 'Metas', path: '/goals' },
         { icon: Repeat, label: 'Fixos', path: '/recurring' },
-        { icon: Calendar, label: 'Planos', path: '/subscriptions' },
+        { icon: Target, label: 'Planos', path: '/planning' },
+        { icon: Calendar, label: 'Assinaturas', path: '/subscriptions' }, // Changed label from 'Planos' to 'Assinaturas' to avoid conflict with 'Planos' above
         { icon: TrendingUp, label: 'Simular', path: '/simulator' },
         { icon: PiggyBank, label: 'Limites', path: '/budgets' },
-        { icon: Settings, label: 'Config', path: '/settings' },
+        { icon: Settings, label: 'Ajustes', path: '/settings' }, // Kept 'Ajustes' from the first Settings entry
     ];
 
     return (

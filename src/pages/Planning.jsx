@@ -62,8 +62,8 @@ export default function Planning() {
                 top: '0',
                 zIndex: 10,
                 backdropFilter: 'blur(12px)',
-                background: 'rgba(28, 28, 30, 0.85)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                background: 'var(--glass-bg)',
+                borderBottom: '1px solid var(--glass-border)',
                 margin: '0 -1rem 1.5rem -1rem', // Negative margin to span full width on mobile
                 borderRadius: '0 0 16px 16px', // Rounded only at bottom
                 width: 'calc(100% + 2rem)' //Compensate for negative margins

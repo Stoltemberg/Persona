@@ -121,8 +121,8 @@ export default function Settings() {
                 {/* Plan Settings */}
                 <Card className="glass-card fade-in stagger-1" style={{ border: isPro ? '1px solid #38ef7d' : '1px solid var(--glass-border)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <div style={{ padding: '0.8rem', background: isPro ? 'rgba(56, 239, 125, 0.1)' : 'rgba(255, 255, 255, 0.1)', borderRadius: '12px' }}>
-                            <Shield size={24} color={isPro ? '#38ef7d' : 'white'} />
+                        <div className="icon-container" style={{ background: isPro ? 'rgba(56, 239, 125, 0.1)' : undefined, color: isPro ? '#38ef7d' : undefined }}>
+                            <Shield size={24} />
                         </div>
                         <div>
                             <h3>Meu Plano</h3>
@@ -158,8 +158,8 @@ export default function Settings() {
                 {/* Profile Settings */}
                 <Card className="glass-card fade-in stagger-1">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                        <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px' }}>
-                            <User size={24} color="white" />
+                        <div className="icon-container">
+                            <User size={24} />
                         </div>
                         <h3>Perfil</h3>
                     </div>
@@ -210,8 +210,8 @@ export default function Settings() {
                 {/* Appearance Settings */}
                 <Card className="glass-card fade-in stagger-2">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                        <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px' }}>
-                            <Sun size={24} color="white" />
+                        <div className="icon-container">
+                            <Sun size={24} />
                         </div>
                         <h3>Aparência</h3>
                     </div>
@@ -237,7 +237,7 @@ export default function Settings() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                     <Card className="glass-card fade-in stagger-2">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                            <div style={{ padding: '0.8rem', background: 'rgba(18, 194, 233, 0.1)', borderRadius: '12px', color: '#12c2e9' }}>
+                            <div className="icon-container" style={{ background: 'rgba(18, 194, 233, 0.1)', color: '#12c2e9' }}>
                                 <Wallet size={24} />
                             </div>
                             <h3>Finanças</h3>
@@ -295,7 +295,7 @@ export default function Settings() {
 
                     <Card className="glass-card fade-in stagger-3">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                            <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '12px' }}>
+                            <div className="icon-container">
                                 <Bell size={24} />
                             </div>
                             <h3>Notificações</h3>

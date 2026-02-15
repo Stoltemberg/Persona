@@ -395,10 +395,11 @@ export default function Transactions() {
                                             setCategory(cat.name);
                                             setSelectedCategory(cat);
                                         }}
+                                        className={!selectedCategory || selectedCategory.id !== cat.id ? 'surface-secondary' : ''}
                                         style={{
                                             padding: '0.5rem',
                                             borderRadius: '8px',
-                                            background: selectedCategory?.id === cat.id ? `${cat.color}40` : 'rgba(255,255,255,0.05)',
+                                            background: selectedCategory?.id === cat.id ? `${cat.color}40` : undefined,
                                             border: selectedCategory?.id === cat.id ? `1px solid ${cat.color}` : '1px solid transparent',
                                             cursor: 'pointer',
                                             display: 'flex',
@@ -410,12 +411,12 @@ export default function Transactions() {
                                         }}
                                     >
                                         <div style={{ fontSize: '1.5rem' }}>{cat.icon}</div>
-                                        <div style={{ fontSize: '0.7rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>{cat.name}</div>
+                                        <div style={{ fontSize: '0.7rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', color: 'var(--text-main)' }}>{cat.name}</div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                            <div className="surface-secondary" style={{ padding: '1rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
                                 <p>Nenhuma categoria criada.</p>
                                 <Button type="button" variant="ghost" className="btn-primary" style={{ marginTop: '0.5rem', fontSize: '0.8rem' }} onClick={() => window.location.href = '/categories'}>Criar Agora</Button>
                             </div>
@@ -438,14 +439,16 @@ export default function Transactions() {
                                     <div
                                         key={opt.value}
                                         onClick={() => setExpenseType(opt.value)}
+                                        className={expenseType !== opt.value ? 'surface-secondary' : ''}
                                         style={{
                                             padding: '0.75rem 0.5rem',
                                             borderRadius: '8px',
                                             cursor: 'pointer',
                                             textAlign: 'center',
-                                            background: expenseType === opt.value ? 'rgba(246, 79, 89, 0.2)' : 'rgba(255,255,255,0.05)',
+                                            background: expenseType === opt.value ? 'rgba(246, 79, 89, 0.2)' : undefined,
                                             border: expenseType === opt.value ? '1px solid #f64f59' : '1px solid transparent',
-                                            transition: 'all 0.2s'
+                                            transition: 'all 0.2s',
+                                            color: 'var(--text-main)'
                                         }}
                                     >
                                         <div style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>{opt.icon}</div>

@@ -72,8 +72,8 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                         <div style={{
                             padding: '0.6rem',
                             borderRadius: '50%',
-                            background: cat ? `${cat.color}20` : (transaction.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)'),
-                            color: cat ? cat.color : (transaction.type === 'income' ? '#12c2e9' : '#f64f59'),
+                            background: cat ? `${cat.color}20` : (transaction.type === 'income' ? 'rgba(10, 132, 255, 0.1)' : 'rgba(255, 69, 58, 0.1)'),
+                            color: cat ? cat.color : (transaction.type === 'income' ? 'var(--color-info)' : 'var(--color-danger)'),
                             display: 'flex', alignItems: 'center', justifyItems: 'center',
                             fontSize: '1rem'
                         }}>
@@ -104,7 +104,7 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                     <div className="transaction-right">
                         <div style={{ textAlign: 'right' }}>
                             <h3 style={{
-                                color: transaction.type === 'income' ? '#12c2e9' : '#f64f59',
+                                color: transaction.type === 'income' ? 'var(--color-info)' : 'var(--color-danger)',
                                 fontWeight: 500,
                                 fontSize: '1rem'
                             }}>

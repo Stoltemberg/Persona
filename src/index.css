@@ -59,6 +59,7 @@
   /* Tighter tracking for SF feel */
 
   color-scheme: dark;
+  --bg-panel: var(--bg-card);
 }
 
 /* Light Mode Overrides - Minimalist Light */
@@ -428,6 +429,39 @@ p {
 
 
 
+
+/* Theming Utilities */
+.icon-container {
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.light .icon-container {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000000;
+}
+
+.surface-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.light .surface-secondary {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.text-main {
+  color: var(--text-main);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
 
 
 /* Custom Scrollbar */
@@ -1880,9 +1914,10 @@ html.light .mobile-bottom-bar,
   text-align: center;
 }
 
-.category-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
+.category.nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  /* Subtle highlight */
+  color: var(--text-main);
 }
 
 .light .category-item {

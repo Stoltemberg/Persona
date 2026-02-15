@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { usePrivacy } from '../context/PrivacyContext';
 import { CountUp } from '../components/CountUp';
 import { PageHeader } from '../components/PageHeader';
+import { UpcomingBills } from '../components/UpcomingBills';
 
 export default function Dashboard() {
     const { user, profile, signOut } = useAuth();
@@ -257,6 +258,9 @@ export default function Dashboard() {
                     </div>
                 </Link>
             </div>
+
+            {/* Upcoming Bills Widget */}
+            <UpcomingBills />
 
             {/* Recent Transactions - Simplified List */}
             <div>

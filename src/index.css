@@ -3,7 +3,7 @@
    ========================================= */
 
 /* ---- Fonts ---- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap');
 
 /* =========================================
    1. Design Tokens (CSS Variables)
@@ -47,8 +47,10 @@
   --radius-pill: 9999px;
 
   /* Typography */
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  letter-spacing: -0.022em;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 
   color-scheme: dark;
 }
@@ -106,31 +108,32 @@ html.light body,
    3. Typography — SF Pro Hierarchy
    ========================================= */
 h1 {
-  font-size: 2.75rem;
-  font-weight: 700;
+  font-size: 2.25rem;
+  font-weight: 600;
   color: var(--text-main);
-  line-height: 1.08;
-  letter-spacing: -0.03em;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
 }
 
 h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--text-main);
 }
 
 h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 500;
   color: var(--text-secondary);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
 }
 
 p {
   color: var(--text-secondary);
-  line-height: 1.6;
-  font-size: 0.95rem;
+  line-height: 1.5;
+  font-size: 0.93rem;
+  font-weight: 400;
 }
 
 /* Light mode text */

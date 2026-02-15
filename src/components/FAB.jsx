@@ -26,12 +26,15 @@ export function FAB({ className, style }) {
     const [type, setType] = useState('expense');
     const [category, setCategory] = useState('');
     const [expenseType, setExpenseType] = useState('variable');
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
 
     useEffect(() => {
         if (isOpen && user) {
             fetchCategories();
+            // Reset date to today on open if needed, or keep last selected
+            if (!date) setDate(new Date().toISOString().split('T')[0]);
         }
     }, [isOpen, user]);
 
@@ -56,6 +59,7 @@ export function FAB({ className, style }) {
         setType('expense');
         setCategory('');
         setExpenseType('variable');
+        setDate(new Date().toISOString().split('T')[0]);
         setSelectedCategory(null);
     };
 
@@ -69,7 +73,7 @@ export function FAB({ className, style }) {
                 type,
                 category,
                 expense_type: type === 'expense' ? expenseType : null,
-                date: new Date().toISOString(),
+                date: date, // Use selected date
                 profile_id: user.id
             }]).select();
 
@@ -144,17 +148,27 @@ export function FAB({ className, style }) {
                         </Button>
                     </div>
 
-                    <Input
-                        label="Valor"
-                        placeholder="0,00"
-                        type="number"
-                        step="0.01"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        required
-                        autoFocus
-                        style={{ fontSize: '1.5rem', fontWeight: 700, textAlign: 'center', color: type === 'income' ? '#12c2e9' : '#f64f59' }}
-                    />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <Input
+                            label="Valor"
+                            placeholder="0,00"
+                            type="number"
+                            step="0.01"
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            required
+                            autoFocus
+                            style={{ fontSize: '1.5rem', fontWeight: 700, textAlign: 'center', color: type === 'income' ? '#12c2e9' : '#f64f59' }}
+                        />
+                        <Input
+                            label="Data"
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            required
+                            style={{ fontSize: '1.1rem', fontWeight: 500, textAlign: 'center' }}
+                        />
+                    </div>
 
                     {/* Quick Category Grid */}
                     <div style={{ marginBottom: '1.5rem' }}>

@@ -661,27 +661,50 @@ p {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  animation: fadeIn 0.3s ease-out forwards;
+  animation: fadeIn 0.2s ease-out forwards;
 }
 
 .modal-content {
   width: 100%;
-  max-width: 500px;
+  max-width: 480px;
   margin: auto;
   padding: 2rem;
   position: relative;
   max-height: 90vh;
-  /* Prevent it from being taller than screen */
   overflow-y: auto;
-  /* Internal scroll if too tall */
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+  /* Glass Card Style */
+  background: rgba(20, 20, 20, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+
+  animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.light .modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .nav-item {

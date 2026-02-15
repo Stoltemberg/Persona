@@ -9,6 +9,7 @@ import { Skeleton } from '../components/Skeleton';
 import { EmptyState } from '../components/EmptyState';
 import { Plus, Trash2, Edit2, Calendar, Check, X, Repeat } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
+import { PageHeader } from '../components/PageHeader';
 
 export default function Recurring() {
     const { user } = useAuth();
@@ -155,17 +156,16 @@ export default function Recurring() {
 
     return (
         <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-            <header className="page-header" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
-                <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                        Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Recorrências</span>
-                    </h1>
-                    <p style={{ opacity: 0.6 }}>Gerencie seus gastos e ganhos fixos</p>
-                </div>
-                <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
-                    <span className="responsive-btn-text">Nova Recorrência</span>
-                </Button>
-            </header>
+            <PageHeader
+                title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Recorrências</span></span>}
+                subtitle="Gerencie seus gastos e ganhos fixos"
+            >
+                {templates.length > 0 && (
+                    <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
+                        <span className="responsive-btn-text">Nova Recorrência</span>
+                    </Button>
+                )}
+            </PageHeader>
 
             {loading ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

@@ -212,7 +212,7 @@ export default function Dashboard() {
                     Saldo Total
                 </p>
                 <div style={{
-                    fontSize: '3.5rem',
+                    fontSize: '3.25rem',
                     fontWeight: 500,
                     letterSpacing: '0.01em',
                     lineHeight: 1.1,

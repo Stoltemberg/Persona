@@ -21,7 +21,7 @@ const lightVars = {
 const darkVars = {
     '--bg-deep': '#050505',
     '--bg-card': '#0a0a0a',
-    '--color-brand': '#ffffff',
+    '--color-brand': '#0A84FF',
     '--color-accent': '#2a2a2a',
     '--glass-bg': '#0a0a0a',
     '--glass-border': 'rgba(255, 255, 255, 0.08)',

@@ -137,14 +137,16 @@ export default function Wallets() {
                     </h1>
                     <p style={{ opacity: 0.6 }}>Gerencie suas contas bancárias e dinheiro físico</p>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: '100%', maxWidth: '300px' }}>
-                    <Button onClick={() => setIsTransferOpen(true)} variant="ghost" icon={ArrowRightLeft} disabled={wallets.length < 2} title={wallets.length < 2 ? "Precisa de pelo menos 2 carteiras" : "Transferir"} style={{ flex: '1', minWidth: '120px' }}>
-                        Transferir
-                    </Button>
-                    <Button onClick={handleOpenNew} icon={Plus} style={{ flex: '1', minWidth: '120px' }}>
-                        Nova Carteira
-                    </Button>
-                </div>
+                {!loading && wallets.length > 0 && (
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: '100%', maxWidth: '300px' }}>
+                        <Button onClick={() => setIsTransferOpen(true)} variant="ghost" icon={ArrowRightLeft} disabled={wallets.length < 2} title={wallets.length < 2 ? "Precisa de pelo menos 2 carteiras" : "Transferir"} style={{ flex: '1', minWidth: '120px' }}>
+                            Transferir
+                        </Button>
+                        <Button onClick={handleOpenNew} icon={Plus} style={{ flex: '1', minWidth: '120px' }}>
+                            Nova Carteira
+                        </Button>
+                    </div>
+                )}
             </header>
 
             {loading ? (

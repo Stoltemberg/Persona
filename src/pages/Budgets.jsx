@@ -84,15 +84,17 @@ export default function Budgets() {
     const totalProgress = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-            <header className="flex-between mb-2 flex-wrap gap-1" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
-                <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                        Meus <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Orçamentos</span>
-                    </h1>
-                    <p className="text-muted" style={{ opacity: 0.6 }}>Defina limites e economize</p>
-                </div>
-            </header>
+        <div className={isTab ? "fade-in" : "container fade-in"} style={{ paddingBottom: '80px' }}>
+            {!isTab && (
+                <header className="flex-between mb-2 flex-wrap gap-1" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
+                    <div>
+                        <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
+                            Meus <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Orçamentos</span>
+                        </h1>
+                        <p className="text-muted" style={{ opacity: 0.6 }}>Defina limites e economize</p>
+                    </div>
+                </header>
+            )}
 
             {/* Overview Card */}
             <Card className="glass-card mb-2" style={{ background: 'linear-gradient(135deg, rgba(18, 194, 233, 0.1), rgba(196, 113, 237, 0.1))' }}>

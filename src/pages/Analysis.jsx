@@ -126,13 +126,13 @@ export default function Analysis() {
     const totalExpenses = chartData.reduce((acc, curr) => acc + curr.value, 0);
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-
-
-            <PageHeader
-                title={<span>Análise <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Mensal</span></span>}
-                subtitle="Resumo financeiro completo"
-            />
+        <div className={isTab ? "fade-in" : "container fade-in"} style={{ paddingBottom: '80px' }}>
+            {!isTab && (
+                <PageHeader
+                    title={<span>Análise <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Mensal</span></span>}
+                    subtitle="Resumo financeiro completo"
+                />
+            )}
 
             {/* Month Selector */}
             <div className="glass-pill-nav">

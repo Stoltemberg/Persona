@@ -10,7 +10,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { EmptyState } from '../components/EmptyState';
 import { PageHeader } from '../components/PageHeader';
 
-export default function Goals() {
+export default function Goals({ isTab }) {
     const { user } = useAuth();
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -263,25 +263,32 @@ export default function Goals() {
         setCurrentTip(TIPS[randomIndex]);
     }, []);
 
-    // ... existing imports/code ...
+
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-            {/* ... header ... */}
+        <div className={isTab ? "fade-in" : "container fade-in"} style={{ paddingBottom: '80px' }}>
+            {!isTab && (
+                <PageHeader
+                    title={<span>Metas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Financeiras</span></span>}
+                    subtitle="Acompanhe e realize seus sonhos"
+                >
+                    <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
+                        Nova Meta
+                    </Button>
+                </PageHeader>
+            )}
 
+            {isTab && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                    <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
+                        Nova Meta
+                    </Button>
+                </div>
+            )}
 
-            <PageHeader
-                title={<span>Metas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Financeiras</span></span>}
-                subtitle="Acompanhe e realize seus sonhos"
-            >
-                <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
-                    Nova Meta
-                </Button>
-            </PageHeader>
 
             {/* Smart Tips Section - Global */}
             <div className="glass-panel panel-gradient-purple" style={{
-                marginBottom: '2rem',
                 padding: '1.5rem',
                 display: 'flex',
                 gap: '1rem',

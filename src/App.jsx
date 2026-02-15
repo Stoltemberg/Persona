@@ -14,7 +14,7 @@ import Analysis from './pages/Analysis';
 import Wallets from './pages/Wallets';
 import Budgets from './pages/Budgets';
 import Recurring from './pages/Recurring';
-import Simulator from './pages/Simulator';
+import Planning from './pages/Planning';
 
 // Lazy Load Pages (Secondary / Auth)
 const Login = React.lazy(() => import('./pages/Login'));
@@ -82,37 +82,18 @@ const AnimatedRoutes = () => {
                 <Transactions />
               </PageTransition>
             } />
-            <Route path="/categories" element={
-              <PageTransition>
-                <Categories />
-              </PageTransition>
-            } />
-            <Route path="/analysis" element={
-              <PageTransition>
-                <Analysis />
-              </PageTransition>
-            } />
             <Route path="/recurring" element={
               <PageTransition>
                 <Recurring />
               </PageTransition>
             } />
 
-            <Route path="/budgets" element={
+            <Route path="/planning" element={
               <PageTransition>
-                <Budgets />
+                <Planning />
               </PageTransition>
             } />
-            <Route path="/goals" element={
-              <PageTransition>
-                <Goals />
-              </PageTransition>
-            } />
-            <Route path="/wallets" element={
-              <PageTransition>
-                <Wallets />
-              </PageTransition>
-            } />
+
             <Route path="/simulator" element={
               <PageTransition>
                 <Simulator />

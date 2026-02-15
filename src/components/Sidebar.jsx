@@ -15,13 +15,9 @@ export function Sidebar() {
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
         { icon: Receipt, label: 'Transações', path: '/transactions' },
-        { icon: Target, label: 'Metas', path: '/goals' },
-        { icon: PieChart, label: 'Análise', path: '/analysis' },
-        // Subscriptions merged into Recurring
         { icon: Repeat, label: 'Recorrentes', path: '/recurring' },
-        { icon: Wallet, label: 'Orçamentos', path: '/budgets' },
+        { icon: Target, label: 'Planejamento', path: '/planning' },
         { icon: Settings, label: 'Configurações', path: '/settings' },
-        { icon: TrendingUp, label: 'Simulador', path: '/simulator' },
     ];
 
     if (role === 'admin') {

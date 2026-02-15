@@ -49,21 +49,30 @@ export default function Planning() {
                 subtitle={getSubtitle()}
             />
 
-            {/* Tab Navigation - Scrollable on mobile */}
+            {/* Tab Navigation - Sticky & Scrollable */}
             <div className="glass-panel" style={{
                 padding: '0.5rem',
-                marginBottom: '2rem',
+                marginBottom: '1.5rem',
                 display: 'flex',
                 gap: '0.5rem',
                 overflowX: 'auto',
                 whiteSpace: 'nowrap',
-                scrollbarWidth: 'none' // Hide scrollbar Firefox
+                scrollbarWidth: 'none',
+                position: 'sticky',
+                top: '0',
+                zIndex: 10,
+                backdropFilter: 'blur(12px)',
+                background: 'rgba(28, 28, 30, 0.85)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                margin: '0 -1rem 1.5rem -1rem', // Negative margin to span full width on mobile
+                borderRadius: '0 0 16px 16px', // Rounded only at bottom
+                width: 'calc(100% + 2rem)' //Compensate for negative margins
             }}>
                 <Button
                     variant={activeTab === 'analysis' ? 'primary' : 'ghost'}
                     onClick={() => setActiveTab('analysis')}
                     icon={PieChart}
-                    style={{ borderRadius: '12px', flex: 1, minWidth: 'fit-content', justifyContent: 'center' }}
+                    style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
                 >
                     Análise
                 </Button>
@@ -71,7 +80,7 @@ export default function Planning() {
                     variant={activeTab === 'goals' ? 'primary' : 'ghost'}
                     onClick={() => setActiveTab('goals')}
                     icon={Target}
-                    style={{ borderRadius: '12px', flex: 1, minWidth: 'fit-content', justifyContent: 'center' }}
+                    style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
                 >
                     Metas
                 </Button>
@@ -79,7 +88,7 @@ export default function Planning() {
                     variant={activeTab === 'budgets' ? 'primary' : 'ghost'}
                     onClick={() => setActiveTab('budgets')}
                     icon={Wallet}
-                    style={{ borderRadius: '12px', flex: 1, minWidth: 'fit-content', justifyContent: 'center' }}
+                    style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
                 >
                     Orçamentos
                 </Button>
@@ -87,10 +96,12 @@ export default function Planning() {
                     variant={activeTab === 'simulator' ? 'primary' : 'ghost'}
                     onClick={() => setActiveTab('simulator')}
                     icon={TrendingUp}
-                    style={{ borderRadius: '12px', flex: 1, minWidth: 'fit-content', justifyContent: 'center' }}
+                    style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
                 >
                     Simulador
                 </Button>
+                {/* Spacer for right padding */}
+                <div style={{ width: '0.5rem', flex: '0 0 auto' }}></div>
             </div>
 
             {/* Content Area */}

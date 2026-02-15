@@ -208,7 +208,6 @@ html.light h3 {
     transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     box-shadow 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     background-color 0.25s ease;
-  overflow: hidden;
 }
 
 .glass-card-hover:hover {
@@ -631,6 +630,12 @@ option {
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   margin-bottom: 3.5rem;
+}
+
+.dashboard-stats-grid a {
+  display: block;
+  overflow: visible;
+  min-width: 0;
 }
 
 .dashboard-stat-card {

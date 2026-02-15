@@ -13,18 +13,31 @@ export function MobileNav() {
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
     const { isEventMode, toggleEventMode } = useEvent();
 
-    const navItems = [
-        { icon: Settings, label: 'Ajustes', path: '/settings' },
+    // Items for the bottom bar (Left of FAB and Right of FAB)
+    // We want: Dashboard, Transactions | FAB | Fixos, Menu
+    const barItemsLeft = [
+        { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+        { icon: Receipt, label: 'Transações', path: '/transactions' },
+    ];
+
+    const barItemsRight = [
         { icon: Repeat, label: 'Fixos', path: '/recurring' },
+        // The last slot is the menu button, handled separately
+    ];
+
+    // Items for the hamburger menu overlay
+    const menuItems = [
         { icon: Wallet, label: 'Carteiras', path: '/wallets' },
         { icon: Tag, label: 'Categorias', path: '/categories' },
+        { icon: Settings, label: 'Configurações', path: '/settings' },
     ];
 
     return (
         <>
             {/* Main Bottom Bar */}
             <nav className="mobile-bottom-bar">
-                {navItems.slice(0, 2).map((item) => (
+                {/* Left Side */}
+                {barItemsLeft.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
@@ -56,7 +69,8 @@ export function MobileNav() {
                     }}
                 />
 
-                {navItems.slice(2, 4).map((item) => (
+                {/* Right Side */}
+                {barItemsRight.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
@@ -75,7 +89,7 @@ export function MobileNav() {
                     </NavLink>
                 ))}
 
-                {/* Menu Toggle (for Settings and others) */}
+                {/* Menu Toggle (Always last on right) */}
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="mobile-nav-item"
@@ -116,8 +130,9 @@ export function MobileNav() {
                                 <span>Viagem</span>
                             </button>
                         </div>
-                        {/* Render Items not in bottom bar (Fixos) */}
-                        {navItems.slice(4).map((item) => (
+
+                        {/* Render Menu Items */}
+                        {menuItems.map((item) => (
                             <NavLink
                                 key={item.path}
                                 to={item.path}

@@ -224,12 +224,28 @@ html.light label {
 .btn-ghost {
   background: transparent;
   color: var(--color-brand);
-  /* Ghost buttons usually use brand color text */
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btn-ghost:hover {
   background: rgba(10, 132, 255, 0.1);
-  /* Subtle brand-tinted background */
+}
+
+.light .btn-ghost:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
 }
 
 /* Light Mode Buttons override */

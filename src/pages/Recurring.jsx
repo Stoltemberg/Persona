@@ -260,14 +260,14 @@ export default function Recurring() {
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             <button
                                                 onClick={() => toggleActive(tmpl.id, tmpl.active)}
-                                                className="btn-ghost"
+                                                className="btn-ghost btn-icon"
                                                 title={tmpl.active ? "Pausar" : "Ativar"}
                                                 style={{ color: tmpl.active ? '#00ebc7' : 'var(--text-muted)' }}
                                             >
                                                 {tmpl.active ? <Check size={18} /> : <X size={18} />}
                                             </button>
-                                            <button onClick={() => handleOpenEdit(tmpl)} className="btn-ghost" title="Editar"><Edit2 size={18} /></button>
-                                            <button onClick={() => handleDelete(tmpl.id)} className="btn-ghost" style={{ color: '#f64f59' }} title="Excluir"><Trash2 size={18} /></button>
+                                            <button onClick={() => handleOpenEdit(tmpl)} className="btn-ghost btn-icon" title="Editar"><Edit2 size={18} /></button>
+                                            <button onClick={() => handleDelete(tmpl.id)} className="btn-ghost btn-icon" style={{ color: '#f64f59' }} title="Excluir"><Trash2 size={18} /></button>
                                         </div>
                                     </div>
 

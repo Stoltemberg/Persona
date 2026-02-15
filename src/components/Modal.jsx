@@ -26,7 +26,7 @@ export function Modal({ isOpen, onClose, title, children }) {
             >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                     <h3>{title}</h3>
-                    <button className="btn-ghost" onClick={onClose} style={{ padding: '0.5rem' }}>
+                    <button className="btn-ghost btn-icon" onClick={onClose}>
                         <X size={20} />
                     </button>
                 </div>

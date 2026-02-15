@@ -115,16 +115,15 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                         <div className="desktop-actions" style={{ display: 'flex', gap: '0.5rem', marginLeft: '1rem' }}>
                             <button
                                 onClick={(e) => { e.stopPropagation(); onEdit(transaction); }}
-                                className="btn-ghost"
-                                style={{ padding: '0.6rem' }}
+                                className="btn-ghost btn-icon"
                                 title="Editar"
                             >
                                 <Edit2 size={16} />
                             </button>
                             <button
                                 onClick={(e) => { e.stopPropagation(); onDelete(transaction.id); }}
-                                className="btn-ghost"
-                                style={{ color: '#f64f59', padding: '0.6rem' }}
+                                className="btn-ghost btn-icon"
+                                style={{ color: '#f64f59' }}
                                 title="Excluir"
                             >
                                 <Trash2 size={16} />

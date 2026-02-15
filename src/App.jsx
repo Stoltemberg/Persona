@@ -19,11 +19,9 @@ import Budgets from './pages/Budgets';
 // Lazy Load Pages (Secondary / Auth)
 const Login = React.lazy(() => import('./pages/Login'));
 const Landing = React.lazy(() => import('./pages/Landing'));
-const Settings = React.lazy(() => import('./pages/Settings'));
 const Terms = React.lazy(() => import('./pages/Terms'));
 const Privacy = React.lazy(() => import('./pages/Privacy'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
-const Admin = React.lazy(() => import('./pages/Admin'));
 
 // Loading Fallback
 const LoadingScreen = () => (

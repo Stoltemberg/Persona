@@ -85,7 +85,6 @@ export function FAB({ className, style }) {
                 category,
                 expense_type: type === 'expense' ? expenseType : null,
                 date: date,
-                status: status, // New field
                 profile_id: user.id
             }]).select();
 

@@ -1825,8 +1825,8 @@ html.light .mobile-bottom-bar,
 }
 
 .menu-toggle-btn.active {
-  background: var(--text-main);
-  color: var(--bg-deep);
+  background: var(--color-brand);
+  color: #FFFFFF;
   border-color: transparent;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
@@ -2153,4 +2153,15 @@ html.light .mobile-bottom-bar,
   .hide-on-mobile {
     display: none !important;
   }
+}
+
+/* Force Dark Mode Button Colors */
+html:not(.light) .btn-primary {
+  background: var(--color-brand) !important;
+  color: #FFFFFF !important;
+}
+
+html:not(.light) .nav-item.active {
+  background-color: var(--color-brand) !important;
+  color: #FFFFFF !important;
 }

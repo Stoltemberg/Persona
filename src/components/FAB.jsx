@@ -93,8 +93,7 @@ export function FAB({ className, style }) {
             if (error) throw error;
 
             success();
-            // Removed toast for cleaner UI
-            // addToast('Transação registrada!', 'success');
+            addToast('Transação registrada!', 'success');
             handleClose();
 
             // Dispatch event with the new transaction data
@@ -106,7 +105,8 @@ export function FAB({ className, style }) {
             }
 
         } catch (error) {
-            addToast(error.message, 'error');
+            console.error('FAB save error:', error);
+            addToast(error.message || 'Erro ao salvar', 'error');
         } finally {
             setLoading(false);
         }

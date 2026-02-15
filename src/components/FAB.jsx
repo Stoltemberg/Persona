@@ -86,7 +86,6 @@ export function FAB({ className, style }) {
                 expense_type: type === 'expense' ? expenseType : null,
                 date: date,
                 status: status, // New field
-                is_recurring: isRecurring, // New field (assuming DB support)
                 profile_id: user.id
             }]).select();
 

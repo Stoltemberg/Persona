@@ -29,6 +29,7 @@ export function MobileNav() {
     const menuItems = [
         { icon: Wallet, label: 'Carteiras', path: '/wallets' },
         { icon: Tag, label: 'Categorias', path: '/categories' },
+        { icon: Target, label: 'Planejamento', path: '/planning' },
         { icon: Settings, label: 'Configurações', path: '/settings' },
     ];
 
@@ -101,24 +102,23 @@ export function MobileNav() {
 
             {/* Menu Overlay */}
             {isMenuOpen && createPortal(
-                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)} style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', position: 'fixed', inset: 0, zIndex: 100 }}>
+                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)}>
                     <div
                         className="mobile-menu-grid"
                         onClick={e => e.stopPropagation()}
                     >
+                        {/* Drag Handle */}
+                        <div className="menu-drag-handle"></div>
+
                         {/* Quick Settings Toggles */}
-                        <div style={{
-                            gridColumn: '1 / -1',
-                            display: 'grid',
-                            gridTemplateColumns: '1fr 1fr',
-                            gap: '1rem',
-                            marginBottom: '2rem'
-                        }}>
+                        <div className="menu-toggles-row">
                             <button
                                 onClick={togglePrivacy}
                                 className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`}
                             >
-                                {isPrivacyMode ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
+                                <div className="toggle-icon-box">
+                                    {isPrivacyMode ? <EyeOff size={20} strokeWidth={1.5} /> : <Eye size={20} strokeWidth={1.5} />}
+                                </div>
                                 <span>{isPrivacyMode ? 'Oculto' : 'Visível'}</span>
                             </button>
 
@@ -126,25 +126,29 @@ export function MobileNav() {
                                 onClick={() => toggleEventMode(!isEventMode)}
                                 className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`}
                             >
-                                <Plane size={16} strokeWidth={1.5} />
+                                <div className="toggle-icon-box">
+                                    <Plane size={20} strokeWidth={1.5} />
+                                </div>
                                 <span>Viagem</span>
                             </button>
                         </div>
 
-                        {/* Render Menu Items */}
-                        {menuItems.map((item) => (
-                            <NavLink
-                                key={item.path}
-                                to={item.path}
-                                onClick={() => setIsMenuOpen(false)}
-                                className="mobile-menu-item"
-                            >
-                                <div className="mobile-menu-icon-container">
-                                    <item.icon size={16} strokeWidth={1.5} />
-                                </div>
-                                <span className="mobile-menu-label">{item.label}</span>
-                            </NavLink>
-                        ))}
+                        {/* Render Menu Items Grid */}
+                        <div className="menu-items-grid">
+                            {menuItems.map((item) => (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="mobile-menu-item"
+                                >
+                                    <div className="mobile-menu-icon-container">
+                                        <item.icon size={22} strokeWidth={1.5} />
+                                    </div>
+                                    <span className="mobile-menu-label">{item.label}</span>
+                                </NavLink>
+                            ))}
+                        </div>
                     </div>
                 </div>,
                 document.body

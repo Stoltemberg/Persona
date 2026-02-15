@@ -801,6 +801,201 @@ option {
 }
 
 /* =========================================
+   15b. FAB Modal — Apple Sheet Style
+   ========================================= */
+.fab-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Segmented Control */
+.fab-type-toggle {
+  display: flex;
+  background: var(--input-bg);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 3px;
+}
+
+.fab-type-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fab-type-btn.active {
+  background: var(--bg-card);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.fab-type-btn.active.expense {
+  color: var(--color-danger);
+}
+
+.fab-type-btn.active.income {
+  color: var(--color-brand);
+}
+
+.light .fab-type-btn.active {
+  background: #FFFFFF;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Row layout */
+.fab-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* Chips */
+.fab-chips-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.fab-chip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fab-chip:active {
+  transform: scale(0.96);
+}
+
+.fab-chip.active {
+  background: rgba(10, 132, 255, 0.1);
+  border-color: rgba(10, 132, 255, 0.2);
+  color: var(--color-brand);
+}
+
+.light .fab-chip {
+  border-color: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.light .fab-chip.active {
+  background: rgba(0, 122, 255, 0.08);
+  border-color: rgba(0, 122, 255, 0.15);
+  color: var(--color-brand);
+}
+
+/* Section */
+.fab-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fab-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Category scroll */
+.fab-categories-scroll {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.fab-categories-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.fab-category-item {
+  min-width: 68px;
+  padding: 0.6rem 0.4rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.fab-category-item:active {
+  transform: scale(0.95);
+}
+
+.fab-category-item.selected {
+  border-color: var(--color-brand);
+}
+
+.light .fab-category-item {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.fab-category-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.fab-category-name {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60px;
+}
+
+.fab-empty-cats {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 0.75rem;
+  width: 100%;
+  text-align: center;
+}
+
+/* Submit */
+.fab-submit {
+  width: 100%;
+  justify-content: center;
+  height: 46px;
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
+}
+
+/* =========================================
    15. Animations
    ========================================= */
 .fade-in {

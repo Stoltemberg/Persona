@@ -125,43 +125,30 @@ export function FAB({ className, style }) {
                 <Plus size={24} strokeWidth={2.2} />
             </button>
 
-            <Modal isOpen={isOpen} onClose={handleClose} title="Adicionar Rápido">
-                <form onSubmit={handleSubmit}>
-                    {/* Type Selection */}
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <Button
+            <Modal isOpen={isOpen} onClose={handleClose} title="Nova Transação">
+                <form onSubmit={handleSubmit} className="fab-modal-form">
+                    {/* Type Segmented Control */}
+                    <div className="fab-type-toggle">
+                        <button
                             type="button"
-                            className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
-                            style={{
-                                flex: 1,
-                                justifyContent: 'center',
-                                border: type === 'expense' ? '1px solid #f64f59' : '1px solid var(--glass-border)',
-                                background: type === 'expense' ? 'rgba(246, 79, 89, 0.1)' : 'transparent',
-                                color: type === 'expense' ? '#f64f59' : 'var(--text-muted)'
-                            }}
+                            className={`fab-type-btn ${type === 'expense' ? 'active expense' : ''}`}
                             onClick={() => { setType('expense'); setCategory(''); setSelectedCategory(null); medium(); }}
                         >
-                            <ArrowDownLeft size={18} style={{ marginRight: '0.5rem' }} />
+                            <ArrowDownLeft size={15} />
                             Despesa
-                        </Button>
-                        <Button
+                        </button>
+                        <button
                             type="button"
-                            className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
-                            style={{
-                                flex: 1,
-                                justifyContent: 'center',
-                                border: type === 'income' ? '1px solid #12c2e9' : '1px solid var(--glass-border)',
-                                background: type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'transparent',
-                                color: type === 'income' ? '#12c2e9' : 'var(--text-muted)'
-                            }}
+                            className={`fab-type-btn ${type === 'income' ? 'active income' : ''}`}
                             onClick={() => { setType('income'); setCategory(''); setSelectedCategory(null); medium(); }}
                         >
-                            <ArrowUpRight size={18} style={{ marginRight: '0.5rem' }} />
+                            <ArrowUpRight size={15} />
                             Receita
-                        </Button>
+                        </button>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    {/* Amount & Date */}
+                    <div className="fab-row">
                         <Input
                             label="Valor"
                             placeholder="0,00"
@@ -171,7 +158,7 @@ export function FAB({ className, style }) {
                             onChange={(e) => setAmount(e.target.value)}
                             required
                             autoFocus
-                            style={{ fontSize: '1.5rem', fontWeight: 700, textAlign: 'center', color: type === 'income' ? '#12c2e9' : '#f64f59' }}
+                            style={{ fontSize: '1.2rem', fontWeight: 500, textAlign: 'center' }}
                         />
                         <Input
                             label="Data"
@@ -180,7 +167,6 @@ export function FAB({ className, style }) {
                             onChange={(e) => {
                                 const newDate = e.target.value;
                                 setDate(newDate);
-                                // Auto-update status based on date
                                 if (newDate > new Date().toISOString().split('T')[0]) {
                                     setStatus('pending');
                                 } else {
@@ -188,87 +174,51 @@ export function FAB({ className, style }) {
                                 }
                             }}
                             required
-                            style={{ fontSize: '1.1rem', fontWeight: 500, textAlign: 'center' }}
                         />
                     </div>
 
-                    {/* Status & Recurrence Toggles */}
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <Button
+                    {/* Status & Recurrence Chips */}
+                    <div className="fab-chips-row">
+                        <button
                             type="button"
-                            className={status === 'paid' ? 'btn-primary' : 'btn-ghost'}
-                            style={{
-                                flex: 1,
-                                justifyContent: 'center',
-                                background: status === 'paid' ? 'rgba(46, 204, 113, 0.2)' : 'rgba(255,255,255,0.05)',
-                                color: status === 'paid' ? '#2ecc71' : 'var(--text-muted)',
-                                border: status === 'paid' ? '1px solid #2ecc71' : '1px solid transparent'
-                            }}
+                            className={`fab-chip ${status === 'paid' ? 'active' : ''}`}
                             onClick={() => { setStatus(status === 'paid' ? 'pending' : 'paid'); medium(); }}
                         >
-                            {status === 'paid' ? <CheckCircle size={18} style={{ marginRight: '0.5rem' }} /> : <Circle size={18} style={{ marginRight: '0.5rem' }} />}
+                            {status === 'paid' ? <CheckCircle size={14} /> : <Circle size={14} />}
                             {status === 'paid' ? 'Pago' : 'Pendente'}
-                        </Button>
-
-                        <Button
+                        </button>
+                        <button
                             type="button"
-                            className={isRecurring ? 'btn-primary' : 'btn-ghost'}
-                            style={{
-                                flex: 1,
-                                justifyContent: 'center',
-                                background: isRecurring ? 'rgba(52, 152, 219, 0.2)' : 'rgba(255,255,255,0.05)',
-                                color: isRecurring ? '#3498db' : 'var(--text-muted)',
-                                border: isRecurring ? '1px solid #3498db' : '1px solid transparent'
-                            }}
+                            className={`fab-chip ${isRecurring ? 'active' : ''}`}
                             onClick={() => { setIsRecurring(!isRecurring); medium(); }}
                         >
-                            <Repeat size={18} style={{ marginRight: '0.5rem' }} />
+                            <Repeat size={14} />
                             {isRecurring ? 'Fixo' : 'Único'}
-                        </Button>
+                        </button>
                     </div>
 
-                    {/* Quick Category Grid */}
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                            Categoria
-                        </label>
-                        <div style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none' }}>
+                    {/* Category Scroll */}
+                    <div className="fab-section">
+                        <label className="fab-label">Categoria</label>
+                        <div className="fab-categories-scroll">
                             {availableCategories.map(cat => (
                                 <div
                                     key={cat.id}
-                                    onClick={() => {
-                                        setCategory(cat.name);
-                                        setSelectedCategory(cat);
-                                        medium();
-                                    }}
-                                    className="category-item"
-                                    style={{
-                                        background: selectedCategory?.id === cat.id ? `${cat.color}40` : undefined,
-                                        border: selectedCategory?.id === cat.id ? `1px solid ${cat.color}` : undefined,
-                                        minWidth: '80px',
-                                        height: '80px',
-                                        borderRadius: '16px',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '0.5rem',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.2s'
-                                    }}
+                                    onClick={() => { setCategory(cat.name); setSelectedCategory(cat); medium(); }}
+                                    className={`fab-category-item ${selectedCategory?.id === cat.id ? 'selected' : ''}`}
+                                    style={selectedCategory?.id === cat.id ? { borderColor: cat.color, background: `${cat.color}15` } : undefined}
                                 >
-                                    <div style={{ fontSize: '1.5rem' }}>{cat.icon}</div>
-                                    <div style={{ fontSize: '0.7rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '90%', textAlign: 'center' }}>{cat.name}</div>
+                                    <span className="fab-category-icon">{cat.icon}</span>
+                                    <span className="fab-category-name">{cat.name}</span>
                                 </div>
                             ))}
                             {availableCategories.length === 0 && (
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '1rem', width: '100%', textAlign: 'center' }}>
-                                    Nenhuma categoria encontrada.
-                                </div>
+                                <div className="fab-empty-cats">Nenhuma categoria encontrada.</div>
                             )}
                         </div>
                     </div>
 
+                    {/* Description */}
                     <Input
                         label="Descrição"
                         placeholder="Ex: Almoço"
@@ -276,8 +226,6 @@ export function FAB({ className, style }) {
                         onChange={(e) => {
                             const val = e.target.value;
                             setDescription(val);
-
-                            // Smart Category Logic
                             if (val.length > 2 && !category) {
                                 const smartMatch = getSmartCategory(val, categories);
                                 if (smartMatch) {
@@ -290,7 +238,7 @@ export function FAB({ className, style }) {
                         required
                     />
 
-                    <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem', height: '50px', fontSize: '1.1rem' }} loading={loading}>
+                    <Button type="submit" className="btn-primary fab-submit" loading={loading}>
                         Registrar
                     </Button>
                 </form>

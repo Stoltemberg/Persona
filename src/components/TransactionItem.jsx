@@ -1,3 +1,4 @@
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { Edit2, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { Card } from './Card';
 import { useAuth } from '../hooks/useAuth';

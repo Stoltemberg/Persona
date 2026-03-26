@@ -3,6 +3,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Switch } from '../components/Switch';
+import { Modal } from '../components/Modal';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../context/ThemeContext';
@@ -29,6 +30,7 @@ export default function Settings() {
     const [loading, setLoading] = useState(false);
     const [fullName, setFullName] = useState(profile?.full_name || '');
     const [partnerTagInput, setPartnerTagInput] = useState('');
+    const [isCoupleModalOpen, setIsCoupleModalOpen] = useState(false);
     const [showUpgrade, setShowUpgrade] = useState(false);
     const [subscription, setSubscription] = useState(null);
     const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_PRESETS[0]);
@@ -89,6 +91,7 @@ export default function Settings() {
 
             addToast('Conta vinculada ao parceiro(a)!', 'success');
             setPartnerTagInput('');
+            setIsCoupleModalOpen(false);
             await fetchProfile(user.id);
         } catch (err) {
             console.error("Catch:", err);
@@ -295,25 +298,14 @@ export default function Settings() {
                             </Button>
                         </div>
                     ) : (
-                        <form onSubmit={handleLinkPartner}>
+                        <div>
                             <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-                                Compartilhe finanças com seu(ua) parceiro(a). Insira o ID dele(a) abaixo.
+                                Compartilhe transações, limites e carteiras com seu(ua) parceiro(a). O Modo Casal sincroniza ambas as contas perfeitamente.
                             </p>
-                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-                                <div style={{ flex: 1 }}>
-                                    <Input
-                                        placeholder="Ex: maria#1234"
-                                        value={partnerTagInput}
-                                        onChange={(e) => setPartnerTagInput(e.target.value)}
-                                        required
-                                        style={{ marginTop: 0 }}
-                                    />
-                                </div>
-                                <Button type="submit" className="btn-primary" loading={loading} style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', marginTop: '1.5rem' }}>
-                                    Vincular
-                                </Button>
-                            </div>
-                        </form>
+                            <Button type="button" className="btn-primary" onClick={() => setIsCoupleModalOpen(true)} style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', width: '100%', justifyContent: 'center' }}>
+                                Vincular Parceiro(a)
+                            </Button>
+                        </div>
                     )}
                 </Card>
 
@@ -428,6 +420,30 @@ export default function Settings() {
                 </div>
             </div>
             <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
+
+            <Modal isOpen={isCoupleModalOpen} onClose={() => setIsCoupleModalOpen(false)} title="Vincular Conta">
+                <form onSubmit={handleLinkPartner}>
+                    <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--text-muted)' }}>
+                        Digite o ID da sua esposa, marido ou parceiro(a) para compartilhar finanças. 
+                        O ID pode ser encontrado na tela de configurações da conta dele(a).
+                    </p>
+                    <Input
+                        label="ID do Parceiro(a)"
+                        placeholder="Ex: maria#1234"
+                        value={partnerTagInput}
+                        onChange={(e) => setPartnerTagInput(e.target.value)}
+                        required
+                    />
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                        <Button type="button" variant="ghost" onClick={() => setIsCoupleModalOpen(false)} style={{ flex: 1, justifyContent: 'center' }}>
+                            Cancelar
+                        </Button>
+                        <Button type="submit" className="btn-primary" loading={loading} style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', flex: 1, justifyContent: 'center' }}>
+                            Vincular
+                        </Button>
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 }

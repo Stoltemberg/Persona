@@ -6,7 +6,7 @@ import { Switch } from '../components/Switch';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useTheme } from '../context/ThemeContext';
-import { User, Bell, Shield, Wallet, Moon, Sun, Monitor, Camera, Zap, Maximize } from 'lucide-react';
+import { User, Bell, Shield, Wallet, Moon, Sun, Monitor, Camera, Zap, Maximize, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { useToast } from '../context/ToastContext';
@@ -23,11 +23,12 @@ const AVATAR_PRESETS = [
 ];
 
 export default function Settings() {
-    const { profile, user, isPro } = useAuth();
+    const { profile, user, isPro, partnerProfile, fetchProfile } = useAuth();
     const { theme, changeTheme } = useTheme();
     const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [fullName, setFullName] = useState(profile?.full_name || '');
+    const [partnerTagInput, setPartnerTagInput] = useState('');
     const [showUpgrade, setShowUpgrade] = useState(false);
     const [subscription, setSubscription] = useState(null);
     const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_PRESETS[0]);
@@ -70,6 +71,40 @@ export default function Settings() {
         }
     };
 
+    const handleLinkPartner = async (e) => {
+        e.preventDefault();
+        if (!partnerTagInput) return;
+        setLoading(true);
+        try {
+            const { error } = await supabase.rpc('link_partner', { partner_tag: partnerTagInput });
+            if (error) throw error;
+            addToast('Conta vinculada ao parceiro(a)!', 'success');
+            setPartnerTagInput('');
+            fetchProfile(user.id);
+        } catch (err) {
+            console.error(err);
+            addToast(err.message || 'Erro ao vincular conta', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUnlinkPartner = async () => {
+        if (!window.confirm('Deseja realmente desvincular as contas?')) return;
+        setLoading(true);
+        try {
+            const { error } = await supabase.rpc('unlink_partner');
+            if (error) throw error;
+            addToast('Contas desvinculadas.', 'info');
+            fetchProfile(user.id);
+        } catch (err) {
+            console.error(err);
+            addToast('Erro ao desvincular.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleExport = async () => {
         if (!isPro) {
             setShowUpgrade(true);
@@ -81,10 +116,10 @@ export default function Settings() {
             addToast('Gerando relatório...', 'info');
 
             // Fetch fresh data
-            const { data: allTransactions } = await supabase.from('transactions').select('*').eq('profile_id', user.id);
-            const { data: allWallets } = await supabase.from('wallets').select('*').eq('profile_id', user.id);
-            const { data: allGoals } = await supabase.from('goals').select('*').eq('profile_id', user.id);
-            const { data: allBudgets } = await supabase.from('budgets').select('*').eq('profile_id', user.id);
+            const { data: allTransactions } = await supabase.from('transactions').select('*');
+            const { data: allWallets } = await supabase.from('wallets').select('*');
+            const { data: allGoals } = await supabase.from('goals').select('*');
+            const { data: allBudgets } = await supabase.from('budgets').select('*');
 
             // Fetch categories correctly as per Budgets.jsx logic if possible, or just all expense categories
             const { data: expenseCategories } = await supabase.from('categories').select('*').eq('type', 'expense');
@@ -205,6 +240,65 @@ export default function Settings() {
                             </Button>
                         </div>
                     </form>
+                </Card>
+
+                {/* Couple Mode Settings */}
+                <Card className="glass-card fade-in stagger-2">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                        <div className="icon-container" style={{ background: 'rgba(246, 79, 89, 0.1)', color: '#f64f59' }}>
+                            <Heart size={24} />
+                        </div>
+                        <div>
+                            <h3>Modo Casal</h3>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                Seu ID: <strong style={{color: 'var(--text-main)'}}>{profile?.nickname}#{profile?.discriminator}</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    {partnerProfile ? (
+                        <div style={{ background: 'var(--bg-elevated)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                            <div className="flex-align-center gap-1 mb-1" style={{ marginBottom: '1rem' }}>
+                                <div className="avatar-preview" style={{ width: '40px', height: '40px', fontSize: '1rem' }}>
+                                    {partnerProfile?.full_name?.[0] || partnerProfile?.nickname?.[0]?.toUpperCase() || 'P'}
+                                </div>
+                                <div>
+                                    <p style={{ fontWeight: 600, margin: 0 }}>{partnerProfile?.full_name || partnerProfile?.nickname}</p>
+                                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
+                                        {partnerProfile?.nickname}#{partnerProfile?.discriminator}
+                                    </p>
+                                </div>
+                            </div>
+                            <Button 
+                                variant="ghost" 
+                                style={{ width: '100%', color: '#f64f59', border: '1px solid rgba(246, 79, 89, 0.2)', justifyContent: 'center' }}
+                                onClick={handleUnlinkPartner}
+                                disabled={loading}
+                            >
+                                Desfazer Vínculo
+                            </Button>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleLinkPartner}>
+                            <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
+                                Compartilhe finanças com seu(ua) parceiro(a). Insira o ID dele(a) abaixo.
+                            </p>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+                                <div style={{ flex: 1 }}>
+                                    <Input
+                                        placeholder="Ex: maria#1234"
+                                        value={partnerTagInput}
+                                        onChange={(e) => setPartnerTagInput(e.target.value)}
+                                        required
+                                        style={{ marginTop: 0 }}
+                                    />
+                                </div>
+                                <Button type="submit" className="btn-primary" loading={loading} style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', marginTop: '1.5rem' }}>
+                                    Vincular
+                                </Button>
+                            </div>
+                        </form>
+                    )}
                 </Card>
 
                 {/* Appearance Settings */}

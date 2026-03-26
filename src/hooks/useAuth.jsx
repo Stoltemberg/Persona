@@ -12,6 +12,7 @@ export function AuthProvider({ children }) {
     const [isPro, setIsPro] = useState(false);
     const [role, setRole] = useState('user');
     const [planTier, setPlanTier] = useState('free');
+    const [partnerProfile, setPartnerProfile] = useState(null);
 
     useEffect(() => {
         // Check active session
@@ -28,6 +29,7 @@ export function AuthProvider({ children }) {
                 fetchProfile(session.user.id);
             } else {
                 setProfile(null);
+                setPartnerProfile(null);
                 setIsPro(false);
                 setRole('user');
                 setPlanTier('free');
@@ -47,13 +49,46 @@ export function AuthProvider({ children }) {
                 .single();
 
             if (!error && data) {
-                setProfile(data);
-                if (data.role) setRole(data.role);
-                if (data.plan_tier) setPlanTier(data.plan_tier);
+                let finalData = data;
+                
+                // Auto-generate nickname and discriminator if not present
+                if (!data.nickname || !data.discriminator) {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    const baseNickname = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || `user${Math.floor(Math.random()*1000)}`;
+                    const newNickname = baseNickname.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 15);
+                    const newDiscriminator = Math.floor(1000 + Math.random() * 9000).toString();
+                    
+                    const { data: updated, error: updateErr } = await supabase
+                        .from('profiles')
+                        .update({ nickname: newNickname, discriminator: newDiscriminator })
+                        .eq('id', userId)
+                        .select()
+                        .single();
+                        
+                    if (!updateErr && updated) {
+                        finalData = updated;
+                    }
+                }
+
+                setProfile(finalData);
+                if (finalData.role) setRole(finalData.role);
+                if (finalData.plan_tier) setPlanTier(finalData.plan_tier);
 
                 // Keep compatibility with isPro boolean
-                if (data.plan_tier === 'complete' || data.plan_tier === 'intermediate') {
+                if (finalData.plan_tier === 'complete' || finalData.plan_tier === 'intermediate') {
                     setIsPro(true);
+                }
+
+                // Fetch partner profile if exists
+                if (finalData.partner_id) {
+                    const { data: pData } = await supabase
+                        .from('profiles')
+                        .select('nickname, discriminator, full_name, avatar_url')
+                        .eq('id', finalData.partner_id)
+                        .single();
+                    if (pData) setPartnerProfile(pData);
+                } else {
+                    setPartnerProfile(null);
                 }
             }
 
@@ -110,7 +145,7 @@ export function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, profile, isPro, role, planTier, signUp, signIn, signOut, loading, fetchProfile }}>
+        <AuthContext.Provider value={{ user, profile, isPro, role, planTier, partnerProfile, signUp, signIn, signOut, loading, fetchProfile }}>
             {!loading && children}
         </AuthContext.Provider>
     );

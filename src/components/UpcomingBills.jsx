@@ -38,7 +38,7 @@ export function UpcomingBills() {
             const { data, error } = await supabase
                 .from('recurring_templates')
                 .select('*')
-                .eq('profile_id', user.id)
+                
                 .eq('type', 'expense')
                 .eq('active', true)
                 .lte('next_due_date', nextWeek.toISOString())

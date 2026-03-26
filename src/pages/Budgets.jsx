@@ -39,7 +39,7 @@ export default function Budgets({ isTab }) {
             const { data: txs } = await supabase
                 .from('transactions')
                 .select('*')
-                .eq('profile_id', user.id)
+                
                 .eq('type', 'expense')
                 .gte('date', startOfMonth)
                 .lte('date', endOfMonth);

@@ -1,8 +1,9 @@
-import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { Edit2, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { Card } from './Card';
+import { useAuth } from '../hooks/useAuth';
 
 export function TransactionItem({ transaction, categories, onEdit, onDelete, index }) {
+    const { user } = useAuth();
     const x = useMotionValue(0);
     const backgroundOpacity = useTransform(x, [-100, 0, 100], [1, 0, 1]);
     const backgroundColor = useTransform(x, [-100, 0, 100], ['#f64f59', 'transparent', '#12c2e9']);
@@ -81,7 +82,23 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                         </div>
 
                         <div>
-                            <h4 style={{ marginBottom: '0.1rem', fontSize: '0.95rem' }}>{transaction.description}</h4>
+                            <h4 style={{ marginBottom: '0.1rem', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                {transaction.description}
+                                {transaction.profile_id && transaction.profile_id !== user?.id && (
+                                    <span style={{ 
+                                        fontSize: '0.6rem', 
+                                        padding: '0.1rem 0.3rem', 
+                                        background: 'rgba(246, 79, 89, 0.15)', 
+                                        color: '#f64f59', 
+                                        borderRadius: '8px', 
+                                        border: '1px solid rgba(246, 79, 89, 0.3)',
+                                        textTransform: 'uppercase',
+                                        fontWeight: 600
+                                    }}>
+                                        Parceiro
+                                    </span>
+                                )}
+                            </h4>
                             <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
                                 {transaction.category} • {new Date(transaction.date).toLocaleDateString('pt-BR')}
                                 {transaction.expense_type && (

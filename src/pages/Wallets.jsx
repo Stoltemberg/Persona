@@ -175,7 +175,21 @@ export default function Wallets() {
                                 </div>
                             </div>
 
-                            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{wallet.name}</h3>
+                            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                {wallet.name}
+                                {wallet.profile_id && wallet.profile_id !== user.id && (
+                                    <span style={{ 
+                                        fontSize: '0.65rem', 
+                                        padding: '0.2rem 0.5rem', 
+                                        background: 'rgba(246, 79, 89, 0.15)', 
+                                        color: '#f64f59', 
+                                        borderRadius: '12px', 
+                                        border: '1px solid rgba(246, 79, 89, 0.3)' 
+                                    }}>
+                                        Parceiro
+                                    </span>
+                                )}
+                            </h3>
                             <p style={{ opacity: 0.7, fontSize: '0.9rem', textTransform: 'capitalize' }}>{wallet.type.replace('_', ' ')}</p>
 
                             <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>

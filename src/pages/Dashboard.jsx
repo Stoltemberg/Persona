@@ -92,7 +92,7 @@ export default function Dashboard() {
             const { data, error } = await supabase
                 .from('transactions')
                 .select('*')
-                .eq('profile_id', user.id)
+                
                 .order('date', { ascending: false });
 
             if (error) throw error;
@@ -121,7 +121,7 @@ export default function Dashboard() {
             const { data: goalsData } = await supabase
                 .from('goals')
                 .select('*')
-                .eq('profile_id', user.id);
+                ;
 
             let totalSavings = 0;
             let goal = null;
@@ -134,7 +134,7 @@ export default function Dashboard() {
             const { data: walletsData } = await supabase
                 .from('wallets')
                 .select('*')
-                .eq('profile_id', user.id);
+                ;
 
             let walletsWithBalance = [];
             if (walletsData) {

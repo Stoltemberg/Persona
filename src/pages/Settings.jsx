@@ -73,17 +73,28 @@ export default function Settings() {
 
     const handleLinkPartner = async (e) => {
         e.preventDefault();
-        if (!partnerTagInput) return;
+        if (!partnerTagInput) {
+            alert('Por favor, informe um ID válido.');
+            return;
+        }
         setLoading(true);
         try {
-            const { error } = await supabase.rpc('link_partner', { partner_tag: partnerTagInput });
-            if (error) throw error;
+            console.log("Enviando tag:", partnerTagInput);
+            const { data, error } = await supabase.rpc('link_partner', { partner_tag: partnerTagInput.toLowerCase() });
+            
+            if (error) {
+                console.error("Erro do supabase:", error);
+                throw error;
+            }
+
             addToast('Conta vinculada ao parceiro(a)!', 'success');
             setPartnerTagInput('');
-            fetchProfile(user.id);
+            await fetchProfile(user.id);
         } catch (err) {
-            console.error(err);
-            addToast(err.message || 'Erro ao vincular conta', 'error');
+            console.error("Catch:", err);
+            const msg = err.message || 'Erro ao vincular conta';
+            alert(msg); // Usando alert como fallback visual garantido
+            addToast(msg, 'error');
         } finally {
             setLoading(false);
         }
@@ -94,12 +105,17 @@ export default function Settings() {
         setLoading(true);
         try {
             const { error } = await supabase.rpc('unlink_partner');
-            if (error) throw error;
+            if (error) {
+                console.error("Erro do supabase:", error);
+                throw error;
+            }
             addToast('Contas desvinculadas.', 'info');
-            fetchProfile(user.id);
+            await fetchProfile(user.id);
         } catch (err) {
-            console.error(err);
-            addToast('Erro ao desvincular.', 'error');
+            console.error("Catch:", err);
+            const msg = err.message || 'Erro ao desvincular conta';
+            alert(msg);
+            addToast(msg, 'error');
         } finally {
             setLoading(false);
         }

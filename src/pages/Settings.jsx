@@ -30,7 +30,9 @@ export default function Settings() {
     const [loading, setLoading] = useState(false);
     const [fullName, setFullName] = useState(profile?.full_name || '');
     const [partnerTagInput, setPartnerTagInput] = useState('');
+    const [linkError, setLinkError] = useState('');
     const [isCoupleModalOpen, setIsCoupleModalOpen] = useState(false);
+    const [isUnlinkModalOpen, setIsUnlinkModalOpen] = useState(false);
     const [showUpgrade, setShowUpgrade] = useState(false);
     const [subscription, setSubscription] = useState(null);
     const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_PRESETS[0]);
@@ -75,17 +77,16 @@ export default function Settings() {
 
     const handleLinkPartner = async (e) => {
         e.preventDefault();
+        setLinkError('');
         if (!partnerTagInput) {
-            alert('Por favor, informe um ID válido.');
+            setLinkError('Por favor, informe um ID válido.');
             return;
         }
         setLoading(true);
         try {
-            console.log("Enviando tag:", partnerTagInput);
             const { data, error } = await supabase.rpc('link_partner', { partner_tag: partnerTagInput.toLowerCase() });
             
             if (error) {
-                console.error("Erro do supabase:", error);
                 throw error;
             }
 
@@ -96,28 +97,25 @@ export default function Settings() {
         } catch (err) {
             console.error("Catch:", err);
             const msg = err.message || 'Erro ao vincular conta';
-            alert(msg); // Usando alert como fallback visual garantido
-            addToast(msg, 'error');
+            setLinkError(msg);
         } finally {
             setLoading(false);
         }
     };
 
     const handleUnlinkPartner = async () => {
-        if (!window.confirm('Deseja realmente desvincular as contas?')) return;
         setLoading(true);
         try {
             const { error } = await supabase.rpc('unlink_partner');
             if (error) {
-                console.error("Erro do supabase:", error);
                 throw error;
             }
             addToast('Contas desvinculadas.', 'info');
+            setIsUnlinkModalOpen(false);
             await fetchProfile(user.id);
         } catch (err) {
             console.error("Catch:", err);
             const msg = err.message || 'Erro ao desvincular conta';
-            alert(msg);
             addToast(msg, 'error');
         } finally {
             setLoading(false);
@@ -291,7 +289,7 @@ export default function Settings() {
                             <Button 
                                 variant="ghost" 
                                 style={{ width: '100%', color: '#f64f59', border: '1px solid rgba(246, 79, 89, 0.2)', justifyContent: 'center' }}
-                                onClick={handleUnlinkPartner}
+                                onClick={() => setIsUnlinkModalOpen(true)}
                                 disabled={loading}
                             >
                                 Desfazer Vínculo
@@ -431,11 +429,15 @@ export default function Settings() {
                         label="ID do Parceiro(a)"
                         placeholder="Ex: maria#1234"
                         value={partnerTagInput}
-                        onChange={(e) => setPartnerTagInput(e.target.value)}
+                        onChange={(e) => {
+                            setPartnerTagInput(e.target.value);
+                            setLinkError('');
+                        }}
+                        error={linkError}
                         required
                     />
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                        <Button type="button" variant="ghost" onClick={() => setIsCoupleModalOpen(false)} style={{ flex: 1, justifyContent: 'center' }}>
+                        <Button type="button" variant="ghost" onClick={() => { setIsCoupleModalOpen(false); setLinkError(''); setPartnerTagInput(''); }} style={{ flex: 1, justifyContent: 'center' }}>
                             Cancelar
                         </Button>
                         <Button type="submit" className="btn-primary" loading={loading} style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', flex: 1, justifyContent: 'center' }}>
@@ -443,6 +445,21 @@ export default function Settings() {
                         </Button>
                     </div>
                 </form>
+            </Modal>
+
+            <Modal isOpen={isUnlinkModalOpen} onClose={() => setIsUnlinkModalOpen(false)} title="Desfazer Vínculo">
+                <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--text-muted)' }}>
+                    Tem certeza que deseja desvincular sua conta de {partnerProfile?.full_name || partnerProfile?.nickname}?
+                    Vocês deixarão de compartilhar as transações, metas e carteiras imediatamente.
+                </p>
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                    <Button type="button" variant="ghost" onClick={() => setIsUnlinkModalOpen(false)} disabled={loading} style={{ flex: 1, justifyContent: 'center' }}>
+                        Cancelar
+                    </Button>
+                    <Button type="button" className="btn-primary" onClick={handleUnlinkPartner} loading={loading} style={{ background: 'var(--color-danger)', border: 'none', color: '#fff', flex: 1, justifyContent: 'center' }}>
+                        Sim, Desvincular
+                    </Button>
+                </div>
             </Modal>
         </div>
     );

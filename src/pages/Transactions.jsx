@@ -51,6 +51,13 @@ export default function Transactions() {
             fetchTransactions();
             fetchCategories();
             fetchWallets();
+
+            const handleSync = () => {
+                fetchTransactions();
+                fetchWallets();
+            };
+            window.addEventListener('supabase-sync', handleSync);
+            return () => window.removeEventListener('supabase-sync', handleSync);
         }
     }, [user]);
 

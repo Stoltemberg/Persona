@@ -33,6 +33,10 @@ export default function Wallets() {
     useEffect(() => {
         if (user) {
             fetchWallets();
+
+            const handleSync = () => fetchWallets();
+            window.addEventListener('supabase-sync', handleSync);
+            return () => window.removeEventListener('supabase-sync', handleSync);
         }
     }, [user]);
 

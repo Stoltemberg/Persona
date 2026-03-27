@@ -40,6 +40,33 @@ export function AuthProvider({ children }) {
         return () => subscription.unsubscribe();
     }, []);
 
+    useEffect(() => {
+        if (!user) return;
+
+        const handleRealtimePayload = (payload) => {
+            console.log('Realtime change received!', payload);
+            
+            // Re-fire specific event if needed by other components originally
+            if (payload.eventType === 'INSERT') {
+                window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: { id: payload.new?.id } }));
+            }
+            
+            // Fire global sync event
+            window.dispatchEvent(new CustomEvent('supabase-sync', { detail: payload }));
+        };
+
+        const channel = supabase.channel('schema-db-changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, handleRealtimePayload)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets' }, handleRealtimePayload)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'goals' }, handleRealtimePayload)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'budgets' }, handleRealtimePayload)
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [user]);
+
     const fetchProfile = async (userId) => {
         try {
             const { data, error } = await supabase

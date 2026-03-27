@@ -109,6 +109,11 @@ BEGIN
         -- You may need to drop existing restrictive policies manually via Dashboard if they conflict
         
         EXECUTE format('
+            DROP POLICY IF EXISTS "Enable read access for family" ON public.%I;
+            DROP POLICY IF EXISTS "Enable insert access for family" ON public.%I;
+            DROP POLICY IF EXISTS "Enable update access for family" ON public.%I;
+            DROP POLICY IF EXISTS "Enable delete access for family" ON public.%I;
+            
             -- Family Select Policy
             CREATE POLICY "Enable read access for family" ON public.%I
             AS PERMISSIVE FOR SELECT
@@ -129,6 +134,14 @@ BEGIN
             CREATE POLICY "Enable delete access for family" ON public.%I
             AS PERMISSIVE FOR DELETE
             USING (profile_id IN (SELECT id FROM public.get_family_ids()));
-        ', t.tablename, t.tablename, t.tablename, t.tablename);
+        ', t.tablename, t.tablename, t.tablename, t.tablename, t.tablename, t.tablename, t.tablename, t.tablename);
     END LOOP;
 END $$;
+
+-- 6. Enable Realtime Sync for shared tables (Modo Casal Sincronizado)
+-- Note: Se alguma tabela já estiver no realtime, esta linha pode dar skip ou erro leve, você pode ignorar.
+BEGIN;
+  DROP PUBLICATION IF EXISTS supabase_realtime;
+  CREATE PUBLICATION supabase_realtime;
+  ALTER PUBLICATION supabase_realtime ADD TABLE transactions, wallets, goals, budgets;
+COMMIT;

@@ -37,10 +37,12 @@ export default function Dashboard() {
 
             window.addEventListener('transaction-updated', handleUpdate);
             window.addEventListener('transaction-inserted', handleInsert);
+            window.addEventListener('supabase-sync', handleUpdate);
 
             return () => {
                 window.removeEventListener('transaction-updated', handleUpdate);
                 window.removeEventListener('transaction-inserted', handleInsert);
+                window.removeEventListener('supabase-sync', handleUpdate);
             };
         }
     }, [user]);

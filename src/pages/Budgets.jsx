@@ -20,6 +20,10 @@ export default function Budgets({ isTab }) {
         if (user) {
             fetchData();
             loadBudgets();
+
+            const handleSync = () => fetchData();
+            window.addEventListener('supabase-sync', handleSync);
+            return () => window.removeEventListener('supabase-sync', handleSync);
         }
     }, [user]);
 

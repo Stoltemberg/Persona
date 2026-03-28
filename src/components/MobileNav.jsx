@@ -47,7 +47,7 @@ export function MobileNav() {
                     >
                         {({ isActive }) => (
                             <div className={`mobile-nav-icon`} style={{
-                                color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
+                                color: isActive ? 'var(--color-brand)' : 'var(--text-muted)',
                                 transform: isActive ? 'scale(1.1)' : 'none',
                                 transition: 'all 0.2s ease'
                             }}>
@@ -82,7 +82,7 @@ export function MobileNav() {
                     >
                         {({ isActive }) => (
                             <div className={`mobile-nav-icon`} style={{
-                                color: isActive ? 'var(--text-main)' : 'var(--text-muted)',
+                                color: isActive ? 'var(--color-brand)' : 'var(--text-muted)',
                                 transform: isActive ? 'scale(1.1)' : 'none',
                                 transition: 'all 0.2s ease'
                             }}>
@@ -96,9 +96,9 @@ export function MobileNav() {
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="mobile-nav-item"
-                    style={{ color: isMenuOpen ? 'var(--text-main)' : 'var(--text-muted)' }}
+                    style={{ color: isMenuOpen ? 'var(--color-brand)' : 'var(--text-muted)' }}
                 >
-                    {isMenuOpen ? <X size={24} strokeWidth={1.5} /> : <MenuIcon size={24} strokeWidth={1.5} />}
+                    {isMenuOpen ? <X size={24} strokeWidth={2} /> : <MenuIcon size={24} strokeWidth={1.5} />}
                 </button>
             </nav>
 

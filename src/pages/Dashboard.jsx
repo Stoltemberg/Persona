@@ -7,11 +7,25 @@ import { OnboardingTour } from '../components/OnboardingTour';
 import { Skeleton } from '../components/Skeleton';
 import { ArrowDownLeft, ArrowUpRight, PiggyBank } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 import { usePrivacy } from '../context/PrivacyContext';
 import { CountUp } from '../components/CountUp';
 import { PageHeader } from '../components/PageHeader';
 import { UpcomingBills } from '../components/UpcomingBills';
+
+const listVariants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: { staggerChildren: 0.06 }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, scale: 0.95, y: 15 },
+    show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 400, damping: 30 } }
+};
 
 export default function Dashboard() {
     const { user, profile, signOut } = useAuth();
@@ -230,7 +244,12 @@ export default function Dashboard() {
                     <Link to="/transactions" className="dashboard-section-link">Ver tudo</Link>
                 </div>
 
-                <div className="dashboard-tx-list">
+                <motion.div 
+                    className="dashboard-tx-list"
+                    variants={listVariants}
+                    initial="hidden"
+                    animate="show"
+                >
                     {loading ? (
                         Array(3).fill(0).map((_, i) => (
                             <Skeleton key={i} width="100%" height="64px" style={{ borderRadius: '16px' }} />
@@ -239,9 +258,7 @@ export default function Dashboard() {
                         <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>Sem movimentações recentes</p>
                     ) : (
                         recentTransactions.map((tx, index) => (
-                            <div key={tx.id} className={`glass-card dashboard-tx-card ${newTxId === tx.id ? 'animate-slide-in' : ''}`}
-                                style={{ animationDelay: `${index * 0.05}s` }}
-                            >
+                            <motion.div key={tx.id} variants={itemVariants} className={`glass-card dashboard-tx-card ${newTxId === tx.id ? 'animate-slide-in' : ''}`}>
                                 <div className="dashboard-tx-left">
                                     <div className="dashboard-tx-icon" style={{
                                         background: tx.type === 'income' ? 'rgba(52, 199, 89, 0.08)' : 'rgba(255, 69, 58, 0.08)',
@@ -259,10 +276,10 @@ export default function Dashboard() {
                                 }}>
                                     {isPrivacyMode ? '••••' : (tx.type === 'income' ? '+' : '-') + ` R$ ${parseFloat(tx.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                 </div>
-                            </div>
+                            </motion.div>
                         ))
                     )}
-                </div>
+                </motion.div>
             </div>
         </div>
     );

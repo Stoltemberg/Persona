@@ -124,11 +124,11 @@ const AnimatedRoutes = () => {
 
 const PageTransition = ({ children }) => (
   <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -20 }}
-    transition={{ duration: 0.3 }}
-    style={{ width: '100%' }}
+    initial={{ opacity: 0, x: 35, filter: 'blur(4px)' }}
+    animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+    exit={{ opacity: 0, x: -35, filter: 'blur(4px)' }}
+    transition={{ type: 'spring', stiffness: 400, damping: 35, mass: 0.8 }}
+    style={{ width: '100%', willChange: 'transform, opacity, filter' }}
   >
     {children}
   </motion.div>

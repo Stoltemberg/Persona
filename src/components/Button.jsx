@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { motion } from 'framer-motion';
 
 // Using clsx/twMerge for class management if we ever add tailwind, 
 // but primarily for conditional class joining with our CSS modules/global styles.
@@ -16,8 +17,10 @@ export function Button({
     const variantClass = variant === 'primary' ? 'btn-primary' : 'btn-ghost';
 
     return (
-        <button
-            className={clsx(baseClass, variantClass, className)}
+        <motion.button
+            whileTap={!loading && !props.disabled ? { scale: 0.95 } : {}}
+            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+            className={twMerge(clsx(baseClass, variantClass, className))}
             disabled={loading || props.disabled}
             {...props}
         >
@@ -29,6 +32,6 @@ export function Button({
                     {children}
                 </>
             )}
-        </button>
+        </motion.button>
     );
 }

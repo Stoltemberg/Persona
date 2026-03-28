@@ -82,6 +82,15 @@
     @apply hover:border-glass-border-highlight hover:shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-300;
   }
 
+  /* Premium Dock Toggles */
+  .dock-toggle {
+    @apply flex items-center justify-center p-3 rounded-2xl transition-all duration-300 text-text-muted hover:bg-white/5;
+  }
+  
+  .dock-toggle-active {
+    @apply bg-brand/15 text-brand shadow-[0_0_15px_rgba(212,175,55,0.1)] border border-brand/20;
+  }
+
   .bento-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
@@ -153,8 +162,9 @@ html.light h3 {
 
 .app-layout {
   min-height: 100vh;
-  margin: 0 auto;
+  margin: 0;
   overflow-x: hidden;
+  background-color: var(--color-background);
 }
 
 .sidebar-container {
@@ -2048,9 +2058,17 @@ html.light .mobile-bottom-bar,
    ========================================= */
 @media (min-width: 1024px) {
   .app-layout {
-    display: flex;
-    justify-content: center;
-    max-width: 100%;
+    display: block;
+    width: 100%;
+  }
+
+  /* Center Container on Desktop */
+  .main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    padding-bottom: 8rem;
+    overflow-y: visible;
   }
 
   /* Desktop Grid for cards */

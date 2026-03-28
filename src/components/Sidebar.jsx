@@ -73,31 +73,41 @@ export function Sidebar() {
             <div className="w-px h-8 bg-orange-400/10 mx-2" />
 
             {/* Toggles & Actions */}
-            <div className="flex items-center gap-1">
-                <button
+            <div className="flex items-center gap-1 ml-1">
+                <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={togglePrivacy}
-                    className="p-3 rounded-2xl text-text-muted hover:bg-white/5 hover:text-text-main transition-all duration-300"
+                    className={clsx(
+                        "dock-toggle",
+                        isPrivacyMode && "dock-toggle-active"
+                    )}
                     title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
                 >
-                    {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-                <button
+                    {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
+                </motion.button>
+                <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => toggleEventMode(!isEventMode)}
                     className={clsx(
-                        "p-3 rounded-2xl transition-all duration-300",
-                        isEventMode ? "text-brand bg-brand/10" : "text-text-muted hover:bg-white/5 hover:text-text-main"
+                        "dock-toggle",
+                        isEventMode && "dock-toggle-active"
                     )}
                     title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
                 >
-                    <Plane size={20} />
-                </button>
-                <button
+                    <Plane size={18} />
+                </motion.button>
+                <div className="w-px h-6 bg-white/5 mx-1" />
+                <motion.button
+                    whileHover={{ scale: 1.1, color: "var(--color-danger)" }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={signOut}
-                    className="p-3 rounded-2xl text-danger hover:bg-danger/10 transition-all duration-300 group"
+                    className="dock-toggle hover:bg-danger/10"
                     title="Sair"
                 >
-                    <LogOut size={20} className="group-hover:translate-x-0.5 transition-transform" />
-                </button>
+                    <LogOut size={18} />
+                </motion.button>
             </div>
         </div>
     );

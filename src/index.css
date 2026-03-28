@@ -644,16 +644,19 @@ option {
 }
 
 .dashboard-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
   margin-bottom: 3.5rem;
 }
 
 .dashboard-stats-grid a {
   display: block;
   overflow: visible;
-  min-width: 0;
+  flex: 1;
+  min-width: 160px;
+  max-width: 310px;
 }
 
 .dashboard-stat-card {

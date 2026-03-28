@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart, Wallet, Repeat, Eye, EyeOff, Calendar, TrendingUp, Plane, Zap } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart, Wallet, Repeat, Eye, EyeOff, Calendar, TrendingUp, Plane } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
@@ -71,31 +71,6 @@ export function Sidebar() {
                     </NavLink>
                 ))}
             </nav>
-
-            <button 
-                onClick={() => window.location.href = '/settings?upgrade=true'}
-                className="upgrade-pro-btn"
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '0.75rem 1rem',
-                    borderRadius: 'var(--radius-md)',
-                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.05))',
-                    border: '1px solid rgba(212, 175, 55, 0.3)',
-                    color: 'var(--color-brand)',
-                    fontWeight: 600,
-                    fontSize: '0.85rem',
-                    cursor: 'pointer',
-                    width: '100%',
-                    marginBottom: '1rem',
-                    transition: 'all 0.3s ease',
-                    marginTop: 'auto'
-                }}
-            >
-                <Zap size={18} fill="currentColor" />
-                <span>Seja PRO</span>
-            </button>
 
             <button
                 onClick={signOut}

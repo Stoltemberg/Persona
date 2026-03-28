@@ -1,9 +1,9 @@
 /* =========================================
-   Persona — Apple Human Interface Style
+   Persona — OLED Minimalist Finance
    ========================================= */
 
 /* ---- Fonts ---- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&family=Outfit:wght@300..700&display=swap');
 
 /* =========================================
    1. Design Tokens (CSS Variables)
@@ -11,43 +11,43 @@
 :root {
   /* Surface Colors — True Black for OLED */
   --bg-deep: #000000;
-  --bg-card: #161617;
+  --bg-card: #050505;
   --bg-panel: var(--bg-card);
 
-  /* Semantic Colors — iOS System Palette */
-  --color-brand: #0A84FF;
-  --color-success: #5AC570;
-  --color-danger: #FF453A;
-  --color-warning: #FF9F0A;
-  --color-info: #64D2FF;
-  --color-purple: #BF5AF2;
+  /* Semantic Colors — High Contrast */
+  --color-brand: #FFFFFF;
+  --color-success: #10B981;
+  --color-danger: #EF4444;
+  --color-warning: #F59E0B;
+  --color-info: #3B82F6;
+  --color-purple: #8B5CF6;
 
-  /* Glass Materials */
-  --glass-bg: rgba(22, 22, 23, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.05);
-  --glass-border-highlight: rgba(255, 255, 255, 0.14);
-  --glass-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
-  --glass-blur: blur(20px);
-  --glass-saturation: saturate(180%);
+  /* Glass Materials - Minimalist */
+  --glass-bg: rgba(10, 10, 10, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.04);
+  --glass-border-highlight: rgba(255, 255, 255, 0.08);
+  --glass-shadow: none;
+  --glass-blur: blur(24px);
+  --glass-saturation: saturate(150%);
 
   /* Text Colors */
-  --text-main: rgba(255, 255, 255, 0.9);
-  --text-secondary: rgba(235, 235, 245, 0.6);
-  --text-muted: rgba(235, 235, 245, 0.3);
+  --text-main: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.3);
 
   /* Input Surfaces */
-  --input-bg: rgba(118, 118, 128, 0.24);
+  --input-bg: rgba(255, 255, 255, 0.04);
 
-  /* Geometry — Apple Radii */
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  /* Geometry — Sharper, more editorial */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
   --radius-pill: 9999px;
 
   /* Typography */
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 15px;
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -108,6 +108,7 @@ html.light body,
    3. Typography — SF Pro Hierarchy
    ========================================= */
 h1 {
+  font-family: 'Outfit', sans-serif;
   font-size: 2.25rem;
   font-weight: 600;
   color: var(--text-main);
@@ -116,6 +117,7 @@ h1 {
 }
 
 h2 {
+  font-family: 'Outfit', sans-serif;
   font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -123,6 +125,7 @@ h2 {
 }
 
 h3 {
+  font-family: 'Outfit', sans-serif;
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--text-secondary);
@@ -134,6 +137,13 @@ p {
   line-height: 1.5;
   font-size: 0.93rem;
   font-weight: 400;
+}
+
+.tabular-data, 
+.dashboard-balance-value, 
+.dashboard-stat-value, 
+.dashboard-tx-amount {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Light mode text */
@@ -234,10 +244,10 @@ html.light h3 {
   cursor: pointer;
   padding: 0.7rem 1.25rem;
   border-radius: var(--radius-pill);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.9rem;
   letter-spacing: -0.01em;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
   font-family: inherit;
   display: inline-flex;
   align-items: center;
@@ -247,6 +257,11 @@ html.light h3 {
   overflow: hidden;
   -webkit-user-select: none;
   user-select: none;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--bg-deep), 0 0 0 5px var(--color-brand);
 }
 
 .btn:active {
@@ -267,11 +282,11 @@ html.light h3 {
 
 .btn-ghost {
   background: transparent;
-  color: var(--color-brand);
+  color: var(--text-main);
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .btn-ghost:hover {
@@ -342,12 +357,12 @@ html:not(.light) .nav-item.active {
   width: 100%;
   padding: 0.75rem 1rem;
   background: var(--input-bg);
-  border: none;
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   color: var(--text-main);
   font-family: inherit;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .input-field:hover {
@@ -467,9 +482,14 @@ option {
   border-radius: var(--radius-sm);
   text-decoration: none;
   color: var(--text-secondary);
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
   font-weight: 500;
   font-size: 0.9rem;
+}
+
+.nav-item:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-brand);
 }
 
 .nav-item:hover {

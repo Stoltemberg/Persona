@@ -8,6 +8,7 @@ import { Skeleton } from '../components/Skeleton';
 import { ArrowDownLeft, ArrowUpRight, PiggyBank } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import clsx from 'clsx';
 
 import { usePrivacy } from '../context/PrivacyContext';
 import { CountUp } from '../components/CountUp';

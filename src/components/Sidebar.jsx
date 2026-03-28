@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
 import clsx from 'clsx';
+import { motion } from 'framer-motion';
 
 import { createPortal } from 'react-dom';
 

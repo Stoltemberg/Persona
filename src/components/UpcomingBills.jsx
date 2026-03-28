@@ -4,6 +4,8 @@ import { useAuth } from '../hooks/useAuth';
 import { Check, AlertCircle, Calendar, Clock } from 'lucide-react';
 import { formatCurrency } from '../utils/format';
 import { useToast } from '../context/ToastContext';
+import { motion } from 'framer-motion';
+import clsx from 'clsx';
 
 export function UpcomingBills() {
     const { user } = useAuth();

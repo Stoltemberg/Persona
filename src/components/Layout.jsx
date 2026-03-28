@@ -14,9 +14,7 @@ export function Layout() {
 
             {/* Main Content Area */}
             <main className="main-content">
-                <div className="content-wrapper">
-                    <Outlet />
-                </div>
+                <Outlet />
             </main>
 
             {/* Mobile Bottom Nav */}

@@ -195,45 +195,90 @@ export default function Dashboard() {
             />
 
             {/* Hero Balance Section */}
-            <section className="dashboard-balance-section">
-                <p className="dashboard-balance-label">Saldo Total</p>
-                <div className="dashboard-balance-value">
-                    {loading ? <Skeleton width="200px" height="72px" style={{ margin: '0 auto' }} /> : (
-                        isPrivacyMode ? '••••' : <CountUp end={balance} prefix="R$ " duration={1.5} />
+            <motion.section 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="mb-14 text-center"
+            >
+                <p className="text-xs uppercase tracking-[0.2em] font-medium text-text-secondary mb-3">Saldo Total</p>
+                <div className="text-5xl md:text-6xl font-display font-semibold tracking-tight leading-tight min-h-[80px] flex items-center justify-center">
+                    {loading ? (
+                        <div className="w-52 h-16 bg-white/5 animate-pulse rounded-2xl mx-auto" />
+                    ) : (
+                        isPrivacyMode ? (
+                            <span className="blur-md select-none">R$ 10.000,00</span>
+                        ) : (
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                            >
+                                <CountUp end={balance} prefix="R$ " duration={2} />
+                            </motion.div>
+                        )
                     )}
                 </div>
-            </section>
+            </motion.section>
 
-            {/* Quick Stats Grid */}
-            <div className="dashboard-stats-grid">
-                <Link to="/planning" style={{ textDecoration: 'none' }}>
-                    <div className="glass-card dashboard-stat-card zoom-on-hover">
-                        <div className="dashboard-stat-icon" style={{ background: 'rgba(255, 69, 58, 0.08)', color: 'var(--color-danger)' }}>
-                            <ArrowUpRight size={15} />
-                        </div>
-                        <div>
-                            <div className="dashboard-stat-label">Saídas (Mês)</div>
-                            <div className="dashboard-stat-value" style={{ color: 'var(--color-danger)' }}>
-                                {loading ? '...' : (isPrivacyMode ? '••••' : `R$ ${expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
+            {/* Asymmetric Bento Grid for Stats */}
+            <motion.div 
+                variants={listVariants}
+                initial="hidden"
+                animate="show"
+                className="grid grid-cols-1 md:grid-cols-12 gap-5 mb-14"
+            >
+                {/* Large Stats Card (Expenses) - Col 1-7 */}
+                <motion.div variants={itemVariants} className="md:col-span-7">
+                    <Link to="/planning" className="block h-full group">
+                        <div className="glass h-full p-8 rounded-3xl relative overflow-hidden transition-all duration-500 hover:border-brand/40 hover:bg-white/[0.03]">
+                            {/* Decorative Background Gradient */}
+                            <div className="absolute -right-10 -top-10 w-40 h-40 bg-danger/10 blur-[60px] rounded-full group-hover:bg-danger/20 transition-colors" />
+                            
+                            <div className="relative z-10 flex flex-col h-full justify-between gap-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-danger/10 flex items-center justify-center text-danger">
+                                        <ArrowUpRight size={20} />
+                                    </div>
+                                    <span className="text-sm font-medium text-text-secondary tracking-wide uppercase">Saídas Mensais</span>
+                                </div>
+                                
+                                <div>
+                                    <div className="text-3xl font-display font-semibold text-danger mb-1">
+                                        {loading ? '...' : (isPrivacyMode ? '••••' : `R$ ${expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
+                                    </div>
+                                    <p className="text-xs text-text-muted">Previsto para este mês</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </Link>
+                    </Link>
+                </motion.div>
 
-                <Link to="/planning" style={{ textDecoration: 'none' }}>
-                    <div className="glass-card dashboard-stat-card zoom-on-hover">
-                        <div className="dashboard-stat-icon" style={{ background: 'rgba(52, 199, 89, 0.08)', color: 'var(--color-success)' }}>
-                            <PiggyBank size={15} />
-                        </div>
-                        <div>
-                            <div className="dashboard-stat-label">Economias</div>
-                            <div className="dashboard-stat-value" style={{ color: 'var(--color-success)' }}>
-                                {loading ? '...' : (isPrivacyMode ? '••••' : `R$ ${savings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
+                {/* Smaller Stats Card (Savings) - Col 8-12 */}
+                <motion.div variants={itemVariants} className="md:col-span-5">
+                    <Link to="/planning" className="block h-full group">
+                        <div className="glass h-full p-8 rounded-3xl relative overflow-hidden transition-all duration-500 hover:border-success/40 hover:bg-white/[0.03]">
+                            <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-success/10 blur-[50px] rounded-full group-hover:bg-success/20 transition-colors" />
+                            
+                            <div className="relative z-10 flex flex-col h-full justify-between gap-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center text-success">
+                                        <PiggyBank size={20} />
+                                    </div>
+                                    <span className="text-sm font-medium text-text-secondary tracking-wide uppercase">Economias</span>
+                                </div>
+                                
+                                <div>
+                                    <div className="text-2xl font-display font-semibold text-success mb-1">
+                                        {loading ? '...' : (isPrivacyMode ? '••••' : `R$ ${savings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
+                                    </div>
+                                    <p className="text-xs text-text-muted">Total acumulado</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </Link>
-            </div>
+                    </Link>
+                </motion.div>
+            </motion.div>
 
             {/* Upcoming Bills Widget */}
             <UpcomingBills />
@@ -245,35 +290,47 @@ export default function Dashboard() {
                 </div>
 
                 <motion.div
-                    className="dashboard-tx-list"
+                    className="flex flex-col gap-3"
                     variants={listVariants}
                     initial="hidden"
                     animate="show"
                 >
                     {loading ? (
                         Array(3).fill(0).map((_, i) => (
-                            <Skeleton key={i} width="100%" height="64px" style={{ borderRadius: '16px' }} />
+                            <div key={i} className="w-full h-20 bg-white/5 animate-pulse rounded-3xl" />
                         ))
                     ) : recentTransactions.length === 0 ? (
-                        <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>Sem movimentações recentes</p>
+                        <p className="text-center text-text-muted py-12 text-sm italic">Sem movimentações recentes</p>
                     ) : (
                         recentTransactions.map((tx, index) => (
-                            <motion.div key={tx.id} variants={itemVariants} className={`glass-card dashboard-tx-card ${newTxId === tx.id ? 'animate-slide-in' : ''}`}>
-                                <div className="dashboard-tx-left">
-                                    <div className="dashboard-tx-icon" style={{
-                                        background: tx.type === 'income' ? 'rgba(52, 199, 89, 0.08)' : 'rgba(255, 69, 58, 0.08)',
-                                        color: tx.type === 'income' ? 'var(--color-success)' : 'var(--color-danger)'
-                                    }}>
-                                        {tx.type === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
+                            <motion.div 
+                                key={tx.id} 
+                                variants={itemVariants} 
+                                className={clsx(
+                                    "glass p-4 rounded-[24px] flex items-center justify-between transition-all duration-300 hover:bg-white/[0.03] group",
+                                    newTxId === tx.id && "ring-2 ring-brand ring-offset-2 ring-offset-background"
+                                )}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={clsx(
+                                        "w-11 h-11 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110",
+                                        tx.type === 'income' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
+                                    )}>
+                                        {tx.type === 'income' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
                                     </div>
                                     <div>
-                                        <div className="dashboard-tx-desc">{tx.description}</div>
-                                        <div className="dashboard-tx-date">{new Date(tx.date).toLocaleDateString('pt-BR')}</div>
+                                        <div className="font-semibold text-text-main text-sm mb-0.5 group-hover:text-brand transition-colors">
+                                            {tx.description}
+                                        </div>
+                                        <div className="text-[11px] text-text-muted font-medium uppercase tracking-wider">
+                                            {new Date(tx.date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="dashboard-tx-amount" style={{
-                                    color: tx.type === 'income' ? 'var(--color-success)' : 'var(--text-main)'
-                                }}>
+                                <div className={clsx(
+                                    "font-display font-bold text-base tracking-tight",
+                                    tx.type === 'income' ? 'text-success' : 'text-text-main'
+                                )}>
                                     {isPrivacyMode ? '••••' : (tx.type === 'income' ? '+' : '-') + ` R$ ${parseFloat(tx.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                 </div>
                             </motion.div>

@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Security & Temp
+.env
+.env.*
+.temp_skills

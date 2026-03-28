@@ -190,6 +190,7 @@ export default function Dashboard() {
             <OnboardingTour />
 
             <PageHeader
+                className="dashboard-header-centered"
                 title={<span>Olá, <span style={{ fontWeight: 600 }}>{profile?.full_name?.split(' ')[0] || 'Usuário'}</span></span>}
             />
 

@@ -130,6 +130,7 @@ export function UpcomingBills() {
                 color: 'var(--text-secondary)',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '0.5rem'
             }}>
                 <Calendar size={16} /> Próximos Vencimentos

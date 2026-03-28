@@ -25,22 +25,9 @@ const NotFound = React.lazy(() => import('./pages/NotFound'));
 
 // Loading Fallback
 const LoadingScreen = () => (
-  <div className="flex items-center justify-center min-h-screen w-full bg-background flex-col gap-6">
-    <motion.div 
-      animate={{ 
-        scale: [1, 1.1, 1],
-        opacity: [0.3, 1, 0.3] 
-      }}
-      transition={{ 
-        duration: 2, 
-        repeat: Infinity, 
-        ease: "easeInOut" 
-      }}
-      className="w-16 h-16 rounded-3xl bg-brand/10 border border-brand/20 flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.1)]"
-    >
-      <div className="w-8 h-8 border-3 border-brand border-t-transparent animate-spin rounded-full" />
-    </motion.div>
-    <p className="text-sm font-medium text-text-muted tracking-[0.2em] uppercase opacity-50">Carregando Persona</p>
+  <div className="flex-center" style={{ height: '100vh', width: '100%', flexDirection: 'column', gap: '1rem' }}>
+    <div className="spinner"></div>
+    <p style={{ opacity: 0.5 }}>Carregando...</p>
   </div>
 );
 
@@ -137,15 +124,11 @@ const AnimatedRoutes = () => {
 
 const PageTransition = ({ children }) => (
   <motion.div
-    initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
-    animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-    exit={{ opacity: 0, scale: 1.02, filter: 'blur(10px)' }}
-    transition={{ 
-      duration: 0.5, 
-      ease: [0.16, 1, 0.3, 1],
-      opacity: { duration: 0.4 }
-    }}
-    className="w-full will-change-[transform,opacity,filter]"
+    initial={{ opacity: 0, x: 35, filter: 'blur(4px)' }}
+    animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+    exit={{ opacity: 0, x: -35, filter: 'blur(4px)' }}
+    transition={{ type: 'spring', stiffness: 400, damping: 35, mass: 0.8 }}
+    style={{ width: '100%', willChange: 'transform, opacity, filter' }}
   >
     {children}
   </motion.div>

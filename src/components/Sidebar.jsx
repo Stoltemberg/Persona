@@ -4,7 +4,6 @@ import { useAuth } from '../hooks/useAuth';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
 
 import { createPortal } from 'react-dom';
 
@@ -26,90 +25,61 @@ export function Sidebar() {
     }
 
     const sidebarContent = (
-        <div className="sidebar-panel">
-            {/* Logo Section */}
-            <div className="flex items-center px-3 border-r border-orange-400/10 mr-2">
-                <div className="w-10 h-10 rounded-2xl bg-brand/10 flex items-center justify-center text-brand shadow-[0_0_15px_rgba(212,175,55,0.2)]">
-                    <span className="font-display font-bold text-xl">P</span>
+        <aside className="glass-panel sidebar-panel">
+            <div className="sidebar-header">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                    <h1 style={{ fontSize: '1.5rem', marginBottom: 0, fontWeight: 600, color: 'var(--text-main)' }}>Persona</h1>
+                    <button
+                        onClick={togglePrivacy}
+                        className="sidebar-header-btn"
+                        title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
+                    >
+                        {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                    <button
+                        onClick={() => toggleEventMode(!isEventMode)}
+                        className="sidebar-header-btn"
+                        style={{ color: isEventMode ? 'var(--text-main)' : undefined }}
+                        title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
+                    >
+                        <Plane size={18} />
+                    </button>
                 </div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Professional Finance</p>
             </div>
 
-            {/* Navigation Items */}
-            <nav className="flex items-center gap-1">
-                {navItems.map((item, index) => (
-                    <motion.div
+            <nav className="sidebar-nav">
+                {navItems.map((item) => (
+                    <NavLink
                         key={item.path}
-                        whileHover={{ y: -4, scale: 1.05 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                        to={item.path}
+                        className={({ isActive }) => clsx(
+                            'nav-item',
+                            isActive ? 'active' : ''
+                        )}
                     >
-                        <NavLink
-                            to={item.path}
-                            className={({ isActive }) => clsx(
-                                'flex flex-col items-center justify-center min-w-[64px] h-[56px] rounded-2xl transition-all duration-300 group relative',
-                                isActive 
-                                    ? 'text-brand' 
-                                    : 'text-text-secondary hover:text-text-main hover:bg-white/5'
-                            )}
-                        >
-                            {({ isActive }) => (
-                                <>
-                                    <item.icon size={22} className={isActive ? "stroke-[2.2px]" : "stroke-[1.8px]"} />
-                                    <span className="text-[9px] font-medium uppercase tracking-wider mt-1 opacity-80">
-                                        {item.label}
-                                    </span>
-                                    {isActive && (
-                                        <motion.div 
-                                            layoutId="active-dock-pill"
-                                            className="absolute -bottom-1 w-1 h-1 rounded-full bg-brand shadow-[0_0_8px_rgba(212,175,55,1)]"
-                                        />
-                                    )}
-                                </>
-                            )}
-                        </NavLink>
-                    </motion.div>
+                        {({ isActive }) => (
+                            <>
+                                <div>
+                                    <item.icon size={20} />
+                                </div>
+                                <span>
+                                    {item.label}
+                                </span>
+                            </>
+                        )}
+                    </NavLink>
                 ))}
             </nav>
 
-            <div className="w-px h-8 bg-orange-400/10 mx-2" />
-
-            {/* Toggles & Actions */}
-            <div className="flex items-center gap-1 ml-1">
-                <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={togglePrivacy}
-                    className={clsx(
-                        "dock-toggle",
-                        isPrivacyMode && "dock-toggle-active"
-                    )}
-                    title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
-                >
-                    {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
-                </motion.button>
-                <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => toggleEventMode(!isEventMode)}
-                    className={clsx(
-                        "dock-toggle",
-                        isEventMode && "dock-toggle-active"
-                    )}
-                    title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
-                >
-                    <Plane size={18} />
-                </motion.button>
-                <div className="w-px h-6 bg-white/5 mx-1" />
-                <motion.button
-                    whileHover={{ scale: 1.1, color: "var(--color-danger)" }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={signOut}
-                    className="dock-toggle hover:bg-danger/10"
-                    title="Sair"
-                >
-                    <LogOut size={18} />
-                </motion.button>
-            </div>
-        </div>
+            <button
+                onClick={signOut}
+                className="logout-btn"
+            >
+                <LogOut size={22} />
+                <span>Sair</span>
+            </button>
+        </aside>
     );
 
     // Use Portal to render outside of the app root (avoiding transforms)

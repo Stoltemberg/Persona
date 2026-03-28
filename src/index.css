@@ -336,8 +336,9 @@ html:not(.light) .btn-primary {
 }
 
 html:not(.light) .nav-item.active {
-  background-color: var(--color-brand) !important;
-  color: #0A0A0A !important;
+  color: var(--color-brand) !important;
+  background-color: rgba(212, 175, 55, 0.12) !important;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.15), inset 0 0 1px rgba(212, 175, 55, 0.4);
 }
 
 /* =========================================
@@ -504,10 +505,11 @@ option {
 }
 
 .nav-item.active {
-  background: var(--color-brand);
-  color: #0A0A0A !important;
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--color-brand) !important;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15), inset 0 0 1px rgba(212, 175, 55, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.25);
 }
 
 .nav-item.active svg {
@@ -2142,29 +2144,32 @@ html.light .mobile-bottom-bar,
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.5rem;
     border: none;
-    padding: 0;
+    padding: 2px;
     margin: 0;
   }
 
   .nav-item {
     flex-direction: column;
-    gap: 3px;
-    padding: 0.5rem 0.7rem;
-    min-width: 58px;
+    gap: 4px;
+    padding: 0.6rem 0.8rem;
+    min-width: 64px;
     justify-content: center;
-    border-radius: 14px;
+    border-radius: 16px;
     text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .nav-item span {
-    font-size: 0.65rem;
+    font-size: 0.68rem;
     font-weight: 500;
+    letter-spacing: 0.01em;
   }
 
   .nav-item:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
+    background: rgba(212, 175, 55, 0.05);
   }
 
   .logout-btn {
@@ -2172,26 +2177,32 @@ html.light .mobile-bottom-bar,
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 3px;
-    padding: 0.5rem 0.7rem;
-    min-width: 58px;
+    gap: 4px;
+    padding: 0.6rem 0.8rem;
+    min-width: 64px;
     height: auto;
-    border-radius: 14px;
-    background: rgba(255, 69, 58, 0.08);
+    border-radius: 16px;
+    background: rgba(255, 69, 58, 0.05);
     color: var(--color-danger);
-    margin-left: 0.4rem;
+    margin-left: 0.6rem;
     position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .logout-btn:hover {
+    background: rgba(255, 69, 58, 0.12);
+    transform: translateY(-2px);
   }
 
   .logout-btn::before {
     content: '';
     position: absolute;
-    left: -0.5rem;
+    left: -0.4rem;
     top: 50%;
     transform: translateY(-50%);
-    height: 22px;
+    height: 24px;
     width: 1px;
-    background: var(--glass-border);
+    background: rgba(212, 175, 55, 0.2);
   }
 
   .light .logout-btn::before {

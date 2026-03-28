@@ -2068,126 +2068,33 @@ html.light .mobile-bottom-bar,
     min-width: 0;
   }
 
-  /* Floating Dock */
+  /* Premium Vertical Sidebar Layout */
   .sidebar-container {
     display: flex;
-    justify-content: center;
     position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: auto;
-    max-width: 90vw;
-    height: auto;
+    top: 0;
+    left: 1.5rem;
+    height: 100vh;
+    width: 280px;
     z-index: 9999;
     pointer-events: none;
+    align-items: center;
+    justify-content: center;
   }
 
   .sidebar-panel {
-    pointer-events: auto;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.6rem 0.8rem;
-    width: max-content;
-    height: auto;
+    display: none; /* Hide legacy horizontal panel */
+  }
+
+  /* Note: The new Sidebar.jsx uses its own classes and inline styles but relies on .sidebar-container for positioning. */
+
+  .main-content {
+    padding: 2rem;
+    padding-left: calc(280px + 4rem); /* Space for sidebar + gaps */
+    max-width: 1600px;
+    width: 100%;
     margin: 0;
-
-    /* True Liquid Glass: Highly transparent dark base + Extreme Blur */
-    background: rgba(10, 10, 10, 0.45);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
-
-    border-radius: 40px;
-    /* Full pill shape */
-
-    /* Subtle inner light + Champagne Gold outer rim */
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 10px 40px rgba(0, 0, 0, 0.6);
-  }
-
-  .light .sidebar-panel {
-    background: rgba(255, 255, 255, 0.45) !important;
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 10px 40px rgba(0, 0, 0, 0.1);
-  }
-
-  .sidebar-header {
-    display: none;
-  }
-
-  .sidebar-nav {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-    border: none;
-    padding: 2px;
-    margin: 0;
-  }
-
-  .nav-item {
-    flex-direction: column;
-    gap: 4px;
-    padding: 0.6rem 0.8rem;
-    min-width: 64px;
-    justify-content: center;
-    border-radius: 16px;
-    text-align: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .nav-item span {
-    font-size: 0.68rem;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-  }
-
-  .nav-item:hover {
-    transform: translateY(-2px);
-    background: rgba(212, 175, 55, 0.05);
-  }
-
-  .logout-btn {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    padding: 0.6rem 0.8rem;
-    min-width: 64px;
-    height: auto;
-    border-radius: 16px;
-    background: rgba(255, 69, 58, 0.05);
-    color: var(--color-danger);
-    margin-left: 0.6rem;
-    position: relative;
-    transition: all 0.3s ease;
-  }
-
-  .logout-btn:hover {
-    background: rgba(255, 69, 58, 0.12);
-    transform: translateY(-2px);
-  }
-
-  .logout-btn::before {
-    content: '';
-    position: absolute;
-    left: -0.4rem;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 24px;
-    width: 1px;
-    background: rgba(212, 175, 55, 0.2);
-  }
-
-  .light .logout-btn::before {
-    background: rgba(0, 0, 0, 0.08);
-  }
-
-  .logout-btn span {
-    display: none;
+    overflow-y: visible;
   }
 
   .logout-btn:hover {

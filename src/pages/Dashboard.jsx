@@ -187,7 +187,7 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
+        <div className="w-full max-w-6xl mx-auto">
             <OnboardingTour />
 
             <PageHeader
@@ -227,7 +227,7 @@ export default function Dashboard() {
                 variants={listVariants}
                 initial="hidden"
                 animate="show"
-                className="grid grid-cols-1 md:grid-cols-12 gap-5 mb-14"
+                className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-14 w-full"
             >
                 {/* Large Stats Card (Expenses) - Col 1-7 */}
                 <motion.div variants={itemVariants} className="md:col-span-7">

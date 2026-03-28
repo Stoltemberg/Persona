@@ -2060,12 +2060,15 @@ html.light .mobile-bottom-bar,
   .app-layout {
     display: block;
     width: 100%;
+    min-height: 100vh;
   }
 
-  /* Center Container on Desktop */
-  .main-content {
-    max-width: 1200px;
+  /* Unified Desktop Centering */
+  .main-content,
+  .content-wrapper {
+    max-width: 1240px;
     margin: 0 auto;
+    width: 100%;
     padding: 2rem 1.5rem;
     padding-bottom: 8rem;
     overflow-y: visible;

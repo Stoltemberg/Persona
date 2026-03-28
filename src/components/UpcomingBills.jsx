@@ -203,5 +203,3 @@ export function UpcomingBills() {
         </section>
     );
 }
-    );
-}

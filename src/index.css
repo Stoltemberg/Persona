@@ -2075,8 +2075,11 @@ html.light .mobile-bottom-bar,
 @media (min-width: 1024px) {
   .app-layout {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    max-width: 100%;
+    width: 100%;
+    min-height: 100vh;
   }
 
   /* Desktop Grid for cards */
@@ -2222,6 +2225,9 @@ html.light .mobile-bottom-bar,
   }
 
   .main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 2rem;
     padding-bottom: 8rem;
     max-width: 1200px;
@@ -2276,6 +2282,4 @@ html.light .mobile-bottom-bar,
   to {
     transform: rotate(360deg);
   }
-}
-}
 }

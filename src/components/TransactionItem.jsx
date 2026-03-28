@@ -74,8 +74,8 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                         <div style={{
                             padding: '0.6rem',
                             borderRadius: '50%',
-                            background: cat ? `${cat.color}20` : (transaction.type === 'income' ? 'rgba(10, 132, 255, 0.1)' : 'rgba(255, 69, 58, 0.1)'),
-                            color: cat ? cat.color : (transaction.type === 'income' ? 'var(--color-info)' : 'var(--color-danger)'),
+                            background: cat ? `${cat.color}20` : (transaction.type === 'income' ? 'rgba(40, 94, 77, 0.1)' : 'rgba(139, 44, 44, 0.1)'),
+                            color: cat ? cat.color : (transaction.type === 'income' ? 'var(--color-success)' : 'var(--color-danger)'),
                             display: 'flex', alignItems: 'center', justifyItems: 'center',
                             fontSize: '1rem'
                         }}>

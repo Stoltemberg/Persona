@@ -908,8 +908,8 @@ option {
 }
 
 .fab-chip.active {
-  background: rgba(10, 132, 255, 0.1);
-  border-color: rgba(10, 132, 255, 0.2);
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.2);
   color: var(--color-brand);
 }
 
@@ -1304,7 +1304,7 @@ option {
 
 .theme-btn.active {
   border: 2px solid var(--color-brand);
-  background: rgba(10, 132, 255, 0.08);
+  background: rgba(212, 175, 55, 0.08);
 }
 
 .theme-btn:hover {
@@ -1535,7 +1535,7 @@ option {
   background: var(--color-brand);
   color: #FFFFFF;
   border: none;
-  box-shadow: 0 4px 14px rgba(10, 132, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1546,7 +1546,7 @@ option {
 
 .fab-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(10, 132, 255, 0.45);
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.45);
 }
 
 .fab-btn:active {
@@ -1728,9 +1728,9 @@ html.light .mobile-bottom-bar,
 }
 
 .menu-toggle-btn.active {
-  background: rgba(10, 132, 255, 0.12);
+  background: rgba(212, 175, 55, 0.12);
   color: var(--color-brand);
-  border-color: rgba(10, 132, 255, 0.2);
+  border-color: rgba(212, 175, 55, 0.2);
   box-shadow: none;
 }
 

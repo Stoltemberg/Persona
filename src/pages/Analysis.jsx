@@ -85,9 +85,9 @@ export default function Analysis({ isTab }) {
         });
 
         return [
-            { name: 'Fixo', value: totals.fixed, color: '#0a84ff', key: 'fixed' },     // Apple Blue
-            { name: 'Variável', value: totals.variable, color: '#ff9f0a', key: 'variable' }, // Apple Orange
-            { name: 'Lazer', value: totals.lifestyle, color: '#bf5af2', key: 'lifestyle' }  // Apple Purple
+            { name: 'Fixo', value: totals.fixed, color: '#5A445D', key: 'fixed' },     // Muted Aubergine
+            { name: 'Variável', value: totals.variable, color: '#D4AF37', key: 'variable' }, // Champagne Gold
+            { name: 'Lazer', value: totals.lifestyle, color: '#3E5A74', key: 'lifestyle' }  // Slate Blue
         ].filter(d => d.value > 0);
     };
 

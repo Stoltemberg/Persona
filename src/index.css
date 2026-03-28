@@ -24,9 +24,9 @@
   --color-text-muted: #5C5853;
 
   /* Glass Materials */
-  --glass-bg: rgba(10, 10, 10, 0.6);
-  --glass-border: rgba(212, 175, 55, 0.15);
-  --glass-border-highlight: rgba(212, 175, 55, 0.3);
+  --color-glass-bg: rgba(10, 10, 10, 0.6);
+  --color-glass-border: rgba(212, 175, 55, 0.15);
+  --color-glass-border-highlight: rgba(212, 175, 55, 0.3);
   
   /* Geometry */
   --radius-xs: 4px;

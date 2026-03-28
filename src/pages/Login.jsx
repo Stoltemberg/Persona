@@ -31,7 +31,12 @@ export default function Login() {
                 await signIn(email, password);
             }
         } catch (err) {
-            setError(err.message);
+            let errorMsg = err.message;
+            if (errorMsg.includes('Invalid login credentials')) errorMsg = 'E-mail ou senha incorretos.';
+            if (errorMsg.includes('User already registered')) errorMsg = 'Este e-mail já está cadastrado.';
+            if (errorMsg.includes('Password should be at least')) errorMsg = 'A senha deve ter pelo menos 6 caracteres.';
+            
+            setError(errorMsg);
         } finally {
             setLoading(false);
         }

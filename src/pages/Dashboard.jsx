@@ -241,7 +241,6 @@ export default function Dashboard() {
             <div>
                 <div className="dashboard-section-header">
                     <h3 className="dashboard-section-title">Últimas movimentações</h3>
-                    <Link to="/transactions" className="dashboard-section-link">Ver tudo</Link>
                 </div>
 
                 <motion.div 
@@ -280,6 +279,14 @@ export default function Dashboard() {
                         ))
                     )}
                 </motion.div>
+
+                {recentTransactions.length > 0 && !loading && (
+                    <div className="dashboard-footer-action">
+                        <Link to="/transactions" className="dashboard-section-link">
+                            Ver tudo
+                        </Link>
+                    </div>
+                )}
             </div>
         </div>
     );

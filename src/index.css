@@ -707,6 +707,18 @@ option {
   margin-bottom: 1rem;
 }
 
+@media (max-width: 1024px) {
+  .dashboard-section-header {
+    justify-content: center;
+  }
+}
+
+.dashboard-footer-action {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
 .dashboard-section-title {
   font-size: 1rem;
   font-weight: 600;

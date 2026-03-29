@@ -210,9 +210,7 @@ export default function Dashboard() {
                 title={<span>Olá, <span style={{ fontWeight: 600 }}>{profile?.full_name?.split(' ')[0] || 'Usuário'}</span></span>}
             />
 
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
-            </div>
+            <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
 
             {/* Hero Balance Section */}
             <section className="dashboard-balance-section">

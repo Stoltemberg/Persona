@@ -154,7 +154,8 @@ p {
 .tabular-data,
 .dashboard-balance-value,
 .dashboard-stat-value,
-.dashboard-tx-amount {
+.dashboard-tx-amount,
+.partner-filter-btn {
   font-variant-numeric: tabular-nums;
 }
 
@@ -194,6 +195,56 @@ p {
     radial-gradient(at 0% 0%, hsla(var(--h-brand), var(--s-brand), var(--l-brand), 0.05) 0px, transparent 50%),
     radial-gradient(at 100% 100%, hsla(var(--h-success), var(--s-success), var(--l-success), 0.05) 0px, transparent 50%);
   filter: blur(100px);
+}
+
+/* Partner Filter Bar */
+.partner-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: var(--input-bg);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  gap: 4px;
+  margin-bottom: 2rem;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  touch-action: manipulation;
+}
+
+.partner-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  text-wrap: balance;
+}
+
+.partner-filter-btn:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.partner-filter-btn.active {
+  background: var(--color-brand);
+  color: #0A0A0A;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
+}
+
+.partner-filter-btn:not(.active):hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
 }
 
 /* Light mode text */

@@ -142,9 +142,7 @@ export default function Analysis({ isTab }) {
                 />
             )}
 
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
-            </div>
+            <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
 
             {/* Month Selector */}
             <div className="glass-pill-nav">

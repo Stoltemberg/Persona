@@ -275,9 +275,7 @@ export default function Transactions() {
                 </div>
             </PageHeader>
 
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-                <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
-            </div>
+            <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
 
             {/* Date Filters */}
             <div className="date-filters" style={{ marginBottom: '1.5rem' }}>

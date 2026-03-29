@@ -72,14 +72,40 @@ export function Sidebar() {
                 ))}
             </nav>
 
+            <div className="sidebar-controls desktop-only-flex">
+                <button
+                    onClick={togglePrivacy}
+                    className="nav-item tray-btn"
+                    title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
+                >
+                   <div>
+                        {isPrivacyMode ? <EyeOff size={20} /> : <Eye size={20} />}
+                   </div>
+                   <span>Valores</span>
+                </button>
+                <button
+                    onClick={() => toggleEventMode(!isEventMode)}
+                    className={clsx("nav-item tray-btn", isEventMode && "active")}
+                    title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
+                >
+                    <div>
+                        <Plane size={20} />
+                    </div>
+                    <span>Viagem</span>
+                </button>
+            </div>
+
             <button
                 onClick={signOut}
                 className="logout-btn"
             >
-                <LogOut size={22} />
+                <div>
+                    <LogOut size={22} />
+                </div>
                 <span>Sair</span>
             </button>
         </aside>
+
     );
 
     // Use Portal to render outside of the app root (avoiding transforms)

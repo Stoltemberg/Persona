@@ -2131,8 +2131,8 @@ html.light .mobile-bottom-bar,
 
     /* Ultra Translucency + Extreme Saturation (iOS 26) */
     background: rgba(10, 10, 10, 0.25);
-    backdrop-filter: blur(24px) saturate(280%);
-    -webkit-backdrop-filter: blur(48px) saturate(280%);
+    backdrop-filter: blur(12px) saturate(280%);
+    -webkit-backdrop-filter: blur(12px) saturate(280%);
 
     border-radius: 28px;
     /* Squircle feel */

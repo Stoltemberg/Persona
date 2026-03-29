@@ -4,7 +4,7 @@ import { Card } from './Card';
 import { useAuth } from '../hooks/useAuth';
 
 export function TransactionItem({ transaction, categories, onEdit, onDelete, index }) {
-    const { user } = useAuth();
+    const { user, partnerProfile } = useAuth();
     const x = useMotionValue(0);
     const backgroundOpacity = useTransform(x, [-100, 0, 100], [1, 0, 1]);
     const backgroundColor = useTransform(x, [-100, 0, 100], ['#f64f59', 'transparent', '#12c2e9']);
@@ -14,11 +14,16 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
 
     return (
         <motion.div
-            layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, height: 0, marginBottom: 0, scale: 0.9 }}
-            transition={{ duration: 0.2 }}
+            layout="position"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8, height: 0, marginBottom: 0 }}
+            transition={{ 
+                duration: 0.3, 
+                ease: 'easeOut',
+                opacity: { delay: index * 0.04 },
+                y: { delay: index * 0.04 }
+            }}
             style={{ position: 'relative', overflow: 'hidden', borderRadius: '24px', marginBottom: '10px' }}
         >
             {/* Background Actions Layer */}
@@ -87,16 +92,26 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                                 {transaction.description}
                                 {transaction.profile_id && transaction.profile_id !== user?.id && (
                                     <span style={{ 
-                                        fontSize: '0.6rem', 
-                                        padding: '0.1rem 0.3rem', 
-                                        background: 'rgba(246, 79, 89, 0.15)', 
-                                        color: '#f64f59', 
-                                        borderRadius: '8px', 
-                                        border: '1px solid rgba(246, 79, 89, 0.3)',
-                                        textTransform: 'uppercase',
-                                        fontWeight: 600
+                                        fontSize: '0.65rem', 
+                                        padding: '0.15rem 0.4rem', 
+                                        background: 'rgba(255,255,255,0.05)', 
+                                        color: 'var(--text-main)', 
+                                        borderRadius: '12px', 
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        fontWeight: 500,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.3rem',
+                                        textTransform: 'none'
                                     }}>
-                                        Parceiro
+                                        {partnerProfile?.avatar_url ? (
+                                            <img src={partnerProfile.avatar_url} alt="Partner" style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: 'rgba(246, 79, 89, 0.2)', color: '#f64f59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700 }}>
+                                                {(partnerProfile?.nickname || partnerProfile?.full_name || 'P')[0].toUpperCase()}
+                                            </div>
+                                        )}
+                                        {partnerProfile?.nickname || partnerProfile?.full_name?.split(' ')[0] || 'Parceiro'}
                                     </span>
                                 )}
                             </h4>

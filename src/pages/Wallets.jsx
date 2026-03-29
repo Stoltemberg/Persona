@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
@@ -15,7 +16,7 @@ import { TransferModal } from '../components/TransferModal';
 import { ArrowRightLeft } from 'lucide-react';
 
 export default function Wallets() {
-    const { user, isPro } = useAuth();
+    const { user, isPro, partnerProfile } = useAuth();
     const { addToast } = useToast();
     const [wallets, setWallets] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -161,40 +162,59 @@ export default function Wallets() {
                 </div>
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                    {wallets.map((wallet, index) => (
-                        <Card key={wallet.id} className="fade-in" style={{ animationDelay: `${index * 0.05}s` }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-                                <div style={{
-                                    padding: '1rem',
-                                    borderRadius: '14px',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    color: 'var(--text-main)',
-                                    border: '1px solid rgba(255,255,255,0.1)'
-                                }}>
-                                    {getIcon(wallet.type)}
-                                </div>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <button onClick={() => handleOpenEdit(wallet)} className="btn-ghost" title="Editar"><Edit2 size={18} /></button>
-                                    <button onClick={() => handleDelete(wallet.id)} className="btn-ghost" style={{ color: '#f64f59' }} title="Excluir"><Trash2 size={18} /></button>
-                                </div>
-                            </div>
-
-                            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                {wallet.name}
-                                {wallet.profile_id && wallet.profile_id !== user.id && (
-                                    <span style={{ 
-                                        fontSize: '0.65rem', 
-                                        padding: '0.2rem 0.5rem', 
-                                        background: 'rgba(246, 79, 89, 0.15)', 
-                                        color: '#f64f59', 
-                                        borderRadius: '12px', 
-                                        border: '1px solid rgba(246, 79, 89, 0.3)' 
+                    <AnimatePresence mode="popLayout">
+                        {wallets.map((wallet, index) => (
+                            <Card 
+                                key={wallet.id} 
+                                layout="position"
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                                transition={{ duration: 0.3, ease: 'easeOut', opacity: { delay: index * 0.04 }, y: { delay: index * 0.04 } }} 
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                                    <div style={{
+                                        padding: '1rem',
+                                        borderRadius: '14px',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        color: 'var(--text-main)',
+                                        border: '1px solid rgba(255,255,255,0.1)'
                                     }}>
-                                        Parceiro
-                                    </span>
-                                )}
-                            </h3>
-                            <p style={{ opacity: 0.7, fontSize: '0.9rem', textTransform: 'capitalize' }}>{wallet.type.replace('_', ' ')}</p>
+                                        {getIcon(wallet.type)}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <button onClick={() => handleOpenEdit(wallet)} className="btn-ghost" title="Editar"><Edit2 size={18} /></button>
+                                        <button onClick={() => handleDelete(wallet.id)} className="btn-ghost" style={{ color: '#f64f59' }} title="Excluir"><Trash2 size={18} /></button>
+                                    </div>
+                                </div>
+
+                                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    {wallet.name}
+                                    {wallet.profile_id && wallet.profile_id !== user.id && (
+                                        <span style={{ 
+                                            fontSize: '0.65rem', 
+                                            padding: '0.15rem 0.4rem', 
+                                            background: 'rgba(255,255,255,0.05)', 
+                                            color: 'var(--text-main)', 
+                                            borderRadius: '12px', 
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            fontWeight: 500,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.3rem'
+                                        }}>
+                                            {partnerProfile?.avatar_url ? (
+                                                <img src={partnerProfile.avatar_url} alt="Partner" style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: 'rgba(246, 79, 89, 0.2)', color: '#f64f59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700 }}>
+                                                    {(partnerProfile?.nickname || partnerProfile?.full_name || 'P')[0].toUpperCase()}
+                                                </div>
+                                            )}
+                                            {partnerProfile?.nickname || partnerProfile?.full_name?.split(' ')[0] || 'Parceiro'}
+                                        </span>
+                                    )}
+                                </h3>
+                                <p style={{ opacity: 0.7, fontSize: '0.9rem', textTransform: 'capitalize' }}>{wallet.type.replace('_', ' ')}</p>
 
                             <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Saldo Inicial</p>
@@ -204,7 +224,7 @@ export default function Wallets() {
                     ))}
 
                     {wallets.length === 0 && (
-                        <div style={{ gridColumn: '1/-1' }}>
+                        <motion.div key="empty" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} style={{ gridColumn: '1/-1' }}>
                             <EmptyState
                                 icon={Wallet}
                                 title="Nenhuma carteira encontrada"
@@ -212,8 +232,9 @@ export default function Wallets() {
                                 actionText="Criar Primeira Carteira"
                                 onAction={handleOpenNew}
                             />
-                        </div>
+                        </motion.div>
                     )}
+                    </AnimatePresence>
                 </div>
             )}
 

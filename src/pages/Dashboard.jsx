@@ -7,7 +7,7 @@ import { OnboardingTour } from '../components/OnboardingTour';
 import { Skeleton } from '../components/Skeleton';
 import { ArrowDownLeft, ArrowUpRight, PiggyBank } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { usePrivacy } from '../context/PrivacyContext';
 import { CountUp } from '../components/CountUp';
@@ -24,12 +24,13 @@ const listVariants = {
 };
 
 const itemVariants = {
-    hidden: { opacity: 0, scale: 0.95, y: 15 },
-    show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 400, damping: 30 } }
+    hidden: { opacity: 0, y: 8 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+    exit: { opacity: 0, y: -8, transition: { duration: 0.2, ease: 'easeOut' } }
 };
 
 export default function Dashboard() {
-    const { user, profile, signOut } = useAuth();
+    const { user, profile, partnerProfile, signOut } = useAuth();
     const { isPrivacyMode } = usePrivacy();
     const [balance, setBalance] = useState(0);
     const [expenses, setExpenses] = useState(0);
@@ -268,50 +269,70 @@ export default function Dashboard() {
                     initial="hidden"
                     animate="show"
                 >
-                    {loading ? (
-                        Array(3).fill(0).map((_, i) => (
-                            <Skeleton key={i} width="100%" height="64px" style={{ borderRadius: '16px' }} />
-                        ))
-                    ) : recentTransactions.length === 0 ? (
-                        <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>Sem movimentações recentes</p>
-                    ) : (
-                        recentTransactions.map((tx, index) => (
-                            <motion.div key={tx.id} variants={itemVariants} className={`glass-card dashboard-tx-card ${newTxId === tx.id ? 'animate-slide-in' : ''}`}>
-                                <div className="dashboard-tx-left">
-                                    <div className="dashboard-tx-icon" style={{
-                                        background: tx.type === 'income' ? 'rgba(52, 199, 89, 0.08)' : 'rgba(255, 69, 58, 0.08)',
-                                        color: tx.type === 'income' ? 'var(--color-success)' : 'var(--color-danger)'
-                                    }}>
-                                        {tx.type === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
-                                    </div>
-                                    <div>
-                                        <div className="dashboard-tx-desc" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                            {tx.description}
-                                            {tx.profile_id === profile?.partner_id && (
-                                                <span style={{ 
-                                                    fontSize: '0.6rem', 
-                                                    padding: '0.1rem 0.3rem', 
-                                                    background: 'hsla(var(--h-brand), var(--s-brand), var(--l-brand), 0.15)', 
-                                                    color: 'var(--color-brand)', 
-                                                    borderRadius: '4px', 
-                                                    fontWeight: 600,
-                                                    textTransform: 'uppercase'
-                                                }}>
-                                                    Parceiro
-                                                </span>
-                                            )}
+                    <AnimatePresence mode="popLayout">
+                        {loading ? (
+                            Array(3).fill(0).map((_, i) => (
+                                <Skeleton key={i} width="100%" height="64px" style={{ borderRadius: '16px', marginBottom: '10px' }} />
+                            ))
+                        ) : recentTransactions.length === 0 ? (
+                            <p key="empty" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>Sem movimentações recentes</p>
+                        ) : (
+                            recentTransactions.map((tx, index) => (
+                                <motion.div 
+                                    key={tx.id} 
+                                    variants={itemVariants} 
+                                    exit="exit"
+                                    layout="position"
+                                    className={`glass-card dashboard-tx-card ${newTxId === tx.id ? 'animate-slide-in' : ''}`}
+                                    style={{ marginBottom: '10px' }}
+                                >
+                                    <div className="dashboard-tx-left">
+                                        <div className="dashboard-tx-icon" style={{
+                                            background: tx.type === 'income' ? 'rgba(52, 199, 89, 0.08)' : 'rgba(255, 69, 58, 0.08)',
+                                            color: tx.type === 'income' ? 'var(--color-success)' : 'var(--color-danger)'
+                                        }}>
+                                            {tx.type === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
                                         </div>
-                                        <div className="dashboard-tx-date">{new Date(tx.date).toLocaleDateString('pt-BR')}</div>
+                                        <div>
+                                            <div className="dashboard-tx-desc" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                {tx.description}
+                                                {tx.profile_id === profile?.partner_id && (
+                                                    <span style={{ 
+                                                        fontSize: '0.65rem', 
+                                                        padding: '0.15rem 0.4rem', 
+                                                        background: 'rgba(255,255,255,0.05)', 
+                                                        color: 'var(--text-main)', 
+                                                        borderRadius: '12px', 
+                                                        border: '1px solid rgba(255,255,255,0.1)',
+                                                        fontWeight: 500,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '0.3rem',
+                                                        textTransform: 'none'
+                                                    }}>
+                                                        {partnerProfile?.avatar_url ? (
+                                                            <img src={partnerProfile.avatar_url} alt="Partner" style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+                                                        ) : (
+                                                            <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: 'rgba(246, 79, 89, 0.2)', color: '#f64f59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700 }}>
+                                                                {(partnerProfile?.nickname || partnerProfile?.full_name || 'P')[0].toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                        {partnerProfile?.nickname || partnerProfile?.full_name?.split(' ')[0] || 'Parceiro'}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="dashboard-tx-date">{new Date(tx.date).toLocaleDateString('pt-BR')}</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="dashboard-tx-amount" style={{
-                                    color: tx.type === 'income' ? 'var(--color-success)' : 'var(--text-main)'
-                                }}>
-                                    {isPrivacyMode ? '••••' : (tx.type === 'income' ? '+' : '-') + ` R$ ${parseFloat(tx.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                                </div>
-                            </motion.div>
-                        ))
-                    )}
+                                    <div className="dashboard-tx-amount" style={{
+                                        color: tx.type === 'income' ? 'var(--color-success)' : 'var(--text-main)'
+                                    }}>
+                                        {isPrivacyMode ? '••••' : (tx.type === 'income' ? '+' : '-') + ` R$ ${parseFloat(tx.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                    </div>
+                                </motion.div>
+                            ))
+                        )}
+                    </AnimatePresence>
                 </motion.div>
 
                 {recentTransactions.length > 0 && !loading && (

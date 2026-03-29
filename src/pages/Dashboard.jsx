@@ -30,7 +30,7 @@ const itemVariants = {
 };
 
 export default function Dashboard() {
-    const { user, profile, partnerProfile, signOut } = useAuth();
+    const { user, profile, partnerProfile, incomingRequest, fetchProfile, signOut } = useAuth();
     const { isPrivacyMode } = usePrivacy();
     const [balance, setBalance] = useState(0);
     const [expenses, setExpenses] = useState(0);
@@ -205,6 +205,47 @@ export default function Dashboard() {
     return (
         <div className="container fade-in" style={{ paddingBottom: '80px' }}>
             <OnboardingTour />
+
+            {incomingRequest && (
+                <div style={{ padding: '0 1.5rem', marginBottom: '1.5rem' }} className="fade-in">
+                    <Card style={{ background: 'linear-gradient(135deg, rgba(246,79,89,0.1), rgba(18,194,233,0.1))', border: '1px solid rgba(246,79,89,0.3)' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center', textAlign: 'center' }}>
+                            <div className="avatar-preview" style={{ width: '48px', height: '48px', fontSize: '1.2rem', margin: '0 auto', background: 'var(--bg-elevated)', border: '2px solid rgba(246,79,89,0.5)' }}>
+                                {incomingRequest.avatar_url ? (
+                                    <img src={incomingRequest.avatar_url} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    (incomingRequest.nickname || incomingRequest.full_name || 'U')[0].toUpperCase()
+                                )}
+                            </div>
+                            <div>
+                                <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-main)' }}>{incomingRequest.nickname} enviou um convite!</h3>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '4px 0 0' }}>Para compartilhar finanças no Modo Casal.</p>
+                            </div>
+                            <div style={{ display: 'flex', width: '100%', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                <Button 
+                                    style={{ flex: 1, justifyContent: 'center', background: 'var(--glass-border)', color: 'var(--text-main)' }}
+                                    onClick={async () => {
+                                        try {
+                                            await supabase.rpc('reject_partner_request');
+                                            fetchProfile(user.id);
+                                        } catch(e) { console.error(e) }
+                                    }}
+                                >Recusar</Button>
+                                <Button 
+                                    className="btn-primary"
+                                    style={{ flex: 1, justifyContent: 'center', background: 'linear-gradient(135deg, #f64f59, #f7797d)', color: 'white', border: 'none' }}
+                                    onClick={async () => {
+                                        try {
+                                            await supabase.rpc('accept_partner_request');
+                                            fetchProfile(user.id);
+                                        } catch(e) { console.error(e) }
+                                    }}
+                                >Aceitar</Button>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            )}
 
             <PageHeader
                 className="dashboard-header-centered"

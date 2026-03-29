@@ -24,7 +24,7 @@ const AVATAR_PRESETS = [
 ];
 
 export default function Settings() {
-    const { profile, user, isPro, partnerProfile, fetchProfile } = useAuth();
+    const { profile, user, isPro, partnerProfile, incomingRequest, outgoingRequest, fetchProfile } = useAuth();
     const { theme, changeTheme } = useTheme();
     const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
@@ -90,7 +90,7 @@ export default function Settings() {
                 throw error;
             }
 
-            addToast('Conta vinculada ao parceiro(a)!', 'success');
+            addToast('Convite enviado com sucesso! Aguarde a aprovação.', 'success');
             setPartnerTagInput('');
             setIsCoupleModalOpen(false);
             await fetchProfile(user.id);
@@ -295,13 +295,45 @@ export default function Settings() {
                                 Desfazer Vínculo
                             </Button>
                         </div>
+                    ) : outgoingRequest ? (
+                        <div style={{ background: 'var(--bg-elevated)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                            <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
+                                Convite pendente enviado para <strong>{outgoingRequest.nickname}</strong>. Aguardando aceite.
+                            </p>
+                            <Button 
+                                variant="ghost" 
+                                style={{ width: '100%', color: 'var(--text-main)', border: '1px solid var(--glass-border)', justifyContent: 'center' }}
+                                onClick={async () => {
+                                    setLoading(true);
+                                    try {
+                                        await supabase.rpc('cancel_partner_request');
+                                        addToast('Convite cancelado.', 'info');
+                                        fetchProfile(user.id);
+                                    } catch(e) { console.error(e) } finally { setLoading(false) }
+                                }}
+                                disabled={loading}
+                            >
+                                Cancelar Convite
+                            </Button>
+                        </div>
+                    ) : incomingRequest ? (
+                        <div style={{ background: 'var(--bg-elevated)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                            <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
+                                <strong>{incomingRequest.nickname}</strong> enviou um convite! Aceite-o no seu Dashboard.
+                            </p>
+                            <Link to="/" style={{textDecoration: 'none'}}>
+                                <Button type="button" className="btn-primary" style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', width: '100%', justifyContent: 'center' }}>
+                                    Ir para o Dashboard
+                                </Button>
+                            </Link>
+                        </div>
                     ) : (
                         <div>
                             <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
                                 Compartilhe transações, limites e carteiras com seu(ua) parceiro(a). O Modo Casal sincroniza ambas as contas perfeitamente.
                             </p>
                             <Button type="button" className="btn-primary" onClick={() => setIsCoupleModalOpen(true)} style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', width: '100%', justifyContent: 'center' }}>
-                                Vincular Parceiro(a)
+                                Convidar Parceiro(a)
                             </Button>
                         </div>
                     )}
@@ -419,7 +451,7 @@ export default function Settings() {
             </div>
             <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
 
-            <Modal isOpen={isCoupleModalOpen} onClose={() => setIsCoupleModalOpen(false)} title="Vincular Conta">
+            <Modal isOpen={isCoupleModalOpen} onClose={() => setIsCoupleModalOpen(false)} title="Enviar Convite">
                 <form onSubmit={handleLinkPartner}>
                     <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--text-muted)' }}>
                         Digite o ID da sua esposa, marido ou parceiro(a) para compartilhar finanças. 
@@ -441,7 +473,7 @@ export default function Settings() {
                             Cancelar
                         </Button>
                         <Button type="submit" className="btn-primary" loading={loading} style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', flex: 1, justifyContent: 'center' }}>
-                            Vincular
+                            Enviar
                         </Button>
                     </div>
                 </form>

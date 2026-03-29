@@ -13,6 +13,8 @@ export function AuthProvider({ children }) {
     const [role, setRole] = useState('user');
     const [planTier, setPlanTier] = useState('free');
     const [partnerProfile, setPartnerProfile] = useState(null);
+    const [incomingRequest, setIncomingRequest] = useState(null);
+    const [outgoingRequest, setOutgoingRequest] = useState(null);
     const [lastPartnerUpdate, setLastPartnerUpdate] = useState(localStorage.getItem('last_partner_update') || null);
     const [lastViewedTransactions, setLastViewedTransactions] = useState(localStorage.getItem('last_viewed_transactions') || null);
 
@@ -128,8 +130,30 @@ export function AuthProvider({ children }) {
                         .eq('id', finalData.partner_id)
                         .single();
                     if (pData) setPartnerProfile(pData);
+                    setIncomingRequest(null);
+                    setOutgoingRequest(null);
                 } else {
                     setPartnerProfile(null);
+                    
+                    if (finalData.pending_partner_id) {
+                        // Someone invited me
+                        const { data: incData } = await supabase
+                            .from('profiles')
+                            .select('nickname, discriminator, full_name, avatar_url')
+                            .eq('id', finalData.pending_partner_id)
+                            .maybeSingle();
+                        setIncomingRequest(incData || null);
+                        setOutgoingRequest(null);
+                    } else {
+                        setIncomingRequest(null);
+                        // I invited someone
+                        const { data: outData } = await supabase
+                            .from('profiles')
+                            .select('nickname, discriminator, full_name, avatar_url')
+                            .eq('pending_partner_id', userId)
+                            .maybeSingle();
+                        setOutgoingRequest(outData || null);
+                    }
                 }
             }
 
@@ -196,6 +220,7 @@ export function AuthProvider({ children }) {
     return (
         <AuthContext.Provider value={{ 
             user, profile, isPro, role, planTier, partnerProfile, 
+            incomingRequest, outgoingRequest,
             signUp, signIn, signOut, loading, fetchProfile,
             lastPartnerUpdate, lastViewedTransactions, markTransactionsAsRead, hasNewPartnerUpdates
         }}>

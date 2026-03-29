@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { createPortal } from 'react-dom';
 
 export function Sidebar() {
-    const { signOut, role } = useAuth();
+    const { signOut, role, hasNewPartnerUpdates } = useAuth();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
     const { isEventMode, toggleEventMode } = useEvent();
 
@@ -55,7 +55,8 @@ export function Sidebar() {
                         to={item.path}
                         className={({ isActive }) => clsx(
                             'nav-item',
-                            isActive ? 'active' : ''
+                            isActive ? 'active' : '',
+                            item.label === 'Transações' && hasNewPartnerUpdates && 'indicator-pulse'
                         )}
                     >
                         {({ isActive }) => (

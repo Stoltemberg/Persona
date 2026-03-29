@@ -13,6 +13,7 @@ import { usePrivacy } from '../context/PrivacyContext';
 import { CountUp } from '../components/CountUp';
 import { PageHeader } from '../components/PageHeader';
 import { UpcomingBills } from '../components/UpcomingBills';
+import { PartnerFilter } from '../components/PartnerFilter';
 
 const listVariants = {
     hidden: { opacity: 0 },
@@ -38,6 +39,7 @@ export default function Dashboard() {
     const [wallets, setWallets] = useState([]);
     const [primaryGoal, setPrimaryGoal] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [activeFilter, setActiveFilter] = useState('all');
 
     const [newTxId, setNewTxId] = useState(null);
 
@@ -59,7 +61,7 @@ export default function Dashboard() {
                 window.removeEventListener('supabase-sync', handleUpdate);
             };
         }
-    }, [user]);
+    }, [user, activeFilter]);
 
     const checkRecurring = async () => {
         try {
@@ -108,10 +110,17 @@ export default function Dashboard() {
             const { data, error } = await supabase
                 .from('transactions')
                 .select('*')
-
                 .order('date', { ascending: false });
 
             if (error) throw error;
+
+            // Filter transactions based on activeFilter
+            const filteredData = data.filter(tx => {
+                if (activeFilter === 'all') return true;
+                if (activeFilter === 'me') return tx.profile_id === user.id;
+                if (activeFilter === 'partner') return tx.profile_id === profile?.partner_id;
+                return true;
+            });
 
             let totalIncome = 0;
             let totalExpense = 0;
@@ -120,7 +129,7 @@ export default function Dashboard() {
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
 
-            data.forEach(tx => {
+            filteredData.forEach(tx => {
                 const amount = parseFloat(tx.amount);
                 const date = new Date(tx.date);
 
@@ -154,15 +163,22 @@ export default function Dashboard() {
 
             let walletsWithBalance = [];
             if (walletsData) {
-                walletsWithBalance = walletsData.map(w => {
-                    const walletTxs = data.filter(tx => tx.wallet_id === w.id);
-                    const income = walletTxs.filter(t => t.type === 'income').reduce((acc, t) => acc + parseFloat(t.amount), 0);
-                    const expense = walletTxs.filter(t => t.type === 'expense').reduce((acc, t) => acc + parseFloat(t.amount), 0);
-                    return {
-                        ...w,
-                        current_balance: (parseFloat(w.initial_balance) || 0) + income - expense
-                    };
-                });
+                walletsWithBalance = walletsData
+                    .filter(w => {
+                        if (activeFilter === 'all') return true;
+                        if (activeFilter === 'me') return w.profile_id === user.id;
+                        if (activeFilter === 'partner') return w.profile_id === profile?.partner_id;
+                        return true;
+                    })
+                    .map(w => {
+                        const walletTxs = filteredData.filter(tx => tx.wallet_id === w.id);
+                        const income = walletTxs.filter(t => t.type === 'income').reduce((acc, t) => acc + parseFloat(t.amount), 0);
+                        const expense = walletTxs.filter(t => t.type === 'expense').reduce((acc, t) => acc + parseFloat(t.amount), 0);
+                        return {
+                            ...w,
+                            current_balance: (parseFloat(w.initial_balance) || 0) + income - expense
+                        };
+                    });
             }
 
             setBalance(totalIncome - totalExpense);
@@ -170,8 +186,8 @@ export default function Dashboard() {
             setSavings(totalSavings);
             setPrimaryGoal(goal);
             setWallets(walletsWithBalance);
-            setRecentTransactions(data.slice(0, 5));
-            setAllTransactions(data);
+            setRecentTransactions(filteredData.slice(0, 5));
+            setAllTransactions(filteredData);
 
             if (newTransactionId) {
                 setNewTxId(newTransactionId);
@@ -193,6 +209,10 @@ export default function Dashboard() {
                 className="dashboard-header-centered"
                 title={<span>Olá, <span style={{ fontWeight: 600 }}>{profile?.full_name?.split(' ')[0] || 'Usuário'}</span></span>}
             />
+
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+            </div>
 
             {/* Hero Balance Section */}
             <section className="dashboard-balance-section">
@@ -267,7 +287,22 @@ export default function Dashboard() {
                                         {tx.type === 'income' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
                                     </div>
                                     <div>
-                                        <div className="dashboard-tx-desc">{tx.description}</div>
+                                        <div className="dashboard-tx-desc" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                            {tx.description}
+                                            {tx.profile_id === profile?.partner_id && (
+                                                <span style={{ 
+                                                    fontSize: '0.6rem', 
+                                                    padding: '0.1rem 0.3rem', 
+                                                    background: 'hsla(var(--h-brand), var(--s-brand), var(--l-brand), 0.15)', 
+                                                    color: 'var(--color-brand)', 
+                                                    borderRadius: '4px', 
+                                                    fontWeight: 600,
+                                                    textTransform: 'uppercase'
+                                                }}>
+                                                    Parceiro
+                                                </span>
+                                            )}
+                                        </div>
                                         <div className="dashboard-tx-date">{new Date(tx.date).toLocaleDateString('pt-BR')}</div>
                                     </div>
                                 </div>

@@ -13,6 +13,8 @@ export function AuthProvider({ children }) {
     const [role, setRole] = useState('user');
     const [planTier, setPlanTier] = useState('free');
     const [partnerProfile, setPartnerProfile] = useState(null);
+    const [lastPartnerUpdate, setLastPartnerUpdate] = useState(localStorage.getItem('last_partner_update') || null);
+    const [lastViewedTransactions, setLastViewedTransactions] = useState(localStorage.getItem('last_viewed_transactions') || null);
 
     useEffect(() => {
         // Check active session
@@ -46,8 +48,13 @@ export function AuthProvider({ children }) {
         const handleRealtimePayload = (payload) => {
             console.log('Realtime change received!', payload);
             
-            // Re-fire specific event if needed by other components originally
-            if (payload.eventType === 'INSERT') {
+            if (payload.eventType === 'INSERT' && payload.table === 'transactions') {
+                // If the new transaction is from the partner
+                if (payload.new?.profile_id === profile?.partner_id) {
+                    const now = new Date().toISOString();
+                    setLastPartnerUpdate(now);
+                    localStorage.setItem('last_partner_update', now);
+                }
                 window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: { id: payload.new?.id } }));
             }
             
@@ -171,8 +178,20 @@ export function AuthProvider({ children }) {
         if (error) throw error;
     };
 
+    const markTransactionsAsRead = () => {
+        const now = new Date().toISOString();
+        setLastViewedTransactions(now);
+        localStorage.setItem('last_viewed_transactions', now);
+    };
+
+    const hasNewPartnerUpdates = lastPartnerUpdate && (!lastViewedTransactions || lastPartnerUpdate > lastViewedTransactions);
+
     return (
-        <AuthContext.Provider value={{ user, profile, isPro, role, planTier, partnerProfile, signUp, signIn, signOut, loading, fetchProfile }}>
+        <AuthContext.Provider value={{ 
+            user, profile, isPro, role, planTier, partnerProfile, 
+            signUp, signIn, signOut, loading, fetchProfile,
+            lastPartnerUpdate, lastViewedTransactions, markTransactionsAsRead, hasNewPartnerUpdates
+        }}>
             {!loading && children}
         </AuthContext.Provider>
     );

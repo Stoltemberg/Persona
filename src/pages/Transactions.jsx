@@ -16,14 +16,16 @@ import { getSmartCategory } from '../utils/smartCategories';
 import { TransactionItem } from '../components/TransactionItem';
 import { DateRangePicker } from '../components/DateRangePicker';
 import { PageHeader } from '../components/PageHeader';
+import { PartnerFilter } from '../components/PartnerFilter';
 
 export default function Transactions() {
-    const { user } = useAuth();
+    const { user, profile, markTransactionsAsRead } = useAuth();
     const { addToast } = useToast();
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [activeFilter, setActiveFilter] = useState('all');
 
     // Form State
     const [transactionToEdit, setTransactionToEdit] = useState(null);
@@ -48,6 +50,7 @@ export default function Transactions() {
 
     useEffect(() => {
         if (user) {
+            markTransactionsAsRead();
             fetchTransactions();
             fetchCategories();
             fetchWallets();
@@ -270,7 +273,11 @@ export default function Transactions() {
                         Nova
                     </Button>
                 </div>
-            </PageHeader>      {/* Date Filters */}
+            </PageHeader>
+
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+            </div>
 
             {/* Date Filters */}
             <div className="date-filters" style={{ marginBottom: '1.5rem' }}>
@@ -319,6 +326,11 @@ export default function Transactions() {
                     <AnimatePresence mode="popLayout">
                         {transactions
                             .filter(tx => {
+                                // First apply partner filter
+                                if (activeFilter === 'me' && tx.profile_id !== user.id) return false;
+                                if (activeFilter === 'partner' && tx.profile_id !== profile?.partner_id) return false;
+
+                                // Then apply date filter
                                 if (!startDate && !endDate) return true;
                                 const txDate = new Date(tx.date);
                                 txDate.setHours(0, 0, 0, 0);

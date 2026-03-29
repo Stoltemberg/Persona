@@ -5,11 +5,13 @@ import { Card } from '../components/Card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import { PageHeader } from '../components/PageHeader';
+import { PartnerFilter } from '../components/PartnerFilter';
 
 export default function Analysis({ isTab }) {
-    const { user } = useAuth();
+    const { user, profile } = useAuth();
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [activeFilter, setActiveFilter] = useState('all');
 
     // Date State (Native JS)
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -49,9 +51,11 @@ export default function Analysis({ isTab }) {
     // --- Filtering & Stats ---
     const getMonthlyTransactions = () => {
         return transactions.filter(tx => {
+            // Apply Partner Filter
+            if (activeFilter === 'me' && tx.profile_id !== user.id) return false;
+            if (activeFilter === 'partner' && tx.profile_id !== profile?.partner_id) return false;
+
             const txDate = new Date(tx.date); // Assumes YYYY-MM-DD or ISO
-            // Adjust for timezone differences if necessary, but simple comparison usually works for local apps
-            // Better: compare Month and Year indices
             return txDate.getMonth() === currentDate.getMonth() &&
                 txDate.getFullYear() === currentDate.getFullYear();
         });
@@ -109,6 +113,10 @@ export default function Analysis({ isTab }) {
         }
 
         transactions.forEach(tx => {
+            // Apply Partner Filter for trends too
+            if (activeFilter === 'me' && tx.profile_id !== user.id) return;
+            if (activeFilter === 'partner' && tx.profile_id !== profile?.partner_id) return;
+
             const txDate = new Date(tx.date);
             const match = trend.find(t => t.monthIndex === txDate.getMonth() && t.year === txDate.getFullYear());
             if (match) {
@@ -133,6 +141,10 @@ export default function Analysis({ isTab }) {
                     subtitle="Resumo financeiro completo"
                 />
             )}
+
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+            </div>
 
             {/* Month Selector */}
             <div className="glass-pill-nav">

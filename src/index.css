@@ -9,26 +9,38 @@
    1. Design Tokens (CSS Variables)
    ========================================= */
 :root {
-  /* Premium Wealth Management / Onyx & Gold */
+  /* HSL Base Tokens for Premium Flexibility */
+  --h-brand: 45;
+  --s-brand: 65%;
+  --l-brand: 53%;
+
+  --h-success: 162;
+  --s-success: 41%;
+  --l-success: 27%;
+
+  --h-danger: 0;
+  --s-danger: 52%;
+  --l-danger: 35%;
+
+  /* Color System */
   --bg-deep: #050505;
   --bg-card: #0A0A0A;
   --bg-panel: var(--bg-card);
 
-  /* Semantic Colors — Muted, Elegant */
-  --color-brand: #D4AF37;
-  --color-success: #285E4D;
-  --color-danger: #8B2C2C;
+  --color-brand: hsl(var(--h-brand), var(--s-brand), var(--l-brand));
+  --color-success: hsl(var(--h-success), var(--s-success), var(--l-success));
+  --color-danger: hsl(var(--h-danger), var(--s-danger), var(--l-danger));
   --color-warning: #B07D35;
   --color-info: #3E5A74;
   --color-purple: #5A445D;
 
-  /* Glass Materials - Luxury */
-  --glass-bg: rgba(10, 10, 10, 0.6);
-  --glass-border: rgba(212, 175, 55, 0.15);
-  --glass-border-highlight: rgba(212, 175, 55, 0.3);
-  --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  --glass-blur: blur(24px);
-  --glass-saturation: saturate(150%);
+  /* Glass Materials - Luxury Layering */
+  --glass-bg: rgba(10, 10, 10, 0.75);
+  --glass-border: hsla(var(--h-brand), var(--s-brand), var(--l-brand), 0.15);
+  --glass-border-highlight: hsla(var(--h-brand), var(--s-brand), var(--l-brand), 0.35);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 1px hsla(var(--h-brand), var(--s-brand), var(--l-brand), 0.2);
+  --glass-blur: blur(28px);
+  --glass-saturation: saturate(180%);
 
   /* Text Colors */
   --text-main: #F3EFEA;
@@ -36,21 +48,21 @@
   --text-muted: #5C5853;
 
   /* Input Surfaces */
-  --input-bg: rgba(255, 255, 255, 0.03);
+  --input-bg: rgba(255, 255, 255, 0.04);
 
-  /* Geometry — Sharper, more editorial */
+  /* Geometry */
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
   --radius-pill: 9999px;
 
   /* Typography */
   font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 15px;
   font-weight: 400;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 
   color-scheme: dark;
 }
@@ -144,6 +156,44 @@ p {
 .dashboard-stat-value,
 .dashboard-tx-amount {
   font-variant-numeric: tabular-nums;
+}
+
+/* Indicators & Animations */
+.indicator-pulse {
+  position: relative;
+}
+
+.indicator-pulse::after {
+  content: '';
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 8px;
+  height: 8px;
+  background: var(--color-brand);
+  border-radius: 50%;
+  box-shadow: 0 0 0 rgba(212, 175, 55, 0.4);
+  animation: pulse-ring 1.5s infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(212, 175, 55, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+.mesh-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-color: var(--bg-deep);
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(var(--h-brand), var(--s-brand), var(--l-brand), 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(var(--h-success), var(--s-success), var(--l-success), 0.05) 0px, transparent 50%);
+  filter: blur(100px);
 }
 
 /* Light mode text */

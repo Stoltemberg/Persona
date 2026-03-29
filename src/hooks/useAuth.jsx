@@ -45,6 +45,12 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         if (!user) return;
 
+        // Ensure partner data is freshly fetched if app is re-focused
+        const handleFocus = () => {
+            fetchProfile(user.id);
+        };
+        window.addEventListener('focus', handleFocus);
+
         const handleRealtimePayload = (payload) => {
             console.log('Realtime change received!', payload);
             
@@ -70,6 +76,7 @@ export function AuthProvider({ children }) {
             .subscribe();
 
         return () => {
+            window.removeEventListener('focus', handleFocus);
             supabase.removeChannel(channel);
         };
     }, [user]);

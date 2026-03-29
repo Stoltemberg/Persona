@@ -84,7 +84,7 @@ export default function Settings() {
         }
         setLoading(true);
         try {
-            const { data, error } = await supabase.rpc('link_partner', { partner_tag: partnerTagInput.toLowerCase() });
+            const { data, error } = await supabase.rpc('link_partner', { partner_tag: partnerTagInput.trim() });
             
             if (error) {
                 throw error;

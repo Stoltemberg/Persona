@@ -1,10 +1,17 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { ArrowLeft } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 export default function Privacy() {
     return (
-        <div className="fade-in" style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
+        <main className="fade-in" style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
+            <Helmet>
+                <title>Política de Privacidade | Persona</title>
+                <meta name="description" content="Política de Privacidade do Persona. Saiba como lidamos com seus dados e garantimos a sua segurança financeira." />
+                <link rel="canonical" href="https://persona.dev.br/privacy" />
+            </Helmet>
+
             <Link to="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem', color: 'var(--text-muted)' }}>
                 <ArrowLeft size={20} /> Voltar
             </Link>
@@ -26,6 +33,6 @@ export default function Privacy() {
 
                 <p style={{ marginTop: '2rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>Última atualização: Janeiro de 2026</p>
             </div>
-        </div>
+        </main>
     );
 }

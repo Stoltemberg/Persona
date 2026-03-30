@@ -6,6 +6,7 @@ import { Button } from '../components/Button';
 import { Navigate } from 'react-router-dom';
 import { TrendingUp, Plane, Zap, Shield, Globe, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 
 export default function Login() {
     const { signIn, signUp, user } = useAuth();
@@ -43,7 +44,12 @@ export default function Login() {
     };
 
     return (
-        <div className="login-container">
+        <main className="login-container">
+            <Helmet>
+                <title>{isSignUp ? 'Criar Conta | Persona' : 'Acessar Persona | Login'}</title>
+                <meta name="description" content="Acesse ou crie sua conta no Persona. O gerenciador financeiro mais inteligente e elegante." />
+                <link rel="canonical" href="https://persona.dev.br/login" />
+            </Helmet>
 
             {/* Background Effects - Removed for Minimalism */}
 
@@ -211,6 +217,6 @@ export default function Login() {
                     </motion.div>
                 </div>
             </div>
-        </div>
+        </main>
     );
 }

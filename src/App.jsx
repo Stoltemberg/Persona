@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from './hooks/useAuth';
 import React, { Suspense } from 'react';
 import { Layout } from './components/Layout';
+import { HelmetProvider } from 'react-helmet-async';
 
 // Lazy Load Pages
 // Lazy Load Pages (Core App)
@@ -49,11 +50,13 @@ const Home = () => {
 
 function App() {
   return (
-    <Router>
-      <Suspense fallback={<LoadingScreen />}>
-        <AnimatedRoutes />
-      </Suspense>
-    </Router>
+    <HelmetProvider>
+      <Router>
+        <Suspense fallback={<LoadingScreen />}>
+          <AnimatedRoutes />
+        </Suspense>
+      </Router>
+    </HelmetProvider>
   );
 }
 

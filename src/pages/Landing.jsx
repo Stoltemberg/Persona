@@ -2,12 +2,31 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { ArrowRight, Check, Shield, Zap, LayoutDashboard, Database } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { Helmet } from 'react-helmet-async';
 
 export default function Landing() {
     const { theme } = useTheme();
 
     return (
-        <div className="fade-in" style={{ overflowX: 'hidden' }}>
+        <main className="fade-in" style={{ overflowX: 'hidden' }}>
+            <Helmet>
+                <title>Persona - Organize suas Finanças</title>
+                <meta name="description" content="O gerenciador financeiro mais bonito e intuitivo para o seu dia a dia. Controle gastos, crie metas e alcance a liberdade financeira." />
+                <script type="application/ld+json">
+                    {`
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "SoftwareApplication",
+                            "name": "Persona",
+                            "applicationCategory": "FinanceApplication",
+                            "operatingSystem": "Web",
+                            "url": "https://persona.dev.br/",
+                            "description": "O gerenciador financeiro mais bonito e intuitivo para o seu dia a dia."
+                        }
+                    `}
+                </script>
+            </Helmet>
+
             {/* Header */}
             <header style={{
                 position: 'fixed',
@@ -88,7 +107,7 @@ export default function Landing() {
             </section>
 
             {/* Features */}
-            <section style={{ padding: '4rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
+            <section aria-label="Recursos" style={{ padding: '4rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                     <FeatureCard icon={LayoutDashboard} title="Controle Total" text="Dashboard intuitivo com todas as suas contas em um só lugar." />
                     <FeatureCard icon={Database} title="Organização Automática" text="Categorias inteligentes e filtros poderosos para suas transações." />
@@ -131,27 +150,28 @@ export default function Landing() {
                     <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Termos de Uso</Link>
                     <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacidade</Link>
                 </div>
-                <p>© 2026 Persona Finance. Todos os direitos reservados.</p>
+                <p>© 2026 Persona Finance. CNPJ: 00.000.000/0001-00. Todos os direitos reservados.</p>
+                <address style={{ marginTop: '1rem', fontStyle: 'normal', fontSize: '0.8rem', opacity: 0.6 }}>São Paulo, SP - Brasil</address>
             </footer>
-        </div>
+        </main>
     );
 }
 
 function FeatureCard({ icon: Icon, title, text }) {
     return (
-        <div className="glass-card" style={{ padding: '2rem' }}>
+        <article className="glass-card" style={{ padding: '2rem' }}>
             <div style={{ padding: '1rem', background: 'rgba(17, 153, 142, 0.1)', borderRadius: '12px', width: 'fit-content', marginBottom: '1rem', color: '#38ef7d' }}>
                 <Icon size={24} />
             </div>
             <h3 style={{ marginBottom: '0.5rem' }}>{title}</h3>
             <p style={{ color: 'var(--text-muted)' }}>{text}</p>
-        </div>
+        </article>
     );
 }
 
 function PricingCard({ title, price, features, featured, buttonText = "Começar", color = "#38ef7d" }) {
     return (
-        <div className="glass-card" style={{
+        <article className="glass-card" style={{
             padding: '2rem',
             width: '100%',
             maxWidth: '350px',
@@ -197,6 +217,6 @@ function PricingCard({ title, price, features, featured, buttonText = "Começar"
                     {buttonText}
                 </Button>
             </Link>
-        </div>
+        </article>
     );
 }

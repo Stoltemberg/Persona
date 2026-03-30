@@ -1782,54 +1782,94 @@ option {
 }
 
 /* =========================================
-   25. Mobile Navigation — Dock Style
+   25. Mobile Navigation — iOS 26 Liquid Glass 
    ========================================= */
-.mobile-bottom-bar {
+.liquid-nav-container {
   position: fixed;
-  bottom: 1.5rem;
-  left: 1rem;
-  right: 1rem;
-  height: 64px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0 1.25rem 2rem 1.25rem; /* Safe area padding */
+  z-index: 9999;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  pointer-events: none; /* Let clicks pass through padding */
+}
+
+.liquid-glass-pill {
+  pointer-events: auto; /* Re-enable clicks on the pill itself */
+  display: flex;
   align-items: center;
-  padding: 0 1rem;
-
-  /* True Liquid Glass: Highly transparent dark base + Extreme Blur */
-  background: rgba(10, 10, 10, 0.45);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
-
-  border-radius: 40px;
-  /* Full pill shape */
-  z-index: 100;
-
-  /* Subtle inner light + Champagne Gold outer rim */
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 10px 40px rgba(0, 0, 0, 0.6);
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  height: 64px;
+  padding: 0 0.5rem;
+  border-radius: 40px; /* Full pill */
+  
+  /* Authentic Liquid Glass 26+ formula */
+  background: rgba(10, 10, 11, 0.45);
+  backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
-/* Light Mode Dock */
-.light .mobile-bottom-bar,
-html.light .mobile-bottom-bar,
-:root.light .mobile-bottom-bar {
-  background: rgba(255, 255, 255, 0.45) !important;
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 10px 40px rgba(0, 0, 0, 0.1);
+.light .liquid-glass-pill {
+  background: rgba(250, 250, 252, 0.5);
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0,0,0,0.05);
 }
 
-.mobile-nav-item {
+.liquid-nav-item {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
-  background: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: transparent;
   border: none;
   cursor: pointer;
-  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
   color: var(--text-muted);
-  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Base icon state */
+.liquid-icon {
+  position: relative;
+  z-index: 2; /* Sit above bubble */
+  transition: color 0.3s ease;
+}
+
+.liquid-nav-item.active .liquid-icon {
+  color: var(--color-brand);
+}
+
+.liquid-fab-override {
+  color: var(--text-main) !important;
+}
+
+.liquid-fab-override svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* The actual fluid bubble indicator */
+.liquid-bubble {
+  position: absolute;
+  inset: 0;
+  background: rgba(212, 175, 55, 0.15); /* Brand tint */
+  border-radius: 50%;
+  z-index: 1;
+  /* Optional: Light inner glow */
+  box-shadow: inset 0 0 12px rgba(212, 175, 55, 0.2);
+}
+
+.light .liquid-bubble {
+  background: rgba(0, 0, 0, 0.06);
+  box-shadow: none;
 }
 
 /* =========================================
@@ -2532,7 +2572,7 @@ html.light .mobile-bottom-bar,
    ========================================= */
 @media (max-width: 768px) {
   .container {
-    padding: 1.5rem 1rem !important; /* Tighter to the edge */
+    padding: 1.5rem 1rem calc(1.5rem + 100px) !important; /* Tighter to the edge, but extra padding for Liquid Glass floating Nav */
   }
 
   .dashboard-stats-grid {

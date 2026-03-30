@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, PieChart, Wallet, Menu as MenuIcon, X, PiggyBank, Repeat, Calendar, TrendingUp, Eye, EyeOff, Plane, Tag } from 'lucide-react';
-import clsx from 'clsx';
+import { LayoutDashboard, Receipt, Target, Settings, Wallet, Menu as MenuIcon, X, Repeat, Plane, EyeOff, Eye, Tag } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import { motion } from 'framer-motion';
 import { FAB } from './FAB';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
@@ -13,19 +13,15 @@ export function MobileNav() {
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
     const { isEventMode, toggleEventMode } = useEvent();
 
-    // Items for the bottom bar (Left of FAB and Right of FAB)
-    // We want: Dashboard, Transactions | FAB | Fixos, Menu
     const barItemsLeft = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-        { icon: Receipt, label: 'Transações', path: '/transactions' },
+        { id: 'dashboard', icon: LayoutDashboard, path: '/dashboard' },
+        { id: 'transactions', icon: Receipt, path: '/transactions' },
     ];
 
     const barItemsRight = [
-        { icon: Repeat, label: 'Fixos', path: '/recurring' },
-        // The last slot is the menu button, handled separately
+        { id: 'recurring', icon: Repeat, path: '/recurring' },
     ];
 
-    // Items for the hamburger menu overlay
     const menuItems = [
         { icon: Wallet, label: 'Carteiras', path: '/wallets' },
         { icon: Tag, label: 'Categorias', path: '/categories' },
@@ -35,107 +31,116 @@ export function MobileNav() {
 
     return (
         <>
-            {/* Main Bottom Bar */}
-            <nav className="mobile-bottom-bar">
-                {/* Left Side */}
-                {barItemsLeft.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        onClick={() => setIsMenuOpen(false)}
-                        className="mobile-nav-item"
+            <motion.nav 
+                className="liquid-nav-container"
+                initial={{ y: 100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            >
+                <div className="liquid-glass-pill">
+                    {barItemsLeft.map((item) => {
+                        const isActive = location.pathname.startsWith(item.path);
+                        return (
+                            <NavLink
+                                key={item.id}
+                                to={item.path}
+                                onClick={() => setIsMenuOpen(false)}
+                                className={`liquid-nav-item ${isActive ? 'active' : ''}`}
+                            >
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="liquid-bubble"
+                                        className="liquid-bubble"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+                                <item.icon className="liquid-icon" size={24} strokeWidth={isActive ? 2.5 : 1.5} />
+                            </NavLink>
+                        );
+                    })}
+
+                    {/* Central Action (FAB translated to internal glass item) */}
+                    <div className="liquid-nav-item">
+                        <FAB
+                            className="liquid-fab-override"
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: 'transparent',
+                                border: 'none',
+                                color: 'inherit',
+                                padding: 0,
+                                boxShadow: 'none'
+                            }}
+                        />
+                    </div>
+
+                    {barItemsRight.map((item) => {
+                        const isActive = location.pathname.startsWith(item.path);
+                        return (
+                            <NavLink
+                                key={item.id}
+                                to={item.path}
+                                onClick={() => setIsMenuOpen(false)}
+                                className={`liquid-nav-item ${isActive ? 'active' : ''}`}
+                            >
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="liquid-bubble"
+                                        className="liquid-bubble"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+                                <item.icon className="liquid-icon" size={24} strokeWidth={isActive ? 2.5 : 1.5} />
+                            </NavLink>
+                        );
+                    })}
+
+                    <button
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className={`liquid-nav-item ${isMenuOpen ? 'active' : ''}`}
                     >
-                        {({ isActive }) => (
-                            <div className={`mobile-nav-icon`} style={{
-                                color: isActive ? 'var(--color-brand)' : 'var(--text-muted)',
-                                transform: isActive ? 'scale(1.1)' : 'none',
-                                transition: 'all 0.2s ease'
-                            }}>
-                                <item.icon size={24} strokeWidth={isActive ? 2 : 1.5} />
-                            </div>
+                        {isMenuOpen && (
+                            <motion.div
+                                layoutId="liquid-bubble"
+                                className="liquid-bubble"
+                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                            />
                         )}
-                    </NavLink>
-                ))}
-
-                {/* Center FAB */}
-                <FAB
-                    className="mobile-center-fab"
-                    style={{
-                        position: 'relative',
-                        width: '46px',
-                        height: '46px',
-                        borderRadius: '50%',
-                        background: 'transparent',
-                        boxShadow: 'none',
-                        flexShrink: 0,
-                        color: 'var(--text-muted)'
-                    }}
-                />
-
-                {/* Right Side */}
-                {barItemsRight.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        onClick={() => setIsMenuOpen(false)}
-                        className="mobile-nav-item"
-                    >
-                        {({ isActive }) => (
-                            <div className={`mobile-nav-icon`} style={{
-                                color: isActive ? 'var(--color-brand)' : 'var(--text-muted)',
-                                transform: isActive ? 'scale(1.1)' : 'none',
-                                transition: 'all 0.2s ease'
-                            }}>
-                                <item.icon size={24} strokeWidth={isActive ? 2 : 1.5} />
-                            </div>
-                        )}
-                    </NavLink>
-                ))}
-
-                {/* Menu Toggle (Always last on right) */}
-                <button
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="mobile-nav-item"
-                    style={{ color: isMenuOpen ? 'var(--color-brand)' : 'var(--text-muted)' }}
-                >
-                    {isMenuOpen ? <X size={24} strokeWidth={2} /> : <MenuIcon size={24} strokeWidth={1.5} />}
-                </button>
-            </nav>
+                        {isMenuOpen ? <X className="liquid-icon" size={24} strokeWidth={2.5} /> : <MenuIcon className="liquid-icon" size={24} strokeWidth={1.5} />}
+                    </button>
+                </div>
+            </motion.nav>
 
             {/* Menu Overlay */}
             {isMenuOpen && createPortal(
-                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)}>
-                    <div
+                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)} style={{ zIndex: 9998 }}>
+                    <motion.div
+                        initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 50, scale: 0.95 }}
+                        transition={{ type: "spring", damping: 25, stiffness: 300 }}
                         className="mobile-menu-grid"
                         onClick={e => e.stopPropagation()}
                     >
-                        {/* Drag Handle */}
                         <div className="menu-drag-handle"></div>
 
-                        {/* Quick Settings Toggles */}
                         <div className="menu-toggles-row">
-                            <button
-                                onClick={togglePrivacy}
-                                className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`}
-                            >
+                            <button onClick={togglePrivacy} className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`}>
                                 <div className="toggle-icon-box">
                                     {isPrivacyMode ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                                 </div>
                                 <span>{isPrivacyMode ? 'Oculto' : 'Visível'}</span>
                             </button>
-
-                            <button
-                                onClick={() => toggleEventMode(!isEventMode)}
-                                className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`}
-                            >
-                                <div className="toggle-icon-box">
-                                    <Plane size={16} strokeWidth={1.5} />
-                                </div>
+                            <button onClick={() => toggleEventMode(!isEventMode)} className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`}>
+                                <div className="toggle-icon-box"><Plane size={16} strokeWidth={1.5} /></div>
                                 <span>Viagem</span>
                             </button>
                         </div>
 
-                        {/* Render Menu Items Grid */}
                         <div className="menu-items-grid">
                             {menuItems.map((item) => (
                                 <NavLink
@@ -151,7 +156,7 @@ export function MobileNav() {
                                 </NavLink>
                             ))}
                         </div>
-                    </div>
+                    </motion.div>
                 </div>,
                 document.body
             )}

@@ -153,8 +153,15 @@ export default function Dashboard() {
             let goal = null;
 
             if (goalsData) {
-                totalSavings = goalsData.reduce((acc, curr) => acc + (parseFloat(curr.current_amount) || 0), 0);
-                goal = goalsData.find(g => g.is_primary) || null;
+                const filteredGoals = goalsData.filter(g => {
+                    if (activeFilter === 'all') return true;
+                    if (activeFilter === 'me') return g.profile_id === user.id;
+                    if (activeFilter === 'partner') return g.profile_id === profile?.partner_id;
+                    return true;
+                });
+                
+                totalSavings = filteredGoals.reduce((acc, curr) => acc + (parseFloat(curr.current_amount) || 0), 0);
+                goal = filteredGoals.find(g => g.is_primary) || null;
             }
 
             const { data: walletsData } = await supabase

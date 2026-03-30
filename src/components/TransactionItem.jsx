@@ -1,9 +1,10 @@
+import React from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { Edit2, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { Card } from './Card';
 import { useAuth } from '../hooks/useAuth';
 
-export function TransactionItem({ transaction, categories, onEdit, onDelete, index }) {
+export const TransactionItem = React.memo(function TransactionItem({ transaction, categories, onEdit, onDelete, index }) {
     const { user, partnerProfile } = useAuth();
     const x = useMotionValue(0);
     const backgroundOpacity = useTransform(x, [-100, 0, 100], [1, 0, 1]);
@@ -163,4 +164,5 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
             </motion.div>
         </motion.div>
     );
-}
+});
+

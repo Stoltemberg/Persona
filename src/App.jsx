@@ -5,16 +5,16 @@ import React, { Suspense } from 'react';
 import { Layout } from './components/Layout';
 
 // Lazy Load Pages
-// Eager Load Pages (Core App)
-import Dashboard from './pages/Dashboard';
-import Transactions from './pages/Transactions';
-import Recurring from './pages/Recurring';
-import Planning from './pages/Planning';
-import Settings from './pages/Settings';
-import Wallets from './pages/Wallets';
-import Categories from './pages/Categories';
-import Admin from './pages/Admin';
-import Budgets from './pages/Budgets';
+// Lazy Load Pages (Core App)
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const Transactions = React.lazy(() => import('./pages/Transactions'));
+const Recurring = React.lazy(() => import('./pages/Recurring'));
+const Planning = React.lazy(() => import('./pages/Planning'));
+const Settings = React.lazy(() => import('./pages/Settings'));
+const Wallets = React.lazy(() => import('./pages/Wallets'));
+const Categories = React.lazy(() => import('./pages/Categories'));
+const Admin = React.lazy(() => import('./pages/Admin'));
+const Budgets = React.lazy(() => import('./pages/Budgets'));
 
 // Lazy Load Pages (Secondary / Auth)
 const Login = React.lazy(() => import('./pages/Login'));
@@ -124,11 +124,11 @@ const AnimatedRoutes = () => {
 
 const PageTransition = ({ children }) => (
   <motion.div
-    initial={{ opacity: 0, x: 35, filter: 'blur(4px)' }}
-    animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-    exit={{ opacity: 0, x: -35, filter: 'blur(4px)' }}
+    initial={{ opacity: 0, x: 20 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -20 }}
     transition={{ type: 'spring', stiffness: 400, damping: 35, mass: 0.8 }}
-    style={{ width: '100%', willChange: 'transform, opacity, filter' }}
+    style={{ width: '100%', willChange: 'transform, opacity' }}
   >
     {children}
   </motion.div>

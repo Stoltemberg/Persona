@@ -150,7 +150,7 @@ export default function Landing() {
                     <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Termos de Uso</Link>
                     <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacidade</Link>
                 </div>
-                <p>© 2026 Persona Finance. CNPJ: 00.000.000/0001-00. Todos os direitos reservados.</p>
+                <p>© 2026 Persona Finance. Todos os direitos reservados.</p>
                 <address style={{ marginTop: '1rem', fontStyle: 'normal', fontSize: '0.8rem', opacity: 0.6 }}>São Paulo, SP - Brasil</address>
             </footer>
         </main>

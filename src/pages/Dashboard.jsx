@@ -34,6 +34,7 @@ export default function Dashboard() {
     const { isPrivacyMode } = usePrivacy();
     const [balance, setBalance] = useState(0);
     const [expenses, setExpenses] = useState(0);
+    const [incomes, setIncomes] = useState(0);
     const [savings, setSavings] = useState(0);
     const [recentTransactions, setRecentTransactions] = useState([]);
     const [allTransactions, setAllTransactions] = useState([]);
@@ -126,6 +127,7 @@ export default function Dashboard() {
             let totalIncome = 0;
             let totalExpense = 0;
             let monthlyExpense = 0;
+            let monthlyIncome = 0;
 
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
@@ -136,6 +138,9 @@ export default function Dashboard() {
 
                 if (tx.type === 'income') {
                     totalIncome += amount;
+                    if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+                        monthlyIncome += amount;
+                    }
                 } else {
                     totalExpense += amount;
                     if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
@@ -191,6 +196,7 @@ export default function Dashboard() {
 
             setBalance(totalIncome - totalExpense);
             setExpenses(monthlyExpense);
+            setIncomes(monthlyIncome);
             setSavings(totalSavings);
             setPrimaryGoal(goal);
             setWallets(walletsWithBalance);
@@ -287,15 +293,15 @@ export default function Dashboard() {
                     </div>
                 </Link>
 
-                <Link to="/planning" style={{ textDecoration: 'none' }}>
+                <Link to="/transactions" style={{ textDecoration: 'none' }}>
                     <div className="glass-card dashboard-stat-card zoom-on-hover">
                         <div className="dashboard-stat-icon" style={{ background: 'rgba(52, 199, 89, 0.08)', color: 'var(--color-success)' }}>
-                            <PiggyBank size={15} />
+                            <ArrowDownLeft size={15} />
                         </div>
                         <div>
-                            <div className="dashboard-stat-label">Economias</div>
+                            <div className="dashboard-stat-label">Entradas (Mês)</div>
                             <div className="dashboard-stat-value" style={{ color: 'var(--color-success)' }}>
-                                {loading ? '...' : (isPrivacyMode ? '••••' : `R$ ${savings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
+                                {loading ? '...' : (isPrivacyMode ? '••••' : `R$ ${incomes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
                             </div>
                         </div>
                     </div>

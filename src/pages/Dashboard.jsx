@@ -326,7 +326,7 @@ export default function Dashboard() {
                     <AnimatePresence mode="popLayout">
                         {loading ? (
                             Array(3).fill(0).map((_, i) => (
-                                <Skeleton key={i} width="100%" height="64px" style={{ borderRadius: '16px', marginBottom: '10px' }} />
+                                <Skeleton key={i} width="100%" height="64px" style={{ borderRadius: '4px', marginBottom: '8px' }} />
                             ))
                         ) : recentTransactions.length === 0 ? (
                             <p key="empty" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>Sem movimentações recentes</p>
@@ -338,7 +338,6 @@ export default function Dashboard() {
                                     exit="exit"
                                     layout="position"
                                     className={`glass-card dashboard-tx-card ${newTxId === tx.id ? 'animate-slide-in' : ''}`}
-                                    style={{ marginBottom: '10px' }}
                                 >
                                     <div className="dashboard-tx-left">
                                         <div className="dashboard-tx-icon" style={{

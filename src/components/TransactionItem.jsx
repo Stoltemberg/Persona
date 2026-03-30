@@ -24,7 +24,7 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                 opacity: { delay: index * 0.04 },
                 y: { delay: index * 0.04 }
             }}
-            style={{ position: 'relative', overflow: 'hidden', borderRadius: '24px', marginBottom: '10px' }}
+            style={{ position: 'relative', overflow: 'hidden', borderRadius: '2px', marginBottom: '6px' }}
         >
             {/* Background Actions Layer */}
             <motion.div
@@ -40,7 +40,7 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '0 20px',
-                    borderRadius: '24px',
+                    borderRadius: '2px',
                     zIndex: 0
                 }}
             >
@@ -59,30 +59,27 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                         onEdit(transaction);
                     }
                 }}
-                style={{ x, position: 'relative', zIndex: 1, background: 'var(--bg-panel)', borderRadius: '24px' }} // Ensure background is solid
+                style={{ x, position: 'relative', zIndex: 1, background: '#09090A', borderRadius: '2px' }}
             >
                 <Card
                     hover={false}
-                    className="transaction-card"
+                    className="dashboard-tx-card"
                     style={{
                         margin: 0,
-                        background: 'rgba(255,255,255,0.02)',
-                        border: '1px solid rgba(255,255,255,0.05)',
-                        backdropFilter: 'blur(10px)',
-                        padding: '1rem 1.25rem',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
+                        border: 'none',
+                        borderBottom: '1px solid rgba(255,255,255,0.05)',
+                        background: 'transparent'
                     }}
                 >
                     <div className="transaction-left">
                         <div style={{
                             padding: '0.6rem',
-                            borderRadius: '50%',
+                            borderRadius: '2px',
                             background: cat ? `${cat.color}20` : (transaction.type === 'income' ? 'rgba(40, 94, 77, 0.1)' : 'rgba(139, 44, 44, 0.1)'),
                             color: cat ? cat.color : (transaction.type === 'income' ? 'var(--color-success)' : 'var(--color-danger)'),
                             display: 'flex', alignItems: 'center', justifyItems: 'center',
-                            fontSize: '1rem'
+                            fontSize: '1rem',
+                            boxShadow: '0 0 0 1px rgba(255,255,255,0.05) inset'
                         }}>
                             {cat ? cat.icon : (transaction.type === 'income' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />)}
                         </div>

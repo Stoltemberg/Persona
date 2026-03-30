@@ -305,38 +305,100 @@ html.light h3 {
 }
 
 /* =========================================
-   5. Cards — Apple Platter Style
+   5. Cards — Notched Monolith Architecture
    ========================================= */
 .glass-card {
   position: relative;
-  background: var(--bg-card);
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur) var(--glass-saturation);
-  -webkit-backdrop-filter: var(--glass-blur) var(--glass-saturation);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
+  background: #0A0A0B; /* Solid premium dark ink */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
   padding: 1.25rem;
-  box-shadow: var(--glass-shadow);
   transition:
     transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     box-shadow 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    background-color 0.25s ease;
+    border-color 0.25s ease;
+  overflow: visible; /* Allow corner notch and glow to render out of bounds */
+}
+
+/* The Notch Cut (Differentiation anchor) */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+  background: var(--bg-deep); /* Match page background perfectly */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  transform: rotate(45deg);
+  pointer-events: none;
+  box-shadow: -2px 2px 4px rgba(0,0,0,0.2) inset; /* Make the cut look slightly recessed */
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Subtle accent dot on the notch to signify "active object" */
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 4px;
+  height: 4px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.light .glass-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.light .glass-card::before {
+  background: var(--bg-deep); /* #F2F2F7 */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
 .glass-card-hover:hover {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-  border-color: var(--glass-border-highlight);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
-.glass-card-hover::after {
-  display: none;
+.light .glass-card-hover:hover {
+  border-color: rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.glass-card-hover:hover::before {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: -3px 3px 6px rgba(0,0,0,0.4) inset;
+}
+
+.light .glass-card-hover:hover::before {
+  border-color: rgba(0, 0, 0, 0.2) !important;
+  box-shadow: none;
+}
+
+.glass-card-hover:hover::after {
+  background: var(--color-brand);
+  box-shadow: 0 0 8px var(--color-brand);
 }
 
 .glass-panel {
-  background: var(--bg-card);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  backdrop-filter: none;
+  background: #0A0A0B;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+
+.light .glass-panel {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
 /* =========================================
@@ -773,47 +835,45 @@ option {
 
 .dashboard-stat-card {
   padding: 1.25rem;
-  text-align: center;
+  text-align: left;
   border: none;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: column; /* Left-aligned column */
+  align-items: flex-start;
+  gap: 1rem;
   text-decoration: none;
   color: inherit;
-  overflow: visible;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.glass-card.dashboard-stat-card {
   overflow: visible;
 }
 
 .dashboard-stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .dashboard-stat-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px; /* Harder edge */
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.05) inset;
 }
 
 .dashboard-stat-label {
   font-size: 0.8rem;
   color: var(--text-secondary);
   font-weight: 500;
-  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .dashboard-stat-value {
-  font-size: 1.25rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  margin-top: 0.1rem;
 }
 
 .dashboard-section-header {
@@ -854,24 +914,29 @@ option {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.25rem;
-  border: 0.5px solid rgba(255, 255, 255, 0.04);
+  padding: 0.85rem 1rem !important; /* Compact override */
+}
+
+/* In lists, removing the heavy glow is better for performance */
+.dashboard-tx-card.glass-card::after {
+  display: none !important;
 }
 
 .dashboard-tx-left {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .dashboard-tx-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px; /* Brutalist edge */
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
 .dashboard-tx-desc {
@@ -879,17 +944,21 @@ option {
   font-size: 0.95rem;
   margin-bottom: 0.15rem;
   color: var(--text-main);
+  letter-spacing: -0.01em;
 }
 
 .dashboard-tx-date {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .dashboard-tx-amount {
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 500;
+  font-size: 1.05rem;
   white-space: nowrap;
+  letter-spacing: -0.02em;
 }
 
 /* =========================================
@@ -2455,5 +2524,35 @@ html.light .mobile-bottom-bar,
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* =========================================
+   31. Mobile Notched Monolith Tweaks
+   ========================================= */
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem 1rem !important; /* Tighter to the edge */
+  }
+
+  .dashboard-stats-grid {
+    gap: 0.85rem;
+  }
+  
+  .dashboard-stat-card {
+    padding: 1rem !important;
+    gap: 0.85rem;
+  }
+  
+  .dashboard-stat-value {
+    font-size: 1.35rem !important;
+  }
+
+  .dashboard-tx-card {
+    padding: 0.75rem 0.85rem !important;
+  }
+
+  .dashboard-tx-amount {
+    font-size: 0.95rem !important;
   }
 }

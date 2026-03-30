@@ -1807,12 +1807,14 @@ option {
   padding: 0 0.5rem;
   border-radius: 40px; /* Full pill */
   
-  /* Authentic Liquid Glass 26+ formula */
+  /* Authentic Liquid Glass 26+ formula (Optimized for Mobile FPS) */
   background: rgba(10, 10, 11, 0.45);
-  backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
-  -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.1);
+  backdrop-filter: blur(16px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(200%) brightness(1.1);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0,0,0,0.5);
   border: 1px solid rgba(255,255,255,0.06);
+  transform: translateZ(0); /* Hardware Acceleration */
+  will-change: transform, backdrop-filter;
 }
 
 .light .liquid-glass-pill {

@@ -59,7 +59,7 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                         onEdit(transaction);
                     }
                 }}
-                style={{ x, position: 'relative', zIndex: 1, background: '#09090A', borderRadius: '2px' }}
+                style={{ x, position: 'relative', zIndex: 1, borderRadius: '2px' }}
             >
                 <Card
                     hover={false}
@@ -67,8 +67,7 @@ export function TransactionItem({ transaction, categories, onEdit, onDelete, ind
                     style={{
                         margin: 0,
                         border: 'none',
-                        borderBottom: '1px solid rgba(255,255,255,0.05)',
-                        background: 'transparent'
+                        borderBottom: '1px solid rgba(255,255,255,0.05)'
                     }}
                 >
                     <div className="transaction-left">

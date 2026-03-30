@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Receipt, Target, Settings, Wallet, Menu as MenuIcon, X, Repeat, Plane, EyeOff, Eye, Tag } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { FAB } from './FAB';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
@@ -39,7 +39,7 @@ export function MobileNav() {
             >
                 <div className="liquid-glass-pill">
                     {barItemsLeft.map((item) => {
-                        const isActive = location.pathname.startsWith(item.path);
+                        const isActive = location.pathname.startsWith(item.path) && !isMenuOpen;
                         return (
                             <NavLink
                                 key={item.id}
@@ -79,7 +79,7 @@ export function MobileNav() {
                     </div>
 
                     {barItemsRight.map((item) => {
-                        const isActive = location.pathname.startsWith(item.path);
+                        const isActive = location.pathname.startsWith(item.path) && !isMenuOpen;
                         return (
                             <NavLink
                                 key={item.id}
@@ -116,48 +116,60 @@ export function MobileNav() {
             </motion.nav>
 
             {/* Menu Overlay */}
-            {isMenuOpen && createPortal(
-                <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)} style={{ zIndex: 9998 }}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 50, scale: 0.95 }}
-                        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                        className="mobile-menu-grid"
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div className="menu-drag-handle"></div>
+            {createPortal(
+                <AnimatePresence>
+                    {isMenuOpen && (
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="mobile-menu-overlay" 
+                            onClick={() => setIsMenuOpen(false)} 
+                            style={{ zIndex: 9998 }}
+                        >
+                            <motion.div
+                                initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 50, scale: 0.95 }}
+                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                className="mobile-menu-grid"
+                                onClick={e => e.stopPropagation()}
+                            >
+                                <div className="menu-drag-handle"></div>
 
-                        <div className="menu-toggles-row">
-                            <button onClick={togglePrivacy} className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`}>
-                                <div className="toggle-icon-box">
-                                    {isPrivacyMode ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
+                                <div className="menu-toggles-row">
+                                    <button onClick={togglePrivacy} className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`}>
+                                        <div className="toggle-icon-box">
+                                            {isPrivacyMode ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
+                                        </div>
+                                        <span>{isPrivacyMode ? 'Oculto' : 'Visível'}</span>
+                                    </button>
+                                    <button onClick={() => toggleEventMode(!isEventMode)} className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`}>
+                                        <div className="toggle-icon-box"><Plane size={16} strokeWidth={1.5} /></div>
+                                        <span>Viagem</span>
+                                    </button>
                                 </div>
-                                <span>{isPrivacyMode ? 'Oculto' : 'Visível'}</span>
-                            </button>
-                            <button onClick={() => toggleEventMode(!isEventMode)} className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`}>
-                                <div className="toggle-icon-box"><Plane size={16} strokeWidth={1.5} /></div>
-                                <span>Viagem</span>
-                            </button>
-                        </div>
 
-                        <div className="menu-items-grid">
-                            {menuItems.map((item) => (
-                                <NavLink
-                                    key={item.path}
-                                    to={item.path}
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="mobile-menu-item"
-                                >
-                                    <div className="mobile-menu-icon-container">
-                                        <item.icon size={22} strokeWidth={1.5} />
-                                    </div>
-                                    <span className="mobile-menu-label">{item.label}</span>
-                                </NavLink>
-                            ))}
-                        </div>
-                    </motion.div>
-                </div>,
+                                <div className="menu-items-grid">
+                                    {menuItems.map((item) => (
+                                        <NavLink
+                                            key={item.path}
+                                            to={item.path}
+                                            onClick={() => setIsMenuOpen(false)}
+                                            className="mobile-menu-item"
+                                        >
+                                            <div className="mobile-menu-icon-container">
+                                                <item.icon size={22} strokeWidth={1.5} />
+                                            </div>
+                                            <span className="mobile-menu-label">{item.label}</span>
+                                        </NavLink>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>,
                 document.body
             )}
         </>

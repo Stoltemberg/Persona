@@ -1864,6 +1864,8 @@ option {
 .liquid-fab-override svg {
   width: 28px;
   height: 28px;
+  color: var(--color-brand);
+  filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.4));
 }
 
 /* The actual fluid bubble indicator */
@@ -1894,7 +1896,8 @@ option {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  animation: fadeIn 0.2s ease-out;
+  transform: translateZ(0); /* Hardware bypass */
+  will-change: backdrop-filter, opacity;
 }
 
 .mobile-menu-grid {

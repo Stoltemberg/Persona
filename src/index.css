@@ -1848,7 +1848,15 @@ option {
 }
 
 .liquid-fab-override {
+  position: relative !important;
+  bottom: auto !important;
+  right: auto !important;
+  left: auto !important;
   color: var(--text-main) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  z-index: 2;
 }
 
 .liquid-fab-override svg {

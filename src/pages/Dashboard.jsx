@@ -14,6 +14,7 @@ import { useDashboardAnimations } from '../hooks/useDashboardAnimations';
 import { usePrivacy } from '../context/PrivacyContext';
 import { CountUp } from '../components/CountUp';
 import { PageHeader } from '../components/PageHeader';
+import { PartnerFilter } from '../components/PartnerFilter';
 import { UpcomingBills } from '../components/UpcomingBills';
 
 export default function Dashboard() {

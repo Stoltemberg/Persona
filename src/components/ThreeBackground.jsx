@@ -69,12 +69,12 @@ export function ThreeBackground() {
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    // Desenhando partículas redondas, muito sutis e menores
+    // Desenhando partículas redondas, muito sutis mas levemente maiores para visibilidade
     const material = new THREE.PointsMaterial({
-      size: 0.35,
+      size: 1.5,
       vertexColors: true,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.7,
       map: createCircleTexture(),
       blending: THREE.AdditiveBlending,
       depthWrite: false

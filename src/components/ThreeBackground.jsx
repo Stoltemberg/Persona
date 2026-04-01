@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import * as THREE from 'three';
 
 export function ThreeBackground() {
@@ -127,19 +128,20 @@ export function ThreeBackground() {
     };
   }, []);
 
-  return (
+  return createPortal(
     <div
       ref={mountRef}
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '100%',
-        height: '100%',
+        width: '100vw',
+        height: '100vh',
         zIndex: -1, // fica por trás do app
         pointerEvents: 'none', // ignore mouse clicks/hovers para a UI embaixo
         opacity: 0.8 // opacidade base
       }}
-    />
+    />,
+    document.body
   );
 }

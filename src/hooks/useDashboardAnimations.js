@@ -25,39 +25,38 @@ export function useDashboardAnimations(loading, activeFilter) {
       return;
     }
 
-    // Timeline de entrada do Dashboard (Staggering complexo)
+    // Timeline de entrada do Dashboard (Acelerado)
     const tl = anime.timeline({
-      easing: 'spring(1, 80, 10, 0)',
-      duration: 1000
+      easing: 'spring(1, 90, 12, 0)',
     });
 
     tl.add({
       targets: containerRef.current.querySelector('.dashboard-header-centered'),
       translateY: [20, 0],
       opacity: [0, 1],
-    })
+    }, 0)
     .add({
       targets: containerRef.current.querySelector('.dashboard-balance-section'),
       scale: [0.95, 1],
       opacity: [0, 1],
-    }, '-=800')
+    }, 50)
     .add({
       targets: containerRef.current.querySelectorAll('.dashboard-stat-card'),
       translateY: [30, 0],
       opacity: [0, 1],
-      delay: anime.stagger(100)
-    }, '-=700')
+      delay: anime.stagger(40)
+    }, 100)
     .add({
       targets: containerRef.current.querySelector('.upcoming-widget-container'),
       translateY: [20, 0],
       opacity: [0, 1],
-    }, '-=600')
+    }, 150)
     .add({
       targets: containerRef.current.querySelectorAll('.dashboard-tx-card'),
       translateY: [20, 0],
       opacity: [0, 1],
-      delay: anime.stagger(60)
-    }, '-=800');
+      delay: anime.stagger(30)
+    }, 200);
 
     animationPlayed.current = true;
 

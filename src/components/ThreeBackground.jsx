@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { Timer } from 'three/examples/jsm/misc/Timer.js'; // Fallback se new THREE.Timer() não estiver diretamente em THREE
 
 export function ThreeBackground() {
   const mountRef = useRef(null);
@@ -66,12 +65,8 @@ export function ThreeBackground() {
     scene.add(particles);
 
     // TIMER & ANIMATION
-    // Dependendo da versão do three (r183+ recomendou THREE.Timer)
-    // Se o Timer padrão não estivar disponível, importamos de addons. Mas THREE.Clock serve como fallback se necessário.
     let animationId;
-    let clock = new THREE.Clock(); // Defaulting to clock just in case THREE.Timer isn't globally exposed
-    // Try to safely instantiate timer if available:
-    const timer = typeof Timer !== 'undefined' ? new Timer() : null;
+    let clock = new THREE.Clock(); 
 
     let mouseX = 0;
     let mouseY = 0;
@@ -91,17 +86,8 @@ export function ThreeBackground() {
     const animate = () => {
       animationId = requestAnimationFrame(animate);
 
-      let delta = 0;
-      let elapsed = 0;
-      
-      if (timer) {
-        timer.update();
-        delta = timer.getDelta();
-        elapsed = timer.getElapsed();
-      } else {
-        delta = clock.getDelta();
-        elapsed = clock.getElapsedTime();
-      }
+      let delta = clock.getDelta();
+      let elapsed = clock.getElapsedTime();
 
       // Rotação suave constante
       particles.rotation.y += delta * 0.05;

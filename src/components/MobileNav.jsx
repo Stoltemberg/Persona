@@ -14,12 +14,12 @@ export function MobileNav() {
     const { isEventMode, toggleEventMode } = useEvent();
 
     const barItemsLeft = [
-        { id: 'dashboard', icon: LayoutDashboard, path: '/dashboard' },
-        { id: 'transactions', icon: Receipt, path: '/transactions' },
+        { id: 'dashboard', icon: LayoutDashboard, path: '/dashboard', label: 'Dashboard' },
+        { id: 'transactions', icon: Receipt, path: '/transactions', label: 'Transações' },
     ];
 
     const barItemsRight = [
-        { id: 'recurring', icon: Repeat, path: '/recurring' },
+        { id: 'recurring', icon: Repeat, path: '/recurring', label: 'Contas Recorrentes' },
     ];
 
     const menuItems = [
@@ -46,6 +46,7 @@ export function MobileNav() {
                                 to={item.path}
                                 onClick={() => setIsMenuOpen(false)}
                                 className={`liquid-nav-item ${isActive ? 'active' : ''}`}
+                                aria-label={item.label}
                             >
                                 {isActive && (
                                     <motion.div
@@ -86,6 +87,7 @@ export function MobileNav() {
                                 to={item.path}
                                 onClick={() => setIsMenuOpen(false)}
                                 className={`liquid-nav-item ${isActive ? 'active' : ''}`}
+                                aria-label={item.label}
                             >
                                 {isActive && (
                                     <motion.div
@@ -102,6 +104,8 @@ export function MobileNav() {
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         className={`liquid-nav-item ${isMenuOpen ? 'active' : ''}`}
+                        aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
+                        aria-expanded={isMenuOpen}
                     >
                         {isMenuOpen && (
                             <motion.div
@@ -139,33 +143,49 @@ export function MobileNav() {
                                 <div className="menu-drag-handle"></div>
 
                                 <div className="menu-toggles-row">
-                                    <button onClick={togglePrivacy} className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`}>
+                                    <button onClick={togglePrivacy} className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`} aria-label={isPrivacyMode ? "Mostrar valores" : "Ocultar valores"}>
                                         <div className="toggle-icon-box">
                                             {isPrivacyMode ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                                         </div>
                                         <span>{isPrivacyMode ? 'Oculto' : 'Visível'}</span>
                                     </button>
-                                    <button onClick={() => toggleEventMode(!isEventMode)} className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`}>
+                                    <button onClick={() => toggleEventMode(!isEventMode)} className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`} aria-label={isEventMode ? "Sair Modo Viagem" : "Modo Viagem"}>
                                         <div className="toggle-icon-box"><Plane size={16} strokeWidth={1.5} /></div>
                                         <span>Viagem</span>
                                     </button>
                                 </div>
 
-                                <div className="menu-items-grid">
+                                <motion.div 
+                                    className="menu-items-grid"
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={{
+                                        hidden: { opacity: 0 },
+                                        visible: {
+                                            opacity: 1,
+                                            transition: { staggerChildren: 0.05, delayChildren: 0.1 }
+                                        }
+                                    }}
+                                >
                                     {menuItems.map((item) => (
-                                        <NavLink
-                                            key={item.path}
-                                            to={item.path}
-                                            onClick={() => setIsMenuOpen(false)}
-                                            className="mobile-menu-item"
-                                        >
-                                            <div className="mobile-menu-icon-container">
-                                                <item.icon size={22} strokeWidth={1.5} />
-                                            </div>
-                                            <span className="mobile-menu-label">{item.label}</span>
-                                        </NavLink>
+                                        <motion.div key={item.path} variants={{
+                                            hidden: { opacity: 0, y: 10 },
+                                            visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } }
+                                        }}>
+                                            <NavLink
+                                                to={item.path}
+                                                onClick={() => setIsMenuOpen(false)}
+                                                className="mobile-menu-item"
+                                                aria-label={item.label}
+                                            >
+                                                <div className="mobile-menu-icon-container">
+                                                    <item.icon size={22} strokeWidth={1.5} />
+                                                </div>
+                                                <span className="mobile-menu-label">{item.label}</span>
+                                            </NavLink>
+                                        </motion.div>
                                     ))}
-                                </div>
+                                </motion.div>
                             </motion.div>
                         </motion.div>
                     )}

@@ -33,6 +33,7 @@ export function Sidebar() {
                         onClick={togglePrivacy}
                         className="sidebar-header-btn"
                         title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
+                        aria-label={isPrivacyMode ? "Mostrar valores monetários" : "Ocultar valores monetários"}
                     >
                         {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -41,6 +42,7 @@ export function Sidebar() {
                         className="sidebar-header-btn"
                         style={{ color: isEventMode ? 'var(--text-main)' : undefined }}
                         title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
+                        aria-label={isEventMode ? "Sair do Modo Viagem" : "Entrar no Modo Viagem"}
                     >
                         <Plane size={18} />
                     </button>
@@ -53,6 +55,7 @@ export function Sidebar() {
                     <NavLink
                         key={item.path}
                         to={item.path}
+                        aria-label={item.label}
                         className={({ isActive }) => clsx(
                             'nav-item',
                             isActive ? 'active' : '',
@@ -76,6 +79,7 @@ export function Sidebar() {
             <button
                 onClick={signOut}
                 className="logout-btn"
+                aria-label="Sair da conta"
             >
 
                 <div>

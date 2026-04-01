@@ -23,10 +23,27 @@ export function ThreeBackground() {
     root.appendChild(renderer.domElement);
 
     // PARTICLES / ORBS
-    const particleCount = 100;
+    const particleCount = 150;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
+
+    // Textura de círculo suave (minimalista)
+    const createCircleTexture = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.5)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(32, 32, 32, 0, Math.PI * 2);
+      ctx.fill();
+      return new THREE.CanvasTexture(canvas);
+    };
     
     // Tema Persona: (gradientes de roxo/magenta/ciano sutil)
     // #f64f59(vermelho), #c471ed(roxo), #12c2e9(azul)
@@ -37,10 +54,10 @@ export function ThreeBackground() {
     ];
 
     for (let i = 0; i < particleCount; i++) {
-      // Posições espalhadas num raio amplo
-      positions[i * 3] = (Math.random() - 0.5) * 50;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 50;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+      // Posições espalhadas num raio AMPLO para cobrir monitores ultrawide
+      positions[i * 3] = (Math.random() - 0.5) * 200;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
 
       // Cores misturadas
       const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
@@ -52,12 +69,13 @@ export function ThreeBackground() {
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    // Desenhando partículas redondas e brilhantes
+    // Desenhando partículas redondas, muito sutis e menores
     const material = new THREE.PointsMaterial({
-      size: 0.8,
+      size: 0.35,
       vertexColors: true,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.5,
+      map: createCircleTexture(),
       blending: THREE.AdditiveBlending,
       depthWrite: false
     });
@@ -78,8 +96,9 @@ export function ThreeBackground() {
     const windowHalfY = window.innerHeight / 2;
 
     const onDocumentMouseMove = (event) => {
-      mouseX = (event.clientX - windowHalfX) * 0.05;
-      mouseY = (event.clientY - windowHalfY) * 0.05;
+      // Sensibilidade do mouse muito reduzida para evitar movimentos bruscos
+      mouseX = (event.clientX - windowHalfX) * 0.01;
+      mouseY = (event.clientY - windowHalfY) * 0.01;
     };
     
     document.addEventListener('mousemove', onDocumentMouseMove);
@@ -94,13 +113,13 @@ export function ThreeBackground() {
       particles.rotation.y += delta * 0.05;
       particles.rotation.x += delta * 0.02;
 
-      // Movimentação sutil com o mouse (parallax/damping)
-      targetX = mouseX * 0.05;
-      targetY = mouseY * 0.05;
+      // Movimentação absurdamente sutil com o mouse (parallax amortecido)
+      targetX = mouseX * 0.02;
+      targetY = mouseY * 0.02;
 
-      particles.rotation.z += 0.05 * (targetX - particles.rotation.z);
-      camera.position.x += (targetX * 0.5 - camera.position.x) * 0.02;
-      camera.position.y += (-targetY * 0.5 - camera.position.y) * 0.02;
+      particles.rotation.z += 0.01 * (targetX - particles.rotation.z);
+      camera.position.x += (targetX * 0.5 - camera.position.x) * 0.01;
+      camera.position.y += (-targetY * 0.5 - camera.position.y) * 0.01;
       camera.lookAt(scene.position);
 
       renderer.render(scene, camera);

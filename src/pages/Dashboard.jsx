@@ -371,7 +371,7 @@ export default function Dashboard() {
                 </div>
 
                 {recentTransactions.length > 0 && !loading && (
-                    <div className="dashboard-footer-action">
+                    <div className="dashboard-footer-action" style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem', width: '100%' }}>
                         <Link to="/transactions" className="dashboard-section-link">
                             Ver tudo
                         </Link>

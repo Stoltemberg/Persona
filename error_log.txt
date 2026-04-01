@@ -1,0 +1,56 @@
+﻿
+> persona@0.0.0 build
+> vite build
+
+[36mvite v7.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 3710 modules transformed.
+node.exe : [31mÔ£ù[39m Build failed in 6.75s
+No linha:1 caractere:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([31mÔ£ù[39m Build failed    
+ in 6.75s:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[31merror during build:
+[31m[vite-plugin-pwa:build] There was an error during the build:
+  src/pages/Dashboard.jsx (10:7): "default" is not exported by 
+"node_modules/animejs/dist/modules/index.js", imported by 
+"src/pages/Dashboard.jsx".
+Additionally, handling the error in the 'buildEnd' hook caused the 
+following error:
+  src/pages/Dashboard.jsx (10:7): "default" is not exported by 
+"node_modules/animejs/dist/modules/index.js", imported by 
+"src/pages/Dashboard.jsx".[31m
+file: [36mC:/Users/tutor/OneDrive/├ürea de 
+Trabalho/Persona/src/pages/Dashboard.jsx:10:7[31m
+[33m
+ 8: import { ArrowDownLeft, ArrowUpRight, PiggyBank } from 'lucide-react';
+ 9: import { Link } from 'react-router-dom';
+10: import anime from 'animejs';
+           ^
+11: import { DashboardCanvas } from 
+'../components/animations/DashboardCanvas';
+12: import { usePrivacy } from '../context/PrivacyContext';
+[31m
+    at getRollupError (file:///C:/Users/tutor/OneDrive/%C3%81rea%20de%20Tra
+balho/Persona/node_modules/rollup/dist/es/shared/parseAst.js:401:41)
+    at file:///C:/Users/tutor/OneDrive/%C3%81rea%20de%20Trabalho/Persona/no
+de_modules/rollup/dist/es/shared/node-entry.js:23418:39
+    at async catchUnfinishedHookActions (file:///C:/Users/tutor/OneDrive/%C
+3%81rea%20de%20Trabalho/Persona/node_modules/rollup/dist/es/shared/node-ent
+ry.js:22876:16)
+    at async rollupInternal (file:///C:/Users/tutor/OneDrive/%C3%81rea%20de
+%20Trabalho/Persona/node_modules/rollup/dist/es/shared/node-entry.js:23401:
+5)
+    at async buildEnvironment (file:///C:/Users/tutor/OneDrive/%C3%81rea%20
+de%20Trabalho/Persona/node_modules/vite/dist/node/chunks/config.js:33540:12
+)
+    at async Object.build (file:///C:/Users/tutor/OneDrive/%C3%81rea%20de%2
+0Trabalho/Persona/node_modules/vite/dist/node/chunks/config.js:33899:19)
+    at async Object.buildApp (file:///C:/Users/tutor/OneDrive/%C3%81rea%20d
+e%20Trabalho/Persona/node_modules/vite/dist/node/chunks/config.js:33896:153
+)
+    at async CAC.<anonymous> (file:///C:/Users/tutor/OneDrive/%C3%81rea%20d
+e%20Trabalho/Persona/node_modules/vite/dist/node/cli.js:629:3)[39m

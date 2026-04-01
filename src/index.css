@@ -178,9 +178,20 @@ p {
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(212, 175, 55, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(212, 175, 55, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+  }
 }
 
 .mesh-background {
@@ -191,7 +202,7 @@ p {
   bottom: 0;
   z-index: -1;
   background-color: var(--bg-deep);
-  background-image: 
+  background-image:
     radial-gradient(at 0% 0%, hsla(var(--h-brand), var(--s-brand), var(--l-brand), 0.05) 0px, transparent 50%),
     radial-gradient(at 100% 100%, hsla(var(--h-success), var(--s-success), var(--l-success), 0.05) 0px, transparent 50%);
   filter: blur(100px);
@@ -309,15 +320,17 @@ html.light h3 {
    ========================================= */
 .glass-card {
   position: relative;
-  background: #0A0A0B; /* Solid premium dark ink */
+  background: rgba(10, 10, 11, 0.5); /* Translúcido para revelar o 3D */
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
+  border-radius: 12px; /* Radius elegante, melhor aderência ao design moderno */
   padding: 1.25rem;
   transition:
     transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     box-shadow 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     border-color 0.25s ease;
-  overflow: visible; /* Allow corner notch and glow to render out of bounds */
+  overflow: visible;
 }
 
 /* The Notch Cut (Differentiation anchor) */
@@ -328,12 +341,14 @@ html.light h3 {
   right: -10px;
   width: 20px;
   height: 20px;
-  background: var(--bg-deep); /* Match page background perfectly */
+  background: var(--bg-deep);
+  /* Match page background perfectly */
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   border-left: 1px solid rgba(255, 255, 255, 0.08);
   transform: rotate(45deg);
   pointer-events: none;
-  box-shadow: -2px 2px 4px rgba(0,0,0,0.2) inset; /* Make the cut look slightly recessed */
+  box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.2) inset;
+  /* Make the cut look slightly recessed */
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -358,7 +373,8 @@ html.light h3 {
 }
 
 .light .glass-card::before {
-  background: var(--bg-deep); /* #F2F2F7 */
+  background: var(--bg-deep);
+  /* #F2F2F7 */
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   border-left: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: none;
@@ -377,7 +393,7 @@ html.light h3 {
 
 .glass-card-hover:hover::before {
   border-color: rgba(255, 255, 255, 0.2) !important;
-  box-shadow: -3px 3px 6px rgba(0,0,0,0.4) inset;
+  box-shadow: -3px 3px 6px rgba(0, 0, 0, 0.4) inset;
 }
 
 .light .glass-card-hover:hover::before {
@@ -838,7 +854,8 @@ option {
   text-align: left;
   border: none;
   display: flex;
-  flex-direction: column; /* Left-aligned column */
+  flex-direction: column;
+  /* Left-aligned column */
   align-items: flex-start;
   gap: 1rem;
   text-decoration: none;
@@ -854,11 +871,12 @@ option {
 .dashboard-stat-icon {
   width: 36px;
   height: 36px;
-  border-radius: 4px; /* Harder edge */
+  border-radius: 4px;
+  /* Harder edge */
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.05) inset;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
 .dashboard-stat-label {
@@ -914,7 +932,8 @@ option {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 1rem !important; /* Compact override */
+  padding: 0.85rem 1rem !important;
+  /* Compact override */
 }
 
 /* In lists, removing the heavy glow is better for performance */
@@ -931,7 +950,8 @@ option {
 .dashboard-tx-icon {
   width: 32px;
   height: 32px;
-  border-radius: 4px; /* Brutalist edge */
+  border-radius: 4px;
+  /* Brutalist edge */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1789,15 +1809,18 @@ option {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 0 1.25rem 2rem 1.25rem; /* Safe area padding */
+  padding: 0 1.25rem 2rem 1.25rem;
+  /* Safe area padding */
   z-index: 9999;
   display: flex;
   justify-content: center;
-  pointer-events: none; /* Let clicks pass through padding */
+  pointer-events: none;
+  /* Let clicks pass through padding */
 }
 
 .liquid-glass-pill {
-  pointer-events: auto; /* Re-enable clicks on the pill itself */
+  pointer-events: auto;
+  /* Re-enable clicks on the pill itself */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1805,22 +1828,24 @@ option {
   max-width: 400px;
   height: 64px;
   padding: 0 0.5rem;
-  border-radius: 40px; /* Full pill */
-  
+  border-radius: 40px;
+  /* Full pill */
+
   /* Authentic Liquid Glass 26+ formula (Optimized for Mobile FPS) */
   background: rgba(10, 10, 11, 0.45);
   backdrop-filter: blur(16px) saturate(200%) brightness(1.1);
   -webkit-backdrop-filter: blur(16px) saturate(200%) brightness(1.1);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0,0,0,0.5);
-  border: 1px solid rgba(255,255,255,0.06);
-  transform: translateZ(0); /* Hardware Acceleration */
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transform: translateZ(0);
+  /* Hardware Acceleration */
   will-change: transform, backdrop-filter;
 }
 
 .light .liquid-glass-pill {
   background: rgba(250, 250, 252, 0.5);
-  border: 1px solid rgba(0,0,0,0.06);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0,0,0,0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -1px 0 rgba(0, 0, 0, 0.05);
 }
 
 .liquid-nav-item {
@@ -1841,7 +1866,8 @@ option {
 /* Base icon state */
 .liquid-icon {
   position: relative;
-  z-index: 2; /* Sit above bubble */
+  z-index: 2;
+  /* Sit above bubble */
   transition: color 0.3s ease;
 }
 
@@ -1872,7 +1898,8 @@ option {
 .liquid-bubble {
   position: absolute;
   inset: 0;
-  background: rgba(212, 175, 55, 0.15); /* Brand tint */
+  background: rgba(212, 175, 55, 0.15);
+  /* Brand tint */
   border-radius: 50%;
   z-index: 1;
   /* Optional: Light inner glow */
@@ -1896,7 +1923,8 @@ option {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  transform: translateZ(0); /* Hardware bypass */
+  transform: translateZ(0);
+  /* Hardware bypass */
   will-change: backdrop-filter, opacity;
 }
 
@@ -2585,18 +2613,19 @@ option {
    ========================================= */
 @media (max-width: 768px) {
   .container {
-    padding: 1.5rem 1rem calc(1.5rem + 100px) !important; /* Tighter to the edge, but extra padding for Liquid Glass floating Nav */
+    padding: 1.5rem 1rem calc(1.5rem + 100px) !important;
+    /* Tighter to the edge, but extra padding for Liquid Glass floating Nav */
   }
 
   .dashboard-stats-grid {
     gap: 0.85rem;
   }
-  
+
   .dashboard-stat-card {
     padding: 1rem !important;
     gap: 0.85rem;
   }
-  
+
   .dashboard-stat-value {
     font-size: 1.35rem !important;
   }

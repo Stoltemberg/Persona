@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
@@ -7,27 +8,13 @@ import { OnboardingTour } from '../components/OnboardingTour';
 import { Skeleton } from '../components/Skeleton';
 import { ArrowDownLeft, ArrowUpRight, PiggyBank } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ThreeBackground } from '../components/ThreeBackground';
+import { useDashboardAnimations } from '../hooks/useDashboardAnimations';
 
 import { usePrivacy } from '../context/PrivacyContext';
 import { CountUp } from '../components/CountUp';
 import { PageHeader } from '../components/PageHeader';
 import { UpcomingBills } from '../components/UpcomingBills';
-import { PartnerFilter } from '../components/PartnerFilter';
-
-const listVariants = {
-    hidden: { opacity: 0 },
-    show: {
-        opacity: 1,
-        transition: { staggerChildren: 0.06 }
-    }
-};
-
-const itemVariants = {
-    hidden: { opacity: 0, y: 8 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
-    exit: { opacity: 0, y: -8, transition: { duration: 0.2, ease: 'easeOut' } }
-};
 
 export default function Dashboard() {
     const { user, profile, partnerProfile, incomingRequest, fetchProfile, signOut } = useAuth();
@@ -44,6 +31,7 @@ export default function Dashboard() {
     const [activeFilter, setActiveFilter] = useState('all');
 
     const [newTxId, setNewTxId] = useState(null);
+    const containerRef = useDashboardAnimations(loading, activeFilter);
 
     useEffect(() => {
         if (user) {
@@ -164,7 +152,7 @@ export default function Dashboard() {
                     if (activeFilter === 'partner') return g.profile_id === profile?.partner_id;
                     return true;
                 });
-                
+
                 totalSavings = filteredGoals.reduce((acc, curr) => acc + (parseFloat(curr.current_amount) || 0), 0);
                 goal = filteredGoals.find(g => g.is_primary) || null;
             }
@@ -216,8 +204,10 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-            <OnboardingTour />
+        <>
+            <ThreeBackground />
+            <div ref={containerRef} className="container" style={{ paddingBottom: '80px', position: 'relative', zIndex: 1 }}>
+                <OnboardingTour />
 
             {incomingRequest && (
                 <div style={{ padding: '0 1.5rem', marginBottom: '1.5rem' }} className="fade-in">
@@ -235,23 +225,23 @@ export default function Dashboard() {
                                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '4px 0 0' }}>Para compartilhar finanças no Modo Casal.</p>
                             </div>
                             <div style={{ display: 'flex', width: '100%', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                <Button 
+                                <Button
                                     style={{ flex: 1, justifyContent: 'center', background: 'var(--glass-border)', color: 'var(--text-main)' }}
                                     onClick={async () => {
                                         try {
                                             await supabase.rpc('reject_partner_request');
                                             fetchProfile(user.id);
-                                        } catch(e) { console.error(e) }
+                                        } catch (e) { console.error(e) }
                                     }}
                                 >Recusar</Button>
-                                <Button 
+                                <Button
                                     className="btn-primary"
                                     style={{ flex: 1, justifyContent: 'center', background: 'linear-gradient(135deg, #f64f59, #f7797d)', color: 'white', border: 'none' }}
                                     onClick={async () => {
                                         try {
                                             await supabase.rpc('accept_partner_request');
                                             fetchProfile(user.id);
-                                        } catch(e) { console.error(e) }
+                                        } catch (e) { console.error(e) }
                                     }}
                                 >Aceitar</Button>
                             </div>
@@ -317,13 +307,7 @@ export default function Dashboard() {
                     <h3 className="dashboard-section-title">Últimas movimentações</h3>
                 </div>
 
-                <motion.div
-                    className="dashboard-tx-list"
-                    variants={listVariants}
-                    initial="hidden"
-                    animate="show"
-                >
-                    <AnimatePresence mode="popLayout">
+                <div className="dashboard-tx-list">
                         {loading ? (
                             Array(3).fill(0).map((_, i) => (
                                 <Skeleton key={i} width="100%" height="64px" style={{ borderRadius: '4px', marginBottom: '8px' }} />
@@ -331,13 +315,11 @@ export default function Dashboard() {
                         ) : recentTransactions.length === 0 ? (
                             <p key="empty" style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>Sem movimentações recentes</p>
                         ) : (
-                            recentTransactions.map((tx, index) => (
-                                <motion.div 
-                                    key={tx.id} 
-                                    variants={itemVariants} 
-                                    exit="exit"
-                                    layout="position"
+                            recentTransactions.map(tx => (
+                                <div
+                                    key={tx.id}
                                     className={`glass-card dashboard-tx-card ${newTxId === tx.id ? 'animate-slide-in' : ''}`}
+                                    style={{ opacity: 0 }} // Previne Flash of Unstyled Content antes do Anime.js atuar
                                 >
                                     <div className="dashboard-tx-left">
                                         <div className="dashboard-tx-icon" style={{
@@ -350,12 +332,12 @@ export default function Dashboard() {
                                             <div className="dashboard-tx-desc" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                                 {tx.description}
                                                 {tx.profile_id === profile?.partner_id && (
-                                                    <span style={{ 
-                                                        fontSize: '0.65rem', 
-                                                        padding: '0.15rem 0.4rem', 
-                                                        background: 'rgba(255,255,255,0.05)', 
-                                                        color: 'var(--text-main)', 
-                                                        borderRadius: '12px', 
+                                                    <span style={{
+                                                        fontSize: '0.65rem',
+                                                        padding: '0.15rem 0.4rem',
+                                                        background: 'rgba(255,255,255,0.05)',
+                                                        color: 'var(--text-main)',
+                                                        borderRadius: '12px',
                                                         border: '1px solid rgba(255,255,255,0.1)',
                                                         fontWeight: 500,
                                                         display: 'flex',
@@ -382,11 +364,10 @@ export default function Dashboard() {
                                     }}>
                                         {isPrivacyMode ? '••••' : (tx.type === 'income' ? '+' : '-') + ` R$ ${parseFloat(tx.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                     </div>
-                                </motion.div>
+                                </div>
                             ))
                         )}
-                    </AnimatePresence>
-                </motion.div>
+                </div>
 
                 {recentTransactions.length > 0 && !loading && (
                     <div className="dashboard-footer-action">
@@ -396,6 +377,7 @@ export default function Dashboard() {
                     </div>
                 )}
             </div>
-        </div>
+            </div>
+        </>
     );
 }

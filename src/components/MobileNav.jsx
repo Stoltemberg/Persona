@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, Wallet, Menu as MenuIcon, X, Repeat, Plane, EyeOff, Eye, Tag } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, Wallet, Menu as MenuIcon, X, Repeat, Plane, EyeOff, Eye, Tag, LogOut } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FAB } from './FAB';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
+import { useAuth } from '../hooks/useAuth';
 
 export function MobileNav() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
     const { isEventMode, toggleEventMode } = useEvent();
+    const { signOut } = useAuth();
 
     const barItemsLeft = [
         { id: 'dashboard', icon: LayoutDashboard, path: '/dashboard', label: 'Dashboard' },
@@ -185,6 +187,23 @@ export function MobileNav() {
                                             </NavLink>
                                         </motion.div>
                                     ))}
+
+                                    <motion.div variants={{
+                                        hidden: { opacity: 0, y: 10 },
+                                        visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } }
+                                    }}>
+                                        <button
+                                            onClick={signOut}
+                                            className="mobile-menu-item"
+                                            style={{ width: '100%', border: 'none', background: 'transparent', cursor: 'pointer', textAlign: 'left' }}
+                                            aria-label="Sair da conta"
+                                        >
+                                            <div className="mobile-menu-icon-container" style={{ background: 'rgba(246, 79, 89, 0.1)', color: '#f64f59' }}>
+                                                <LogOut size={22} strokeWidth={1.5} />
+                                            </div>
+                                            <span className="mobile-menu-label" style={{ color: '#f64f59' }}>Sair da conta</span>
+                                        </button>
+                                    </motion.div>
                                 </motion.div>
                             </motion.div>
                         </motion.div>

@@ -16,7 +16,7 @@ import { TransferModal } from '../components/TransferModal';
 import { ArrowRightLeft } from 'lucide-react';
 
 export default function Wallets() {
-    const { user, isPro, partnerProfile } = useAuth();
+    const { user, isPro, planTier, partnerProfile } = useAuth();
     const { addToast } = useToast();
     const [wallets, setWallets] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -58,7 +58,11 @@ export default function Wallets() {
     };
 
     const handleOpenNew = () => {
-        if (!isPro && wallets.length >= 1) {
+        let maxWallets = 1;
+        if (planTier === 'intermediate') maxWallets = 3;
+        if (planTier === 'complete') maxWallets = Infinity;
+
+        if (wallets.length >= maxWallets) {
             setShowUpgrade(true);
             return;
         }

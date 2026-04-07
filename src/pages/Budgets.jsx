@@ -6,15 +6,17 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { PieChart, Wallet, AlertCircle, CheckCircle, Save } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { UpgradeModal } from '../components/UpgradeModal';
 
 export default function Budgets({ isTab }) {
-    const { user } = useAuth();
+    const { user, planTier } = useAuth();
     const [loading, setLoading] = useState(true);
     const [categories, setCategories] = useState([]);
     const [transactions, setTransactions] = useState([]);
     const [budgets, setBudgets] = useState({});
     const [editingId, setEditingId] = useState(null);
     const [tempLimit, setTempLimit] = useState('');
+    const [showUpgrade, setShowUpgrade] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -69,6 +71,22 @@ export default function Budgets({ isTab }) {
         setBudgets(newBudgets);
         localStorage.setItem('persona_budgets', JSON.stringify(newBudgets));
         setEditingId(null);
+    };
+
+    const handleOpenEdit = (categoryId, currentLimit) => {
+        let maxBudgets = 5;
+        if (planTier === 'intermediate') maxBudgets = 10;
+        if (planTier === 'complete') maxBudgets = Infinity;
+
+        const activeBudgetsCount = Object.values(budgets).filter(v => parseFloat(v) > 0).length;
+
+        if (currentLimit === 0 && activeBudgetsCount >= maxBudgets) {
+            setShowUpgrade(true);
+            return;
+        }
+
+        setEditingId(categoryId);
+        setTempLimit(currentLimit);
     };
 
     const getSpent = (categoryName) => {
@@ -152,7 +170,7 @@ export default function Budgets({ isTab }) {
                                     </Button>
                                 ) : (
                                     <Button
-                                        onClick={() => { setEditingId(cat.id); setTempLimit(limit); }}
+                                        onClick={() => handleOpenEdit(cat.id, limit)}
                                         className="btn-ghost"
                                         style={{
                                             fontSize: '0.8rem',
@@ -213,6 +231,8 @@ export default function Budgets({ isTab }) {
                     Nenhuma categoria de despesa encontrada.
                 </div>
             )}
+            
+            <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
         </div>
     );
 }

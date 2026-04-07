@@ -89,23 +89,23 @@ export default function Landing() {
 
                     <div className="landing-pricing-grid">
                         <PricingCard
-                            title="Grátis"
+                            title="Free"
                             price="R$ 0"
-                            features={['5 Carteiras', '10 Orçamentos', 'Análise Básica']}
+                            features={['1 Carteira', '5 Orçamentos', 'Análise Básica']}
                         />
                         <PricingCard
-                            title="Intermediário"
+                            title="One"
                             price="R$ 14,90"
-                            features={['Carteiras Ilimitadas', 'Orçamentos Ilimitados', 'Sem Anúncios']}
-                            buttonText="Assinar Intermediário"
+                            features={['3 Carteiras', '10 Orçamentos', 'Análise Básica']}
+                            buttonText="Assinar One"
                             color="#12c2e9"
                         />
                         <PricingCard
-                            title="Completo"
+                            title="Duo"
                             price="R$ 29,90"
                             featured
-                            features={['Tudo do Intermediário', 'IA Financeira', 'Exportação Excel', 'Suporte VIP']}
-                            buttonText="Assinar Completo"
+                            features={['Carteiras Ilimitadas', 'IA Financeira', 'Exportação Excel', 'Modo Casal', 'Orçamentos Ilimitados']}
+                            buttonText="Assinar Duo"
                             color="#FFD700"
                         />
                     </div>

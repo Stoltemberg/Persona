@@ -18,25 +18,25 @@ export function UpgradeModal({ isOpen, onClose }) {
     const tiers = [
         {
             id: 'free',
-            name: 'Grátis',
+            name: 'Free',
             price: 'R$ 0',
-            features: ['5 Carteiras', '10 Orçamentos', 'Análise Básica'],
+            features: ['1 Carteira', '5 Orçamentos', 'Análise Básica'],
             icon: Zap,
             color: '#4ade80'
         },
         {
             id: 'intermediate',
-            name: 'Intermediário',
+            name: 'One',
             price: 'R$ 14,90',
-            features: ['Carteiras Ilimitadas', 'Orçamentos Ilimitados', 'Sem Anúncios'],
+            features: ['3 Carteiras', '10 Orçamentos', 'Análise Básica'],
             icon: Shield,
             color: '#12c2e9'
         },
         {
             id: 'complete',
-            name: 'Completo',
+            name: 'Duo',
             price: 'R$ 29,90',
-            features: ['Tudo do Intermediário', 'IA Financeira', 'Exportação Excel', 'Suporte VIP'],
+            features: ['Carteiras Ilimitadas', 'IA Financeira', 'Exportação Excel', 'Modo Casal', 'Orçamentos Ilimitados'],
             icon: Crown,
             color: '#FFD700'
         }

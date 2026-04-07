@@ -24,7 +24,7 @@ const AVATAR_PRESETS = [
 ];
 
 export default function Settings() {
-    const { profile, user, isPro, partnerProfile, incomingRequest, outgoingRequest, fetchProfile } = useAuth();
+    const { profile, user, isPro, planTier, partnerProfile, incomingRequest, outgoingRequest, fetchProfile } = useAuth();
     const { theme, changeTheme } = useTheme();
     const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
@@ -123,7 +123,7 @@ export default function Settings() {
     };
 
     const handleExport = async () => {
-        if (!isPro) {
+        if (planTier !== 'complete') {
             setShowUpgrade(true);
             return;
         }
@@ -332,7 +332,13 @@ export default function Settings() {
                             <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
                                 Compartilhe transações, limites e carteiras com seu(ua) parceiro(a). O Modo Casal sincroniza ambas as contas perfeitamente.
                             </p>
-                            <Button type="button" className="btn-primary" onClick={() => setIsCoupleModalOpen(true)} style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', width: '100%', justifyContent: 'center' }}>
+                            <Button type="button" className="btn-primary" onClick={() => {
+                                if (planTier !== 'complete') {
+                                    setShowUpgrade(true);
+                                    return;
+                                }
+                                setIsCoupleModalOpen(true);
+                            }} style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', width: '100%', justifyContent: 'center' }}>
                                 Convidar Parceiro(a)
                             </Button>
                         </div>
@@ -382,16 +388,16 @@ export default function Settings() {
                                 width: '100%',
                                 marginBottom: '1rem',
                                 justifyContent: 'center',
-                                background: !isPro
+                                background: planTier !== 'complete'
                                     ? 'rgba(255, 255, 255, 0.05)'
                                     : 'linear-gradient(135deg, #11998e, #38ef7d)',
-                                border: !isPro ? '1px solid rgba(255,255,255,0.1)' : 'none',
-                                opacity: !isPro ? 0.7 : 1
+                                border: planTier !== 'complete' ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                                opacity: planTier !== 'complete' ? 0.7 : 1
                             }}
                             onClick={handleExport}
                             disabled={loading}
                         >
-                            {!isPro && <Lock size={16} style={{ marginRight: '0.5rem' }} />}
+                            {planTier !== 'complete' && <Lock size={16} style={{ marginRight: '0.5rem' }} />}
                             Exportar Relatório (Excel)
                         </Button>
 
@@ -408,7 +414,7 @@ export default function Settings() {
                                 }}
                                 onClick={() => setShowUpgrade(true)}
                             >
-                                Assinar Persona PRO 💎
+                                Assinar um Plano 💎
                             </Button>
                         )}
 

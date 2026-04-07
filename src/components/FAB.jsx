@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Plus, ArrowUpRight, ArrowDownLeft, Repeat } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
 import { useHaptic } from '../hooks/useHaptic';
 import { Modal } from './Modal';
-import { Button } from './Button';
-import { Input } from './Input';
+import { TransactionForm } from './TransactionForm';
 import { getSmartCategory } from '../utils/smartCategories';
 
 export function FAB({ className, style }) {
@@ -72,6 +71,26 @@ export function FAB({ className, style }) {
         setSelectedCategory(null);
     };
 
+    const handleTypeChange = (nextType) => {
+        setType(nextType);
+        setCategory('');
+        setSelectedCategory(null);
+        medium();
+    };
+
+    const handleDescriptionChange = (value) => {
+        setDescription(value);
+
+        if (value.length > 2 && !category) {
+            const smartMatch = getSmartCategory(value, categories);
+            if (smartMatch) {
+                if (smartMatch.type !== type) setType(smartMatch.type);
+                setCategory(smartMatch.name);
+                setSelectedCategory(smartMatch);
+            }
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -105,6 +124,7 @@ export function FAB({ className, style }) {
                     amount: parseFloat(amount),
                     type,
                     category,
+                    wallet_id: selectedWalletId,
                     expense_type: type === 'expense' ? expenseType : null,
                     frequency: 'monthly',
                     next_due_date: nextDate.toISOString(),
@@ -148,121 +168,36 @@ export function FAB({ className, style }) {
             </button>
 
             <Modal isOpen={isOpen} onClose={handleClose} title="Nova Transação">
-                <form onSubmit={handleSubmit} className="fab-modal-form">
-                    <div className="fab-type-toggle">
-                        <button
-                            type="button"
-                            className={`fab-type-btn ${type === 'expense' ? 'active expense' : ''}`}
-                            onClick={() => { setType('expense'); setCategory(''); setSelectedCategory(null); medium(); }}
-                        >
-                            <ArrowDownLeft size={15} />
-                            Despesa
-                        </button>
-                        <button
-                            type="button"
-                            className={`fab-type-btn ${type === 'income' ? 'active income' : ''}`}
-                            onClick={() => { setType('income'); setCategory(''); setSelectedCategory(null); medium(); }}
-                        >
-                            <ArrowUpRight size={15} />
-                            Receita
-                        </button>
-                    </div>
-
-                    <div className="fab-row">
-                        <Input
-                            label="Valor"
-                            placeholder="0,00"
-                            type="number"
-                            step="0.01"
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                            required
-                            autoFocus
-                            style={{ fontSize: '1.2rem', fontWeight: 500, textAlign: 'center' }}
-                        />
-                        <Input
-                            label="Data"
-                            type="date"
-                            value={date}
-                            onChange={(e) => setDate(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="fab-chips-row">
-                        <button
-                            type="button"
-                            className={`fab-chip ${isRecurring ? 'active' : ''}`}
-                            onClick={() => { setIsRecurring(!isRecurring); medium(); }}
-                        >
-                            <Repeat size={14} />
-                            {isRecurring ? 'Mensal' : 'Único'}
-                        </button>
-                    </div>
-
-                    <div className="input-group">
-                        <label className="fab-label">Carteira</label>
-                        <select
-                            className="input-field"
-                            value={selectedWalletId}
-                            onChange={(e) => setSelectedWalletId(e.target.value)}
-                            required
-                        >
-                            {wallets.length === 0 ? (
-                                <option value="">Cadastre uma carteira primeiro</option>
-                            ) : (
-                                wallets.map((wallet) => (
-                                    <option key={wallet.id} value={wallet.id}>
-                                        {wallet.name}
-                                    </option>
-                                ))
-                            )}
-                        </select>
-                    </div>
-
-                    <div className="fab-section">
-                        <label className="fab-label">Categoria</label>
-                        <div className="fab-categories-scroll">
-                            {availableCategories.map((cat) => (
-                                <div
-                                    key={cat.id}
-                                    onClick={() => { setCategory(cat.name); setSelectedCategory(cat); medium(); }}
-                                    className={`fab-category-item ${selectedCategory?.id === cat.id ? 'selected' : ''}`}
-                                    style={selectedCategory?.id === cat.id ? { borderColor: cat.color, background: `${cat.color}15` } : undefined}
-                                >
-                                    <span className="fab-category-icon">{cat.icon}</span>
-                                    <span className="fab-category-name">{cat.name}</span>
-                                </div>
-                            ))}
-                            {availableCategories.length === 0 && (
-                                <div className="fab-empty-cats">Nenhuma categoria encontrada.</div>
-                            )}
-                        </div>
-                    </div>
-
-                    <Input
-                        label="Descrição"
-                        placeholder="Ex: Almoço"
-                        value={description}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            setDescription(val);
-                            if (val.length > 2 && !category) {
-                                const smartMatch = getSmartCategory(val, categories);
-                                if (smartMatch) {
-                                    if (smartMatch.type !== type) setType(smartMatch.type);
-                                    setCategory(smartMatch.name);
-                                    setSelectedCategory(smartMatch);
-                                }
-                            }
+                <div className="fab-modal-form">
+                    <TransactionForm
+                        amount={amount}
+                        onAmountChange={setAmount}
+                        date={date}
+                        onDateChange={setDate}
+                        type={type}
+                        onTypeChange={handleTypeChange}
+                        wallets={wallets}
+                        selectedWalletId={selectedWalletId}
+                        onWalletChange={setSelectedWalletId}
+                        availableCategories={availableCategories}
+                        selectedCategory={selectedCategory}
+                        onCategorySelect={(cat) => {
+                            setCategory(cat.name);
+                            setSelectedCategory(cat);
+                            medium();
                         }}
-                        required
+                        expenseType={expenseType}
+                        onExpenseTypeChange={setExpenseType}
+                        showRecurringToggle={true}
+                        isRecurring={isRecurring}
+                        onRecurringChange={setIsRecurring}
+                        description={description}
+                        onDescriptionChange={handleDescriptionChange}
+                        onSubmit={handleSubmit}
+                        submitLabel="Registrar"
+                        loading={loading}
                     />
-
-                    <Button type="submit" className="btn-primary fab-submit" loading={loading}>
-                        Registrar
-                    </Button>
-                </form>
+                </div>
             </Modal>
         </>
     );

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
@@ -9,9 +9,13 @@ import { Plus, Trash2, Edit2, TrendingUp, Lightbulb, AlertTriangle, Star } from 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { EmptyState } from '../components/EmptyState';
 import { PageHeader } from '../components/PageHeader';
+import { useToast } from '../context/ToastContext';
+
+const sortGoals = (items) => [...items].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
 export default function Goals({ isTab }) {
     const { user } = useAuth();
+    const { addToast, addActionToast } = useToast();
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,10 +28,16 @@ export default function Goals({ isTab }) {
     const [currentAmount, setCurrentAmount] = useState('');
     const [deadline, setDeadline] = useState('');
     const [depositAmount, setDepositAmount] = useState('');
+    const pendingDeleteTimers = useRef(new Map());
 
     useEffect(() => {
         if (user) fetchGoals();
     }, [user]);
+
+    useEffect(() => () => {
+        pendingDeleteTimers.current.forEach((timer) => clearTimeout(timer));
+        pendingDeleteTimers.current.clear();
+    }, []);
 
     const fetchGoals = async () => {
         try {
@@ -45,19 +55,31 @@ export default function Goals({ isTab }) {
         }
     };
 
+    const resetForm = () => {
+        setTitle('');
+        setTargetAmount('');
+        setCurrentAmount('');
+        setDeadline('');
+        setGoalToEdit(null);
+    };
+
     const handleOpenEdit = (goal) => {
         setGoalToEdit(goal);
         setTitle(goal.title);
-        setTargetAmount(goal.target_amount);
-        setCurrentAmount(goal.current_amount);
+        setTargetAmount(String(goal.target_amount));
+        setCurrentAmount(String(goal.current_amount));
         setDeadline(goal.deadline || '');
         setIsModalOpen(true);
     };
 
     const handleOpenNew = () => {
-        setGoalToEdit(null);
         resetForm();
         setIsModalOpen(true);
+    };
+
+    const handleCloseGoalModal = () => {
+        setIsModalOpen(false);
+        resetForm();
     };
 
     const handleSaveGoal = async (e) => {
@@ -84,25 +106,47 @@ export default function Goals({ isTab }) {
 
             if (error) throw error;
             await fetchGoals();
-            setIsModalOpen(false);
-            resetForm();
+            handleCloseGoalModal();
+            addToast(goalToEdit ? 'Meta atualizada.' : 'Meta criada.', 'success');
         } catch (error) {
-            alert(error.message);
+            addToast(error.message || 'Erro ao salvar meta.', 'error');
         } finally {
             setSubmitting(false);
         }
     };
 
-    const handleDeleteGoal = async (id) => {
-        if (!confirm('Tem certeza? Isso não pode ser desfeito.')) return;
-
+    const commitDeleteGoal = async (goal) => {
         try {
-            const { error } = await supabase.from('goals').delete().eq('id', id);
+            const { error } = await supabase.from('goals').delete().eq('id', goal.id);
             if (error) throw error;
-            setGoals(goals.filter((goal) => goal.id !== id));
         } catch (error) {
             console.error('Error deleting goal:', error);
+            setGoals((prev) => sortGoals([...prev, goal]));
+            addToast('Não foi possível excluir a meta.', 'error');
         }
+    };
+
+    const handleDeleteGoal = (id) => {
+        const goal = goals.find((item) => item.id === id);
+        if (!goal) return;
+
+        setGoals((prev) => prev.filter((item) => item.id !== id));
+
+        const timer = setTimeout(() => {
+            pendingDeleteTimers.current.delete(id);
+            commitDeleteGoal(goal);
+        }, 5000);
+
+        pendingDeleteTimers.current.set(id, timer);
+
+        addActionToast('Meta removida.', 'Desfazer', () => {
+            const pendingTimer = pendingDeleteTimers.current.get(id);
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                pendingDeleteTimers.current.delete(id);
+                setGoals((prev) => sortGoals([...prev, goal]));
+            }
+        }, 'info');
     };
 
     const handleOpenDeposit = (goal) => {
@@ -117,7 +161,7 @@ export default function Goals({ isTab }) {
 
         try {
             const amount = parseFloat(depositAmount);
-            if (!amount || amount <= 0) throw new Error('Valor inválido');
+            if (!amount || amount <= 0) throw new Error('Informe um valor válido para o aporte.');
 
             const newAmount = parseFloat(selectedGoal.current_amount) + amount;
             const { error } = await supabase.from('goals').update({ current_amount: newAmount }).eq('id', selectedGoal.id);
@@ -125,8 +169,9 @@ export default function Goals({ isTab }) {
             if (error) throw error;
             await fetchGoals();
             setIsDepositModalOpen(false);
+            addToast('Aporte registrado.', 'success');
         } catch (error) {
-            alert(error.message);
+            addToast(error.message || 'Erro ao registrar aporte.', 'error');
         } finally {
             setSubmitting(false);
         }
@@ -138,23 +183,16 @@ export default function Goals({ isTab }) {
             const { error } = await supabase.from('goals').update({ is_primary: true }).eq('id', goalId);
             if (error) throw error;
             await fetchGoals();
+            addToast('Meta principal atualizada.', 'success');
         } catch (error) {
             console.error('Error setting primary goal:', error);
-            alert('Erro ao definir principal. Tente novamente mais tarde.');
+            addToast('Erro ao definir principal. Tente novamente mais tarde.', 'error');
         }
-    };
-
-    const resetForm = () => {
-        setTitle('');
-        setTargetAmount('');
-        setCurrentAmount('');
-        setDeadline('');
-        setGoalToEdit(null);
     };
 
     const getAdvice = (goal) => {
         const remaining = goal.target_amount - goal.current_amount;
-        if (remaining <= 0) return { text: 'Meta atingida! Você está pronta para comemorar.', color: '#00ebc7', icon: Star };
+        if (remaining <= 0) return { text: 'Meta atingida. Você está pronta para comemorar.', color: '#00ebc7', icon: Star };
 
         const progress = (goal.current_amount / goal.target_amount) * 100;
 
@@ -324,7 +362,7 @@ export default function Goals({ isTab }) {
                 )}
             </div>
 
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={goalToEdit ? 'Editar Meta' : 'Nova Meta'}>
+            <Modal isOpen={isModalOpen} onClose={handleCloseGoalModal} title={goalToEdit ? 'Editar Meta' : 'Nova Meta'}>
                 <form onSubmit={handleSaveGoal}>
                     <Input label="Título" placeholder="Ex: Reserva de Emergência" value={title} onChange={(e) => setTitle(e.target.value)} required />
                     <Input label="Valor Alvo (R$)" type="number" step="0.01" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} required />

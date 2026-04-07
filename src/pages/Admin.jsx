@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Navigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ import { useToast } from '../context/ToastContext';
 
 export default function Admin() {
     const { user, role, loading } = useAuth();
-    const { addToast } = useToast();
+    const { addToast, addActionToast } = useToast();
 
     // Dashboard Stats
     const [stats, setStats] = useState({
@@ -23,6 +23,7 @@ export default function Admin() {
     // Coupons State
     const [coupons, setCoupons] = useState([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
+    const pendingDeleteTimers = useRef(new Map());
 
     // New Coupon Form
     const [newCoupon, setNewCoupon] = useState({
@@ -39,6 +40,11 @@ export default function Admin() {
             fetchCoupons();
         }
     }, [role]);
+
+    useEffect(() => () => {
+        pendingDeleteTimers.current.forEach((timer) => clearTimeout(timer));
+        pendingDeleteTimers.current.clear();
+    }, []);
 
     const fetchStats = async () => {
         try {
@@ -111,16 +117,35 @@ export default function Admin() {
         }
     };
 
-    const handleDeleteCoupon = async (id) => {
-        if (!confirm('Tem certeza que deseja excluir este cupom?')) return;
-        try {
-            const { error } = await supabase.from('coupons').delete().eq('id', id);
-            if (error) throw error;
-            addToast('Cupom removido.', 'success');
-            fetchCoupons();
-        } catch (error) {
-            addToast('Erro ao remover cupom.', 'error');
-        }
+    const handleDeleteCoupon = (id) => {
+        const coupon = coupons.find((item) => item.id === id);
+        if (!coupon) return;
+
+        setCoupons((prev) => prev.filter((item) => item.id !== id));
+
+        const timer = setTimeout(async () => {
+            pendingDeleteTimers.current.delete(id);
+            try {
+                const { error } = await supabase.from('coupons').delete().eq('id', id);
+                if (error) throw error;
+                addToast('Cupom removido.', 'success');
+                fetchStats();
+            } catch (error) {
+                setCoupons((prev) => [coupon, ...prev]);
+                addToast('Erro ao remover cupom.', 'error');
+            }
+        }, 5000);
+
+        pendingDeleteTimers.current.set(id, timer);
+
+        addActionToast('Cupom removido.', 'Desfazer', () => {
+            const pendingTimer = pendingDeleteTimers.current.get(id);
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                pendingDeleteTimers.current.delete(id);
+                setCoupons((prev) => [coupon, ...prev]);
+            }
+        }, 'info');
     };
 
     if (loading) return <div className="flex-center" style={{ height: '100vh' }}>Carregando...</div>;

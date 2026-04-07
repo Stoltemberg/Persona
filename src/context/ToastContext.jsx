@@ -18,8 +18,25 @@ export function ToastProvider({ children }) {
         }
     }, []);
 
+    const addActionToast = useCallback((message, actionLabel, onAction, type = 'default') => {
+        const method = type === 'success'
+            ? toast.success
+            : type === 'error'
+                ? toast.error
+                : type === 'info'
+                    ? toast.info
+                    : toast;
+
+        method(message, {
+            action: {
+                label: actionLabel,
+                onClick: onAction,
+            },
+        });
+    }, []);
+
     return (
-        <ToastContext.Provider value={{ addToast }}>
+        <ToastContext.Provider value={{ addToast, addActionToast }}>
             {children}
             {/* Toaster is now in main.jsx, or we can put it here if main.jsx fails */}
         </ToastContext.Provider>

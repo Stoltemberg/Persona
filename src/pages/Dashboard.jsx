@@ -6,7 +6,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { OnboardingTour } from '../components/OnboardingTour';
 import { Skeleton } from '../components/Skeleton';
-import { ArrowDownLeft, ArrowUpRight, PiggyBank, Wallet, Target, Sparkles } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, PiggyBank, Wallet, Target, Sparkles, CheckCircle2, CircleDashed, ReceiptText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThreeBackground } from '../components/ThreeBackground';
 import { useDashboardAnimations } from '../hooks/useDashboardAnimations';
@@ -71,6 +71,7 @@ export default function Dashboard() {
                         amount: tmpl.amount,
                         type: tmpl.type,
                         category: tmpl.category,
+                        wallet_id: tmpl.wallet_id || null,
                         expense_type: tmpl.expense_type,
                         date: new Date().toISOString(),
                         profile_id: user.id
@@ -212,6 +213,77 @@ export default function Dashboard() {
     const goalProgress = primaryGoal && Number(primaryGoal.target_amount) > 0
         ? Math.min((Number(primaryGoal.current_amount || 0) / Number(primaryGoal.target_amount || 0)) * 100, 100)
         : 0;
+    const checklistItems = [
+        {
+            id: 'wallet',
+            label: 'Criar primeira carteira',
+            description: 'Conecta saldos e deixa o painel confiável.',
+            done: wallets.length > 0,
+            to: '/wallets',
+            cta: 'Criar carteira',
+        },
+        {
+            id: 'transaction',
+            label: 'Registrar primeira transação',
+            description: 'Faz o dashboard começar a contar sua história.',
+            done: allTransactions.length > 0,
+            to: '/transactions',
+            cta: 'Registrar agora',
+        },
+        {
+            id: 'goal',
+            label: 'Definir uma meta principal',
+            description: 'Transforma o planejamento em prioridade real.',
+            done: Boolean(primaryGoal),
+            to: '/goals',
+            cta: 'Criar meta',
+        },
+    ];
+    const pendingChecklist = checklistItems.filter((item) => !item.done);
+    const inboxItems = [
+        wallets.length === 0 ? {
+            id: 'wallet-start',
+            title: 'Crie sua base financeira',
+            description: 'Sem carteira cadastrada, saldos e análises ficam incompletos.',
+            to: '/wallets',
+            cta: 'Criar carteira',
+        } : null,
+        allTransactions.length === 0 ? {
+            id: 'tx-start',
+            title: 'Registre seu primeiro movimento',
+            description: 'Uma única transação já libera leitura real do mês.',
+            to: '/transactions',
+            cta: 'Adicionar transação',
+        } : null,
+        !primaryGoal && allTransactions.length > 0 ? {
+            id: 'goal-focus',
+            title: 'Escolha uma meta em foco',
+            description: 'Definir um objetivo principal ajuda o app a priorizar melhor suas ações.',
+            to: '/goals',
+            cta: 'Definir meta',
+        } : null,
+        monthlyNet < 0 ? {
+            id: 'monthly-net',
+            title: 'Seu mês está no negativo',
+            description: 'Vale revisar categorias variáveis e reduzir pressão ainda nesta semana.',
+            to: '/planning?tab=analysis',
+            cta: 'Rever análise',
+        } : null,
+        primaryGoal && goalProgress < 25 && monthlyNet >= 0 ? {
+            id: 'goal-boost',
+            title: 'Hora de acelerar sua meta',
+            description: 'Você já tem espaço no mês. Um pequeno aporte agora cria tração.',
+            to: '/goals',
+            cta: 'Fazer aporte',
+        } : null,
+        topWallet && Number(topWallet.current_balance) < 0 ? {
+            id: 'wallet-attention',
+            title: `Atenção à carteira ${topWallet.name}`,
+            description: 'Há saldo negativo em uma carteira de destaque. Vale conferir entradas e saídas recentes.',
+            to: '/wallets',
+            cta: 'Ver carteiras',
+        } : null,
+    ].filter(Boolean).slice(0, 3);
 
     return (
         <>
@@ -267,6 +339,82 @@ export default function Dashboard() {
             />
 
             <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+
+            {pendingChecklist.length > 0 && (
+                <section className="glass-card fade-in" style={{ padding: '1.2rem', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                        <div>
+                            <div style={{ color: 'var(--text-main)', fontWeight: 600, marginBottom: '0.35rem' }}>Comece por aqui</div>
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.92rem' }}>
+                                {pendingChecklist.length} passo{pendingChecklist.length > 1 ? 's' : ''} para transformar o Persona em um painel realmente útil.
+                            </div>
+                        </div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                            {checklistItems.length - pendingChecklist.length}/{checklistItems.length} concluídos
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem' }}>
+                        {checklistItems.map((item) => (
+                            <div
+                                key={item.id}
+                                className={item.done ? 'surface-secondary' : 'glass-card'}
+                                style={{
+                                    padding: '0.95rem',
+                                    borderRadius: '14px',
+                                    border: item.done ? '1px solid rgba(48, 209, 88, 0.2)' : '1px solid rgba(255,255,255,0.08)',
+                                    opacity: item.done ? 0.82 : 1,
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                                    <div style={{ color: item.done ? '#30d158' : 'var(--text-muted)', marginTop: '0.1rem' }}>
+                                        {item.done ? <CheckCircle2 size={18} /> : <CircleDashed size={18} />}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ color: 'var(--text-main)', fontWeight: 600, marginBottom: '0.25rem' }}>{item.label}</div>
+                                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5 }}>{item.description}</div>
+                                        {!item.done && (
+                                            <Link to={item.to} style={{ textDecoration: 'none' }}>
+                                                <Button className="btn-primary" style={{ marginTop: '0.8rem' }}>
+                                                    {item.cta}
+                                                </Button>
+                                            </Link>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {inboxItems.length > 0 && (
+                <section style={{ marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.9rem' }}>
+                        <div className="dashboard-stat-icon" style={{ background: 'rgba(18, 194, 233, 0.12)', color: '#12c2e9' }}>
+                            <ReceiptText size={15} />
+                        </div>
+                        <div>
+                            <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>Caixa de entrada financeira</div>
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Sugestões práticas para você avançar agora.</div>
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.9rem' }}>
+                        {inboxItems.map((item) => (
+                            <div key={item.id} className="glass-card" style={{ padding: '1rem' }}>
+                                <div style={{ color: 'var(--text-main)', fontWeight: 600, marginBottom: '0.35rem' }}>{item.title}</div>
+                                <div style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5, marginBottom: '0.9rem' }}>
+                                    {item.description}
+                                </div>
+                                <Link to={item.to} style={{ textDecoration: 'none' }}>
+                                    <Button variant="ghost">{item.cta}</Button>
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* Hero Balance Section */}
             <section className="dashboard-balance-section">

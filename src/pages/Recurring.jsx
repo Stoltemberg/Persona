@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
@@ -13,7 +13,7 @@ import { PageHeader } from '../components/PageHeader';
 
 export default function Recurring() {
     const { user } = useAuth();
-    const { addToast } = useToast();
+    const { addToast, addActionToast } = useToast();
     const [templates, setTemplates] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -31,6 +31,7 @@ export default function Recurring() {
     const [nextDueDate, setNextDueDate] = useState('');
     const [expenseType, setExpenseType] = useState('variable');
     const [filter, setFilter] = useState('all');
+    const pendingDeleteTimers = useRef(new Map());
 
     // Metrics
     const activeTemplates = templates.filter(t => t.active);
@@ -47,6 +48,11 @@ export default function Recurring() {
             fetchTemplates();
         }
     }, [user]);
+
+    useEffect(() => () => {
+        pendingDeleteTimers.current.forEach((timer) => clearTimeout(timer));
+        pendingDeleteTimers.current.clear();
+    }, []);
 
     const fetchTemplates = async () => {
         try {
@@ -135,16 +141,34 @@ export default function Recurring() {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('Deseja excluir esta recorrência?')) return;
-        try {
-            const { error } = await supabase.from('recurring_templates').delete().eq('id', id);
-            if (error) throw error;
-            setTemplates(templates.filter(t => t.id !== id));
-            addToast('Recorrência excluída.', 'success');
-        } catch (error) {
-            addToast('Erro ao excluir.', 'error');
-        }
+    const handleDelete = (id) => {
+        const template = templates.find((item) => item.id === id);
+        if (!template) return;
+
+        setTemplates((prev) => prev.filter((item) => item.id !== id));
+
+        const timer = setTimeout(async () => {
+            pendingDeleteTimers.current.delete(id);
+            try {
+                const { error } = await supabase.from('recurring_templates').delete().eq('id', id);
+                if (error) throw error;
+                addToast('Recorrência excluída.', 'success');
+            } catch (error) {
+                setTemplates((prev) => [...prev, template].sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date)));
+                addToast('Erro ao excluir.', 'error');
+            }
+        }, 5000);
+
+        pendingDeleteTimers.current.set(id, timer);
+
+        addActionToast('Recorrência removida.', 'Desfazer', () => {
+            const pendingTimer = pendingDeleteTimers.current.get(id);
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                pendingDeleteTimers.current.delete(id);
+                setTemplates((prev) => [...prev, template].sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date)));
+            }
+        }, 'info');
     };
 
     const toggleActive = async (id, currentStatus) => {

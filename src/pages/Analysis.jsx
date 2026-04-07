@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
@@ -9,17 +10,35 @@ import { PartnerFilter } from '../components/PartnerFilter';
 
 export default function Analysis({ isTab }) {
     const { user, profile } = useAuth();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const tabParam = searchParams.get('tab');
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeFilter, setActiveFilter] = useState('all');
+    const [activeFilter, setActiveFilter] = useState(searchParams.get('scope') || 'all');
 
-    // Date State (Native JS)
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const initialMonth = searchParams.get('month');
+    const [currentDate, setCurrentDate] = useState(() => {
+        if (!initialMonth) return new Date();
+        const [year, month] = initialMonth.split('-').map(Number);
+        if (!year || !month) return new Date();
+        return new Date(year, month - 1, 1);
+    });
     const [selectedType, setSelectedType] = useState(null);
 
     useEffect(() => {
         if (user) fetchTransactions();
     }, [user]);
+
+    useEffect(() => {
+        const nextParams = new URLSearchParams();
+        if (tabParam) nextParams.set('tab', tabParam);
+        nextParams.set('month', `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`);
+
+        if (activeFilter === 'all') nextParams.delete('scope');
+        else nextParams.set('scope', activeFilter);
+
+        setSearchParams(nextParams, { replace: true });
+    }, [activeFilter, currentDate, setSearchParams, tabParam]);
 
     const fetchTransactions = async () => {
         try {

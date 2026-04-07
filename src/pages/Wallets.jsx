@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
@@ -17,7 +17,7 @@ import { ArrowRightLeft } from 'lucide-react';
 
 export default function Wallets() {
     const { user, isPro, planTier, partnerProfile } = useAuth();
-    const { addToast } = useToast();
+    const { addToast, addActionToast } = useToast();
     const [wallets, setWallets] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -30,6 +30,7 @@ export default function Wallets() {
     const [submitting, setSubmitting] = useState(false);
     const [showUpgrade, setShowUpgrade] = useState(false);
     const [isTransferOpen, setIsTransferOpen] = useState(false);
+    const pendingDeleteTimers = useRef(new Map());
 
     useEffect(() => {
         if (user) {
@@ -40,6 +41,11 @@ export default function Wallets() {
             return () => window.removeEventListener('supabase-sync', handleSync);
         }
     }, [user]);
+
+    useEffect(() => () => {
+        pendingDeleteTimers.current.forEach((timer) => clearTimeout(timer));
+        pendingDeleteTimers.current.clear();
+    }, []);
 
     const fetchWallets = async () => {
         try {
@@ -138,16 +144,35 @@ export default function Wallets() {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('Tem certeza? Isso pode afetar transações antigas.')) return;
-        try {
-            const { error } = await supabase.from('wallets').delete().eq('id', id);
-            if (error) throw error;
-            setWallets(wallets.filter(w => w.id !== id));
-            addToast('Carteira excluída.', 'success');
-        } catch (error) {
-            addToast('Erro ao excluir carteira.', 'error');
-        }
+    const handleDelete = (id) => {
+        const wallet = wallets.find((item) => item.id === id);
+        if (!wallet) return;
+
+        setWallets((prev) => prev.filter((item) => item.id !== id));
+
+        const timer = setTimeout(async () => {
+            pendingDeleteTimers.current.delete(id);
+
+            try {
+                const { error } = await supabase.from('wallets').delete().eq('id', id);
+                if (error) throw error;
+                addToast('Carteira excluída.', 'success');
+            } catch (error) {
+                setWallets((prev) => [...prev, wallet].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+                addToast('Erro ao excluir carteira.', 'error');
+            }
+        }, 5000);
+
+        pendingDeleteTimers.current.set(id, timer);
+
+        addActionToast('Carteira removida.', 'Desfazer', () => {
+            const pendingTimer = pendingDeleteTimers.current.get(id);
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                pendingDeleteTimers.current.delete(id);
+                setWallets((prev) => [...prev, wallet].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+            }
+        }, 'info');
     };
 
     const getIcon = (type) => {

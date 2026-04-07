@@ -1,29 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
-import { Plus, Trash2, Edit2, Wallet, TrendingUp, TrendingDown, Tag } from 'lucide-react';
+import { Plus, Trash2, Edit2, TrendingUp, TrendingDown } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
+
+const DEFAULT_ICON = '🏷️';
 
 export default function Categories() {
     const { user } = useAuth();
+    const { addToast, addActionToast } = useToast();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
 
-    // Form
     const [editingCategory, setEditingCategory] = useState(null);
     const [name, setName] = useState('');
-    const [icon, setIcon] = useState('🏷️'); // Default emoji
+    const [icon, setIcon] = useState(DEFAULT_ICON);
     const [color, setColor] = useState('#c471ed');
     const [type, setType] = useState('expense');
+    const pendingDeleteTimers = useRef(new Map());
 
     useEffect(() => {
         if (user) fetchCategories();
     }, [user]);
+
+    useEffect(() => () => {
+        pendingDeleteTimers.current.forEach((timer) => clearTimeout(timer));
+        pendingDeleteTimers.current.clear();
+    }, []);
 
     const fetchCategories = async () => {
         try {
@@ -46,18 +55,18 @@ export default function Categories() {
         setIsModalOpen(true);
     };
 
-    const handleOpenEdit = (cat) => {
-        setEditingCategory(cat);
-        setName(cat.name);
-        setIcon(cat.icon || '🏷️');
-        setColor(cat.color || '#c471ed');
-        setType(cat.type);
+    const handleOpenEdit = (category) => {
+        setEditingCategory(category);
+        setName(category.name);
+        setIcon(category.icon || DEFAULT_ICON);
+        setColor(category.color || '#c471ed');
+        setType(category.type);
         setIsModalOpen(true);
     };
 
     const resetForm = () => {
         setName('');
-        setIcon('🏷️');
+        setIcon(DEFAULT_ICON);
         setColor('#c471ed');
         setType('expense');
         setEditingCategory(null);
@@ -72,7 +81,7 @@ export default function Categories() {
                 icon,
                 color,
                 type,
-                profile_id: user.id
+                profile_id: user.id,
             };
 
             let error;
@@ -92,26 +101,47 @@ export default function Categories() {
             if (error) throw error;
             await fetchCategories();
             setIsModalOpen(false);
+            resetForm();
+            addToast(editingCategory ? 'Categoria atualizada.' : 'Categoria criada.', 'success');
         } catch (error) {
-            alert(error.message);
+            addToast(error.message || 'Erro ao salvar categoria.', 'error');
         } finally {
             setSubmitting(false);
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('Tem certeza? Isso pode afetar transações antigas.')) return;
-        try {
-            const { error } = await supabase.from('categories').delete().eq('id', id);
-            if (error) throw error;
-            setCategories(categories.filter(c => c.id !== id));
-        } catch (error) {
-            alert('Erro ao excluir: ' + error.message);
-        }
+    const handleDelete = (id) => {
+        const category = categories.find((item) => item.id === id);
+        if (!category) return;
+
+        setCategories((prev) => prev.filter((item) => item.id !== id));
+
+        const timer = setTimeout(async () => {
+            pendingDeleteTimers.current.delete(id);
+            try {
+                const { error } = await supabase.from('categories').delete().eq('id', id);
+                if (error) throw error;
+                addToast('Categoria excluída.', 'success');
+            } catch (error) {
+                setCategories((prev) => [...prev, category].sort((a, b) => a.name.localeCompare(b.name)));
+                addToast(`Erro ao excluir categoria: ${error.message}`, 'error');
+            }
+        }, 5000);
+
+        pendingDeleteTimers.current.set(id, timer);
+
+        addActionToast('Categoria removida.', 'Desfazer', () => {
+            const pendingTimer = pendingDeleteTimers.current.get(id);
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                pendingDeleteTimers.current.delete(id);
+                setCategories((prev) => [...prev, category].sort((a, b) => a.name.localeCompare(b.name)));
+            }
+        }, 'info');
     };
 
-    const expenseCategories = categories.filter(c => c.type === 'expense');
-    const incomeCategories = categories.filter(c => c.type === 'income');
+    const expenseCategories = categories.filter((item) => item.type === 'expense');
+    const incomeCategories = categories.filter((item) => item.type === 'income');
 
     return (
         <div className="container fade-in" style={{ paddingBottom: '80px' }}>
@@ -125,66 +155,72 @@ export default function Categories() {
                 <Button onClick={handleOpenNew} icon={Plus}>Nova Categoria</Button>
             </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-                {/* Expense Section */}
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: '#f64f59' }}>
-                        <TrendingDown size={20} />
-                        <h3>Despesas</h3>
+            {loading ? (
+                <p>Carregando categorias...</p>
+            ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: '#f64f59' }}>
+                            <TrendingDown size={20} />
+                            <h3>Despesas</h3>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {expenseCategories.length === 0 && <p style={{ opacity: 0.5 }}>Nenhuma categoria.</p>}
+                            {expenseCategories.map((category) => (
+                                <CategoryItem key={category.id} category={category} onEdit={() => handleOpenEdit(category)} onDelete={() => handleDelete(category.id)} />
+                            ))}
+                        </div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {expenseCategories.length === 0 && <p style={{ opacity: 0.5 }}>Nenhuma categoria.</p>}
-                        {expenseCategories.map(cat => (
-                            <CategoryItem key={cat.id} cat={cat} onEdit={() => handleOpenEdit(cat)} onDelete={() => handleDelete(cat.id)} />
-                        ))}
+
+                    <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: '#12c2e9' }}>
+                            <TrendingUp size={20} />
+                            <h3>Receitas</h3>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {incomeCategories.length === 0 && <p style={{ opacity: 0.5 }}>Nenhuma categoria.</p>}
+                            {incomeCategories.map((category) => (
+                                <CategoryItem key={category.id} category={category} onEdit={() => handleOpenEdit(category)} onDelete={() => handleDelete(category.id)} />
+                            ))}
+                        </div>
                     </div>
                 </div>
+            )}
 
-                {/* Income Section */}
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: '#12c2e9' }}>
-                        <TrendingUp size={20} />
-                        <h3>Receitas</h3>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {incomeCategories.length === 0 && <p style={{ opacity: 0.5 }}>Nenhuma categoria.</p>}
-                        {incomeCategories.map(cat => (
-                            <CategoryItem key={cat.id} cat={cat} onEdit={() => handleOpenEdit(cat)} onDelete={() => handleDelete(cat.id)} />
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingCategory ? "Editar Categoria" : "Nova Categoria"}>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingCategory ? 'Editar Categoria' : 'Nova Categoria'}>
                 <form onSubmit={handleSave}>
                     <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <Button type="button"
+                        <Button
+                            type="button"
                             className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
                             style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? '#f64f59' : undefined, color: type === 'expense' ? '#fff' : undefined }}
-                            onClick={() => setType('expense')}>
+                            onClick={() => setType('expense')}
+                        >
                             Despesa
                         </Button>
-                        <Button type="button"
+                        <Button
+                            type="button"
                             className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
                             style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? '#12c2e9' : undefined, color: type === 'income' ? '#fff' : undefined }}
-                            onClick={() => setType('income')}>
+                            onClick={() => setType('income')}
+                        >
                             Receita
                         </Button>
                     </div>
 
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         <div style={{ flex: 1 }}>
-                            <Input label="Nome" value={name} onChange={e => setName(e.target.value)} required placeholder="Ex: Mercado" />
+                            <Input label="Nome" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Ex: Mercado" />
                         </div>
                         <div style={{ width: '80px' }}>
-                            <Input label="Ícone" value={icon} onChange={e => setIcon(e.target.value)} placeholder="🏷️" style={{ textAlign: 'center' }} />
+                            <Input label="Ícone" value={icon} onChange={(e) => setIcon(e.target.value)} placeholder={DEFAULT_ICON} style={{ textAlign: 'center' }} />
                         </div>
                     </div>
 
                     <div className="input-group" style={{ marginBottom: '1rem' }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem' }}>Cor</label>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <input type="color" value={color} onChange={e => setColor(e.target.value)} style={{ width: '50px', height: '50px', border: 'none', borderRadius: '8px', cursor: 'pointer' }} />
+                            <input type="color" value={color} onChange={(e) => setColor(e.target.value)} style={{ width: '50px', height: '50px', border: 'none', borderRadius: '8px', cursor: 'pointer' }} />
                             <span style={{ fontSize: '0.9rem', opacity: 0.7 }}>{color}</span>
                         </div>
                     </div>
@@ -198,16 +234,16 @@ export default function Categories() {
     );
 }
 
-function CategoryItem({ cat, onEdit, onDelete }) {
+function CategoryItem({ category, onEdit, onDelete }) {
     return (
-        <Card hover style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', borderLeft: `4px solid ${cat.color}` }}>
+        <Card hover style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', borderLeft: `4px solid ${category.color}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span style={{ fontSize: '1.5rem' }}>{cat.icon || '🏷️'}</span>
-                <span style={{ fontWeight: 600 }}>{cat.name}</span>
+                <span style={{ fontSize: '1.5rem' }}>{category.icon || DEFAULT_ICON}</span>
+                <span style={{ fontWeight: 600 }}>{category.name}</span>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button onClick={onEdit} className="btn-ghost" style={{ padding: '0.5rem' }}><Edit2 size={16} /></button>
-                <button onClick={onDelete} className="btn-ghost" style={{ padding: '0.5rem', color: '#f64f59' }}><Trash2 size={16} /></button>
+                <button onClick={onEdit} className="btn-ghost" style={{ padding: '0.5rem' }} aria-label={`Editar ${category.name}`}><Edit2 size={16} /></button>
+                <button onClick={onDelete} className="btn-ghost" style={{ padding: '0.5rem', color: '#f64f59' }} aria-label={`Excluir ${category.name}`}><Trash2 size={16} /></button>
             </div>
         </Card>
     );

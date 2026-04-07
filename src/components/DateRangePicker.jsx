@@ -210,7 +210,7 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
                                         setIsOpen(false);
                                     }}
                                 >
-                                    Este Mês
+                                    Este mês
                                 </Button>
                                 <Button
                                     className="btn-primary"
@@ -228,3 +228,4 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
         </div>
     );
 }
+

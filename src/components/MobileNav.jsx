@@ -33,11 +33,11 @@ export function MobileNav() {
 
     return (
         <>
-            <motion.nav 
+            <motion.nav
                 className="liquid-nav-container"
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             >
                 <div className="liquid-glass-pill">
                     {barItemsLeft.map((item) => {
@@ -54,7 +54,7 @@ export function MobileNav() {
                                     <motion.div
                                         layoutId="liquid-bubble"
                                         className="liquid-bubble"
-                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                                     />
                                 )}
                                 <item.icon className="liquid-icon" size={24} strokeWidth={isActive ? 2.5 : 1.5} />
@@ -62,7 +62,6 @@ export function MobileNav() {
                         );
                     })}
 
-                    {/* Central Action (FAB translated to internal glass item) */}
                     <div className="liquid-nav-item">
                         <FAB
                             className="liquid-fab-override"
@@ -76,7 +75,7 @@ export function MobileNav() {
                                 border: 'none',
                                 color: 'inherit',
                                 padding: 0,
-                                boxShadow: 'none'
+                                boxShadow: 'none',
                             }}
                         />
                     </div>
@@ -95,7 +94,7 @@ export function MobileNav() {
                                     <motion.div
                                         layoutId="liquid-bubble"
                                         className="liquid-bubble"
-                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                                     />
                                 )}
                                 <item.icon className="liquid-icon" size={24} strokeWidth={isActive ? 2.5 : 1.5} />
@@ -106,14 +105,14 @@ export function MobileNav() {
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         className={`liquid-nav-item ${isMenuOpen ? 'active' : ''}`}
-                        aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
+                        aria-label={isMenuOpen ? 'Fechar Menu' : 'Abrir Menu'}
                         aria-expanded={isMenuOpen}
                     >
                         {isMenuOpen && (
                             <motion.div
                                 layoutId="liquid-bubble"
                                 className="liquid-bubble"
-                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                             />
                         )}
                         {isMenuOpen ? <X className="liquid-icon" size={24} strokeWidth={2.5} /> : <MenuIcon className="liquid-icon" size={24} strokeWidth={1.5} />}
@@ -121,59 +120,58 @@ export function MobileNav() {
                 </div>
             </motion.nav>
 
-            {/* Menu Overlay */}
             {createPortal(
                 <AnimatePresence>
                     {isMenuOpen && (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="mobile-menu-overlay" 
-                            onClick={() => setIsMenuOpen(false)} 
+                            className="mobile-menu-overlay"
+                            onClick={() => setIsMenuOpen(false)}
                             style={{ zIndex: 9998 }}
                         >
                             <motion.div
                                 initial={{ opacity: 0, y: 50, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 50, scale: 0.95 }}
-                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                                 className="mobile-menu-grid"
-                                onClick={e => e.stopPropagation()}
+                                onClick={(e) => e.stopPropagation()}
                             >
                                 <div className="menu-drag-handle"></div>
 
                                 <div className="menu-toggles-row">
-                                    <button onClick={togglePrivacy} className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`} aria-label={isPrivacyMode ? "Mostrar valores" : "Ocultar valores"}>
+                                    <button onClick={togglePrivacy} className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`} aria-label={isPrivacyMode ? 'Mostrar valores' : 'Ocultar valores'}>
                                         <div className="toggle-icon-box">
                                             {isPrivacyMode ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                                         </div>
                                         <span>{isPrivacyMode ? 'Oculto' : 'Visível'}</span>
                                     </button>
-                                    <button onClick={() => toggleEventMode(!isEventMode)} className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`} aria-label={isEventMode ? "Sair Modo Viagem" : "Modo Viagem"}>
+                                    <button onClick={() => toggleEventMode(!isEventMode)} className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`} aria-label={isEventMode ? 'Sair Modo Viagem' : 'Modo Viagem'}>
                                         <div className="toggle-icon-box"><Plane size={16} strokeWidth={1.5} /></div>
                                         <span>Viagem</span>
                                     </button>
                                 </div>
 
-                                <motion.div 
+                                <motion.div
                                     className="menu-items-grid"
                                     initial="hidden"
                                     animate="visible"
                                     variants={{
                                         hidden: { opacity: 0 },
-                                        visible: {
-                                            opacity: 1,
-                                            transition: { staggerChildren: 0.05, delayChildren: 0.1 }
-                                        }
+                                        visible: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
                                     }}
                                 >
                                     {menuItems.map((item) => (
-                                        <motion.div key={item.path} variants={{
-                                            hidden: { opacity: 0, y: 10 },
-                                            visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } }
-                                        }}>
+                                        <motion.div
+                                            key={item.path}
+                                            variants={{
+                                                hidden: { opacity: 0, y: 10 },
+                                                visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: 'easeOut' } },
+                                            }}
+                                        >
                                             <NavLink
                                                 to={item.path}
                                                 onClick={() => setIsMenuOpen(false)}
@@ -188,10 +186,12 @@ export function MobileNav() {
                                         </motion.div>
                                     ))}
 
-                                    <motion.div variants={{
-                                        hidden: { opacity: 0, y: 10 },
-                                        visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: "easeOut" } }
-                                    }}>
+                                    <motion.div
+                                        variants={{
+                                            hidden: { opacity: 0, y: 10 },
+                                            visible: { opacity: 1, y: 0, transition: { duration: 0.2, ease: 'easeOut' } },
+                                        }}
+                                    >
                                         <button
                                             onClick={signOut}
                                             className="mobile-menu-item"
@@ -209,7 +209,7 @@ export function MobileNav() {
                         </motion.div>
                     )}
                 </AnimatePresence>,
-                document.body
+                document.body,
             )}
         </>
     );

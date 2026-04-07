@@ -6,12 +6,11 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
-import { Plus, ArrowUpRight, ArrowDownLeft, Trash2, Edit2, Download } from 'lucide-react';
+import { Plus, ArrowUpRight, Download, Search, X } from 'lucide-react';
 import { Skeleton } from '../components/Skeleton';
 
 import { useToast } from '../context/ToastContext';
 import { EmptyState } from '../components/EmptyState';
-import { exportTransactionsToExcel } from '../lib/exportUtils';
 import { getSmartCategory } from '../utils/smartCategories';
 import { TransactionItem } from '../components/TransactionItem';
 import { DateRangePicker } from '../components/DateRangePicker';
@@ -26,8 +25,8 @@ export default function Transactions() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [activeFilter, setActiveFilter] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
 
-    // Form State
     const [transactionToEdit, setTransactionToEdit] = useState(null);
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
@@ -36,17 +35,14 @@ export default function Transactions() {
     const [expenseType, setExpenseType] = useState('variable');
     const [isRecurring, setIsRecurring] = useState(false);
 
-    // Filter State
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
 
-    // Wallets State
     const [wallets, setWallets] = useState([]);
     const [selectedWalletId, setSelectedWalletId] = useState('');
 
-    // Category State
     const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState(null); // Stores the full object
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
     useEffect(() => {
         if (user) {
@@ -59,17 +55,16 @@ export default function Transactions() {
                 fetchTransactions();
                 fetchWallets();
             };
+
             window.addEventListener('supabase-sync', handleSync);
             return () => window.removeEventListener('supabase-sync', handleSync);
         }
     }, [user]);
 
-    // ... fetchTransactions ...
-
     const fetchWallets = async () => {
         const { data } = await supabase.from('wallets').select('*');
         setWallets(data || []);
-        // Set default wallet if none selected or available
+
         if (data && data.length > 0 && !selectedWalletId) {
             setSelectedWalletId(data[0].id);
         }
@@ -112,8 +107,7 @@ export default function Transactions() {
         setSelectedWalletId(tx.wallet_id || (wallets.length > 0 ? wallets[0].id : ''));
         setIsRecurring(false);
 
-        // Try to match existing string category to a category object for UI highlight
-        const match = categories.find(c => c.name === tx.category && c.type === tx.type);
+        const match = categories.find((c) => c.name === tx.category && c.type === tx.type);
         setSelectedCategory(match || null);
 
         setIsModalOpen(true);
@@ -122,18 +116,17 @@ export default function Transactions() {
     const handleSaveTransaction = async (e) => {
         e.preventDefault();
         setSubmitting(true);
+
         try {
             const payload = {
                 description,
                 amount: parseFloat(amount),
                 type,
                 category,
-                // If editing, keep original date or update? Let's keep original date for now unless we add a date picker
-                // Actually, let's allow updating date if we had a field, but we don't. 
-                // Creating new: use now(). Editing: keep existing date.
+                wallet_id: selectedWalletId || null,
                 date: transactionToEdit ? transactionToEdit.date : new Date().toISOString(),
                 profile_id: user.id,
-                expense_type: type === 'expense' ? expenseType : null
+                expense_type: type === 'expense' ? expenseType : null,
             };
 
             let error;
@@ -153,7 +146,6 @@ export default function Transactions() {
                 error = insertError;
                 if (data) newTx = data[0];
 
-                // Handle Recurring Creation (Only for new transactions for now)
                 if (!error && isRecurring) {
                     const nextDate = new Date();
                     nextDate.setMonth(nextDate.getMonth() + 1);
@@ -166,10 +158,10 @@ export default function Transactions() {
                         expense_type: type === 'expense' ? expenseType : null,
                         frequency: 'monthly',
                         next_due_date: nextDate.toISOString(),
-                        profile_id: user.id
+                        profile_id: user.id,
                     }]);
 
-                    if (recurError) console.error("Error creating recurring template:", recurError);
+                    if (recurError) console.error('Error creating recurring template:', recurError);
                 }
             }
 
@@ -181,13 +173,9 @@ export default function Transactions() {
 
             if (transactionToEdit) {
                 addToast('Transação atualizada!', 'success');
-            } else {
-                // No toast for new, just animation
-                if (newTx) {
-                    window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: newTx }));
-                }
+            } else if (newTx) {
+                window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: newTx }));
             }
-
         } catch (error) {
             addToast(error.message, 'error');
         } finally {
@@ -208,59 +196,74 @@ export default function Transactions() {
 
     const handleDeleteTransaction = async (id) => {
         if (!confirm('Tem certeza que deseja excluir esta transação?')) return;
+
         try {
             const { error } = await supabase.from('transactions').delete().eq('id', id);
             if (error) throw error;
-            setTransactions(transactions.filter(t => t.id !== id));
+            setTransactions(transactions.filter((t) => t.id !== id));
         } catch (error) {
             console.error('Erro ao excluir:', error);
             alert('Erro ao excluir transação.');
         }
     };
 
-    const handleExport = () => {
-        if (transactions.length === 0) {
-            addToast('Sem transações para exportar.', 'error');
-            return;
+    const availableCategories = categories.filter((c) => c.type === type);
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+
+    const filteredTransactions = transactions.filter((tx) => {
+        if (activeFilter === 'me' && tx.profile_id !== user.id) return false;
+        if (activeFilter === 'partner' && tx.profile_id !== profile?.partner_id) return false;
+
+        const txDate = new Date(tx.date);
+        txDate.setHours(0, 0, 0, 0);
+
+        let start = null;
+        let end = null;
+
+        if (startDate) {
+            const [y, m, d] = startDate.split('-');
+            start = new Date(Number(y), Number(m) - 1, Number(d));
         }
 
-        // Use the filtered transactions if needed, but usually export all is preferred or explicitly filtered.
-        // Let's filter based on the current date filters if active.
-        const filteredTransactions = transactions.filter(tx => {
-            if (!startDate && !endDate) return true;
-            const txDate = new Date(tx.date);
-            txDate.setHours(0, 0, 0, 0);
-
-            let start = null;
-            let end = null;
-
-            if (startDate) {
-                const [y, m, d] = startDate.split('-');
-                start = new Date(Number(y), Number(m) - 1, Number(d));
-            }
-
-            if (endDate) {
-                const [y, m, d] = endDate.split('-');
-                end = new Date(Number(y), Number(m) - 1, Number(d));
-                end.setHours(23, 59, 59, 999);
-            }
-
-            if (start && txDate < start) return false;
-            if (end && txDate > end) return false;
-
-            return true;
-        });
-
-        if (filteredTransactions.length === 0) {
-            addToast('Nenhuma transação encontrada no período selecionado.', 'error');
-            return;
+        if (endDate) {
+            const [y, m, d] = endDate.split('-');
+            end = new Date(Number(y), Number(m) - 1, Number(d));
+            end.setHours(23, 59, 59, 999);
         }
 
-        exportTransactionsToExcel(filteredTransactions);
+        if (start && txDate < start) return false;
+        if (end && txDate > end) return false;
+
+        if (!normalizedSearch) return true;
+
+        const target = `${tx.description} ${tx.category || ''}`.toLowerCase();
+        return target.includes(normalizedSearch);
+    });
+
+    const filteredIncome = filteredTransactions
+        .filter((tx) => tx.type === 'income')
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+    const filteredExpense = filteredTransactions
+        .filter((tx) => tx.type === 'expense')
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+    const hasActiveFilters = Boolean(searchQuery || startDate || endDate || activeFilter !== 'all');
+
+    const clearFilters = () => {
+        setSearchQuery('');
+        setStartDate('');
+        setEndDate('');
+        setActiveFilter('all');
     };
 
-    // Filter categories for the modal based on current type
-    const availableCategories = categories.filter(c => c.type === type);
+    const handleExport = async () => {
+        if (filteredTransactions.length === 0) {
+            addToast('Sem transações para exportar no filtro atual.', 'error');
+            return;
+        }
+
+        const { exportTransactionsToExcel } = await import('../lib/exportUtils');
+        exportTransactionsToExcel(filteredTransactions);
+    };
 
     return (
         <div className="container fade-in" style={{ paddingBottom: '80px' }}>
@@ -277,14 +280,12 @@ export default function Transactions() {
 
             <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
 
-            {/* Date Filters */}
-            <div className="date-filters" style={{ marginBottom: '1.5rem' }}>
+            <div className="transactions-toolbar">
                 <DateRangePicker
                     startDate={startDate ? new Date(startDate.split('-')[0], startDate.split('-')[1] - 1, startDate.split('-')[2]) : null}
                     endDate={endDate ? new Date(endDate.split('-')[0], endDate.split('-')[1] - 1, endDate.split('-')[2]) : null}
                     onChange={({ start, end }) => {
                         if (start) {
-                            // Formatting to YYYY-MM-DD manually to avoid timezone issues or use format from date-fns
                             const y = start.getFullYear();
                             const m = String(start.getMonth() + 1).padStart(2, '0');
                             const d = String(start.getDate()).padStart(2, '0');
@@ -303,9 +304,49 @@ export default function Transactions() {
                         }
                     }}
                 />
+
+                <div className="transactions-search">
+                    <Search size={16} />
+                    <input
+                        type="search"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Buscar por descrição ou categoria"
+                        aria-label="Buscar transações"
+                    />
+                    {searchQuery && (
+                        <button type="button" onClick={() => setSearchQuery('')} aria-label="Limpar busca">
+                            <X size={14} />
+                        </button>
+                    )}
+                </div>
+
+                {hasActiveFilters && (
+                    <Button variant="ghost" onClick={clearFilters}>
+                        Limpar filtros
+                    </Button>
+                )}
             </div>
 
-            {/* Transaction List */}
+            <div className="transactions-summary">
+                <Card hover={false} className="transactions-summary-card">
+                    <span className="transactions-summary-label">Resultados</span>
+                    <strong>{filteredTransactions.length}</strong>
+                </Card>
+                <Card hover={false} className="transactions-summary-card">
+                    <span className="transactions-summary-label">Entradas filtradas</span>
+                    <strong style={{ color: 'var(--color-success)' }}>
+                        R$ {filteredIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </strong>
+                </Card>
+                <Card hover={false} className="transactions-summary-card">
+                    <span className="transactions-summary-label">Saídas filtradas</span>
+                    <strong style={{ color: 'var(--color-danger)' }}>
+                        R$ {filteredExpense.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </strong>
+                </Card>
+            </div>
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {loading ? (
                     Array(5).fill(0).map((_, i) => (
@@ -319,55 +360,31 @@ export default function Transactions() {
                         actionText="Nova Transação"
                         onAction={handleOpenNew}
                     />
+                ) : filteredTransactions.length === 0 ? (
+                    <EmptyState
+                        icon={Search}
+                        title="Nenhum resultado encontrado"
+                        description="Tente ajustar período, parceiro ou busca para localizar outras movimentações."
+                        actionText="Limpar filtros"
+                        onAction={clearFilters}
+                    />
                 ) : (
-
                     <AnimatePresence mode="popLayout">
-                        {transactions
-                            .filter(tx => {
-                                // First apply partner filter
-                                if (activeFilter === 'me' && tx.profile_id !== user.id) return false;
-                                if (activeFilter === 'partner' && tx.profile_id !== profile?.partner_id) return false;
-
-                                // Then apply date filter
-                                if (!startDate && !endDate) return true;
-                                const txDate = new Date(tx.date);
-                                txDate.setHours(0, 0, 0, 0);
-
-                                let start = null;
-                                let end = null;
-
-                                if (startDate) {
-                                    const [y, m, d] = startDate.split('-');
-                                    start = new Date(Number(y), Number(m) - 1, Number(d));
-                                }
-
-                                if (endDate) {
-                                    const [y, m, d] = endDate.split('-');
-                                    end = new Date(Number(y), Number(m) - 1, Number(d));
-                                    end.setHours(23, 59, 59, 999);
-                                }
-
-                                if (start && txDate < start) return false;
-                                if (end && txDate > end) return false;
-
-                                return true;
-                            })
-                            .map((tx, index) => (
-                                <TransactionItem
-                                    key={tx.id}
-                                    transaction={tx}
-                                    categories={categories}
-                                    onEdit={handleOpenEdit}
-                                    onDelete={handleDeleteTransaction}
-                                    index={index}
-                                />
-                            ))}
+                        {filteredTransactions.map((tx, index) => (
+                            <TransactionItem
+                                key={tx.id}
+                                transaction={tx}
+                                categories={categories}
+                                onEdit={handleOpenEdit}
+                                onDelete={handleDeleteTransaction}
+                                index={index}
+                            />
+                        ))}
                     </AnimatePresence>
                 )}
             </div>
 
-            {/* Add/Edit Transaction Modal */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={transactionToEdit ? "Editar Transação" : "Nova Transação"}>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={transactionToEdit ? 'Editar Transação' : 'Nova Transação'}>
                 <form onSubmit={handleSaveTransaction}>
                     <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                         <Button
@@ -398,14 +415,33 @@ export default function Transactions() {
                         required
                     />
 
-                    {/* Category Selection Grid */}
+                    <div className="input-group">
+                        <label className="input-label">Carteira</label>
+                        <select
+                            className="input-field"
+                            value={selectedWalletId}
+                            onChange={(e) => setSelectedWalletId(e.target.value)}
+                            required
+                        >
+                            {wallets.length === 0 ? (
+                                <option value="">Cadastre uma carteira primeiro</option>
+                            ) : (
+                                wallets.map((wallet) => (
+                                    <option key={wallet.id} value={wallet.id}>
+                                        {wallet.name}
+                                    </option>
+                                ))
+                            )}
+                        </select>
+                    </div>
+
                     <div className="input-group" style={{ marginBottom: '1rem' }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                             Categoria
                         </label>
                         {availableCategories.length > 0 ? (
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '0.5rem' }}>
-                                {availableCategories.map(cat => (
+                                {availableCategories.map((cat) => (
                                     <div
                                         key={cat.id}
                                         onClick={() => {
@@ -424,7 +460,7 @@ export default function Transactions() {
                                             alignItems: 'center',
                                             gap: '0.2rem',
                                             transition: 'all 0.2s',
-                                            textAlign: 'center'
+                                            textAlign: 'center',
                                         }}
                                     >
                                         <div style={{ fontSize: '1.5rem' }}>{cat.icon}</div>
@@ -435,23 +471,21 @@ export default function Transactions() {
                         ) : (
                             <div className="surface-secondary" style={{ padding: '1rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
                                 <p>Nenhuma categoria criada.</p>
-                                <Button type="button" variant="ghost" className="btn-primary" style={{ marginTop: '0.5rem', fontSize: '0.8rem' }} onClick={() => window.location.href = '/categories'}>Criar Agora</Button>
+                                <Button type="button" variant="ghost" className="btn-primary" style={{ marginTop: '0.5rem', fontSize: '0.8rem' }} onClick={() => { window.location.href = '/categories'; }}>Criar agora</Button>
                             </div>
                         )}
-                        {/* Fallback Input if needed (hidden or optional? Let's hide it if categories exist) */}
                     </div>
 
-                    {/* Mandatory Expense Type Selection */}
                     {type === 'expense' && (
                         <div className="input-group" style={{ marginBottom: '1rem' }}>
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 500 }}>
-                                Tipo de Gasto <span style={{ color: '#f64f59' }}>*</span>
+                                Tipo de gasto <span style={{ color: '#f64f59' }}>*</span>
                             </label>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
                                 {[
                                     { value: 'fixed', label: 'Fixo', icon: '🔒' },
                                     { value: 'variable', label: 'Variável', icon: '💳' },
-                                    { value: 'lifestyle', label: 'Lazer', icon: '🍿' }
+                                    { value: 'lifestyle', label: 'Lazer', icon: '🍿' },
                                 ].map((opt) => (
                                     <div
                                         key={opt.value}
@@ -465,7 +499,7 @@ export default function Transactions() {
                                             background: expenseType === opt.value ? 'rgba(246, 79, 89, 0.2)' : undefined,
                                             border: expenseType === opt.value ? '1px solid #f64f59' : '1px solid transparent',
                                             transition: 'all 0.2s',
-                                            color: 'var(--text-main)'
+                                            color: 'var(--text-main)',
                                         }}
                                     >
                                         <div style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>{opt.icon}</div>
@@ -499,7 +533,6 @@ export default function Transactions() {
                             const val = e.target.value;
                             setDescription(val);
 
-                            // Smart Category (Only if adding new or category is empty)
                             if (!transactionToEdit && val.length > 2 && !category) {
                                 const smartMatch = getSmartCategory(val, categories);
                                 if (smartMatch) {
@@ -513,10 +546,10 @@ export default function Transactions() {
                     />
 
                     <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} loading={submitting}>
-                        {transactionToEdit ? "Salvar Alterações" : "Salvar"}
+                        {transactionToEdit ? 'Salvar alterações' : 'Salvar'}
                     </Button>
                 </form>
             </Modal>
-        </div >
+        </div>
     );
 }

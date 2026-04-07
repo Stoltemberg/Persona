@@ -8,7 +8,10 @@ export default function Landing() {
         <main className="landing-page fade-in">
             <Helmet>
                 <title>Persona - Seu sistema operacional financeiro</title>
-                <meta name="description" content="Reimagine sua vida financeira com uma experiência visual moderna: planejamento, automações, metas e decisões mais inteligentes em um só lugar." />
+                <meta
+                    name="description"
+                    content="Reimagine sua vida financeira com uma experiência visual moderna: planejamento, automações, metas e decisões mais inteligentes em um só lugar."
+                />
                 <script type="application/ld+json">
                     {`
                         {
@@ -64,10 +67,7 @@ export default function Landing() {
                     </div>
 
                     <div className="landing-preview-card fade-in stagger-5">
-                        <img
-                            src="/dashboard-preview.png"
-                            alt="Persona Dashboard"
-                        />
+                        <img src="/dashboard-preview.png" alt="Persona Dashboard" />
                     </div>
                 </div>
             </section>
@@ -145,50 +145,61 @@ function FeatureCard({ icon: Icon, title, text }) {
     );
 }
 
-function PricingCard({ title, price, features, featured, buttonText = "Começar", color = "#38ef7d" }) {
+function PricingCard({ title, price, features, featured, buttonText = 'Começar', color = '#38ef7d' }) {
     return (
-        <article className="glass-card" style={{
-            padding: '2rem',
-            width: '100%',
-            border: featured ? `1px solid ${color}` : '1px solid var(--glass-border)',
-            position: 'relative',
-            overflow: 'visible',
-            boxShadow: featured ? `0 0 20px ${color}20` : 'none'
-        }}>
+        <article
+            className="glass-card"
+            style={{
+                padding: '2rem',
+                width: '100%',
+                border: featured ? `1px solid ${color}` : '1px solid var(--glass-border)',
+                position: 'relative',
+                overflow: 'visible',
+                boxShadow: featured ? `0 0 20px ${color}20` : 'none',
+            }}
+        >
             {featured && (
-                <div style={{
-                    position: 'absolute',
-                    top: -12,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: color,
-                    color: '#000',
-                    padding: '0.2rem 1rem',
-                    borderRadius: '20px',
-                    fontSize: '0.8rem',
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap'
-                }}>
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: -12,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: color,
+                        color: '#000',
+                        padding: '0.2rem 1rem',
+                        borderRadius: '20px',
+                        fontSize: '0.8rem',
+                        fontWeight: 'bold',
+                        whiteSpace: 'nowrap',
+                    }}
+                >
                     MAIS POPULAR
                 </div>
             )}
             <h3>{title}</h3>
-            <div style={{ fontSize: '3rem', fontWeight: 700, margin: '1rem 0' }}>{price}<span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-muted)' }}>/mês</span></div>
+            <div style={{ fontSize: '3rem', fontWeight: 700, margin: '1rem 0' }}>
+                {price}
+                <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-muted)' }}>/mês</span>
+            </div>
             <ul style={{ listStyle: 'none', padding: 0, textAlign: 'left', marginBottom: '2rem' }}>
-                {features.map((f, i) => (
-                    <li key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem', color: 'var(--text-secondary)' }}>
-                        <Check size={18} color={color} /> {f}
+                {features.map((feature, index) => (
+                    <li key={index} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem', color: 'var(--text-secondary)' }}>
+                        <Check size={18} color={color} /> {feature}
                     </li>
                 ))}
             </ul>
             <Link to="/login">
-                <Button className={featured ? 'btn-primary' : 'btn-ghost'} style={{
-                    width: '100%',
-                    justifyContent: 'center',
-                    background: featured ? color : 'transparent',
-                    borderColor: featured ? color : 'var(--glass-border)',
-                    color: featured ? '#000' : 'inherit'
-                }}>
+                <Button
+                    className={featured ? 'btn-primary' : 'btn-ghost'}
+                    style={{
+                        width: '100%',
+                        justifyContent: 'center',
+                        background: featured ? color : 'transparent',
+                        borderColor: featured ? color : 'var(--glass-border)',
+                        color: featured ? '#000' : 'inherit',
+                    }}
+                >
                     {buttonText}
                 </Button>
             </Link>

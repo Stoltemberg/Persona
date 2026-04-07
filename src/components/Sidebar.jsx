@@ -1,10 +1,9 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart, Wallet, Repeat, Eye, EyeOff, Calendar, TrendingUp, Plane } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, LogOut, Eye, EyeOff, Plane, Repeat } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
 import clsx from 'clsx';
-
 import { createPortal } from 'react-dom';
 
 export function Sidebar() {
@@ -32,8 +31,8 @@ export function Sidebar() {
                     <button
                         onClick={togglePrivacy}
                         className="sidebar-header-btn"
-                        title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
-                        aria-label={isPrivacyMode ? "Mostrar valores monetários" : "Ocultar valores monetários"}
+                        title={isPrivacyMode ? 'Mostrar valores' : 'Esconder valores'}
+                        aria-label={isPrivacyMode ? 'Mostrar valores monetários' : 'Ocultar valores monetários'}
                     >
                         {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -41,8 +40,8 @@ export function Sidebar() {
                         onClick={() => toggleEventMode(!isEventMode)}
                         className="sidebar-header-btn"
                         style={{ color: isEventMode ? 'var(--text-main)' : undefined }}
-                        title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
-                        aria-label={isEventMode ? "Sair do Modo Viagem" : "Entrar no Modo Viagem"}
+                        title={isEventMode ? 'Sair do Modo Viagem' : 'Modo Viagem'}
+                        aria-label={isEventMode ? 'Sair do Modo Viagem' : 'Entrar no Modo Viagem'}
                     >
                         <Plane size={18} />
                     </button>
@@ -56,46 +55,31 @@ export function Sidebar() {
                         key={item.path}
                         to={item.path}
                         aria-label={item.label}
-                        className={({ isActive }) => clsx(
-                            'nav-item',
-                            isActive ? 'active' : '',
-                            item.label === 'Transações' && hasNewPartnerUpdates && 'indicator-pulse'
-                        )}
+                        className={({ isActive }) =>
+                            clsx('nav-item', isActive ? 'active' : '', item.label === 'Transações' && hasNewPartnerUpdates && 'indicator-pulse')
+                        }
                     >
-                        {({ isActive }) => (
-                            <>
-                                <div>
-                                    <item.icon size={20} />
-                                </div>
-                                <span>
-                                    {item.label}
-                                </span>
-                            </>
-                        )}
+                        <div>
+                            <item.icon size={20} />
+                        </div>
+                        <span>{item.label}</span>
                     </NavLink>
                 ))}
             </nav>
 
-            <button
-                onClick={signOut}
-                className="logout-btn"
-                aria-label="Sair da conta"
-            >
-
+            <button onClick={signOut} className="logout-btn" aria-label="Sair da conta">
                 <div>
                     <LogOut size={22} />
                 </div>
                 <span>Sair</span>
             </button>
         </aside>
-
     );
 
-    // Use Portal to render outside of the app root (avoiding transforms)
     return createPortal(
         <div className="sidebar-container">
             {sidebarContent}
         </div>,
-        document.body
+        document.body,
     );
 }

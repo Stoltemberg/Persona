@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, X, ArrowUpRight, ArrowDownLeft, Wallet, CheckCircle, Circle, Repeat } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownLeft, CheckCircle, Circle, Repeat } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
@@ -7,27 +7,23 @@ import { useHaptic } from '../hooks/useHaptic';
 import { Modal } from './Modal';
 import { Button } from './Button';
 import { Input } from './Input';
-
-import { usePrivacy } from '../context/PrivacyContext';
 import { getSmartCategory } from '../utils/smartCategories';
 
 export function FAB({ className, style }) {
     const { user } = useAuth();
     const { addToast } = useToast();
     const { medium, success } = useHaptic();
-    const { isPrivacyMode } = usePrivacy();
 
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    // Form State
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('expense');
     const [category, setCategory] = useState('');
     const [expenseType, setExpenseType] = useState('variable');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [status, setStatus] = useState('paid'); // 'paid' or 'pending'
+    const [status, setStatus] = useState('paid');
     const [isRecurring, setIsRecurring] = useState(false);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState(null);
@@ -35,10 +31,8 @@ export function FAB({ className, style }) {
     useEffect(() => {
         if (isOpen && user) {
             fetchCategories();
-            // Reset date to today on open if needed, or keep last selected
             if (!date) setDate(new Date().toISOString().split('T')[0]);
 
-            // Auto set status based on date
             if (new Date().toISOString().split('T')[0] < date) {
                 setStatus('pending');
             } else {
@@ -77,6 +71,7 @@ export function FAB({ className, style }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+
         try {
             const { data, error } = await supabase.from('transactions').insert([{
                 description,
@@ -84,8 +79,8 @@ export function FAB({ className, style }) {
                 type,
                 category,
                 expense_type: type === 'expense' ? expenseType : null,
-                date: date,
-                profile_id: user.id
+                date,
+                profile_id: user.id,
             }]).select();
 
             if (error) throw error;
@@ -94,14 +89,11 @@ export function FAB({ className, style }) {
             addToast('Transação registrada!', 'success');
             handleClose();
 
-            // Dispatch event with the new transaction data
             if (data && data.length > 0) {
                 window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: data[0] }));
             } else {
-                // Fallback if data isn't returned for some reason (though .select() should return it)
                 window.dispatchEvent(new Event('transaction-updated'));
             }
-
         } catch (error) {
             console.error('FAB save error:', error);
             addToast(error.message || 'Erro ao salvar', 'error');
@@ -110,7 +102,7 @@ export function FAB({ className, style }) {
         }
     };
 
-    const availableCategories = categories.filter(c => c.type === type);
+    const availableCategories = categories.filter((c) => c.type === type);
 
     return (
         <>
@@ -125,7 +117,6 @@ export function FAB({ className, style }) {
 
             <Modal isOpen={isOpen} onClose={handleClose} title="Nova Transação">
                 <form onSubmit={handleSubmit} className="fab-modal-form">
-                    {/* Type Segmented Control */}
                     <div className="fab-type-toggle">
                         <button
                             type="button"
@@ -145,7 +136,6 @@ export function FAB({ className, style }) {
                         </button>
                     </div>
 
-                    {/* Amount & Date */}
                     <div className="fab-row">
                         <Input
                             label="Valor"
@@ -175,7 +165,6 @@ export function FAB({ className, style }) {
                         />
                     </div>
 
-                    {/* Status & Recurrence Chips */}
                     <div className="fab-chips-row">
                         <button
                             type="button"
@@ -195,11 +184,10 @@ export function FAB({ className, style }) {
                         </button>
                     </div>
 
-                    {/* Category Scroll */}
                     <div className="fab-section">
                         <label className="fab-label">Categoria</label>
                         <div className="fab-categories-scroll">
-                            {availableCategories.map(cat => (
+                            {availableCategories.map((cat) => (
                                 <div
                                     key={cat.id}
                                     onClick={() => { setCategory(cat.name); setSelectedCategory(cat); medium(); }}
@@ -216,7 +204,6 @@ export function FAB({ className, style }) {
                         </div>
                     </div>
 
-                    {/* Description */}
                     <Input
                         label="Descrição"
                         placeholder="Ex: Almoço"

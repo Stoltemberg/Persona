@@ -1,5 +1,5 @@
 /* =========================================
-   Persona — OLED Minimalist Finance
+   Persona â€” OLED Minimalist Finance
    ========================================= */
 
 /* ---- Fonts ---- */
@@ -157,7 +157,7 @@ textarea {
 }
 
 /* =========================================
-   3. Typography — SF Pro Hierarchy
+   3. Typography â€” SF Pro Hierarchy
    ========================================= */
 h1 {
   font-family: 'Outfit', sans-serif;
@@ -526,7 +526,7 @@ html.light h3 {
 }
 
 /* =========================================
-   5. Cards — Notched Monolith Architecture
+   5. Cards â€” Notched Monolith Architecture
    ========================================= */
 .glass-card {
   position: relative;
@@ -633,7 +633,7 @@ html.light h3 {
 }
 
 /* =========================================
-   6. Buttons — Apple Pill Style
+   6. Buttons â€” Apple Pill Style
    ========================================= */
 .btn {
   border: none;
@@ -755,7 +755,7 @@ html:not(.light) .nav-item.active {
 }
 
 /* =========================================
-   7. Inputs — Apple Search Field Style
+   7. Inputs â€” Apple Search Field Style
    ========================================= */
 .input-group label {
   font-weight: 500;
@@ -859,7 +859,7 @@ option {
 }
 
 /* =========================================
-   9. Modal — Apple Sheet Style
+   9. Modal â€” Apple Sheet Style
    ========================================= */
 .modal-overlay {
   position: fixed;
@@ -914,7 +914,7 @@ option {
 }
 
 /* =========================================
-   10. Navigation — Apple Sidebar & Dock
+   10. Navigation â€” Apple Sidebar & Dock
    ========================================= */
 
 /* Nav Item Base */
@@ -1253,8 +1253,82 @@ option {
   flex-wrap: wrap;
 }
 
+.transactions-toolbar {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.transactions-search {
+  flex: 1 1 280px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.9rem;
+  background: var(--input-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+}
+
+.transactions-search svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.transactions-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+}
+
+.transactions-search input:focus {
+  outline: none;
+}
+
+.transactions-search button {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.transactions-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.transactions-summary-card {
+  padding: 1rem 1.1rem;
+}
+
+.transactions-summary-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.transactions-summary-card strong {
+  font-size: 1.1rem;
+  color: var(--text-main);
+}
+
 /* =========================================
-   14. Scrollbar — Minimal
+   14. Scrollbar â€” Minimal
    ========================================= */
 ::-webkit-scrollbar {
   width: 5px;
@@ -1282,7 +1356,7 @@ option {
 }
 
 /* =========================================
-   15b. FAB Modal — Apple Sheet Style
+   15b. FAB Modal â€” Apple Sheet Style
    ========================================= */
 .fab-modal-form {
   display: flex;
@@ -1986,7 +2060,7 @@ option {
 }
 
 /* =========================================
-   24. FAB — Floating Action Button
+   24. FAB â€” Floating Action Button
    ========================================= */
 .fab-btn {
   position: fixed;
@@ -2060,7 +2134,7 @@ option {
 }
 
 /* =========================================
-   25. Mobile Navigation — iOS 26 Liquid Glass 
+   25. Mobile Navigation â€” iOS 26 Liquid Glass 
    ========================================= */
 .liquid-nav-container {
   position: fixed;
@@ -2170,7 +2244,7 @@ option {
 }
 
 /* =========================================
-   26. Mobile Menu Sheet — Apple Action Sheet
+   26. Mobile Menu Sheet â€” Apple Action Sheet
    ========================================= */
 .mobile-menu-overlay {
   position: fixed;
@@ -2355,7 +2429,7 @@ option {
 }
 
 /* =========================================
-   27. Responsive — Mobile First
+   27. Responsive â€” Mobile First
    ========================================= */
 @media (max-width: 768px) {
   h1 {
@@ -2435,6 +2509,19 @@ option {
     grid-template-columns: 1fr 1fr auto;
     gap: 0.5rem;
     width: 100%;
+  }
+
+  .transactions-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .transactions-search {
+    width: 100%;
+  }
+
+  .transactions-summary {
+    grid-template-columns: 1fr;
   }
 
   .date-filters>div {
@@ -2581,7 +2668,7 @@ option {
 }
 
 /* =========================================
-   28. Desktop Layout — Dock (iOS 26 Style)
+   28. Desktop Layout â€” Dock (iOS 26 Style)
    ========================================= */
 @media (min-width: 1024px) {
   .app-layout {

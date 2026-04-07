@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Card } from '../components/Card';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { Navigate } from 'react-router-dom';
-import { TrendingUp, Plane, Zap, Shield, Globe, Star } from 'lucide-react';
+import { TrendingUp, Plane, Zap, Shield, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 
@@ -24,6 +23,7 @@ export default function Login() {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
         try {
             if (isSignUp) {
                 await signUp(email, password, fullName);
@@ -36,7 +36,7 @@ export default function Login() {
             if (errorMsg.includes('Invalid login credentials')) errorMsg = 'E-mail ou senha incorretos.';
             if (errorMsg.includes('User already registered')) errorMsg = 'Este e-mail já está cadastrado.';
             if (errorMsg.includes('Password should be at least')) errorMsg = 'A senha deve ter pelo menos 6 caracteres.';
-            
+
             setError(errorMsg);
         } finally {
             setLoading(false);
@@ -51,11 +51,7 @@ export default function Login() {
                 <link rel="canonical" href="https://persona.dev.br/login" />
             </Helmet>
 
-            {/* Background Effects - Removed for Minimalism */}
-
             <div className="container login-grid">
-
-                {/* Hero Section */}
                 <div className="fade-in login-hero">
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '50px', marginBottom: '1.5rem', border: '1px solid var(--glass-border)' }}>
                         <Star size={14} fill="var(--color-brand)" stroke="var(--color-brand)" />
@@ -114,7 +110,6 @@ export default function Login() {
                     </div>
                 </div>
 
-                {/* Login Form with Animation */}
                 <div className="fade-in stagger-1 login-card-container">
                     <motion.div
                         layout
@@ -173,20 +168,24 @@ export default function Login() {
                                 />
                             </motion.div>
 
-                            {error && <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                style={{
-                                    padding: '0.75rem',
-                                    background: 'rgba(246, 79, 89, 0.1)',
-                                    border: '1px solid rgba(246, 79, 89, 0.2)',
-                                    borderRadius: '8px',
-                                    color: '#f64f59',
-                                    marginBottom: '1.5rem',
-                                    fontSize: '0.9rem',
-                                    textAlign: 'center'
-                                }}
-                            >{error}</motion.div>}
+                            {error && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    style={{
+                                        padding: '0.75rem',
+                                        background: 'rgba(246, 79, 89, 0.1)',
+                                        border: '1px solid rgba(246, 79, 89, 0.2)',
+                                        borderRadius: '8px',
+                                        color: '#f64f59',
+                                        marginBottom: '1.5rem',
+                                        fontSize: '0.9rem',
+                                        textAlign: 'center',
+                                    }}
+                                >
+                                    {error}
+                                </motion.div>
+                            )}
 
                             <motion.div layout="position">
                                 <Button
@@ -195,14 +194,14 @@ export default function Login() {
                                     style={{ width: '100%', justifyContent: 'center', marginBottom: '1.5rem', marginTop: '0.5rem', height: '50px', fontSize: '1.1rem' }}
                                     loading={loading}
                                 >
-                                    {isSignUp ? 'Começar Agora' : 'Entrar'}
+                                    {isSignUp ? 'Começar agora' : 'Entrar'}
                                 </Button>
                             </motion.div>
                         </form>
 
                         <motion.div layout="position" style={{ textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1.5rem' }}>
                             <p className="text-small">
-                                {isSignUp ? 'Já tem cadastro?' : "Novo por aqui?"}{' '}
+                                {isSignUp ? 'Já tem cadastro?' : 'Novo por aqui?'}{' '}
                                 <button
                                     className="toggle-btn"
                                     onClick={() => {
@@ -210,7 +209,7 @@ export default function Login() {
                                         setIsSignUp(!isSignUp);
                                     }}
                                 >
-                                    {isSignUp ? 'Fazer Login' : 'Criar Conta'}
+                                    {isSignUp ? 'Fazer login' : 'Criar conta'}
                                 </button>
                             </p>
                         </motion.div>

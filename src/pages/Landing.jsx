@@ -76,9 +76,9 @@ export default function Landing() {
                 <div className="landing-container">
                     <h2 className="landing-section-title">Tudo que você precisa para ganhar previsibilidade</h2>
                     <div className="landing-grid">
-                    <FeatureCard icon={LayoutDashboard} title="Controle Total" text="Dashboard intuitivo com todas as suas contas em um só lugar." />
-                    <FeatureCard icon={Database} title="Organização Automática" text="Categorias inteligentes e filtros poderosos para suas transações." />
-                    <FeatureCard icon={Zap} title="Planejamento Real" text="Defina orçamentos e alcance suas metas financeiras mais rápido." />
+                        <FeatureCard icon={LayoutDashboard} title="Controle Total" text="Dashboard intuitivo com todas as suas contas em um só lugar." />
+                        <FeatureCard icon={Database} title="Organização Automática" text="Categorias inteligentes e filtros poderosos para suas transações." />
+                        <FeatureCard icon={Zap} title="Planejamento Real" text="Defina orçamentos e alcance suas metas financeiras mais rápido." />
                     </div>
                 </div>
             </section>
@@ -87,28 +87,28 @@ export default function Landing() {
                 <div className="landing-container">
                     <h2 className="text-gradient landing-section-title">Planos para cada estágio da sua jornada</h2>
 
-                <div className="landing-pricing-grid">
-                    <PricingCard
-                        title="Grátis"
-                        price="R$ 0"
-                        features={['5 Carteiras', '10 Orçamentos', 'Análise Básica']}
-                    />
-                    <PricingCard
-                        title="Intermediário"
-                        price="R$ 14,90"
-                        features={['Carteiras Ilimitadas', 'Orçamentos Ilimitados', 'Sem Anúncios']}
-                        buttonText="Assinar Intermediário"
-                        color="#12c2e9"
-                    />
-                    <PricingCard
-                        title="Completo"
-                        price="R$ 29,90"
-                        featured
-                        features={['Tudo do Intermediário', 'IA Financeira', 'Exportação Excel', 'Suporte VIP']}
-                        buttonText="Assinar Completo"
-                        color="#FFD700"
-                    />
-                </div>
+                    <div className="landing-pricing-grid">
+                        <PricingCard
+                            title="Grátis"
+                            price="R$ 0"
+                            features={['5 Carteiras', '10 Orçamentos', 'Análise Básica']}
+                        />
+                        <PricingCard
+                            title="Intermediário"
+                            price="R$ 14,90"
+                            features={['Carteiras Ilimitadas', 'Orçamentos Ilimitados', 'Sem Anúncios']}
+                            buttonText="Assinar Intermediário"
+                            color="#12c2e9"
+                        />
+                        <PricingCard
+                            title="Completo"
+                            price="R$ 29,90"
+                            featured
+                            features={['Tudo do Intermediário', 'IA Financeira', 'Exportação Excel', 'Suporte VIP']}
+                            buttonText="Assinar Completo"
+                            color="#FFD700"
+                        />
+                    </div>
                 </div>
             </section>
 

@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+﻿/* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
@@ -6,7 +6,7 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { OnboardingTour } from '../components/OnboardingTour';
 import { Skeleton } from '../components/Skeleton';
-import { ArrowDownLeft, ArrowUpRight, PiggyBank } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, PiggyBank, Wallet, Target, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThreeBackground } from '../components/ThreeBackground';
 import { useDashboardAnimations } from '../hooks/useDashboardAnimations';
@@ -33,6 +33,7 @@ export default function Dashboard() {
 
     const [newTxId, setNewTxId] = useState(null);
     const containerRef = useDashboardAnimations(loading, activeFilter);
+    const formatCurrency = (value) => `R$ ${Number(value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
     useEffect(() => {
         if (user) {
@@ -204,6 +205,14 @@ export default function Dashboard() {
         }
     };
 
+    const firstName = profile?.full_name?.split(' ')[0] || 'Usuário';
+    const monthlyNet = incomes - expenses;
+    const savingsRate = incomes > 0 ? Math.max(((incomes - expenses) / incomes) * 100, 0) : 0;
+    const topWallet = wallets.slice().sort((a, b) => b.current_balance - a.current_balance)[0] || null;
+    const goalProgress = primaryGoal && Number(primaryGoal.target_amount) > 0
+        ? Math.min((Number(primaryGoal.current_amount || 0) / Number(primaryGoal.target_amount || 0)) * 100, 100)
+        : 0;
+
     return (
         <>
             <ThreeBackground />
@@ -253,7 +262,8 @@ export default function Dashboard() {
 
             <PageHeader
                 className="dashboard-header-centered"
-                title={<span>Olá, <span style={{ fontWeight: 600 }}>{profile?.full_name?.split(' ')[0] || 'Usuário'}</span></span>}
+                title={<span>Olá, <span style={{ fontWeight: 600 }}>{firstName}</span></span>}
+                subtitle="Aqui está um retrato rápido do seu momento financeiro."
             />
 
             <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
@@ -266,6 +276,37 @@ export default function Dashboard() {
                         isPrivacyMode ? '••••' : <CountUp end={balance} prefix="R$ " duration={1.5} />
                     )}
                 </div>
+                <p style={{ marginTop: '0.9rem', color: 'var(--text-secondary)', maxWidth: '520px', marginInline: 'auto', lineHeight: 1.6 }}>
+                    {loading ? 'Atualizando panorama...' : monthlyNet >= 0
+                        ? 'Você está fechando o mês com respiro positivo. Aproveite esse espaço para fortalecer a reserva.'
+                        : 'Seu mês está pressionado. Vale revisar saídas recentes e priorizar o essencial nesta semana.'}
+                </p>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
+                    <div className="glass-card" style={{ padding: '1rem 1.1rem', textAlign: 'left' }}>
+                        <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Resultado do mês</div>
+                        <div style={{ fontSize: '1.35rem', fontWeight: 700, color: monthlyNet >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                            {loading || isPrivacyMode ? '••••' : formatCurrency(monthlyNet)}
+                        </div>
+                    </div>
+                    <div className="glass-card" style={{ padding: '1rem 1.1rem', textAlign: 'left' }}>
+                        <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Ritmo de poupança</div>
+                        <div style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                            {loading ? '...' : `${savingsRate.toFixed(0)}%`}
+                        </div>
+                    </div>
+                    <div className="glass-card" style={{ padding: '1rem 1.1rem', textAlign: 'left' }}>
+                        <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Carteira líder</div>
+                        <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                            {loading ? '...' : topWallet ? topWallet.name : 'Sem carteiras'}
+                        </div>
+                        {topWallet && (
+                            <div style={{ marginTop: '0.35rem', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                                {isPrivacyMode ? '••••' : formatCurrency(topWallet.current_balance)}
+                            </div>
+                        )}
+                    </div>
+                </div>
             </section>
 
             {/* Quick Stats Grid */}
@@ -276,7 +317,7 @@ export default function Dashboard() {
                             <ArrowUpRight size={15} />
                         </div>
                         <div>
-                            <div className="dashboard-stat-label">Saídas (Mês)</div>
+                            <div className="dashboard-stat-label">Saídas do mês</div>
                             <div className="dashboard-stat-value" style={{ color: 'var(--color-danger)' }}>
                                 {loading ? '...' : (isPrivacyMode ? '••••' : `R$ ${expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
                             </div>
@@ -290,13 +331,123 @@ export default function Dashboard() {
                             <ArrowDownLeft size={15} />
                         </div>
                         <div>
-                            <div className="dashboard-stat-label">Entradas (Mês)</div>
+                            <div className="dashboard-stat-label">Entradas do mês</div>
                             <div className="dashboard-stat-value" style={{ color: 'var(--color-success)' }}>
                                 {loading ? '...' : (isPrivacyMode ? '••••' : `R$ ${incomes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}
                             </div>
                         </div>
                     </div>
                 </Link>
+
+                <Link to="/goals" style={{ textDecoration: 'none' }}>
+                    <div className="glass-card dashboard-stat-card zoom-on-hover">
+                        <div className="dashboard-stat-icon" style={{ background: 'rgba(79, 41, 240, 0.12)', color: '#8b6cff' }}>
+                            <PiggyBank size={15} />
+                        </div>
+                        <div>
+                            <div className="dashboard-stat-label">Total em metas</div>
+                            <div className="dashboard-stat-value" style={{ color: 'var(--text-main)' }}>
+                                {loading ? '...' : (isPrivacyMode ? '••••' : formatCurrency(savings))}
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+                <div className="glass-card" style={{ padding: '1.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.8rem' }}>
+                        <div className="dashboard-stat-icon" style={{ background: 'rgba(79, 41, 240, 0.12)', color: '#8b6cff' }}>
+                            <Target size={15} />
+                        </div>
+                        <div>
+                            <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>Meta em foco</div>
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                                {primaryGoal ? primaryGoal.title : 'Defina uma meta principal para orientar seus aportes.'}
+                            </div>
+                        </div>
+                    </div>
+                    {primaryGoal ? (
+                        <>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '0.55rem' }}>
+                                <span>{isPrivacyMode ? '••••' : formatCurrency(primaryGoal.current_amount)}</span>
+                                <span>{goalProgress.toFixed(0)}%</span>
+                            </div>
+                            <div style={{ width: '100%', height: '8px', borderRadius: '999px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden', marginBottom: '0.75rem' }}>
+                                <div style={{ width: `${goalProgress}%`, height: '100%', borderRadius: '999px', background: 'linear-gradient(90deg, #4f29f0, #c471ed)' }} />
+                            </div>
+                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                                Faltam {isPrivacyMode ? '••••' : formatCurrency(Number(primaryGoal.target_amount || 0) - Number(primaryGoal.current_amount || 0))} para chegar ao objetivo.
+                            </p>
+                        </>
+                    ) : (
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                            Quando você define um foco principal, o app fica mais útil para priorizar aportes e acompanhar progresso.
+                        </p>
+                    )}
+                </div>
+
+                <div className="glass-card" style={{ padding: '1.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.8rem' }}>
+                        <div className="dashboard-stat-icon" style={{ background: 'rgba(18, 194, 233, 0.12)', color: '#12c2e9' }}>
+                            <Wallet size={15} />
+                        </div>
+                        <div>
+                            <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>Carteiras em destaque</div>
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Veja onde seu dinheiro está mais concentrado.</div>
+                        </div>
+                    </div>
+                    {wallets.length === 0 ? (
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                            Cadastre uma carteira para acompanhar saldos com mais precisão.
+                        </p>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+                            {wallets.slice().sort((a, b) => b.current_balance - a.current_balance).slice(0, 3).map((wallet) => (
+                                <div key={wallet.id} className="surface-secondary" style={{ padding: '0.8rem 0.9rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'center' }}>
+                                    <div>
+                                        <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>{wallet.name}</div>
+                                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'capitalize' }}>{wallet.type?.replace('_', ' ') || 'carteira'}</div>
+                                    </div>
+                                    <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>
+                                        {isPrivacyMode ? '••••' : formatCurrency(wallet.current_balance)}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <div className="glass-card" style={{ padding: '1.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.8rem' }}>
+                        <div className="dashboard-stat-icon" style={{ background: 'rgba(0, 235, 199, 0.12)', color: '#00bfa5' }}>
+                            <Sparkles size={15} />
+                        </div>
+                        <div>
+                            <div style={{ color: 'var(--text-main)', fontWeight: 600 }}>Próximo melhor passo</div>
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Uma ação simples para destravar progresso agora.</div>
+                        </div>
+                    </div>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: 1.6, marginBottom: '0.9rem' }}>
+                        {wallets.length === 0
+                            ? 'Comece cadastrando sua primeira carteira. Isso deixa os saldos, metas e análises muito mais confiáveis.'
+                            : !primaryGoal
+                                ? 'Escolha uma meta principal para transformar o dashboard em um painel de prioridade real.'
+                                : monthlyNet < 0
+                                    ? 'Seu foco agora é reduzir saídas deste mês. Abra o planejamento e corte uma categoria variável.'
+                                    : 'Você abriu espaço no mês. Aproveite para fazer um novo aporte na meta em foco.'}
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+                        <Link to={wallets.length === 0 ? '/wallets' : !primaryGoal ? '/goals' : monthlyNet < 0 ? '/planning' : '/goals'}>
+                            <Button className="btn-primary">
+                                {wallets.length === 0 ? 'Criar carteira' : !primaryGoal ? 'Definir meta' : monthlyNet < 0 ? 'Rever planejamento' : 'Aportar na meta'}
+                            </Button>
+                        </Link>
+                        <Link to="/transactions">
+                            <Button variant="ghost">Ver transações</Button>
+                        </Link>
+                    </div>
+                </div>
             </div>
 
             {/* Upcoming Bills Widget */}
@@ -382,3 +533,5 @@ export default function Dashboard() {
         </>
     );
 }
+
+

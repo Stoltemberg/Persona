@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Button } from '../components/Button';
 import { ArrowLeft } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
@@ -8,7 +7,10 @@ export default function Terms() {
         <main className="fade-in" style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
             <Helmet>
                 <title>Termos de Uso | Persona</title>
-                <meta name="description" content="Termos de Uso do gerenciador financeiro Persona. Conheça as regras e diretrizes para utilização segura do nosso aplicativo." />
+                <meta
+                    name="description"
+                    content="Termos de Uso do gerenciador financeiro Persona. Conheça as regras e diretrizes para utilização segura do nosso aplicativo."
+                />
                 <link rel="canonical" href="https://persona.dev.br/terms" />
             </Helmet>
 
@@ -23,7 +25,7 @@ export default function Terms() {
                 <p>Ao acessar e usar o Persona, você aceita e concorda em cumprir os termos e disposições deste contrato.</p>
 
                 <h3>2. O Serviço</h3>
-                <p>O Persona é uma ferramenta de gestão financeira pessoal. Oferecemos planos gratuitos e pagos ("Pro"). O serviço é fornecido "como está".</p>
+                <p>O Persona é uma ferramenta de gestão financeira pessoal. Oferecemos planos gratuitos e pagos (&quot;Pro&quot;). O serviço é fornecido &quot;como está&quot;.</p>
 
                 <h3>3. Planos e Pagamentos</h3>
                 <p>O plano Pro oferece recursos adicionais. O pagamento é processado via Mercado Pago. Não armazenamos dados de cartão de crédito. O acesso é liberado após a confirmação do pagamento.</p>

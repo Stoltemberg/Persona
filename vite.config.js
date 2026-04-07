@@ -10,7 +10,6 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes('node_modules')) return
 
-          if (id.includes('exceljs')) return 'excel'
           if (id.includes('three')) return 'three'
           if (id.includes('recharts')) return 'charts'
           if (id.includes('@supabase')) return 'supabase'

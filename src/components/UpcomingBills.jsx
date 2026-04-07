@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { Check, AlertCircle, Calendar, Clock } from 'lucide-react';
@@ -133,7 +133,7 @@ export function UpcomingBills() {
                 justifyContent: 'center',
                 gap: '0.5rem'
             }}>
-                <Calendar size={16} /> Próximos Vencimentos
+                <Calendar size={16} /> Próximos vencimentos
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -203,3 +203,4 @@ export function UpcomingBills() {
         </section>
     );
 }
+

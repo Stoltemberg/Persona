@@ -14,16 +14,11 @@ export default function Goals({ isTab }) {
     const { user } = useAuth();
     const [goals, setGoals] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    // Modals
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
-    const [goalsToEdit, setGoalsToEdit] = useState(null); // If null, it's new mode
-    const [selectedGoal, setSelectedGoal] = useState(null); // For deposit
-
+    const [goalToEdit, setGoalToEdit] = useState(null);
+    const [selectedGoal, setSelectedGoal] = useState(null);
     const [submitting, setSubmitting] = useState(false);
-
-    // Form State
     const [title, setTitle] = useState('');
     const [targetAmount, setTargetAmount] = useState('');
     const [currentAmount, setCurrentAmount] = useState('');
@@ -51,7 +46,7 @@ export default function Goals({ isTab }) {
     };
 
     const handleOpenEdit = (goal) => {
-        setGoalsToEdit(goal);
+        setGoalToEdit(goal);
         setTitle(goal.title);
         setTargetAmount(goal.target_amount);
         setCurrentAmount(goal.current_amount);
@@ -60,7 +55,7 @@ export default function Goals({ isTab }) {
     };
 
     const handleOpenNew = () => {
-        setGoalsToEdit(null);
+        setGoalToEdit(null);
         resetForm();
         setIsModalOpen(true);
     };
@@ -68,6 +63,7 @@ export default function Goals({ isTab }) {
     const handleSaveGoal = async (e) => {
         e.preventDefault();
         setSubmitting(true);
+
         try {
             const payload = {
                 title,
@@ -78,23 +74,15 @@ export default function Goals({ isTab }) {
             };
 
             let error;
-            if (goalsToEdit) {
-                // Edit mode
-                const { error: updateError } = await supabase
-                    .from('goals')
-                    .update(payload)
-                    .eq('id', goalsToEdit.id);
+            if (goalToEdit) {
+                const { error: updateError } = await supabase.from('goals').update(payload).eq('id', goalToEdit.id);
                 error = updateError;
             } else {
-                // Create mode
-                const { error: insertError } = await supabase
-                    .from('goals')
-                    .insert([payload]);
+                const { error: insertError } = await supabase.from('goals').insert([payload]);
                 error = insertError;
             }
 
             if (error) throw error;
-
             await fetchGoals();
             setIsModalOpen(false);
             resetForm();
@@ -107,10 +95,11 @@ export default function Goals({ isTab }) {
 
     const handleDeleteGoal = async (id) => {
         if (!confirm('Tem certeza? Isso não pode ser desfeito.')) return;
+
         try {
             const { error } = await supabase.from('goals').delete().eq('id', id);
             if (error) throw error;
-            setGoals(goals.filter(g => g.id !== id));
+            setGoals(goals.filter((goal) => goal.id !== id));
         } catch (error) {
             console.error('Error deleting goal:', error);
         }
@@ -125,19 +114,15 @@ export default function Goals({ isTab }) {
     const handleDeposit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
+
         try {
             const amount = parseFloat(depositAmount);
-            if (!amount || amount <= 0) throw new Error("Valor inválido");
+            if (!amount || amount <= 0) throw new Error('Valor inválido');
 
             const newAmount = parseFloat(selectedGoal.current_amount) + amount;
-
-            const { error } = await supabase
-                .from('goals')
-                .update({ current_amount: newAmount })
-                .eq('id', selectedGoal.id);
+            const { error } = await supabase.from('goals').update({ current_amount: newAmount }).eq('id', selectedGoal.id);
 
             if (error) throw error;
-
             await fetchGoals();
             setIsDepositModalOpen(false);
         } catch (error) {
@@ -149,18 +134,13 @@ export default function Goals({ isTab }) {
 
     const handleSetPrimary = async (goalId) => {
         try {
-            // 1. Reset all others
             await supabase.from('goals').update({ is_primary: false }).eq('profile_id', user.id);
-
-            // 2. Set new primary
             const { error } = await supabase.from('goals').update({ is_primary: true }).eq('id', goalId);
-
             if (error) throw error;
             await fetchGoals();
         } catch (error) {
-            console.error("Error setting primary goal:", error);
-            // Non-blocking error
-            alert("Erro ao definir principal. Tente novamente mais tarde.");
+            console.error('Error setting primary goal:', error);
+            alert('Erro ao definir principal. Tente novamente mais tarde.');
         }
     };
 
@@ -169,275 +149,173 @@ export default function Goals({ isTab }) {
         setTargetAmount('');
         setCurrentAmount('');
         setDeadline('');
-        setGoalsToEdit(null);
+        setGoalToEdit(null);
     };
 
-    // --- Smart Advisor Logic ---
-    // --- Gamified Advisor Logic ---
     const getAdvice = (goal) => {
         const remaining = goal.target_amount - goal.current_amount;
-        if (remaining <= 0) return { text: "Meta atingida! Você é incrível! 🎉", color: '#00ebc7', icon: Star };
+        if (remaining <= 0) return { text: 'Meta atingida! Você está pronta para comemorar.', color: '#00ebc7', icon: Star };
 
         const progress = (goal.current_amount / goal.target_amount) * 100;
 
-        // Time projection (Simulated for now, can be improved with real transaction history in v2)
-        const weeklyDeposit = 100; // Placeholder average
-        const weeksLeft = Math.ceil(remaining / weeklyDeposit);
-
-        // Deadline Logic
         if (goal.deadline) {
             const today = new Date();
             const deadlineDate = new Date(goal.deadline);
             const daysLeft = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
 
-            if (daysLeft < 0) return {
-                text: "O prazo venceu, mas não desista! Continue até conseguir.",
-                color: '#f64f59',
-                icon: AlertTriangle
-            };
-
-            if (daysLeft < 30 && progress < 80) return {
-                text: "Estamos na reta final! Tente fazer um esforço extra este mês.",
-                color: '#f64f59',
-                icon: TrendingUp
-            };
+            if (daysLeft < 0) return { text: 'O prazo passou, mas a meta continua viva. Replaneje e siga em frente.', color: '#f64f59', icon: AlertTriangle };
+            if (daysLeft < 30 && progress < 80) return { text: 'Estamos na reta final. Tente reforçar o aporte deste mês.', color: '#f64f59', icon: TrendingUp };
         }
 
-        if (progress < 15) return {
-            text: "O início é a parte mais difícil. Deposite R$ 50 hoje para criar tração!",
-            color: '#c471ed',
-            icon: Lightbulb
-        };
-
-        if (progress >= 15 && progress < 50) return {
-            text: `Ótimo ritmo! Faltam apenas R$ ${remaining.toLocaleString('pt-BR')} para completar.`,
-            color: '#12c2e9',
-            icon: TrendingUp
-        };
-
-        if (progress >= 50 && progress < 80) return {
-            text: "Passou da metade! Se você mantiver o foco, chega lá rapidinho.",
-            color: '#4f29f0',
-            icon: TrendingUp
-        };
-
-        if (progress >= 80) return {
-            text: "Quase lá! Visualize seu objetivo realizado. Falta muito pouco!",
-            color: '#00ebc7',
-            icon: Star
-        };
-
-        return {
-            text: "Consistência é a chave. Continue assim.",
-            color: '#c471ed',
-            icon: Lightbulb
-        };
+        if (progress < 15) return { text: 'O começo é a parte mais difícil. Um primeiro aporte pequeno já cria tração.', color: '#c471ed', icon: Lightbulb };
+        if (progress < 50) return { text: `Ótimo ritmo. Faltam apenas R$ ${remaining.toLocaleString('pt-BR')} para completar.`, color: '#12c2e9', icon: TrendingUp };
+        if (progress < 80) return { text: 'Você já passou da metade. Mantendo a consistência, essa meta fica logo logo no passado.', color: '#4f29f0', icon: TrendingUp };
+        return { text: 'Quase lá. Falta pouco para transformar esse plano em conquista.', color: '#00ebc7', icon: Star };
     };
 
-    // --- Dynamic Tips ---
-    const TIPS = [
-        "Reduzindo apenas 15% dos seus gastos variáveis, você atinge suas metas muito mais rápido.",
-        "O hábito de poupar importa mais que o valor. Comece com pouco, mas comece hoje.",
-        "Pequenos gastos invisíveis são como furos em um barco. Cuidado com o 'só hoje'.",
-        "Invista no seu conhecimento. A melhor taxa de juros vem de aprender algo novo.",
-        "Uma meta sem plano é só um desejo. Que bom que você já tem o plano aqui!",
-        "Antes de comprar, pergunte-se: 'Eu preciso disso ou eu quero isso agora?'",
-        "Liberdade financeira é poder escolher como gastar seu tempo, não só seu dinheiro.",
-        "Não poupe o que sobra depois de gastar, mas gaste o que sobra depois de poupar.",
-        "Cuidado com as pequenas despesas; um pequeno vazamento afunda um grande navio.",
-        "Preço é o que você paga. Valor é o que você leva.",
-        "A paz financeira vale mais que qualquer status social.",
-        "Controle seu dinheiro ou a falta dele controlará você.",
-        "Riqueza não é sobre ter muito, é sobre precisar de pouco.",
-        "O melhor investimento que você pode fazer é em si mesmo.",
-        "Juros compostos são a oitava maravilha do mundo. Quem entende, ganha; quem não, paga.",
-        "Se comprar coisas que não precisa, logo terá que vender coisas que precisa.",
-        "Ouvir conselhos financeiros é bom, mas seguir o próprio plano é melhor."
+    const tips = [
+        'Reduzindo uma fatia dos gastos variáveis, você acelera qualquer objetivo com menos esforço do que parece.',
+        'O hábito de poupar importa mais do que começar grande. Consistência vence entusiasmo passageiro.',
+        "Pequenos gastos invisíveis são como vazamentos. O 'só hoje' costuma custar mais do que parece.",
+        'Uma meta sem plano é só um desejo. Aqui ela já virou acompanhamento de verdade.',
+        'Liberdade financeira é ter mais escolha sobre como viver o seu tempo.',
+        'Preço é o que você paga. Valor é o que permanece com você.',
+        'O melhor investimento que você pode fazer é em si mesmo.',
+        'Juros compostos funcionam para quem constrói paciência e regularidade.',
     ];
 
-    const [currentTip, setCurrentTip] = useState(TIPS[0]);
+    const [currentTip, setCurrentTip] = useState(tips[0]);
 
     useEffect(() => {
-        // Randomize tip on mount
-        const randomIndex = Math.floor(Math.random() * TIPS.length);
-        setCurrentTip(TIPS[randomIndex]);
+        const randomIndex = Math.floor(Math.random() * tips.length);
+        setCurrentTip(tips[randomIndex]);
     }, []);
 
-
+    const totalTarget = goals.reduce((sum, goal) => sum + Number(goal.target_amount || 0), 0);
+    const totalSaved = goals.reduce((sum, goal) => sum + Number(goal.current_amount || 0), 0);
+    const primaryGoal = goals.find((goal) => goal.is_primary) || null;
+    const completionRate = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
+    const currencyFormatter = (value) => `R$ ${Number(value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 
     return (
-        <div className={isTab ? "fade-in" : "container fade-in"} style={{ paddingBottom: '80px' }}>
+        <div className={isTab ? 'fade-in' : 'container fade-in'} style={{ paddingBottom: '80px' }}>
             {!isTab && (
                 <PageHeader
                     title={<span>Metas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Financeiras</span></span>}
                     subtitle="Acompanhe e realize seus sonhos"
                 >
-                    <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
-                        Nova Meta
-                    </Button>
+                    <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">Nova Meta</Button>
                 </PageHeader>
             )}
 
             {isTab && (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-                    <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
-                        Nova Meta
-                    </Button>
+                    <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">Nova Meta</Button>
                 </div>
             )}
 
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
+                <Card hover={false}>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Metas ativas</p>
+                    <h3 style={{ color: 'var(--text-main)', fontSize: '1.8rem' }}>{goals.length}</h3>
+                    <p style={{ fontSize: '0.85rem', marginTop: '0.4rem' }}>Acompanhe cada objetivo sem perder o contexto.</p>
+                </Card>
+                <Card hover={false}>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Total acumulado</p>
+                    <h3 style={{ color: 'var(--text-main)', fontSize: '1.8rem' }}>{currencyFormatter(totalSaved)}</h3>
+                    <p style={{ fontSize: '0.85rem', marginTop: '0.4rem' }}>{completionRate.toFixed(0)}% do objetivo total já construído.</p>
+                </Card>
+                <Card hover={false}>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Objetivo total</p>
+                    <h3 style={{ color: 'var(--text-main)', fontSize: '1.8rem' }}>{currencyFormatter(totalTarget)}</h3>
+                    <p style={{ fontSize: '0.85rem', marginTop: '0.4rem' }}>
+                        {primaryGoal ? <>Foco atual: <span style={{ color: 'var(--text-main)' }}>{primaryGoal.title}</span></> : 'Defina uma meta principal para orientar seus aportes.'}
+                    </p>
+                </Card>
+            </div>
 
-            {/* Smart Tips Section - Global */}
-            <div className="glass-panel panel-gradient-purple" style={{
-                padding: '1.5rem',
-                display: 'flex',
-                gap: '1rem',
-                alignItems: 'start'
-            }}>
-                <div className="icon-container">
-                    <Lightbulb size={24} />
-                </div>
+            <div className="glass-panel panel-gradient-purple" style={{ padding: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'start', marginBottom: '1.5rem' }}>
+                <div className="icon-container"><Lightbulb size={24} /></div>
                 <div>
                     <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>Dica do Persona IA</h3>
-                    <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
-                        {currentTip}
-                    </p>
+                    <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>{currentTip}</p>
                 </div>
             </div>
 
-            {/* Goals Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
                 {loading ? (
                     <p>Carregando...</p>
                 ) : goals.length === 0 ? (
                     <div style={{ gridColumn: '1 / -1' }}>
-                        <EmptyState
-                            icon={TrendingUp}
-                            title="Nenhuma meta definida"
-                            description="Transforme seus sonhos em planos. Crie uma meta e comece a poupar hoje."
-                            actionText="Criar Primeira Meta"
-                            onAction={handleOpenNew}
-                        />
+                        <EmptyState icon={TrendingUp} title="Nenhuma meta definida" description="Transforme seus sonhos em planos. Crie uma meta e comece a poupar hoje." actionText="Criar primeira meta" onAction={handleOpenNew} />
                     </div>
                 ) : (
                     goals.map((goal, index) => {
                         const progress = (goal.current_amount / goal.target_amount) * 100;
                         const remaining = goal.target_amount - goal.current_amount;
                         const advice = getAdvice(goal);
-
-                        const data = [
+                        const safeProgress = Number.isFinite(progress) ? Math.min(progress, 100) : 0;
+                        const chartData = [
                             { name: 'Conquistado', value: parseFloat(goal.current_amount) },
                             { name: 'Restante', value: parseFloat(remaining > 0 ? remaining : 0) },
                         ];
 
                         return (
-                            <Card key={goal.id} className="fade-in" style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '1rem',
-                                animationDelay: `${index * 0.1}s`,
-                                position: 'relative',
-                                overflow: 'visible'
-                            }}>
+                            <Card key={goal.id} className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', animationDelay: `${index * 0.1}s`, position: 'relative', overflow: 'visible' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <div>
                                         <h3 style={{ marginBottom: '0.2rem', color: 'var(--text-main)', fontWeight: 600, fontSize: '1.4rem' }}>{goal.title}</h3>
-                                        {goal.deadline && (
-                                            <p style={{ fontSize: '0.85rem' }}>Alvo: {new Date(goal.deadline).toLocaleDateString('pt-BR')}</p>
-                                        )}
+                                        {goal.deadline && <p style={{ fontSize: '0.85rem' }}>Alvo: {new Date(goal.deadline).toLocaleDateString('pt-BR')}</p>}
                                     </div>
                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <Button onClick={() => handleOpenEdit(goal)} variant="ghost" style={{ padding: '0.5rem' }} title="Editar">
-                                            <Edit2 size={18} />
-                                        </Button>
-                                        <Button
-                                            onClick={() => handleSetPrimary(goal.id)}
-                                            variant="ghost"
-                                            style={{ padding: '0.5rem', color: goal.is_primary ? '#c471ed' : 'var(--text-muted)' }}
-                                            title={goal.is_primary ? "Principal" : "Definir como Principal"}
-                                        >
-                                            <Star size={18} fill={goal.is_primary ? '#c471ed' : 'none'} />
-                                        </Button>
-                                        <Button onClick={() => handleDeleteGoal(goal.id)} variant="ghost" style={{ padding: '0.5rem', color: '#f64f59' }} title="Excluir">
-                                            <Trash2 size={18} />
-                                        </Button>
+                                        <Button onClick={() => handleOpenEdit(goal)} variant="ghost" style={{ padding: '0.5rem' }} title="Editar"><Edit2 size={18} /></Button>
+                                        <Button onClick={() => handleSetPrimary(goal.id)} variant="ghost" style={{ padding: '0.5rem', color: goal.is_primary ? '#c471ed' : 'var(--text-muted)' }} title={goal.is_primary ? 'Principal' : 'Definir como principal'}><Star size={18} fill={goal.is_primary ? '#c471ed' : 'none'} /></Button>
+                                        <Button onClick={() => handleDeleteGoal(goal.id)} variant="ghost" style={{ padding: '0.5rem', color: '#f64f59' }} title="Excluir"><Trash2 size={18} /></Button>
                                     </div>
                                 </div>
 
                                 <div style={{ height: '220px', width: '100%', margin: '0.5rem 0', position: 'relative' }}>
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
-                                            <Pie
-                                                data={data}
-                                                cx="50%"
-                                                cy="50%"
-                                                innerRadius={65}
-                                                outerRadius={85}
-                                                startAngle={90}
-                                                endAngle={-270}
-                                                dataKey="value"
-                                                stroke="none"
-                                            >
-                                                <Cell key="cell-0" fill="url(#colorGradient)" />
-                                                <Cell key="cell-1" className="fill-track" />
+                                            <Pie data={chartData} cx="50%" cy="50%" innerRadius={65} outerRadius={85} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
+                                                <Cell key="saved" fill="url(#goalGradient)" />
+                                                <Cell key="remaining" className="fill-track" />
                                             </Pie>
                                             <defs>
-                                                <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="1">
+                                                <linearGradient id="goalGradient" x1="0" y1="0" x2="1" y2="1">
                                                     <stop offset="0%" stopColor="#4f29f0" />
                                                     <stop offset="100%" stopColor="#c471ed" />
                                                 </linearGradient>
                                             </defs>
-                                            <Tooltip
-                                                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--glass-border)', borderRadius: '12px', boxShadow: 'var(--glass-shadow)' }}
-                                                itemStyle={{ color: 'var(--text-main)' }}
-                                                formatter={(value) => `R$ ${value.toFixed(2)}`}
-                                            />
+                                            <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--glass-border)', borderRadius: '12px', boxShadow: 'var(--glass-shadow)' }} itemStyle={{ color: 'var(--text-main)' }} formatter={(value) => `R$ ${value.toFixed(2)}`} />
                                         </PieChart>
                                     </ResponsiveContainer>
-
-                                    {/* Centered Percentage */}
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -50%)',
-                                        textAlign: 'center',
-                                        pointerEvents: 'none'
-                                    }}>
-                                        <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)' }}>{progress.toFixed(0)}%</span>
+                                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
+                                        <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)' }}>{safeProgress.toFixed(0)}%</span>
                                     </div>
                                 </div>
 
-                                <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+                                <div style={{ textAlign: 'center', marginBottom: '0.3rem' }}>
                                     <p style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>
-                                        <span style={{ color: '#c471ed', fontWeight: 600 }}>R$ {goal.current_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                                        {' '} de {' '}
-                                        <span style={{ fontWeight: 600 }}>R$ {goal.target_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                        <span style={{ color: '#c471ed', fontWeight: 600 }}>{currencyFormatter(goal.current_amount)}</span> de <span style={{ fontWeight: 600 }}>{currencyFormatter(goal.target_amount)}</span>
                                     </p>
                                 </div>
 
-                                {/* Advisor Footer (Inside Card) */}
-                                <div className="surface-secondary" style={{
-                                    padding: '0.8rem',
-                                    borderRadius: '12px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.8rem',
-                                    borderLeft: `3px solid ${advice.color}`,
-                                    marginBottom: '1rem'
-                                }}>
-                                    <advice.icon size={20} color={advice.color} style={{ minWidth: '20px' }} />
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: '1.4' }}>
-                                        "{advice.text}"
-                                    </span>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                                    <span>Restam {currencyFormatter(Math.max(remaining, 0))}</span>
+                                    <span>{safeProgress.toFixed(0)}% concluído</span>
                                 </div>
 
-                                <Button
-                                    className="btn-primary"
-                                    icon={TrendingUp}
-                                    style={{ justifyContent: 'center', width: '100%' }}
-                                    onClick={() => handleOpenDeposit(goal)}
-                                >
+                                <div style={{ width: '100%', height: '8px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                                    <div style={{ width: `${safeProgress}%`, height: '100%', background: 'linear-gradient(90deg, #4f29f0, #c471ed)', borderRadius: '999px' }} />
+                                </div>
+
+                                <div className="surface-secondary" style={{ padding: '0.8rem', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '0.8rem', borderLeft: `3px solid ${advice.color}`, marginBottom: '1rem' }}>
+                                    <advice.icon size={20} color={advice.color} style={{ minWidth: '20px' }} />
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: '1.4' }}>"{advice.text}"</span>
+                                </div>
+
+                                <Button className="btn-primary" icon={TrendingUp} style={{ justifyContent: 'center', width: '100%' }} onClick={() => handleOpenDeposit(goal)}>
                                     Adicionar Dinheiro
                                 </Button>
                             </Card>
@@ -446,61 +324,25 @@ export default function Goals({ isTab }) {
                 )}
             </div>
 
-            {/* Create/Edit Modal */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={goalsToEdit ? "Editar Meta" : "Nova Meta"}>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={goalToEdit ? 'Editar Meta' : 'Nova Meta'}>
                 <form onSubmit={handleSaveGoal}>
-                    <Input
-                        label="Título"
-                        placeholder="Ex: Reserva de Emergência"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        required
-                    />
-                    <Input
-                        label="Valor Alvo (R$)"
-                        type="number"
-                        step="0.01"
-                        value={targetAmount}
-                        onChange={(e) => setTargetAmount(e.target.value)}
-                        required
-                    />
-                    <Input
-                        label="Valor Atual (R$)"
-                        type="number"
-                        step="0.01"
-                        value={currentAmount}
-                        onChange={(e) => setCurrentAmount(e.target.value)}
-                        note="Use o botão 'Adicionar Dinheiro' no card para atualizações futuras."
-                    />
-                    <Input
-                        label="Prazo (Opcional)"
-                        type="date"
-                        value={deadline}
-                        onChange={(e) => setDeadline(e.target.value)}
-                    />
+                    <Input label="Título" placeholder="Ex: Reserva de Emergência" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                    <Input label="Valor Alvo (R$)" type="number" step="0.01" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} required />
+                    <Input label="Valor Atual (R$)" type="number" step="0.01" value={currentAmount} onChange={(e) => setCurrentAmount(e.target.value)} note="Use o botão 'Adicionar Dinheiro' no card para atualizações futuras." />
+                    <Input label="Prazo (Opcional)" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
                     <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} loading={submitting}>
-                        {goalsToEdit ? "Salvar Alterações" : "Criar Meta"}
+                        {goalToEdit ? 'Salvar Alterações' : 'Criar Meta'}
                     </Button>
                 </form>
             </Modal>
 
-            {/* Deposit Modal */}
             <Modal isOpen={isDepositModalOpen} onClose={() => setIsDepositModalOpen(false)} title="Adicionar Economia">
                 <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                     <h3 style={{ color: '#c471ed' }}>{selectedGoal?.title}</h3>
                     <p>Quanto você quer guardar hoje?</p>
                 </div>
                 <form onSubmit={handleDeposit}>
-                    <Input
-                        autoFocus
-                        type="number"
-                        step="0.01"
-                        placeholder="0,00"
-                        value={depositAmount}
-                        onChange={(e) => setDepositAmount(e.target.value)}
-                        style={{ fontSize: '2rem', textAlign: 'center', padding: '1rem' }}
-                        required
-                    />
+                    <Input autoFocus type="number" step="0.01" placeholder="0,00" value={depositAmount} onChange={(e) => setDepositAmount(e.target.value)} style={{ fontSize: '2rem', textAlign: 'center', padding: '1rem' }} required />
                     <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} loading={submitting}>
                         Confirmar Depósito
                     </Button>

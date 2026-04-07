@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
@@ -23,6 +23,7 @@ export default function Transactions() {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [activeFilter, setActiveFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -255,14 +256,27 @@ export default function Transactions() {
         setActiveFilter('all');
     };
 
-    const handleExport = async () => {
+    const handleOpenExport = () => {
         if (filteredTransactions.length === 0) {
             addToast('Sem transações para exportar no filtro atual.', 'error');
             return;
         }
 
+        setIsExportModalOpen(true);
+    };
+
+    const handleExportCsv = async () => {
+        const { exportTransactionsToCsv } = await import('../lib/exportUtils');
+        exportTransactionsToCsv(filteredTransactions);
+        setIsExportModalOpen(false);
+        addToast('CSV gerado com sucesso.', 'success');
+    };
+
+    const handleExportExcel = async () => {
         const { exportTransactionsToExcel } = await import('../lib/exportUtils');
         exportTransactionsToExcel(filteredTransactions);
+        setIsExportModalOpen(false);
+        addToast('Planilha compatível em preparação.', 'success');
     };
 
     return (
@@ -271,7 +285,7 @@ export default function Transactions() {
                 title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Transações</span></span>}
             >
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Button onClick={handleExport} variant="ghost" icon={Download} title="Exportar para Excel" style={{ padding: '0.6rem' }} />
+                    <Button onClick={handleOpenExport} variant="ghost" icon={Download} title="Exportar dados" style={{ padding: '0.6rem' }} />
                     <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
                         Nova
                     </Button>
@@ -483,9 +497,9 @@ export default function Transactions() {
                             </label>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
                                 {[
-                                    { value: 'fixed', label: 'Fixo', icon: '🔒' },
-                                    { value: 'variable', label: 'Variável', icon: '💳' },
-                                    { value: 'lifestyle', label: 'Lazer', icon: '🍿' },
+                                    { value: 'fixed', label: 'Fixo', icon: 'F' },
+                                    { value: 'variable', label: 'Variável', icon: 'V' },
+                                    { value: 'lifestyle', label: 'Lazer', icon: 'L' },
                                 ].map((opt) => (
                                     <div
                                         key={opt.value}
@@ -550,6 +564,27 @@ export default function Transactions() {
                     </Button>
                 </form>
             </Modal>
+
+            <Modal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} title="Exportar transações">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className="surface-secondary" style={{ padding: '1rem', borderRadius: '12px' }}>
+                        <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '0.35rem' }}>Escolha o formato</strong>
+                        <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                            CSV abre mais rápido em planilhas e mantém a exportação leve. A planilha compatível abre no Excel sem carregar a dependência pesada anterior.
+                        </p>
+                    </div>
+
+                    <Button type="button" className="btn-primary" onClick={handleExportCsv} style={{ width: '100%', justifyContent: 'center' }}>
+                        Exportar CSV rápido
+                    </Button>
+                    <Button type="button" variant="ghost" onClick={handleExportExcel} style={{ width: '100%', justifyContent: 'center' }}>
+                        Exportar planilha compatível
+                    </Button>
+                </div>
+            </Modal>
         </div>
     );
 }
+
+
+

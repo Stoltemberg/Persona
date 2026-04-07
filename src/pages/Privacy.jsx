@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Button } from '../components/Button';
 import { ArrowLeft } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
@@ -8,7 +7,10 @@ export default function Privacy() {
         <main className="fade-in" style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
             <Helmet>
                 <title>Política de Privacidade | Persona</title>
-                <meta name="description" content="Política de Privacidade do Persona. Saiba como lidamos com seus dados e garantimos a sua segurança financeira." />
+                <meta
+                    name="description"
+                    content="Política de Privacidade do Persona. Saiba como lidamos com seus dados e garantimos a sua segurança financeira."
+                />
                 <link rel="canonical" href="https://persona.dev.br/privacy" />
             </Helmet>
 
@@ -20,13 +22,13 @@ export default function Privacy() {
 
             <div className="glass-card" style={{ padding: '2rem', lineHeight: '1.6' }}>
                 <h3>1. Dados Coletados</h3>
-                <p>Coletamos apenas o necessário para o funcionamento do serviço: Email e Nome (via autenticação). Dados financeiros (transações, saldos) são armazenados de forma segura e privada.</p>
+                <p>Coletamos apenas o necessário para o funcionamento do serviço: email e nome via autenticação. Dados financeiros, como transações e saldos, são armazenados de forma segura e privada.</p>
 
                 <h3>2. Uso dos Dados</h3>
                 <p>Seus dados são usados exclusivamente para fornecer a funcionalidade do app. Não vendemos nem compartilhamos seus dados financeiros com terceiros.</p>
 
                 <h3>3. Segurança</h3>
-                <p>Utilizamos criptografia (SSL) e práticas modernas de segurança (Row Level Security no banco de dados) para garantir que apenas VOCÊ tenha acesso aos seus dados.</p>
+                <p>Utilizamos criptografia (SSL) e práticas modernas de segurança, incluindo Row Level Security no banco de dados, para garantir que apenas você tenha acesso aos seus dados.</p>
 
                 <h3>4. Cookies</h3>
                 <p>Utilizamos cookies apenas para manter sua sessão de login ativa.</p>

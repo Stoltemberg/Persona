@@ -4,17 +4,19 @@ import { Home } from 'lucide-react';
 
 export default function NotFound() {
     return (
-        <div style={{
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            padding: '2rem',
-            background: 'var(--bg-deep)',
-            color: 'var(--text-main)'
-        }}>
+        <div
+            style={{
+                height: '100vh',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                padding: '2rem',
+                background: 'var(--bg-deep)',
+                color: 'var(--text-main)',
+            }}
+        >
             <h1 className="text-gradient" style={{ fontSize: '6rem', margin: 0, lineHeight: 1 }}>404</h1>
             <h2 style={{ marginBottom: '1rem', fontSize: '2rem' }}>Página não encontrada</h2>
             <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', maxWidth: '400px' }}>

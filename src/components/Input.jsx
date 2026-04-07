@@ -3,9 +3,9 @@ import { forwardRef } from 'react';
 
 export const Input = forwardRef(({ className, error, label, ...props }, ref) => {
     return (
-        <div className="input-group" style={{ marginBottom: '1rem' }}>
+        <div className="input-group">
             {label && (
-                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                <label className="input-label">
                     {label}
                 </label>
             )}
@@ -15,7 +15,7 @@ export const Input = forwardRef(({ className, error, label, ...props }, ref) => 
                 {...props}
             />
             {error && (
-                <span style={{ color: 'var(--accent)', fontSize: '0.8rem', marginTop: '0.25rem', display: 'block' }}>
+                <span className="input-error">
                     {error}
                 </span>
             )}

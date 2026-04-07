@@ -22,10 +22,14 @@ export function Button({
             transition={{ type: 'spring', stiffness: 500, damping: 25 }}
             className={twMerge(clsx(baseClass, variantClass, className))}
             disabled={loading || props.disabled}
+            aria-busy={loading ? 'true' : 'false'}
             {...props}
         >
             {loading ? (
-                <span className="loader">Loading...</span> // Simple loader text for now
+                <span className="btn-loader">
+                    <span className="btn-spinner" aria-hidden="true" />
+                    Carregando
+                </span>
             ) : (
                 <>
                     {Icon && <Icon size={18} />}

@@ -1,17 +1,14 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
-import { ArrowRight, Check, Shield, Zap, LayoutDashboard, Database } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
+import { ArrowRight, Check, Sparkles, Zap, LayoutDashboard, Database, HandCoins, Target, ShieldCheck } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 export default function Landing() {
-    const { theme } = useTheme();
-
     return (
-        <main className="fade-in" style={{ overflowX: 'hidden' }}>
+        <main className="landing-page fade-in">
             <Helmet>
-                <title>Persona - Organize suas Finanças</title>
-                <meta name="description" content="O gerenciador financeiro mais bonito e intuitivo para o seu dia a dia. Controle gastos, crie metas e alcance a liberdade financeira." />
+                <title>Persona - Seu sistema operacional financeiro</title>
+                <meta name="description" content="Reimagine sua vida financeira com uma experiência visual moderna: planejamento, automações, metas e decisões mais inteligentes em um só lugar." />
                 <script type="application/ld+json">
                     {`
                         {
@@ -21,26 +18,16 @@ export default function Landing() {
                             "applicationCategory": "FinanceApplication",
                             "operatingSystem": "Web",
                             "url": "https://persona.dev.br/",
-                            "description": "O gerenciador financeiro mais bonito e intuitivo para o seu dia a dia."
+                            "description": "Plataforma financeira para planejar, automatizar e evoluir suas decisões com clareza."
                         }
                     `}
                 </script>
             </Helmet>
 
-            {/* Header */}
-            <header style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                zIndex: 100,
-                backdropFilter: 'blur(10px)',
-                background: 'var(--glass-bg)',
-                borderBottom: '1px solid var(--glass-border)'
-            }}>
-                <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', fontWeight: 800, fontSize: '1.2rem', color: 'var(--text-main)' }}>
-                        <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'linear-gradient(135deg, #11998e, #38ef7d)' }} />
+            <header className="landing-header">
+                <div className="landing-container landing-header-content">
+                    <div className="landing-brand">
+                        <div className="landing-brand-icon" />
                         Persona
                     </div>
                     <Link to="/login">
@@ -49,77 +36,58 @@ export default function Landing() {
                 </div>
             </header>
 
-            {/* Hero Section */}
-            <section style={{
-                minHeight: '90vh',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
-                padding: '8rem 1rem 4rem 1rem',
-                background: 'radial-gradient(circle at 50% 50%, rgba(17, 153, 142, 0.15), transparent 70%)'
-            }}>
-                <div className="fade-in stagger-1" style={{ marginBottom: '1.5rem', padding: '0.5rem 1rem', borderRadius: '50px', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', fontSize: '0.9rem' }}>
-                    ✨ A gestão financeira do futuro
-                </div>
-                <h1 className="text-gradient fade-in stagger-2" style={{ fontSize: 'clamp(3rem, 5vw, 4.5rem)', maxWidth: '900px', lineHeight: 1.1, marginBottom: '1.5rem' }}>
-                    Sua Liberdade Financeira Começa Aqui
-                </h1>
-                <p className="fade-in stagger-3" style={{ fontSize: '1.2rem', color: 'var(--text-muted)', maxWidth: '600px', marginBottom: '2.5rem' }}>
-                    Domine seus gastos, planeje o futuro e tenha clareza total sobre o seu dinheiro com a plataforma mais intuitiva do mercado.
-                </p>
-                <div className="fade-in stagger-4" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                    <Link to="/login">
-                        <Button className="btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
-                            Começar Grátis <ArrowRight />
-                        </Button>
-                    </Link>
-                </div>
+            <section className="landing-hero">
+                <div className="landing-container landing-hero-grid">
+                    <div className="landing-hero-copy">
+                        <div className="landing-pill fade-in stagger-1">
+                            <Sparkles size={16} /> Reimagine suas finanças pessoais e familiares
+                        </div>
+                        <h1 className="text-gradient fade-in stagger-2">
+                            Seu dinheiro com direção, contexto e tranquilidade.
+                        </h1>
+                        <p className="fade-in stagger-3">
+                            A Persona virou seu centro de comando financeiro: organiza rotinas, mostra oportunidades e transforma números em decisões simples.
+                        </p>
+                        <div className="landing-hero-actions fade-in stagger-4">
+                            <Link to="/login">
+                                <Button className="btn-primary" style={{ padding: '1rem 2rem', fontSize: '1rem' }}>
+                                    Experimentar agora <ArrowRight />
+                                </Button>
+                            </Link>
+                            <a className="landing-inline-link" href="#roadmap">Ver como funciona</a>
+                        </div>
+                        <div className="landing-highlights fade-in stagger-5">
+                            <Badge icon={HandCoins} text="Fluxo de caixa em tempo real" />
+                            <Badge icon={Target} text="Metas com acompanhamento inteligente" />
+                            <Badge icon={ShieldCheck} text="Privacidade e segurança por padrão" />
+                        </div>
+                    </div>
 
-                {/* Dashboard Preview */}
-                <div className="fade-in stagger-5" style={{
-                    marginTop: '4rem',
-                    width: '100%',
-                    maxWidth: '1000px',
-                    position: 'relative',
-                    perspective: '1000px'
-                }}>
-                    <div style={{
-                        borderRadius: '24px',
-                        overflow: 'hidden',
-                        boxShadow: '0 50px 100px -20px rgba(0,0,0,0.5)',
-                        border: '1px solid var(--glass-border)',
-                        transform: 'rotateX(5deg)',
-                        transition: 'transform 0.5s ease',
-                        background: 'rgba(23, 23, 23, 0.8)'
-                    }}
-                        onMouseEnter={e => e.currentTarget.style.transform = 'rotateX(0deg) scale(1.02)'}
-                        onMouseLeave={e => e.currentTarget.style.transform = 'rotateX(5deg)'}
-                    >
+                    <div className="landing-preview-card fade-in stagger-5">
                         <img
                             src="/dashboard-preview.png"
                             alt="Persona Dashboard"
-                            style={{ width: '100%', height: 'auto', display: 'block' }}
                         />
                     </div>
                 </div>
             </section>
 
-            {/* Features */}
-            <section aria-label="Recursos" style={{ padding: '4rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+            <section id="roadmap" aria-label="Recursos" className="landing-section">
+                <div className="landing-container">
+                    <h2 className="landing-section-title">Tudo que você precisa para ganhar previsibilidade</h2>
+                    <div className="landing-grid">
                     <FeatureCard icon={LayoutDashboard} title="Controle Total" text="Dashboard intuitivo com todas as suas contas em um só lugar." />
                     <FeatureCard icon={Database} title="Organização Automática" text="Categorias inteligentes e filtros poderosos para suas transações." />
                     <FeatureCard icon={Zap} title="Planejamento Real" text="Defina orçamentos e alcance suas metas financeiras mais rápido." />
+                    </div>
                 </div>
             </section>
 
-            {/* Pricing */}
-            <section style={{ padding: '6rem 1rem', textAlign: 'center' }}>
-                <h2 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '3rem' }}>Planos para você</h2>
+            <section className="landing-section landing-pricing">
+                <div className="landing-container">
+                    <h2 className="text-gradient landing-section-title">Planos para cada estágio da sua jornada</h2>
 
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+                <div className="landing-pricing-grid">
                     <PricingCard
                         title="Grátis"
                         price="R$ 0"
@@ -131,7 +99,6 @@ export default function Landing() {
                         features={['Carteiras Ilimitadas', 'Orçamentos Ilimitados', 'Sem Anúncios']}
                         buttonText="Assinar Intermediário"
                         color="#12c2e9"
-                    // featured removed so it doesn't fight for attention
                     />
                     <PricingCard
                         title="Completo"
@@ -142,11 +109,11 @@ export default function Landing() {
                         color="#FFD700"
                     />
                 </div>
+                </div>
             </section>
 
-            {/* Footer */}
-            <footer style={{ borderTop: '1px solid var(--glass-border)', padding: '4rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '2rem' }}>
+            <footer className="landing-footer">
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
                     <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Termos de Uso</Link>
                     <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacidade</Link>
                 </div>
@@ -154,6 +121,15 @@ export default function Landing() {
                 <address style={{ marginTop: '1rem', fontStyle: 'normal', fontSize: '0.8rem', opacity: 0.6 }}>São Paulo, SP - Brasil</address>
             </footer>
         </main>
+    );
+}
+
+function Badge({ icon: Icon, text }) {
+    return (
+        <span className="landing-badge">
+            <Icon size={15} />
+            {text}
+        </span>
     );
 }
 
@@ -174,7 +150,6 @@ function PricingCard({ title, price, features, featured, buttonText = "Começar"
         <article className="glass-card" style={{
             padding: '2rem',
             width: '100%',
-            maxWidth: '350px',
             border: featured ? `1px solid ${color}` : '1px solid var(--glass-border)',
             position: 'relative',
             overflow: 'visible',

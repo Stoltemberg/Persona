@@ -209,9 +209,6 @@ export function AuthProvider({ children }) {
             await supabase.auth.signOut();
         } catch (error) {
             console.error('Error during sign out:', error);
-        } finally {
-            // Force reset and redirect to ensure user can log out even if API call fails
-            window.location.href = '/login';
         }
     };
 

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from './hooks/useAuth';
 import React, { Suspense } from 'react';
@@ -35,10 +35,17 @@ const LoadingScreen = () => (
 // Protected Route Wrapper
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login', { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   if (loading) return <LoadingScreen />;
 
-  return user ? <Outlet /> : <Navigate to="/login" />;
+  return user ? <Outlet /> : null;
 };
 
 // Root Route Logic

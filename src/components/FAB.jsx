@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, ArrowUpRight, ArrowDownLeft, CheckCircle, Circle, Repeat } from 'lucide-react';
+import { Plus, ArrowUpRight, ArrowDownLeft, Repeat } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
@@ -23,27 +23,31 @@ export function FAB({ className, style }) {
     const [category, setCategory] = useState('');
     const [expenseType, setExpenseType] = useState('variable');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [status, setStatus] = useState('paid');
     const [isRecurring, setIsRecurring] = useState(false);
     const [categories, setCategories] = useState([]);
+    const [wallets, setWallets] = useState([]);
+    const [selectedWalletId, setSelectedWalletId] = useState('');
     const [selectedCategory, setSelectedCategory] = useState(null);
 
     useEffect(() => {
         if (isOpen && user) {
             fetchCategories();
-            if (!date) setDate(new Date().toISOString().split('T')[0]);
-
-            if (new Date().toISOString().split('T')[0] < date) {
-                setStatus('pending');
-            } else {
-                setStatus('paid');
-            }
+            fetchWallets();
         }
     }, [isOpen, user]);
 
     const fetchCategories = async () => {
         const { data } = await supabase.from('categories').select('*');
         setCategories(data || []);
+    };
+
+    const fetchWallets = async () => {
+        const { data } = await supabase.from('wallets').select('*').order('created_at', { ascending: true });
+        setWallets(data || []);
+
+        if (data && data.length > 0 && !selectedWalletId) {
+            setSelectedWalletId(data[0].id);
+        }
     };
 
     const handleOpen = () => {
@@ -63,8 +67,8 @@ export function FAB({ className, style }) {
         setCategory('');
         setExpenseType('variable');
         setDate(new Date().toISOString().split('T')[0]);
-        setStatus('paid');
         setIsRecurring(false);
+        setSelectedWalletId(wallets[0]?.id || '');
         setSelectedCategory(null);
     };
 
@@ -73,17 +77,45 @@ export function FAB({ className, style }) {
         setLoading(true);
 
         try {
-            const { data, error } = await supabase.from('transactions').insert([{
+            if (!selectedWalletId) {
+                throw new Error('Cadastre uma carteira antes de registrar transações pelo atalho rápido.');
+            }
+
+            const payload = {
                 description,
                 amount: parseFloat(amount),
                 type,
                 category,
+                wallet_id: selectedWalletId,
                 expense_type: type === 'expense' ? expenseType : null,
                 date,
                 profile_id: user.id,
-            }]).select();
+            };
+
+            const { data, error } = await supabase.from('transactions').insert([payload]).select();
 
             if (error) throw error;
+
+            if (isRecurring) {
+                const nextDate = new Date(date || new Date().toISOString());
+                nextDate.setMonth(nextDate.getMonth() + 1);
+
+                const { error: recurringError } = await supabase.from('recurring_templates').insert([{
+                    description,
+                    amount: parseFloat(amount),
+                    type,
+                    category,
+                    expense_type: type === 'expense' ? expenseType : null,
+                    frequency: 'monthly',
+                    next_due_date: nextDate.toISOString(),
+                    profile_id: user.id,
+                    active: true,
+                }]);
+
+                if (recurringError) {
+                    console.error('FAB recurring error:', recurringError);
+                }
+            }
 
             success();
             addToast('Transação registrada!', 'success');
@@ -110,7 +142,7 @@ export function FAB({ className, style }) {
                 onClick={handleOpen}
                 className={`fab-btn ${className || ''}`}
                 style={style}
-                aria-label="Adicionar Transação"
+                aria-label="Adicionar transação"
             >
                 <Plus size={24} strokeWidth={2.2} />
             </button>
@@ -152,15 +184,7 @@ export function FAB({ className, style }) {
                             label="Data"
                             type="date"
                             value={date}
-                            onChange={(e) => {
-                                const newDate = e.target.value;
-                                setDate(newDate);
-                                if (newDate > new Date().toISOString().split('T')[0]) {
-                                    setStatus('pending');
-                                } else {
-                                    setStatus('paid');
-                                }
-                            }}
+                            onChange={(e) => setDate(e.target.value)}
                             required
                         />
                     </div>
@@ -168,20 +192,32 @@ export function FAB({ className, style }) {
                     <div className="fab-chips-row">
                         <button
                             type="button"
-                            className={`fab-chip ${status === 'paid' ? 'active' : ''}`}
-                            onClick={() => { setStatus(status === 'paid' ? 'pending' : 'paid'); medium(); }}
-                        >
-                            {status === 'paid' ? <CheckCircle size={14} /> : <Circle size={14} />}
-                            {status === 'paid' ? 'Pago' : 'Pendente'}
-                        </button>
-                        <button
-                            type="button"
                             className={`fab-chip ${isRecurring ? 'active' : ''}`}
                             onClick={() => { setIsRecurring(!isRecurring); medium(); }}
                         >
                             <Repeat size={14} />
-                            {isRecurring ? 'Fixo' : 'Único'}
+                            {isRecurring ? 'Mensal' : 'Único'}
                         </button>
+                    </div>
+
+                    <div className="input-group">
+                        <label className="fab-label">Carteira</label>
+                        <select
+                            className="input-field"
+                            value={selectedWalletId}
+                            onChange={(e) => setSelectedWalletId(e.target.value)}
+                            required
+                        >
+                            {wallets.length === 0 ? (
+                                <option value="">Cadastre uma carteira primeiro</option>
+                            ) : (
+                                wallets.map((wallet) => (
+                                    <option key={wallet.id} value={wallet.id}>
+                                        {wallet.name}
+                                    </option>
+                                ))
+                            )}
+                        </select>
                     </div>
 
                     <div className="fab-section">

@@ -1,16 +1,30 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { PageHeader } from '../components/PageHeader';
 import { Button } from '../components/Button';
 import { PieChart, Target, Wallet, TrendingUp } from 'lucide-react';
 
-// Import Views
 import Analysis from './Analysis';
 import Goals from './Goals';
 import Budgets from './Budgets';
 import Simulator from './Simulator';
 
+const VALID_TABS = ['analysis', 'goals', 'budgets', 'simulator'];
+
 export default function Planning() {
-    const [activeTab, setActiveTab] = useState('analysis');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const requestedTab = searchParams.get('tab');
+    const activeTab = VALID_TABS.includes(requestedTab) ? requestedTab : 'analysis';
+
+    useEffect(() => {
+        if (!VALID_TABS.includes(requestedTab)) {
+            setSearchParams({ tab: 'analysis' }, { replace: true });
+        }
+    }, [requestedTab, setSearchParams]);
+
+    const handleTabChange = (tab) => {
+        setSearchParams({ tab });
+    };
 
     const renderContent = () => {
         switch (activeTab) {
@@ -34,11 +48,11 @@ export default function Planning() {
 
     const getSubtitle = () => {
         switch (activeTab) {
-            case 'analysis': return "Entenda seus hábitos de consumo";
-            case 'goals': return "Acompanhe e realize seus sonhos";
-            case 'budgets': return "Defina limites e economize";
-            case 'simulator': return "Projete seu futuro financeiro";
-            default: return "";
+            case 'analysis': return 'Entenda seus hábitos de consumo';
+            case 'goals': return 'Acompanhe e realize seus sonhos';
+            case 'budgets': return 'Defina limites e economize';
+            case 'simulator': return 'Projete seu futuro financeiro';
+            default: return '';
         }
     };
 
@@ -49,7 +63,6 @@ export default function Planning() {
                 subtitle={getSubtitle()}
             />
 
-            {/* Tab Navigation - Sticky & Scrollable */}
             <div className="glass-panel" style={{
                 padding: '0.5rem',
                 marginBottom: '1.5rem',
@@ -64,13 +77,13 @@ export default function Planning() {
                 backdropFilter: 'blur(12px)',
                 background: 'var(--glass-bg)',
                 borderBottom: '1px solid var(--glass-border)',
-                margin: '0 -1rem 1.5rem -1rem', // Negative margin to span full width on mobile
-                borderRadius: '0 0 16px 16px', // Rounded only at bottom
-                width: 'calc(100% + 2rem)' //Compensate for negative margins
+                margin: '0 -1rem 1.5rem -1rem',
+                borderRadius: '0 0 16px 16px',
+                width: 'calc(100% + 2rem)'
             }}>
                 <Button
                     variant={activeTab === 'analysis' ? 'primary' : 'ghost'}
-                    onClick={() => setActiveTab('analysis')}
+                    onClick={() => handleTabChange('analysis')}
                     icon={PieChart}
                     style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
                 >
@@ -78,7 +91,7 @@ export default function Planning() {
                 </Button>
                 <Button
                     variant={activeTab === 'goals' ? 'primary' : 'ghost'}
-                    onClick={() => setActiveTab('goals')}
+                    onClick={() => handleTabChange('goals')}
                     icon={Target}
                     style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
                 >
@@ -86,7 +99,7 @@ export default function Planning() {
                 </Button>
                 <Button
                     variant={activeTab === 'budgets' ? 'primary' : 'ghost'}
-                    onClick={() => setActiveTab('budgets')}
+                    onClick={() => handleTabChange('budgets')}
                     icon={Wallet}
                     style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
                 >
@@ -94,17 +107,15 @@ export default function Planning() {
                 </Button>
                 <Button
                     variant={activeTab === 'simulator' ? 'primary' : 'ghost'}
-                    onClick={() => setActiveTab('simulator')}
+                    onClick={() => handleTabChange('simulator')}
                     icon={TrendingUp}
                     style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
                 >
                     Simulador
                 </Button>
-                {/* Spacer for right padding */}
                 <div style={{ width: '0.5rem', flex: '0 0 auto' }}></div>
             </div>
 
-            {/* Content Area */}
             <div className="fade-in" key={activeTab}>
                 {renderContent()}
             </div>

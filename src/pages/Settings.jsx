@@ -398,7 +398,7 @@ export default function Settings() {
                             disabled={loading}
                         >
                             {planTier !== 'complete' && <Lock size={16} style={{ marginRight: '0.5rem' }} />}
-                            Exportar Relatório (Excel)
+                            Exportar relatório
                         </Button>
 
                         {!isPro && (
@@ -414,7 +414,7 @@ export default function Settings() {
                                 }}
                                 onClick={() => setShowUpgrade(true)}
                             >
-                                Assinar um Plano 💎
+                                Assinar um Plano
                             </Button>
                         )}
 

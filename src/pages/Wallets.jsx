@@ -49,7 +49,29 @@ export default function Wallets() {
                 .order('created_at', { ascending: true });
 
             if (error) throw error;
-            setWallets(data || []);
+
+            const { data: transactionsData, error: transactionsError } = await supabase
+                .from('transactions')
+                .select('*');
+
+            if (transactionsError) throw transactionsError;
+
+            const walletsWithBalance = (data || []).map((wallet) => {
+                const walletTransactions = (transactionsData || []).filter((tx) => tx.wallet_id === wallet.id);
+                const income = walletTransactions
+                    .filter((tx) => tx.type === 'income')
+                    .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+                const expense = walletTransactions
+                    .filter((tx) => tx.type === 'expense')
+                    .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+
+                return {
+                    ...wallet,
+                    current_balance: (parseFloat(wallet.initial_balance) || 0) + income - expense,
+                };
+            });
+
+            setWallets(walletsWithBalance);
         } catch (error) {
             console.error('Error fetching wallets:', error);
         } finally {
@@ -220,9 +242,19 @@ export default function Wallets() {
                                 </h3>
                                 <p style={{ opacity: 0.7, fontSize: '0.9rem', textTransform: 'capitalize' }}>{wallet.type.replace('_', ' ')}</p>
 
-                            <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Saldo Inicial</p>
-                                <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>R$ {parseFloat(wallet.initial_balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                            <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'grid', gap: '0.75rem' }}>
+                                <div>
+                                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Saldo atual</p>
+                                    <p style={{ fontSize: '1.2rem', fontWeight: 700, color: Number(wallet.current_balance || 0) >= 0 ? 'var(--text-main)' : 'var(--color-danger)' }}>
+                                        R$ {Number(wallet.current_balance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Saldo inicial</p>
+                                    <p style={{ fontSize: '0.95rem', fontWeight: 500 }}>
+                                        R$ {parseFloat(wallet.initial_balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                    </p>
+                                </div>
                             </div>
                         </Card>
                     ))}

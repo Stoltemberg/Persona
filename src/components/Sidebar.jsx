@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, LogOut, Eye, EyeOff, Plane, Repeat } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Settings, LogOut, Eye, EyeOff, Plane, Repeat, Wallet, Tag } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
@@ -16,6 +16,8 @@ export function Sidebar() {
         { icon: Receipt, label: 'Transações', path: '/transactions' },
         { icon: Repeat, label: 'Recorrentes', path: '/recurring' },
         { icon: Target, label: 'Planejamento', path: '/planning' },
+        { icon: Wallet, label: 'Carteiras', path: '/wallets' },
+        { icon: Tag, label: 'Categorias', path: '/categories' },
         { icon: Settings, label: 'Configurações', path: '/settings' },
     ];
 

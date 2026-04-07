@@ -54,10 +54,7 @@ export function AuthProvider({ children }) {
         window.addEventListener('focus', handleFocus);
 
         const handleRealtimePayload = (payload) => {
-            console.log('Realtime change received!', payload);
-            
             if (payload.eventType === 'INSERT' && payload.table === 'transactions') {
-                // If the new transaction is from the partner
                 if (payload.new?.profile_id === profile?.partner_id) {
                     const now = new Date().toISOString();
                     setLastPartnerUpdate(now);
@@ -65,8 +62,7 @@ export function AuthProvider({ children }) {
                 }
                 window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: { id: payload.new?.id } }));
             }
-            
-            // Fire global sync event
+
             window.dispatchEvent(new CustomEvent('supabase-sync', { detail: payload }));
         };
 
@@ -81,7 +77,7 @@ export function AuthProvider({ children }) {
             window.removeEventListener('focus', handleFocus);
             supabase.removeChannel(channel);
         };
-    }, [user]);
+    }, [user, profile?.partner_id]);
 
     const fetchProfile = async (userId) => {
         try {
@@ -116,13 +112,8 @@ export function AuthProvider({ children }) {
                 setProfile(finalData);
                 if (finalData.role) setRole(finalData.role);
                 if (finalData.plan_tier) setPlanTier(finalData.plan_tier);
+                setIsPro(finalData.plan_tier === 'complete' || finalData.plan_tier === 'intermediate');
 
-                // Keep compatibility with isPro boolean
-                if (finalData.plan_tier === 'complete' || finalData.plan_tier === 'intermediate') {
-                    setIsPro(true);
-                }
-
-                // Fetch partner profile if exists
                 if (finalData.partner_id) {
                     const { data: pData } = await supabase
                         .from('profiles')
@@ -157,11 +148,8 @@ export function AuthProvider({ children }) {
                 }
             }
 
-            // Optional: Still check DB function if needed, but local profile data is faster usually
-            // Check subscription status (Legacy check or extra validation)
             const { data: isProData, error: proError } = await supabase.rpc('is_pro');
             if (!proError) {
-                // If the RPC says pro, ensure we mark as pro (handling legacy subscriptions)
                 if (isProData) setIsPro(true);
             }
         } catch (error) {
@@ -191,18 +179,6 @@ export function AuthProvider({ children }) {
         if (error) throw error;
         return data;
     };
-    // Actually signIn code in previous file:
-    /*
-    const signIn = async (email, password) => {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-        if (error) throw error;
-        return data;
-    };
-    */
-    // I should only replace the top part properly.
 
     const signOut = async () => {
         try {

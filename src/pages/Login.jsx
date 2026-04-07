@@ -12,6 +12,7 @@ export default function Login() {
     const [isSignUp, setIsSignUp] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [notice, setNotice] = useState(null);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -23,11 +24,13 @@ export default function Login() {
         e.preventDefault();
         setLoading(true);
         setError(null);
+        setNotice(null);
 
         try {
             if (isSignUp) {
                 await signUp(email, password, fullName);
-                alert('Verifique seu e-mail para confirmar o cadastro!');
+                setNotice('Cadastro criado. Verifique seu e-mail para confirmar a conta antes de entrar.');
+                setIsSignUp(false);
             } else {
                 await signIn(email, password);
             }
@@ -187,6 +190,25 @@ export default function Login() {
                                 </motion.div>
                             )}
 
+                            {notice && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    style={{
+                                        padding: '0.75rem',
+                                        background: 'rgba(48, 209, 88, 0.12)',
+                                        border: '1px solid rgba(48, 209, 88, 0.24)',
+                                        borderRadius: '8px',
+                                        color: '#30d158',
+                                        marginBottom: '1.5rem',
+                                        fontSize: '0.9rem',
+                                        textAlign: 'center',
+                                    }}
+                                >
+                                    {notice}
+                                </motion.div>
+                            )}
+
                             <motion.div layout="position">
                                 <Button
                                     type="submit"
@@ -206,6 +228,7 @@ export default function Login() {
                                     className="toggle-btn"
                                     onClick={() => {
                                         setError(null);
+                                        setNotice(null);
                                         setIsSignUp(!isSignUp);
                                     }}
                                 >

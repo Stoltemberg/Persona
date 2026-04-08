@@ -167,7 +167,7 @@ export function FAB({ className, style }) {
                 <Plus size={24} strokeWidth={2.2} />
             </button>
 
-            <Modal isOpen={isOpen} onClose={handleClose} title="Novo lancamento">
+            <Modal isOpen={isOpen} onClose={handleClose} title="Novo lancamento" contentClassName="fab-modal-content">
                 <div className="fab-modal-form">
                     <div className="fab-modal-intro">
                         <div>
@@ -183,7 +183,7 @@ export function FAB({ className, style }) {
                                 </span>
                                 <div>
                                     <strong>{selectedWallet?.name || 'Selecione a carteira'}</strong>
-                                    <span>Origem do valor</span>
+                                    <span>Carteira escolhida</span>
                                 </div>
                             </div>
 
@@ -203,7 +203,7 @@ export function FAB({ className, style }) {
                                 </span>
                                 <div>
                                     <strong>{isRecurring ? 'Mensal' : 'Lancamento unico'}</strong>
-                                    <span>{isRecurring ? 'Recorrencia ativa' : 'Entrada imediata'}</span>
+                                    <span>{isRecurring ? 'Com recorrencia' : 'Registro imediato'}</span>
                                 </div>
                             </div>
                         </div>

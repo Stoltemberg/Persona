@@ -2,7 +2,7 @@ import { X } from 'lucide-react';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
-export function Modal({ isOpen, onClose, title, children }) {
+export function Modal({ isOpen, onClose, title, children, contentClassName = '' }) {
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
@@ -20,7 +20,7 @@ export function Modal({ isOpen, onClose, title, children }) {
             onClick={onClose}
         >
             <div
-                className="modal-content"
+                className={`modal-content ${contentClassName}`.trim()}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="modal-header">

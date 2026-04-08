@@ -1360,12 +1360,12 @@ option {
    ========================================= */
 .fab-modal-form {
   display: grid;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .fab-modal-intro {
   display: grid;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .fab-modal-intro h3 {
@@ -1379,18 +1379,19 @@ option {
 
 .fab-modal-highlights {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 0.75rem;
 }
 
 .fab-highlight-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
-  padding: 0.9rem 1rem;
+  padding: 0.85rem 0.95rem;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.06);
+  min-height: 88px;
 }
 
 .fab-highlight-card strong {
@@ -1402,6 +1403,7 @@ option {
 .fab-highlight-card span {
   color: var(--text-secondary);
   font-size: 0.8rem;
+  line-height: 1.35;
 }
 
 .fab-highlight-icon {
@@ -1419,6 +1421,10 @@ option {
 .fab-form-shell {
   display: grid;
   gap: 1rem;
+}
+
+.fab-modal-content {
+  max-width: 720px;
 }
 
 .fab-form-grid {
@@ -4081,6 +4087,12 @@ option {
 }
 
 @media (max-width: 768px) {
+  .fab-modal-content {
+    max-width: calc(100vw - 1rem);
+    padding: 1rem;
+    border-radius: 22px;
+  }
+
   .fab-modal-highlights,
   .fab-form-grid {
     grid-template-columns: 1fr;

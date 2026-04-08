@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Check, Edit2, Plus, Repeat, Trash2, TrendingUp, Wallet, X, Zap } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
@@ -7,9 +8,8 @@ import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { Skeleton } from '../components/Skeleton';
 import { EmptyState } from '../components/EmptyState';
-import { Plus, Trash2, Edit2, Check, X, Repeat, Zap, TrendingUp, Wallet } from 'lucide-react';
-import { useToast } from '../context/ToastContext';
 import { PageHeader } from '../components/PageHeader';
+import { useToast } from '../context/ToastContext';
 
 const getToday = () => new Date().toISOString().split('T')[0];
 
@@ -22,7 +22,6 @@ export default function Recurring() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [templateToEdit, setTemplateToEdit] = useState(null);
     const [submitting, setSubmitting] = useState(false);
-
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('expense');
@@ -65,7 +64,7 @@ export default function Recurring() {
             setTemplates(data || []);
         } catch (error) {
             console.error('Error fetching templates:', error);
-            addToast('Erro ao carregar recorrências.', 'error');
+            addToast('Erro ao carregar recorrencias.', 'error');
         } finally {
             setLoading(false);
         }
@@ -124,13 +123,13 @@ export default function Recurring() {
         resetForm();
     };
 
-    const handleSave = async (e) => {
-        e.preventDefault();
+    const handleSave = async (event) => {
+        event.preventDefault();
         setSubmitting(true);
 
         try {
             if (!selectedWalletId) {
-                throw new Error('Selecione a carteira desta recorrência.');
+                throw new Error('Selecione a carteira desta recorrencia.');
             }
 
             const payload = {
@@ -164,9 +163,9 @@ export default function Recurring() {
 
             await fetchTemplates();
             handleCloseModal();
-            addToast(templateToEdit ? 'Recorrência atualizada.' : 'Recorrência criada.', 'success');
+            addToast(templateToEdit ? 'Recorrencia atualizada.' : 'Recorrencia criada.', 'success');
         } catch (error) {
-            addToast(error.message || 'Erro ao salvar recorrência.', 'error');
+            addToast(error.message || 'Erro ao salvar recorrencia.', 'error');
         } finally {
             setSubmitting(false);
         }
@@ -183,16 +182,16 @@ export default function Recurring() {
             try {
                 const { error } = await supabase.from('recurring_templates').delete().eq('id', id);
                 if (error) throw error;
-                addToast('Recorrência excluída.', 'success');
+                addToast('Recorrencia excluida.', 'success');
             } catch (error) {
                 setTemplates((prev) => [...prev, template].sort((a, b) => new Date(a.next_due_date) - new Date(b.next_due_date)));
-                addToast('Erro ao excluir.', 'error');
+                addToast('Erro ao excluir recorrencia.', 'error');
             }
         }, 5000);
 
         pendingDeleteTimers.current.set(id, timer);
 
-        addActionToast('Recorrência removida.', 'Desfazer', () => {
+        addActionToast('Recorrencia removida.', 'Desfazer', () => {
             const pendingTimer = pendingDeleteTimers.current.get(id);
             if (pendingTimer) {
                 clearTimeout(pendingTimer);
@@ -211,144 +210,131 @@ export default function Recurring() {
 
             if (error) throw error;
 
-            setTemplates((prev) => prev.map((item) => (
-                item.id === id ? { ...item, active: !currentStatus } : item
-            )));
-            addToast(currentStatus ? 'Recorrência pausada.' : 'Recorrência ativada.', 'success');
+            setTemplates((prev) => prev.map((item) => (item.id === id ? { ...item, active: !currentStatus } : item)));
+            addToast(currentStatus ? 'Recorrencia pausada.' : 'Recorrencia ativada.', 'success');
         } catch (error) {
             addToast('Erro ao atualizar status.', 'error');
         }
     };
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
+        <div className="container fade-in app-page-shell" style={{ paddingBottom: '80px' }}>
             <PageHeader
-                title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Recorrências</span></span>}
-                subtitle="Gerencie seus gastos e ganhos fixos"
+                title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Recorrencias</span></span>}
+                subtitle="Acompanhe entradas e saidas automaticas com o mesmo padrao visual das outras areas."
             >
-                {templates.length > 0 && (
-                    <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
-                        <span className="responsive-btn-text">Nova Recorrência</span>
-                    </Button>
-                )}
+                <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
+                    Nova recorrencia
+                </Button>
             </PageHeader>
 
             {loading ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {Array(3).fill(0).map((_, index) => (
-                        <Skeleton key={index} width="100%" height="90px" borderRadius="16px" />
+                <div className="app-list-grid">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                        <Skeleton key={index} width="100%" height="180px" borderRadius="20px" />
                     ))}
                 </div>
             ) : (
                 <>
-                    <div className="grid-responsive mb-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-                        <Card className="glass-card glow-on-hover" style={{ padding: '1.5rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                                <div style={{ padding: '10px', background: 'rgba(246, 79, 89, 0.15)', borderRadius: '10px', color: '#f64f59' }}>
-                                    <Zap size={24} />
+                    <div className="app-summary-grid">
+                        <Card hover={false} className="app-summary-card app-summary-card-danger">
+                            <div className="app-summary-topline">
+                                <div className="app-summary-icon app-summary-icon-danger">
+                                    <Zap size={18} />
                                 </div>
-                                <h3 style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Custo Mensal</h3>
+                                <span className="app-summary-label">Custo mensal</span>
                             </div>
-                            <h2 style={{ fontSize: '2rem', fontWeight: 800 }}>R$ {monthlyBurn.toFixed(2).replace('.', ',')}</h2>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Despesas recorrentes ativas</p>
+                            <strong className="app-summary-value">R$ {monthlyBurn.toFixed(2).replace('.', ',')}</strong>
                         </Card>
-
-                        <Card className="glass-card glow-on-hover" style={{ padding: '1.5rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                                <div style={{ padding: '10px', background: 'rgba(18, 194, 233, 0.15)', borderRadius: '10px', color: '#12c2e9' }}>
-                                    <TrendingUp size={24} />
+                        <Card hover={false} className="app-summary-card app-summary-card-success">
+                            <div className="app-summary-topline">
+                                <div className="app-summary-icon app-summary-icon-success">
+                                    <TrendingUp size={18} />
                                 </div>
-                                <h3 style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Receita Mensal</h3>
+                                <span className="app-summary-label">Receita mensal</span>
                             </div>
-                            <h2 style={{ fontSize: '2rem', fontWeight: 800 }}>R$ {monthlyIncome.toFixed(2).replace('.', ',')}</h2>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Ganhos recorrentes ativos</p>
+                            <strong className="app-summary-value">R$ {monthlyIncome.toFixed(2).replace('.', ',')}</strong>
+                        </Card>
+                        <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                            <div className="app-summary-topline">
+                                <div className="app-summary-icon app-summary-icon-neutral">
+                                    <Repeat size={18} />
+                                </div>
+                                <span className="app-summary-label">Recorrencias ativas</span>
+                            </div>
+                            <strong className="app-summary-value">{activeTemplates.length}</strong>
                         </Card>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-                        <Button
-                            variant={filter === 'all' ? 'primary' : 'ghost'}
-                            onClick={() => setFilter('all')}
-                            style={{ borderRadius: '50px', padding: '0.5rem 1.2rem' }}
-                        >
+                    <div className="app-chip-row">
+                        <button type="button" className={`app-filter-chip${filter === 'all' ? ' is-active' : ''}`} onClick={() => setFilter('all')}>
                             Todos
-                        </Button>
-                        <Button
-                            variant={filter === 'expense' ? 'primary' : 'ghost'}
-                            onClick={() => setFilter('expense')}
-                            style={{ borderRadius: '50px', padding: '0.5rem 1.2rem' }}
-                        >
+                        </button>
+                        <button type="button" className={`app-filter-chip${filter === 'expense' ? ' is-active danger' : ''}`} onClick={() => setFilter('expense')}>
                             Despesas
-                        </Button>
-                        <Button
-                            variant={filter === 'income' ? 'primary' : 'ghost'}
-                            onClick={() => setFilter('income')}
-                            style={{ borderRadius: '50px', padding: '0.5rem 1.2rem' }}
-                        >
+                        </button>
+                        <button type="button" className={`app-filter-chip${filter === 'income' ? ' is-active success' : ''}`} onClick={() => setFilter('income')}>
                             Receitas
-                        </Button>
+                        </button>
                     </div>
 
                     {filteredTemplates.length === 0 ? (
                         <EmptyState
                             icon={Repeat}
-                            title="Nenhuma recorrência encontrada"
-                            description={filter === 'all' ? 'Configure pagamentos automáticos como aluguel, assinaturas ou salário.' : 'Nenhum item neste filtro.'}
-                            actionText="Criar Recorrência"
+                            title="Nenhuma recorrencia encontrada"
+                            description={filter === 'all' ? 'Configure pagamentos automaticos como aluguel, salario ou assinaturas.' : 'Nenhum item neste filtro.'}
+                            actionText="Criar recorrencia"
                             onAction={handleOpenNew}
                         />
                     ) : (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                            {filteredTemplates.map((template, index) => (
-                                <Card
-                                    key={template.id}
-                                    className="fade-in glass-card"
-                                    style={{
-                                        animationDelay: `${index * 0.05}s`,
-                                        opacity: template.active ? 1 : 0.6,
-                                        borderLeft: template.active && template.type === 'expense'
-                                            ? '4px solid #f64f59'
-                                            : (template.active ? '4px solid #12c2e9' : '4px solid transparent'),
-                                    }}
-                                >
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                                        <div style={{
-                                            padding: '0.8rem',
-                                            borderRadius: '12px',
-                                            background: template.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
-                                            color: template.type === 'income' ? '#12c2e9' : '#f64f59',
-                                        }}>
-                                            <Repeat size={20} />
+                        <div className="app-list-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+                            {filteredTemplates.map((template) => (
+                                <Card key={template.id} hover className="app-section-card">
+                                    <div className="app-section-header">
+                                        <div className="app-list-card-main">
+                                            <span className="app-inline-icon" style={{ color: template.type === 'income' ? '#12c2e9' : '#f64f59' }}>
+                                                <Repeat size={18} />
+                                            </span>
+                                            <div>
+                                                <strong>{template.description}</strong>
+                                                <span>{template.category}</span>
+                                            </div>
                                         </div>
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <div className="app-list-card-actions">
                                             <button
                                                 onClick={() => toggleActive(template.id, template.active)}
                                                 className="btn-ghost btn-icon"
                                                 title={template.active ? 'Pausar' : 'Ativar'}
-                                                style={{ color: template.active ? '#00ebc7' : 'var(--text-muted)' }}
+                                                style={{ color: template.active ? '#30d158' : 'var(--text-muted)' }}
                                             >
-                                                {template.active ? <Check size={18} /> : <X size={18} />}
+                                                {template.active ? <Check size={16} /> : <X size={16} />}
                                             </button>
-                                            <button onClick={() => handleOpenEdit(template)} className="btn-ghost btn-icon" title="Editar"><Edit2 size={18} /></button>
-                                            <button onClick={() => handleDelete(template.id)} className="btn-ghost btn-icon" style={{ color: '#f64f59' }} title="Excluir"><Trash2 size={18} /></button>
+                                            <button onClick={() => handleOpenEdit(template)} className="btn-ghost btn-icon" title="Editar">
+                                                <Edit2 size={16} />
+                                            </button>
+                                            <button onClick={() => handleDelete(template.id)} className="btn-ghost btn-icon" style={{ color: '#f64f59' }} title="Excluir">
+                                                <Trash2 size={16} />
+                                            </button>
                                         </div>
                                     </div>
 
-                                    <h3 style={{ fontSize: '1.1rem', marginBottom: '0.3rem' }}>{template.description}</h3>
-                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                                        {template.category} • {(wallets.find((wallet) => wallet.id === template.wallet_id)?.name || 'Sem carteira')} • {template.frequency === 'monthly' ? 'Mensal' : 'Semanal'}
-                                    </p>
+                                    <div className="app-summary-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                                        <Card hover={false} className={`app-summary-card ${template.type === 'income' ? 'app-summary-card-success' : 'app-summary-card-danger'}`}>
+                                            <span className="app-summary-label">Valor</span>
+                                            <strong className="app-summary-value">R$ {parseFloat(template.amount).toFixed(2).replace('.', ',')}</strong>
+                                        </Card>
+                                        <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                                            <span className="app-summary-label">Proxima data</span>
+                                            <strong className="app-summary-value">{new Date(template.next_due_date).toLocaleDateString('pt-BR')}</strong>
+                                        </Card>
+                                    </div>
 
-                                    <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div className="app-list-card-main" style={{ justifyContent: 'space-between' }}>
                                         <div>
-                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Próxima</p>
-                                            <p style={{ fontSize: '0.9rem' }}>{new Date(template.next_due_date).toLocaleDateString('pt-BR')}</p>
+                                            <strong>{wallets.find((wallet) => wallet.id === template.wallet_id)?.name || 'Sem carteira'}</strong>
+                                            <span>{template.frequency === 'monthly' ? 'Mensal' : 'Semanal'}</span>
                                         </div>
-                                        <div style={{ textAlign: 'right' }}>
-                                            <p style={{ fontSize: '1.2rem', fontWeight: 600, color: template.type === 'income' ? '#12c2e9' : '#f64f59' }}>
-                                                R$ {parseFloat(template.amount).toFixed(2).replace('.', ',')}
-                                            </p>
-                                        </div>
+                                        {!template.active && <span className="dashboard-partner-chip" style={{ marginLeft: 0 }}>Pausada</span>}
                                     </div>
                                 </Card>
                             ))}
@@ -357,59 +343,32 @@ export default function Recurring() {
                 </>
             )}
 
-            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={templateToEdit ? 'Editar Recorrência' : 'Nova Recorrência'}>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={templateToEdit ? 'Editar recorrencia' : 'Nova recorrencia'}>
                 <form onSubmit={handleSave}>
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <Button
+                    <div className="app-chip-row" style={{ marginBottom: '1.5rem' }}>
+                        <button
                             type="button"
-                            className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--color-danger)' : undefined, color: type === 'expense' ? '#fff' : undefined }}
+                            className={`app-filter-chip${type === 'expense' ? ' is-active danger' : ''}`}
                             onClick={() => setType('expense')}
                         >
                             Despesa
-                        </Button>
-                        <Button
+                        </button>
+                        <button
                             type="button"
-                            className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--color-success)' : undefined, color: type === 'income' ? '#fff' : undefined }}
+                            className={`app-filter-chip${type === 'income' ? ' is-active success' : ''}`}
                             onClick={() => setType('income')}
                         >
                             Receita
-                        </Button>
+                        </button>
                     </div>
 
-                    <Input
-                        label="Descrição"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        required
-                    />
-
-                    <Input
-                        label="Valor (R$)"
-                        type="number"
-                        step="0.01"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        required
-                    />
-
-                    <Input
-                        label="Categoria"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        placeholder="Ex: Aluguel, Salário"
-                        required
-                    />
+                    <Input label="Descricao" value={description} onChange={(event) => setDescription(event.target.value)} required />
+                    <Input label="Valor (R$)" type="number" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} required />
+                    <Input label="Categoria" value={category} onChange={(event) => setCategory(event.target.value)} placeholder="Ex: Aluguel, Salario" required />
 
                     <div className="input-group" style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Carteira</label>
-                        <select
-                            value={selectedWalletId}
-                            onChange={(e) => setSelectedWalletId(e.target.value)}
-                            className="input-field"
-                            required
-                        >
+                        <label>Carteira</label>
+                        <select value={selectedWalletId} onChange={(event) => setSelectedWalletId(event.target.value)} className="input-field" required>
                             {wallets.length === 0 ? (
                                 <option value="">Cadastre uma carteira primeiro</option>
                             ) : (
@@ -423,12 +382,8 @@ export default function Recurring() {
                     </div>
 
                     <div className="input-group" style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Frequência</label>
-                        <select
-                            value={frequency}
-                            onChange={(e) => setFrequency(e.target.value)}
-                            className="input-field"
-                        >
+                        <label>Frequencia</label>
+                        <select value={frequency} onChange={(event) => setFrequency(event.target.value)} className="input-field">
                             <option value="monthly">Mensal</option>
                             <option value="weekly">Semanal</option>
                         </select>
@@ -436,29 +391,19 @@ export default function Recurring() {
 
                     {type === 'expense' && (
                         <div className="input-group" style={{ marginBottom: '1rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Tipo de gasto</label>
-                            <select
-                                value={expenseType}
-                                onChange={(e) => setExpenseType(e.target.value)}
-                                className="input-field"
-                            >
+                            <label>Tipo de gasto</label>
+                            <select value={expenseType} onChange={(event) => setExpenseType(event.target.value)} className="input-field">
                                 <option value="fixed">Fixo</option>
-                                <option value="variable">Variável</option>
+                                <option value="variable">Variavel</option>
                                 <option value="lifestyle">Lazer</option>
                             </select>
                         </div>
                     )}
 
-                    <Input
-                        label="Próximo Vencimento"
-                        type="date"
-                        value={nextDueDate}
-                        onChange={(e) => setNextDueDate(e.target.value)}
-                        required
-                    />
+                    <Input label="Proximo vencimento" type="date" value={nextDueDate} onChange={(event) => setNextDueDate(event.target.value)} required />
 
-                    <Button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem' }} loading={submitting}>
-                        Salvar
+                    <Button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', justifyContent: 'center' }} loading={submitting}>
+                        {templateToEdit ? 'Salvar alteracoes' : 'Salvar recorrencia'}
                     </Button>
                 </form>
             </Modal>

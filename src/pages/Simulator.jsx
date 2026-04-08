@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Calendar, DollarSign, TrendingUp } from 'lucide-react';
 import { Card } from '../components/Card';
 import { Input } from '../components/Input';
-import { Button } from '../components/Button';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, DollarSign, Calendar } from 'lucide-react';
+import { PageHeader } from '../components/PageHeader';
 
 export default function Simulator({ isTab }) {
     const [monthlySaving, setMonthlySaving] = useState(100);
     const [initialAmount, setInitialAmount] = useState(0);
     const [years, setYears] = useState(10);
-    const [interestRate, setInterestRate] = useState(10); // Annual %
+    const [interestRate, setInterestRate] = useState(10);
     const [data, setData] = useState([]);
 
     useEffect(() => {
@@ -17,28 +17,25 @@ export default function Simulator({ isTab }) {
     }, [monthlySaving, initialAmount, years, interestRate]);
 
     const calculateGrowth = () => {
-        const newData = [];
+        const nextData = [];
         let currentAmount = parseFloat(initialAmount) || 0;
         const monthlyRate = (parseFloat(interestRate) / 100) / 12;
-        const months = parseInt(years) * 12;
+        const months = parseInt(years, 10) * 12;
         const saving = parseFloat(monthlySaving) || 0;
 
-        for (let i = 0; i <= months; i++) {
-            if (i % 12 === 0) { // Record yearly data points
-                newData.push({
-                    year: `Ano ${i / 12}`,
+        for (let month = 0; month <= months; month += 1) {
+            if (month % 12 === 0) {
+                nextData.push({
+                    year: `Ano ${month / 12}`,
                     amount: Math.round(currentAmount),
-                    invested: Math.round((parseFloat(initialAmount) || 0) + (saving * i))
+                    invested: Math.round((parseFloat(initialAmount) || 0) + (saving * month)),
                 });
             }
-            // Compound Interest Formula: A = P(1 + r) + M
+
             currentAmount = (currentAmount + saving) * (1 + monthlyRate);
-            // Actually, logic is: Add saving, then apply interest? Or interest then saving?
-            // Simplified: Add saving at end of month, interest applies to balance start of month.
-            // currentAmount = (currentAmount * (1 + monthlyRate)) + saving;
-            // Let's stick to simple monthly compounding.
         }
-        setData(newData);
+
+        setData(nextData);
     };
 
     const finalAmount = data.length > 0 ? data[data.length - 1].amount : 0;
@@ -46,132 +43,131 @@ export default function Simulator({ isTab }) {
     const totalInterest = finalAmount - totalInvested;
 
     return (
-        <div className={isTab ? "fade-in" : "container fade-in"} style={{ paddingBottom: '80px' }}>
+        <div className={isTab ? 'fade-in app-page-shell' : 'container fade-in app-page-shell'} style={{ paddingBottom: '80px' }}>
             {!isTab && (
-                <header className="page-header" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
-                    <div>
-                        <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                            Simulador de <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Futuro</span>
-                        </h1>
-                        <p style={{ opacity: 0.6 }}>Veja o poder dos juros compostos</p>
-                    </div>
-                </header>
+                <PageHeader
+                    title={<span>Simulador de <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Futuro</span></span>}
+                    subtitle="Visualize o efeito da consistencia e dos juros compostos ao longo do tempo."
+                />
             )}
 
-            <div className="simulator-grid mb-2">
-
-                {/* Inputs */}
-                <Card className="glass-card" style={{ padding: '1.5rem', height: 'fit-content' }}>
-                    <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <DollarSign size={20} color="#c471ed" /> Parâmetros
-                    </h3>
+            <div className="app-two-column-grid">
+                <section className="glass-card app-section-card">
+                    <div className="app-section-header">
+                        <div>
+                            <h3>Parametros</h3>
+                            <p>Ajuste os valores para testar cenarios sem poluir a tela.</p>
+                        </div>
+                        <div className="app-summary-icon app-summary-icon-neutral">
+                            <DollarSign size={18} />
+                        </div>
+                    </div>
 
                     <Input
-                        label="Investimento Inicial (R$)"
+                        label="Investimento inicial (R$)"
                         type="number"
                         value={initialAmount}
-                        onChange={(e) => setInitialAmount(e.target.value)}
+                        onChange={(event) => setInitialAmount(event.target.value)}
                     />
 
                     <Input
-                        label="Aporte Mensal (R$)"
+                        label="Aporte mensal (R$)"
                         type="number"
                         value={monthlySaving}
-                        onChange={(e) => setMonthlySaving(e.target.value)}
-                        subtitle="Economia de iFood, Uber, etc."
+                        onChange={(event) => setMonthlySaving(event.target.value)}
+                        subtitle="Valor que voce consegue manter com regularidade."
                     />
 
                     <Input
-                        label="Taxa de Juros Anual (%)"
+                        label="Taxa anual (%)"
                         type="number"
                         value={interestRate}
-                        onChange={(e) => setInterestRate(e.target.value)}
-                        subtitle="CDI hoje: ~10-11%"
+                        onChange={(event) => setInterestRate(event.target.value)}
+                        subtitle="Use uma taxa realista para o produto que voce imagina."
                     />
 
-                    <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Tempo: {years} anos</label>
+                    <div className="input-group" style={{ marginBottom: 0 }}>
+                        <label>Tempo: {years} anos</label>
                         <input
                             type="range"
                             min="1"
                             max="30"
                             value={years}
-                            onChange={(e) => setYears(e.target.value)}
-                            style={{ width: '100%', accentColor: '#c471ed' }}
+                            onChange={(event) => setYears(event.target.value)}
+                            style={{ width: '100%', accentColor: 'var(--color-brand)' }}
                         />
                     </div>
-                </Card>
+                </section>
 
-                {/* Results & Chart */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-
-                    {/* Summary Cards */}
-                    <div className="grid-responsive" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
-                        <Card className="glass-card glow-on-hover" style={{ padding: '1rem', textAlign: 'center' }}>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Total Acumulado</p>
-                            <h2 style={{ color: '#00ebc7', fontSize: '1.8rem' }}>R$ {finalAmount.toLocaleString('pt-BR')}</h2>
+                <div className="app-page-shell">
+                    <div className="app-summary-grid">
+                        <Card hover={false} className="app-summary-card app-summary-card-success">
+                            <div className="app-summary-topline">
+                                <div className="app-summary-icon app-summary-icon-success">
+                                    <TrendingUp size={18} />
+                                </div>
+                                <span className="app-summary-label">Total acumulado</span>
+                            </div>
+                            <strong className="app-summary-value">R$ {finalAmount.toLocaleString('pt-BR')}</strong>
                         </Card>
-                        <Card className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Total Investido</p>
-                            <h2 style={{ fontSize: '1.5rem' }}>R$ {totalInvested.toLocaleString('pt-BR')}</h2>
+                        <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                            <div className="app-summary-topline">
+                                <div className="app-summary-icon app-summary-icon-neutral">
+                                    <DollarSign size={18} />
+                                </div>
+                                <span className="app-summary-label">Total investido</span>
+                            </div>
+                            <strong className="app-summary-value">R$ {totalInvested.toLocaleString('pt-BR')}</strong>
                         </Card>
-                        <Card className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Juros Ganhos</p>
-                            <h2 style={{ color: '#c471ed', fontSize: '1.5rem' }}>R$ {totalInterest.toLocaleString('pt-BR')}</h2>
+                        <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                            <div className="app-summary-topline">
+                                <div className="app-summary-icon app-summary-icon-neutral">
+                                    <Calendar size={18} />
+                                </div>
+                                <span className="app-summary-label">Juros gerados</span>
+                            </div>
+                            <strong className="app-summary-value">R$ {totalInterest.toLocaleString('pt-BR')}</strong>
                         </Card>
                     </div>
 
-                    {/* Chart */}
-                    <Card className="glass-card" style={{ padding: '1.5rem', height: '400px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                                <defs>
-                                    <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#00ebc7" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#00ebc7" stopOpacity={0} />
-                                    </linearGradient>
-                                    <linearGradient id="colorInvested" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <XAxis dataKey="year" stroke="var(--text-muted)" style={{ fontSize: '0.8rem' }} />
-                                <YAxis
-                                    tickFormatter={(value) => `R$${value / 1000}k`}
-                                    stroke="var(--text-muted)"
-                                    style={{ fontSize: '0.8rem' }}
-                                />
-                                <Tooltip
-                                    contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                                    formatter={(value) => `R$ ${value.toLocaleString('pt-BR')}`}
-                                />
-                                <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-                                <Area
-                                    type="monotone"
-                                    dataKey="amount"
-                                    name="Total com Juros"
-                                    stroke="#00ebc7"
-                                    fillOpacity={1}
-                                    fill="url(#colorAmount)"
-                                    strokeWidth={3}
-                                />
-                                <Area
-                                    type="monotone"
-                                    dataKey="invested"
-                                    name="Dinheiro Investido"
-                                    stroke="#8884d8"
-                                    fillOpacity={1}
-                                    fill="url(#colorInvested)"
-                                    strokeWidth={2}
-                                    strokeDasharray="5 5"
-                                />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </Card>
+                    <Card className="glass-card app-section-card" style={{ minHeight: '420px' }}>
+                        <div className="app-section-header">
+                            <div>
+                                <h3>Evolucao projetada</h3>
+                                <p>Veja a distancia entre o capital aportado e o crescimento acumulado.</p>
+                            </div>
+                        </div>
 
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center' }}>
-                        *Aporte mensal é adicionado no final de cada mês. Juros compostos aplicados mensalmente.
-                    </p>
+                        <div style={{ width: '100%', height: '320px' }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={data} margin={{ top: 12, right: 20, left: 0, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#00ebc7" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#00ebc7" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="colorInvested" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#8884d8" stopOpacity={0.25} />
+                                            <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis dataKey="year" stroke="var(--text-muted)" style={{ fontSize: '0.8rem' }} />
+                                    <YAxis
+                                        tickFormatter={(value) => `R$${value / 1000}k`}
+                                        stroke="var(--text-muted)"
+                                        style={{ fontSize: '0.8rem' }}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                                        formatter={(value) => `R$ ${value.toLocaleString('pt-BR')}`}
+                                    />
+                                    <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                                    <Area type="monotone" dataKey="amount" name="Total com juros" stroke="#00ebc7" fillOpacity={1} fill="url(#colorAmount)" strokeWidth={3} />
+                                    <Area type="monotone" dataKey="invested" name="Total aportado" stroke="#8884d8" fillOpacity={1} fill="url(#colorInvested)" strokeWidth={2} strokeDasharray="5 5" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </Card>
                 </div>
             </div>
         </div>

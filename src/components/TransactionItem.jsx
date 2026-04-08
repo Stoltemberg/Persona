@@ -3,6 +3,7 @@ import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { Edit2, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { Card } from './Card';
 import { useAuth } from '../hooks/useAuth';
+import { CategoryIcon } from '../utils/categoryIcons';
 
 export const TransactionItem = React.memo(function TransactionItem({ transaction, categories, onEdit, onDelete, index }) {
     const { user, partnerProfile } = useAuth();
@@ -80,7 +81,7 @@ export const TransactionItem = React.memo(function TransactionItem({ transaction
                             fontSize: '1rem',
                             boxShadow: '0 0 0 1px rgba(255,255,255,0.05) inset',
                         }}>
-                            {category ? category.icon : (transaction.type === 'income' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />)}
+                            {category ? <CategoryIcon icon={category.icon} size={18} /> : (transaction.type === 'income' ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />)}
                         </div>
 
                         <div>

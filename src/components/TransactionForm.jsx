@@ -1,6 +1,7 @@
 import { Button } from './Button';
 import { Input } from './Input';
 import { useNavigate } from 'react-router-dom';
+import { CategoryIcon } from '../utils/categoryIcons';
 
 export function TransactionForm({
     amount,
@@ -125,7 +126,9 @@ export function TransactionForm({
                                     color: 'var(--text-main)',
                                 }}
                             >
-                                <div style={{ fontSize: '1.5rem' }}>{cat.icon}</div>
+                                <div className="app-inline-icon" style={{ width: '34px', height: '34px', color: cat.color }}>
+                                    <CategoryIcon icon={cat.icon} size={16} />
+                                </div>
                                 <div style={{ fontSize: '0.7rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>
                                     {cat.name}
                                 </div>

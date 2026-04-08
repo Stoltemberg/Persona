@@ -1,6 +1,7 @@
+import { CalendarDays, RefreshCw, Tag, Wallet } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './Button';
 import { Input } from './Input';
-import { useNavigate } from 'react-router-dom';
 import { CategoryIcon } from '../utils/categoryIcons';
 
 export function TransactionForm({
@@ -30,120 +31,121 @@ export function TransactionForm({
     const navigate = useNavigate();
 
     return (
-        <form onSubmit={onSubmit}>
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-                <Button
+        <form onSubmit={onSubmit} className="fab-form-shell">
+            <div className="app-chip-row" style={{ marginBottom: '0.25rem' }}>
+                <button
                     type="button"
-                    className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
-                    style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        background: type === 'expense' ? 'var(--color-danger)' : undefined,
-                        border: type === 'expense' ? 'none' : undefined,
-                        color: type === 'expense' ? '#fff' : undefined,
-                    }}
+                    className={`app-filter-chip${type === 'expense' ? ' is-active danger' : ''}`}
                     onClick={() => onTypeChange('expense')}
                 >
                     Despesa
-                </Button>
-                <Button
+                </button>
+                <button
                     type="button"
-                    className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
-                    style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        background: type === 'income' ? 'var(--color-success)' : undefined,
-                        border: type === 'income' ? 'none' : undefined,
-                        color: type === 'income' ? '#fff' : undefined,
-                    }}
+                    className={`app-filter-chip${type === 'income' ? ' is-active success' : ''}`}
                     onClick={() => onTypeChange('income')}
                 >
                     Receita
-                </Button>
+                </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className="fab-form-grid">
                 <Input
                     label="Valor"
                     placeholder="0,00"
                     type="number"
                     step="0.01"
                     value={amount}
-                    onChange={(e) => onAmountChange(e.target.value)}
+                    onChange={(event) => onAmountChange(event.target.value)}
                     required
                 />
                 <Input
                     label="Data"
                     type="date"
                     value={date}
-                    onChange={(e) => onDateChange(e.target.value)}
+                    onChange={(event) => onDateChange(event.target.value)}
                     required
                 />
             </div>
 
-            <div className="input-group">
-                <label className="input-label">Carteira</label>
-                <select
-                    className="input-field"
-                    value={selectedWalletId}
-                    onChange={(e) => onWalletChange(e.target.value)}
-                    required
-                >
-                    {wallets.length === 0 ? (
-                        <option value="">Cadastre uma carteira primeiro</option>
-                    ) : (
-                        wallets.map((wallet) => (
-                            <option key={wallet.id} value={wallet.id}>
-                                {wallet.name}
-                            </option>
-                        ))
-                    )}
-                </select>
+            <div className="app-section-card fab-field-card">
+                <div className="app-list-card-main">
+                    <span className="app-inline-icon">
+                        <Wallet size={16} />
+                    </span>
+                    <div>
+                        <strong>Carteira</strong>
+                        <span>Selecione a origem para refletir o saldo corretamente.</span>
+                    </div>
+                </div>
+
+                <div className="input-group" style={{ marginBottom: 0 }}>
+                    <select
+                        className="input-field"
+                        value={selectedWalletId}
+                        onChange={(event) => onWalletChange(event.target.value)}
+                        required
+                    >
+                        {wallets.length === 0 ? (
+                            <option value="">Cadastre uma carteira primeiro</option>
+                        ) : (
+                            wallets.map((wallet) => (
+                                <option key={wallet.id} value={wallet.id}>
+                                    {wallet.name}
+                                </option>
+                            ))
+                        )}
+                    </select>
+                </div>
             </div>
 
-            <div className="input-group" style={{ marginBottom: '1rem' }}>
-                <label className="input-label">Categoria</label>
+            <div className="app-section-card fab-field-card">
+                <div className="app-list-card-main">
+                    <span className="app-inline-icon">
+                        <Tag size={16} />
+                    </span>
+                    <div>
+                        <strong>Categoria</strong>
+                        <span>Escolha uma categoria para organizar analises, filtros e planejamento.</span>
+                    </div>
+                </div>
+
                 {availableCategories.length > 0 ? (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '0.5rem' }}>
-                        {availableCategories.map((cat) => (
-                            <button
-                                key={cat.id}
-                                type="button"
-                                onClick={() => onCategorySelect(cat)}
-                                className={!selectedCategory || selectedCategory.id !== cat.id ? 'surface-secondary' : ''}
-                                style={{
-                                    padding: '0.5rem',
-                                    borderRadius: '8px',
-                                    background: selectedCategory?.id === cat.id ? `${cat.color}40` : undefined,
-                                    border: selectedCategory?.id === cat.id ? `1px solid ${cat.color}` : '1px solid transparent',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    gap: '0.2rem',
-                                    transition: 'all 0.2s',
-                                    textAlign: 'center',
-                                    color: 'var(--text-main)',
-                                }}
-                            >
-                                <div className="app-inline-icon" style={{ width: '34px', height: '34px', color: cat.color }}>
-                                    <CategoryIcon icon={cat.icon} size={16} />
-                                </div>
-                                <div style={{ fontSize: '0.7rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>
-                                    {cat.name}
-                                </div>
-                            </button>
-                        ))}
+                    <div className="fab-categories-grid">
+                        {availableCategories.map((category) => {
+                            const isSelected = selectedCategory?.id === category.id;
+
+                            return (
+                                <button
+                                    key={category.id}
+                                    type="button"
+                                    onClick={() => onCategorySelect(category)}
+                                    className={`fab-category-tile${isSelected ? ' is-selected' : ''}`}
+                                    style={isSelected ? {
+                                        borderColor: category.color,
+                                        background: `${category.color}18`,
+                                    } : undefined}
+                                >
+                                    <span className="app-inline-icon" style={{ color: category.color }}>
+                                        <CategoryIcon icon={category.icon} size={16} />
+                                    </span>
+                                    <strong>{category.name}</strong>
+                                </button>
+                            );
+                        })}
                     </div>
                 ) : (
-                    <div className="surface-secondary" style={{ padding: '1rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                        <p>Nenhuma categoria criada.</p>
+                    <div className="app-empty-inline">
+                        <Tag size={16} />
+                        <div>
+                            <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '0.15rem' }}>Nenhuma categoria criada</strong>
+                            <span>Crie categorias para deixar os lancamentos mais consistentes.</span>
+                        </div>
                         <Button
                             type="button"
                             variant="ghost"
-                            className="btn-primary"
-                            style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}
                             onClick={() => navigate('/categories')}
+                            style={{ marginLeft: 'auto' }}
                         >
                             Criar agora
                         </Button>
@@ -152,36 +154,30 @@ export function TransactionForm({
             </div>
 
             {type === 'expense' && (
-                <div className="input-group" style={{ marginBottom: '1rem' }}>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 500 }}>
-                        Tipo de gasto <span style={{ color: '#f64f59' }}>*</span>
-                    </label>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+                <div className="app-section-card fab-field-card">
+                    <div className="app-list-card-main">
+                        <span className="app-inline-icon">
+                            <CalendarDays size={16} />
+                        </span>
+                        <div>
+                            <strong>Tipo de gasto</strong>
+                            <span>Defina como esse valor deve aparecer no controle e nos relatorios.</span>
+                        </div>
+                    </div>
+
+                    <div className="app-chip-row">
                         {[
-                            { value: 'fixed', label: 'Fixo', icon: 'F' },
-                            { value: 'variable', label: 'Variável', icon: 'V' },
-                            { value: 'lifestyle', label: 'Lazer', icon: 'L' },
+                            { value: 'fixed', label: 'Fixo' },
+                            { value: 'variable', label: 'Variavel' },
+                            { value: 'lifestyle', label: 'Lazer' },
                         ].map((option) => (
                             <button
                                 key={option.value}
                                 type="button"
+                                className={`app-filter-chip${expenseType === option.value ? ' is-active danger' : ''}`}
                                 onClick={() => onExpenseTypeChange(option.value)}
-                                className={expenseType !== option.value ? 'surface-secondary' : ''}
-                                style={{
-                                    padding: '0.75rem 0.5rem',
-                                    borderRadius: '8px',
-                                    cursor: 'pointer',
-                                    textAlign: 'center',
-                                    background: expenseType === option.value ? 'rgba(246, 79, 89, 0.2)' : undefined,
-                                    border: expenseType === option.value ? '1px solid #f64f59' : '1px solid transparent',
-                                    transition: 'all 0.2s',
-                                    color: 'var(--text-main)',
-                                }}
                             >
-                                <div style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>{option.icon}</div>
-                                <div style={{ fontSize: '0.8rem', fontWeight: expenseType === option.value ? 600 : 400 }}>
-                                    {option.label}
-                                </div>
+                                {option.label}
                             </button>
                         ))}
                     </div>
@@ -189,29 +185,30 @@ export function TransactionForm({
             )}
 
             {showRecurringToggle && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-                    <input
-                        type="checkbox"
-                        id="recurring"
-                        checked={isRecurring}
-                        onChange={(e) => onRecurringChange(e.target.checked)}
-                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                    />
-                    <label htmlFor="recurring" style={{ cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
-                        Repetir mensalmente?
-                    </label>
-                </div>
+                <button
+                    type="button"
+                    className={`fab-recurring-card${isRecurring ? ' is-active' : ''}`}
+                    onClick={() => onRecurringChange(!isRecurring)}
+                >
+                    <span className="fab-highlight-icon">
+                        <RefreshCw size={16} />
+                    </span>
+                    <div>
+                        <strong>Repetir mensalmente</strong>
+                        <span>Cria tambem um modelo recorrente para os proximos meses.</span>
+                    </div>
+                </button>
             )}
 
             <Input
-                label="Descrição"
-                placeholder="Ex: Supermercado"
+                label="Descricao"
+                placeholder="Ex: Supermercado, salario, academia"
                 value={description}
-                onChange={(e) => onDescriptionChange(e.target.value)}
+                onChange={(event) => onDescriptionChange(event.target.value)}
                 required
             />
 
-            <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} loading={loading}>
+            <Button type="submit" className="btn-primary fab-submit" loading={loading}>
                 {submitLabel}
             </Button>
         </form>

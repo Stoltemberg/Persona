@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { CalendarDays, Plus, Repeat, Sparkles, Wallet } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
@@ -15,7 +15,6 @@ export function FAB({ className, style }) {
 
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('expense');
@@ -91,13 +90,13 @@ export function FAB({ className, style }) {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (event) => {
+        event.preventDefault();
         setLoading(true);
 
         try {
             if (!selectedWalletId) {
-                throw new Error('Cadastre uma carteira antes de registrar transações pelo atalho rápido.');
+                throw new Error('Cadastre uma carteira antes de registrar transacoes pelo atalho rapido.');
             }
 
             const payload = {
@@ -112,7 +111,6 @@ export function FAB({ className, style }) {
             };
 
             const { data, error } = await supabase.from('transactions').insert([payload]).select();
-
             if (error) throw error;
 
             if (isRecurring) {
@@ -138,7 +136,7 @@ export function FAB({ className, style }) {
             }
 
             success();
-            addToast('Transação registrada!', 'success');
+            addToast('Transacao registrada.', 'success');
             handleClose();
 
             if (data && data.length > 0) {
@@ -148,13 +146,14 @@ export function FAB({ className, style }) {
             }
         } catch (error) {
             console.error('FAB save error:', error);
-            addToast(error.message || 'Erro ao salvar', 'error');
+            addToast(error.message || 'Erro ao salvar.', 'error');
         } finally {
             setLoading(false);
         }
     };
 
-    const availableCategories = categories.filter((c) => c.type === type);
+    const availableCategories = categories.filter((item) => item.type === type);
+    const selectedWallet = wallets.find((wallet) => wallet.id === selectedWalletId);
 
     return (
         <>
@@ -162,13 +161,54 @@ export function FAB({ className, style }) {
                 onClick={handleOpen}
                 className={`fab-btn ${className || ''}`}
                 style={style}
-                aria-label="Adicionar transação"
+                aria-label="Adicionar transacao"
             >
+                <span className="fab-btn-ring" aria-hidden="true" />
                 <Plus size={24} strokeWidth={2.2} />
             </button>
 
-            <Modal isOpen={isOpen} onClose={handleClose} title="Nova Transação">
+            <Modal isOpen={isOpen} onClose={handleClose} title="Novo lancamento">
                 <div className="fab-modal-form">
+                    <div className="fab-modal-intro">
+                        <div>
+                            <span className="dashboard-kicker">Atalho rapido</span>
+                            <h3>Registrar sem sair da tela</h3>
+                            <p>Escolha a carteira, a categoria e a data para atualizar o saldo no mesmo instante.</p>
+                        </div>
+
+                        <div className="fab-modal-highlights">
+                            <div className="fab-highlight-card">
+                                <span className="fab-highlight-icon">
+                                    <Wallet size={16} />
+                                </span>
+                                <div>
+                                    <strong>{selectedWallet?.name || 'Selecione a carteira'}</strong>
+                                    <span>Origem do valor</span>
+                                </div>
+                            </div>
+
+                            <div className="fab-highlight-card">
+                                <span className="fab-highlight-icon">
+                                    <CalendarDays size={16} />
+                                </span>
+                                <div>
+                                    <strong>{date ? new Date(`${date}T00:00:00`).toLocaleDateString('pt-BR') : 'Hoje'}</strong>
+                                    <span>Data do registro</span>
+                                </div>
+                            </div>
+
+                            <div className="fab-highlight-card">
+                                <span className="fab-highlight-icon">
+                                    {isRecurring ? <Repeat size={16} /> : <Sparkles size={16} />}
+                                </span>
+                                <div>
+                                    <strong>{isRecurring ? 'Mensal' : 'Lancamento unico'}</strong>
+                                    <span>{isRecurring ? 'Recorrencia ativa' : 'Entrada imediata'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <TransactionForm
                         amount={amount}
                         onAmountChange={setAmount}
@@ -181,20 +221,20 @@ export function FAB({ className, style }) {
                         onWalletChange={setSelectedWalletId}
                         availableCategories={availableCategories}
                         selectedCategory={selectedCategory}
-                        onCategorySelect={(cat) => {
-                            setCategory(cat.name);
-                            setSelectedCategory(cat);
+                        onCategorySelect={(selected) => {
+                            setCategory(selected.name);
+                            setSelectedCategory(selected);
                             medium();
                         }}
                         expenseType={expenseType}
                         onExpenseTypeChange={setExpenseType}
-                        showRecurringToggle={true}
+                        showRecurringToggle
                         isRecurring={isRecurring}
                         onRecurringChange={setIsRecurring}
                         description={description}
                         onDescriptionChange={handleDescriptionChange}
                         onSubmit={handleSubmit}
-                        submitLabel="Registrar"
+                        submitLabel="Salvar lancamento"
                         loading={loading}
                     />
                 </div>

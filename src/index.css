@@ -4694,3 +4694,158 @@ option {
     padding-top: 6rem;
   }
 }
+
+/* =========================================
+   36b. FAB Quick Entry Polish
+   ========================================= */
+.fab-modal-content {
+  width: min(720px, calc(100vw - 1.5rem));
+}
+
+.fab-modal-form {
+  gap: 0.9rem;
+}
+
+.fab-modal-intro {
+  padding: 1rem 1rem 0.95rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.fab-modal-intro h3 {
+  margin-top: 0.5rem;
+}
+
+.fab-modal-intro p {
+  max-width: 52ch;
+  margin-bottom: 0;
+}
+
+.fab-quick-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.fab-quick-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 0.9rem;
+  min-height: 72px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.fab-quick-stat strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.fab-quick-stat span {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.fab-form-shell {
+  gap: 0.82rem;
+}
+
+.fab-form-grid {
+  gap: 0.8rem;
+}
+
+.fab-form-shell .app-section-card,
+.fab-form-shell .fab-recurring-card {
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.fab-field-card {
+  padding: 0.95rem;
+  gap: 0.8rem;
+}
+
+.fab-field-card-header {
+  gap: 0.7rem;
+}
+
+.fab-categories-grid {
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 0.6rem;
+}
+
+.fab-category-tile {
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.fab-category-tile:hover,
+.fab-recurring-card:hover {
+  transform: translateY(-1px);
+}
+
+.fab-recurring-card {
+  min-height: 76px;
+}
+
+.fab-type-toggle {
+  padding: 3px;
+  gap: 3px;
+  margin-bottom: 0.05rem;
+}
+
+.fab-type-btn {
+  min-height: 40px;
+  transition: all 0.2s ease;
+}
+
+.fab-chip-row-tight {
+  margin-top: 0.1rem;
+}
+
+.fab-submit {
+  min-height: 48px;
+  margin-top: 0.1rem;
+}
+
+.fab-btn {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .fab-modal-content {
+    max-width: calc(100vw - 1rem);
+    padding: 0.95rem;
+    border-radius: 22px;
+  }
+
+  .fab-modal-intro {
+    padding: 0.9rem;
+  }
+
+  .fab-quick-summary,
+  .fab-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fab-type-toggle {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab-btn,
+  .fab-category-tile,
+  .fab-recurring-card,
+  .fab-type-btn,
+  .fab-modal-form * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

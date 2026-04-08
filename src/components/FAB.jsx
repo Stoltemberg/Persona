@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { CalendarDays, Plus, Repeat, Sparkles, Wallet } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
@@ -154,6 +155,23 @@ export function FAB({ className, style }) {
 
     const availableCategories = categories.filter((item) => item.type === type);
     const selectedWallet = wallets.find((wallet) => wallet.id === selectedWalletId);
+    const quickStats = useMemo(() => ([
+        {
+            icon: Wallet,
+            label: 'Carteira',
+            value: selectedWallet?.name || 'Selecione uma carteira',
+        },
+        {
+            icon: CalendarDays,
+            label: 'Data',
+            value: date ? new Date(`${date}T00:00:00`).toLocaleDateString('pt-BR') : 'Hoje',
+        },
+        {
+            icon: isRecurring ? Repeat : Sparkles,
+            label: 'Modo',
+            value: isRecurring ? 'Recorrente' : 'Lancamento unico',
+        },
+    ]), [date, isRecurring, selectedWallet?.name]);
 
     return (
         <>
@@ -168,48 +186,47 @@ export function FAB({ className, style }) {
             </button>
 
             <Modal isOpen={isOpen} onClose={handleClose} title="Novo lancamento" contentClassName="fab-modal-content">
-                <div className="fab-modal-form">
-                    <div className="fab-modal-intro">
+                <motion.div
+                    className="fab-modal-form"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.24, ease: 'easeOut' }}
+                >
+                    <motion.div
+                        className="fab-modal-intro app-section-card fab-quick-panel"
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeOut' }}
+                    >
                         <div>
                             <span className="dashboard-kicker">Atalho rapido</span>
                             <h3>Registrar sem sair da tela</h3>
                             <p>Escolha a carteira, a categoria e a data para atualizar o saldo no mesmo instante.</p>
                         </div>
 
-                        <div className="fab-modal-highlights">
-                            <div className="fab-highlight-card">
-                                <span className="fab-highlight-icon">
-                                    <Wallet size={16} />
-                                </span>
-                                <div>
-                                    <strong>{selectedWallet?.name || 'Selecione a carteira'}</strong>
-                                    <span>Carteira escolhida</span>
-                                </div>
-                            </div>
-
-                            <div className="fab-highlight-card">
-                                <span className="fab-highlight-icon">
-                                    <CalendarDays size={16} />
-                                </span>
-                                <div>
-                                    <strong>{date ? new Date(`${date}T00:00:00`).toLocaleDateString('pt-BR') : 'Hoje'}</strong>
-                                    <span>Data do registro</span>
-                                </div>
-                            </div>
-
-                            <div className="fab-highlight-card">
-                                <span className="fab-highlight-icon">
-                                    {isRecurring ? <Repeat size={16} /> : <Sparkles size={16} />}
-                                </span>
-                                <div>
-                                    <strong>{isRecurring ? 'Mensal' : 'Lancamento unico'}</strong>
-                                    <span>{isRecurring ? 'Com recorrencia' : 'Registro imediato'}</span>
-                                </div>
-                            </div>
+                        <div className="fab-quick-summary">
+                            {quickStats.map((item, index) => (
+                                <motion.div
+                                    key={item.label}
+                                    className="fab-quick-stat"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.24, delay: 0.05 * index, ease: 'easeOut' }}
+                                >
+                                    <span className="fab-highlight-icon">
+                                        <item.icon size={16} />
+                                    </span>
+                                    <div>
+                                        <span>{item.label}</span>
+                                        <strong>{item.value}</strong>
+                                    </div>
+                                </motion.div>
+                            ))}
                         </div>
-                    </div>
+                    </motion.div>
 
                     <TransactionForm
+                        compact
                         amount={amount}
                         onAmountChange={setAmount}
                         date={date}
@@ -237,7 +254,7 @@ export function FAB({ className, style }) {
                         submitLabel="Salvar lancamento"
                         loading={loading}
                     />
-                </div>
+                </motion.div>
             </Modal>
         </>
     );

@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { CalendarDays, RefreshCw, Tag, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './Button';
@@ -27,29 +28,44 @@ export function TransactionForm({
     onSubmit,
     submitLabel,
     loading,
+    compact = false,
 }) {
     const navigate = useNavigate();
+    const baseTransition = {
+        duration: 0.22,
+        ease: 'easeOut',
+    };
 
     return (
-        <form onSubmit={onSubmit} className="fab-form-shell">
-            <div className="app-chip-row" style={{ marginBottom: '0.25rem' }}>
+        <form onSubmit={onSubmit} className={`fab-form-shell${compact ? ' is-compact' : ''}`}>
+            <motion.div
+                className="fab-type-toggle"
+                initial={compact ? { opacity: 0, y: 8 } : false}
+                animate={compact ? { opacity: 1, y: 0 } : undefined}
+                transition={baseTransition}
+            >
                 <button
                     type="button"
-                    className={`app-filter-chip${type === 'expense' ? ' is-active danger' : ''}`}
+                    className={`fab-type-btn${type === 'expense' ? ' active expense' : ''}`}
                     onClick={() => onTypeChange('expense')}
                 >
                     Despesa
                 </button>
                 <button
                     type="button"
-                    className={`app-filter-chip${type === 'income' ? ' is-active success' : ''}`}
+                    className={`fab-type-btn${type === 'income' ? ' active income' : ''}`}
                     onClick={() => onTypeChange('income')}
                 >
                     Receita
                 </button>
-            </div>
+            </motion.div>
 
-            <div className="fab-form-grid">
+            <motion.div
+                className="fab-form-grid"
+                initial={compact ? { opacity: 0, y: 10 } : false}
+                animate={compact ? { opacity: 1, y: 0 } : undefined}
+                transition={{ ...baseTransition, delay: 0.04 }}
+            >
                 <Input
                     label="Valor"
                     placeholder="0,00"
@@ -66,10 +82,15 @@ export function TransactionForm({
                     onChange={(event) => onDateChange(event.target.value)}
                     required
                 />
-            </div>
+            </motion.div>
 
-            <div className="app-section-card fab-field-card">
-                <div className="app-list-card-main">
+            <motion.div
+                className="app-section-card fab-field-card"
+                initial={compact ? { opacity: 0, y: 10 } : false}
+                animate={compact ? { opacity: 1, y: 0 } : undefined}
+                transition={{ ...baseTransition, delay: 0.08 }}
+            >
+                <div className="app-list-card-main fab-field-card-header">
                     <span className="app-inline-icon">
                         <Wallet size={16} />
                     </span>
@@ -97,10 +118,15 @@ export function TransactionForm({
                         )}
                     </select>
                 </div>
-            </div>
+            </motion.div>
 
-            <div className="app-section-card fab-field-card">
-                <div className="app-list-card-main">
+            <motion.div
+                className="app-section-card fab-field-card"
+                initial={compact ? { opacity: 0, y: 10 } : false}
+                animate={compact ? { opacity: 1, y: 0 } : undefined}
+                transition={{ ...baseTransition, delay: 0.12 }}
+            >
+                <div className="app-list-card-main fab-field-card-header">
                     <span className="app-inline-icon">
                         <Tag size={16} />
                     </span>
@@ -111,12 +137,15 @@ export function TransactionForm({
                 </div>
 
                 {availableCategories.length > 0 ? (
-                    <div className="fab-categories-grid">
-                        {availableCategories.map((category) => {
+                    <motion.div
+                        className="fab-categories-grid"
+                        layout
+                    >
+                        {availableCategories.map((category, index) => {
                             const isSelected = selectedCategory?.id === category.id;
 
                             return (
-                                <button
+                                <motion.button
                                     key={category.id}
                                     type="button"
                                     onClick={() => onCategorySelect(category)}
@@ -125,15 +154,19 @@ export function TransactionForm({
                                         borderColor: category.color,
                                         background: `${category.color}18`,
                                     } : undefined}
+                                    initial={compact ? { opacity: 0, y: 8 } : false}
+                                    animate={compact ? { opacity: 1, y: 0 } : undefined}
+                                    transition={{ ...baseTransition, delay: 0.02 * index }}
+                                    whileTap={{ scale: 0.98 }}
                                 >
                                     <span className="app-inline-icon" style={{ color: category.color }}>
                                         <CategoryIcon icon={category.icon} size={16} />
                                     </span>
                                     <strong>{category.name}</strong>
-                                </button>
+                                </motion.button>
                             );
                         })}
-                    </div>
+                    </motion.div>
                 ) : (
                     <div className="app-empty-inline">
                         <Tag size={16} />
@@ -151,44 +184,57 @@ export function TransactionForm({
                         </Button>
                     </div>
                 )}
-            </div>
+            </motion.div>
 
-            {type === 'expense' && (
-                <div className="app-section-card fab-field-card">
-                    <div className="app-list-card-main">
-                        <span className="app-inline-icon">
-                            <CalendarDays size={16} />
-                        </span>
-                        <div>
-                            <strong>Tipo de gasto</strong>
-                            <span>Defina como esse valor deve aparecer no controle e nos relatorios.</span>
+            <AnimatePresence mode="wait">
+                {type === 'expense' && (
+                    <motion.div
+                        key="expense-type"
+                        className="app-section-card fab-field-card"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={baseTransition}
+                    >
+                        <div className="app-list-card-main fab-field-card-header">
+                            <span className="app-inline-icon">
+                                <CalendarDays size={16} />
+                            </span>
+                            <div>
+                                <strong>Tipo de gasto</strong>
+                                <span>Defina como esse valor deve aparecer no controle e nos relatorios.</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="app-chip-row">
-                        {[
-                            { value: 'fixed', label: 'Fixo' },
-                            { value: 'variable', label: 'Variavel' },
-                            { value: 'lifestyle', label: 'Lazer' },
-                        ].map((option) => (
-                            <button
-                                key={option.value}
-                                type="button"
-                                className={`app-filter-chip${expenseType === option.value ? ' is-active danger' : ''}`}
-                                onClick={() => onExpenseTypeChange(option.value)}
-                            >
-                                {option.label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
+                        <div className="app-chip-row fab-chip-row-tight">
+                            {[
+                                { value: 'fixed', label: 'Fixo' },
+                                { value: 'variable', label: 'Variavel' },
+                                { value: 'lifestyle', label: 'Lazer' },
+                            ].map((option) => (
+                                <button
+                                    key={option.value}
+                                    type="button"
+                                    className={`app-filter-chip${expenseType === option.value ? ' is-active danger' : ''}`}
+                                    onClick={() => onExpenseTypeChange(option.value)}
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {showRecurringToggle && (
-                <button
+                <motion.button
                     type="button"
                     className={`fab-recurring-card${isRecurring ? ' is-active' : ''}`}
                     onClick={() => onRecurringChange(!isRecurring)}
+                    initial={compact ? { opacity: 0, y: 10 } : false}
+                    animate={compact ? { opacity: 1, y: 0 } : undefined}
+                    transition={{ ...baseTransition, delay: 0.16 }}
+                    whileTap={{ scale: 0.99 }}
                 >
                     <span className="fab-highlight-icon">
                         <RefreshCw size={16} />
@@ -197,20 +243,32 @@ export function TransactionForm({
                         <strong>Repetir mensalmente</strong>
                         <span>Cria tambem um modelo recorrente para os proximos meses.</span>
                     </div>
-                </button>
+                </motion.button>
             )}
 
-            <Input
-                label="Descricao"
-                placeholder="Ex: Supermercado, salario, academia"
-                value={description}
-                onChange={(event) => onDescriptionChange(event.target.value)}
-                required
-            />
+            <motion.div
+                initial={compact ? { opacity: 0, y: 10 } : false}
+                animate={compact ? { opacity: 1, y: 0 } : undefined}
+                transition={{ ...baseTransition, delay: 0.2 }}
+            >
+                <Input
+                    label="Descricao"
+                    placeholder="Ex: Supermercado, salario, academia"
+                    value={description}
+                    onChange={(event) => onDescriptionChange(event.target.value)}
+                    required
+                />
+            </motion.div>
 
-            <Button type="submit" className="btn-primary fab-submit" loading={loading}>
-                {submitLabel}
-            </Button>
+            <motion.div
+                initial={compact ? { opacity: 0, y: 10 } : false}
+                animate={compact ? { opacity: 1, y: 0 } : undefined}
+                transition={{ ...baseTransition, delay: 0.24 }}
+            >
+                <Button type="submit" className="btn-primary fab-submit" loading={loading}>
+                    {submitLabel}
+                </Button>
+            </motion.div>
         </form>
     );
 }

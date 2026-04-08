@@ -1,11 +1,32 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, Check, Compass, ShieldCheck, Sparkles, Target, Wallet } from 'lucide-react';
 import { Button } from '../components/Button';
 
+const pageVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            duration: 0.45,
+            staggerChildren: 0.08,
+        },
+    },
+};
+
+const revealVariants = {
+    hidden: { opacity: 0, y: 18 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.45, ease: 'easeOut' },
+    },
+};
+
 export default function Landing() {
     return (
-        <main className="landing-page fade-in">
+        <motion.main className="landing-page fade-in" variants={pageVariants} initial="hidden" animate="visible">
             <Helmet>
                 <title>Persona - Seu sistema operacional financeiro</title>
                 <meta
@@ -27,7 +48,7 @@ export default function Landing() {
                 </script>
             </Helmet>
 
-            <header className="landing-header">
+            <motion.header className="landing-header" variants={revealVariants}>
                 <div className="landing-container landing-header-content">
                     <div className="landing-brand">
                         <div className="landing-brand-icon" />
@@ -37,11 +58,11 @@ export default function Landing() {
                         <Button className="btn-primary">Entrar</Button>
                     </Link>
                 </div>
-            </header>
+            </motion.header>
 
-            <section className="landing-hero">
+            <motion.section className="landing-hero" variants={revealVariants}>
                 <div className="landing-container landing-hero-grid">
-                    <div className="landing-hero-copy">
+                    <motion.div className="landing-hero-copy" variants={pageVariants}>
                         <div className="landing-pill fade-in stagger-1">
                             <Sparkles size={16} />
                             Financas pessoais e familiares em um fluxo mais claro
@@ -64,9 +85,14 @@ export default function Landing() {
                             <Badge icon={Target} text="Metas e orcamentos acompanhados em tempo real" />
                             <Badge icon={ShieldCheck} text="Privacidade, seguranca e controle por padrao" />
                         </div>
-                    </div>
+                    </motion.div>
 
-                    <article className="landing-preview-card fade-in stagger-5 landing-preview-panel">
+                    <motion.article
+                        className="landing-preview-card fade-in stagger-5 landing-preview-panel"
+                        variants={revealVariants}
+                        whileHover={{ y: -4, scale: 1.01 }}
+                        transition={{ duration: 0.2 }}
+                    >
                         <div className="landing-preview-metric">
                             <span className="dashboard-kicker">Resumo do mes</span>
                             <strong>R$ 8.450,00</strong>
@@ -77,11 +103,11 @@ export default function Landing() {
                             <PreviewItem title="Metas" value="2 em andamento" />
                             <PreviewItem title="Recorrencias" value="6 automatizadas" />
                         </div>
-                    </article>
+                    </motion.article>
                 </div>
-            </section>
+            </motion.section>
 
-            <section id="recursos" aria-label="Recursos" className="landing-section">
+            <motion.section id="recursos" aria-label="Recursos" className="landing-section" variants={revealVariants}>
                 <div className="landing-container">
                     <h2 className="landing-section-title">Tudo que voce precisa para ganhar previsibilidade</h2>
                     <div className="landing-grid">
@@ -90,9 +116,9 @@ export default function Landing() {
                         <FeatureCard icon={Target} title="Planejamento acionavel" text="Metas, simulacoes e orcamentos ficam conectados ao dia a dia." />
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
-            <section className="landing-section landing-pricing">
+            <motion.section className="landing-section landing-pricing" variants={revealVariants}>
                 <div className="landing-container">
                     <h2 className="text-gradient landing-section-title">Planos para cada fase da sua rotina</h2>
 
@@ -117,17 +143,17 @@ export default function Landing() {
                         />
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
-            <footer className="landing-footer">
+            <motion.footer className="landing-footer" variants={revealVariants}>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
                     <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Termos de uso</Link>
                     <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacidade</Link>
                 </div>
                 <p>© 2026 Persona Finance. Todos os direitos reservados.</p>
                 <address style={{ marginTop: '1rem', fontStyle: 'normal', fontSize: '0.8rem', opacity: 0.6 }}>Sao Paulo, SP - Brasil</address>
-            </footer>
-        </main>
+            </motion.footer>
+        </motion.main>
     );
 }
 
@@ -142,13 +168,18 @@ function Badge({ icon: Icon, text }) {
 
 function FeatureCard({ icon: Icon, title, text }) {
     return (
-        <article className="glass-card landing-feature-card">
+        <motion.article
+            className="glass-card landing-feature-card"
+            variants={revealVariants}
+            whileHover={{ y: -6, scale: 1.01 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
             <div className="landing-feature-icon">
                 <Icon size={24} />
             </div>
             <h3>{title}</h3>
             <p>{text}</p>
-        </article>
+        </motion.article>
     );
 }
 
@@ -163,7 +194,13 @@ function PreviewItem({ title, value }) {
 
 function PricingCard({ title, price, features, featured, color = '#38ef7d' }) {
     return (
-        <article className={`glass-card landing-pricing-card${featured ? ' is-featured' : ''}`} style={{ '--landing-card-accent': color }}>
+        <motion.article
+            className={`glass-card landing-pricing-card${featured ? ' is-featured' : ''}`}
+            style={{ '--landing-card-accent': color }}
+            variants={revealVariants}
+            whileHover={{ y: -6, scale: 1.01 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
             {featured && <div className="landing-pricing-badge">Mais escolhido</div>}
             <h3>{title}</h3>
             <div className="landing-pricing-price">
@@ -183,6 +220,6 @@ function PricingCard({ title, price, features, featured, color = '#38ef7d' }) {
                     Comecar
                 </Button>
             </Link>
-        </article>
+        </motion.article>
     );
 }

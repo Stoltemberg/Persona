@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useAuth } from './hooks/useAuth';
 import React, { Suspense } from 'react';
 import { Layout } from './components/Layout';
@@ -25,9 +25,20 @@ const NotFound = React.lazy(() => import('./pages/NotFound'));
 
 // Loading Fallback
 const LoadingScreen = () => (
-  <div className="flex-center" style={{ height: '100vh', width: '100%', flexDirection: 'column', gap: '1rem' }}>
-    <div className="spinner"></div>
-    <p style={{ opacity: 0.5 }}>Carregando...</p>
+  <div className="flex-center" style={{ minHeight: '100vh', width: '100%', flexDirection: 'column', gap: '1rem', padding: '2rem' }}>
+    <div className="spinner" />
+    <div style={{ display: 'grid', gap: '0.75rem', width: 'min(460px, 100%)' }}>
+      <div className="glass-card" style={{ padding: '1rem', opacity: 0.7 }}>
+        <div style={{ width: '40%', height: '14px', borderRadius: '999px', background: 'rgba(255,255,255,0.08)', marginBottom: '0.75rem' }} />
+        <div style={{ width: '100%', height: '12px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)', marginBottom: '0.5rem' }} />
+        <div style={{ width: '78%', height: '12px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)' }} />
+      </div>
+      <div className="glass-card" style={{ padding: '1rem', opacity: 0.45 }}>
+        <div style={{ width: '52%', height: '12px', borderRadius: '999px', background: 'rgba(255,255,255,0.08)', marginBottom: '0.5rem' }} />
+        <div style={{ width: '88%', height: '12px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)' }} />
+      </div>
+    </div>
+    <p style={{ opacity: 0.55 }}>Carregando sua experiencia...</p>
   </div>
 );
 
@@ -68,78 +79,55 @@ function App() {
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+  const reducedMotion = useReducedMotion();
+  const routeKey = location.pathname;
+
+  const pageTransition = {
+    initial: reducedMotion ? { opacity: 0 } : { opacity: 0, y: 14, scale: 0.992 },
+    animate: { opacity: 1, y: 0, scale: 1 },
+    exit: reducedMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.992 },
+  };
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy" element={<Privacy />} />
+    <AnimatePresence mode="wait" initial={false}>
+      <Routes location={location} key={routeKey}>
+        <Route path="/" element={<PageTransition variants={pageTransition}><Home /></PageTransition>} />
+        <Route path="/login" element={<PageTransition variants={pageTransition}><Login /></PageTransition>} />
+        <Route path="/terms" element={<PageTransition variants={pageTransition}><Terms /></PageTransition>} />
+        <Route path="/privacy" element={<PageTransition variants={pageTransition}><Privacy /></PageTransition>} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
-            <Route path="/dashboard" element={
-              <PageTransition>
-                <Dashboard />
-              </PageTransition>
-            } />
-            <Route path="/transactions" element={
-              <PageTransition>
-                <Transactions />
-              </PageTransition>
-            } />
-            <Route path="/recurring" element={
-              <PageTransition>
-                <Recurring />
-              </PageTransition>
-            } />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/recurring" element={<Recurring />} />
 
-            <Route path="/planning" element={
-              <PageTransition>
-                <Planning />
-              </PageTransition>
-            } />
+            <Route path="/planning" element={<Planning />} />
             <Route path="/analysis" element={<Navigate to="/planning?tab=analysis" replace />} />
             <Route path="/goals" element={<Navigate to="/planning?tab=goals" replace />} />
             <Route path="/budgets" element={<Navigate to="/planning?tab=budgets" replace />} />
             <Route path="/simulator" element={<Navigate to="/planning?tab=simulator" replace />} />
 
-            <Route path="/settings" element={
-              <PageTransition>
-                <Settings />
-              </PageTransition>
-            } />
-            <Route path="/wallets" element={
-              <PageTransition>
-                <Wallets />
-              </PageTransition>
-            } />
-            <Route path="/categories" element={
-              <PageTransition>
-                <Categories />
-              </PageTransition>
-            } />
-            <Route path="/admin" element={
-              <PageTransition>
-                <Admin />
-              </PageTransition>
-            } />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/wallets" element={<Wallets />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/admin" element={<Admin />} />
           </Route>
         </Route>
 
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<PageTransition variants={pageTransition}><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
   );
 };
 
-const PageTransition = ({ children }) => (
+const PageTransition = ({ children, variants }) => (
   <motion.div
-    initial={{ opacity: 0, x: 20 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -20 }}
-    transition={{ type: 'spring', stiffness: 400, damping: 35, mass: 0.8 }}
+    initial="initial"
+    animate="animate"
+    exit="exit"
+    variants={variants}
+    transition={{ type: 'spring', stiffness: 280, damping: 28, mass: 0.9 }}
     style={{ width: '100%', willChange: 'transform, opacity' }}
   >
     {children}

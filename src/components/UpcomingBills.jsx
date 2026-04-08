@@ -18,14 +18,23 @@ export function UpcomingBills() {
         if (user) {
             fetchUpcomingBills();
             fetchWallets();
+
+            const handleSync = (event) => {
+                const table = event?.detail?.table;
+
+                if (!table || table === 'recurring_templates' || table === 'transactions') {
+                    fetchUpcomingBills();
+                }
+
+                if (!table || table === 'wallets') {
+                    fetchWallets();
+                }
+            };
+
+            window.addEventListener('supabase-sync', handleSync);
+            return () => window.removeEventListener('supabase-sync', handleSync);
         }
     }, [user]);
-
-    useEffect(() => {
-        const handleUpdate = () => fetchUpcomingBills();
-        window.addEventListener('transaction-inserted', handleUpdate);
-        return () => window.removeEventListener('transaction-inserted', handleUpdate);
-    }, []);
 
     const fetchUpcomingBills = async () => {
         try {
@@ -38,7 +47,7 @@ export function UpcomingBills() {
 
             const { data, error } = await supabase
                 .from('recurring_templates')
-                .select('*')
+                .select('id, description, amount, category, wallet_id, expense_type, next_due_date, frequency, type')
                 .eq('type', 'expense')
                 .eq('active', true)
                 .lte('next_due_date', nextWeek.toISOString())
@@ -54,7 +63,7 @@ export function UpcomingBills() {
     };
 
     const fetchWallets = async () => {
-        const { data, error } = await supabase.from('wallets').select('*');
+        const { data, error } = await supabase.from('wallets').select('id, name');
         if (error) {
             console.error('Error fetching wallets:', error);
             return;

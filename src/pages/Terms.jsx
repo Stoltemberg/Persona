@@ -1,10 +1,54 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
+const sections = [
+    {
+        title: '1. Aceitacao',
+        text: 'Ao acessar e usar a Persona, voce concorda com estes termos e com as regras de utilizacao da plataforma.',
+    },
+    {
+        title: '2. O servico',
+        text: 'A Persona e uma ferramenta de organizacao financeira pessoal e familiar, com recursos gratuitos e planos pagos.',
+    },
+    {
+        title: '3. Planos e pagamentos',
+        text: 'Os pagamentos sao processados por parceiros especializados. Nao armazenamos dados de cartao de credito diretamente.',
+    },
+    {
+        title: '4. Responsabilidades',
+        text: 'Voce e responsavel por proteger sua conta, credenciais e pelas informacoes inseridas no sistema.',
+    },
+    {
+        title: '5. Cancelamento',
+        text: 'Voce pode interromper o uso da plataforma quando quiser. Regras de cancelamento e reembolso seguem a legislacao aplicavel.',
+    },
+];
+
+const pageVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            duration: 0.4,
+            staggerChildren: 0.06,
+        },
+    },
+};
+
+const cardVariants = {
+    hidden: { opacity: 0, y: 14 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.35, ease: 'easeOut' },
+    },
+};
+
 export default function Terms() {
     return (
-        <main className="public-shell">
+        <motion.main className="public-shell" variants={pageVariants} initial="hidden" animate="visible">
             <Helmet>
                 <title>Termos de Uso | Persona</title>
                 <meta
@@ -20,38 +64,20 @@ export default function Terms() {
                     Voltar
                 </Link>
 
-                <div className="public-card public-legal-card">
+                <motion.div className="public-card public-legal-card" variants={cardVariants}>
                     <span className="dashboard-kicker">Documento legal</span>
                     <h1>Termos de uso</h1>
 
-                    <section>
-                        <h3>1. Aceitacao</h3>
-                        <p>Ao acessar e usar a Persona, voce concorda com estes termos e com as regras de utilizacao da plataforma.</p>
-                    </section>
-
-                    <section>
-                        <h3>2. O servico</h3>
-                        <p>A Persona e uma ferramenta de organizacao financeira pessoal e familiar, com recursos gratuitos e planos pagos.</p>
-                    </section>
-
-                    <section>
-                        <h3>3. Planos e pagamentos</h3>
-                        <p>Os pagamentos sao processados por parceiros especializados. Nao armazenamos dados de cartao de credito diretamente.</p>
-                    </section>
-
-                    <section>
-                        <h3>4. Responsabilidades</h3>
-                        <p>Voce e responsavel por proteger sua conta, credenciais e pelas informacoes inseridas no sistema.</p>
-                    </section>
-
-                    <section>
-                        <h3>5. Cancelamento</h3>
-                        <p>Voce pode interromper o uso da plataforma quando quiser. Regras de cancelamento e reembolso seguem a legislacao aplicavel.</p>
-                    </section>
+                    {sections.map(({ title, text }) => (
+                        <motion.section key={title} variants={cardVariants}>
+                            <h3>{title}</h3>
+                            <p>{text}</p>
+                        </motion.section>
+                    ))}
 
                     <p className="public-legal-date">Ultima atualizacao: Janeiro de 2026</p>
-                </div>
+                </motion.div>
             </div>
-        </main>
+        </motion.main>
     );
 }

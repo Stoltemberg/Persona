@@ -17,6 +17,11 @@ serve(async (req) => {
     }
 
     try {
+        const supabaseAdmin = createClient(
+            Deno.env.get('SUPABASE_URL') ?? '',
+            Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        )
+
         const supabaseClient = createClient(
             Deno.env.get('SUPABASE_URL') ?? '',
             Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -37,11 +42,6 @@ serve(async (req) => {
 
         if (couponCode) {
             normalizedCoupon = String(couponCode).trim().toUpperCase()
-
-            const supabaseAdmin = createClient(
-                Deno.env.get('SUPABASE_URL') ?? '',
-                Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-            )
 
             const { data: coupon, error: couponError } = await supabaseAdmin
                 .from('coupons')
@@ -74,7 +74,8 @@ serve(async (req) => {
         const mpAccessToken = Deno.env.get('MP_ACCESS_TOKEN')
         if (!mpAccessToken) throw new Error('Missing MP_ACCESS_TOKEN')
 
-        const externalReference = [user.id, tier, normalizedCoupon].join('|')
+        const checkoutReference = crypto.randomUUID()
+        const externalReference = [user.id, tier, normalizedCoupon, checkoutReference].join('|')
 
         const body = {
             items: [
@@ -97,6 +98,7 @@ serve(async (req) => {
                 user_id: user.id,
                 tier,
                 coupon_code: normalizedCoupon || null,
+                checkout_reference: checkoutReference,
             }
         }
 
@@ -112,6 +114,24 @@ serve(async (req) => {
         const data = await response.json()
         if (!response.ok) {
             throw new Error(`MP Error: ${JSON.stringify(data)}`)
+        }
+
+        const { error: checkoutIntentError } = await supabaseAdmin
+            .from('checkout_intents')
+            .upsert({
+                external_reference: externalReference,
+                user_id: user.id,
+                tier,
+                coupon_code: normalizedCoupon || null,
+                expected_amount: finalPrice,
+                currency_id: 'BRL',
+                mp_preference_id: data.id ?? null,
+                status: 'pending',
+                updated_at: new Date().toISOString(),
+            })
+
+        if (checkoutIntentError) {
+            throw new Error(`Checkout intent error: ${checkoutIntentError.message}`)
         }
 
         return new Response(

@@ -27,11 +27,12 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
                 setIsOpen(false);
             }
         };
+        const handleScrollClose = () => setIsOpen(false);
         document.addEventListener('mousedown', handleClickOutside);
-        document.addEventListener('scroll', () => setIsOpen(false), true); // Close on scroll
+        document.addEventListener('scroll', handleScrollClose, true);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
-            document.removeEventListener('scroll', () => setIsOpen(false), true);
+            document.removeEventListener('scroll', handleScrollClose, true);
         }
     }, []);
 

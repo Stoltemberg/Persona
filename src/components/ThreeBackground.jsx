@@ -1,166 +1,177 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import * as THREE from 'three';
+
+const blobs = [
+    {
+        id: 'a',
+        size: 420,
+        top: '-8%',
+        left: '-10%',
+        color: 'rgba(196, 113, 237, 0.24)',
+        driftX: 1,
+        driftY: 1,
+        duration: '16s',
+    },
+    {
+        id: 'b',
+        size: 360,
+        top: '18%',
+        right: '-8%',
+        color: 'rgba(18, 194, 233, 0.18)',
+        driftX: -1,
+        driftY: 1,
+        duration: '19s',
+    },
+    {
+        id: 'c',
+        size: 300,
+        bottom: '6%',
+        left: '22%',
+        color: 'rgba(246, 79, 89, 0.14)',
+        driftX: 1,
+        driftY: -1,
+        duration: '21s',
+    },
+];
 
 export function ThreeBackground() {
-  const mountRef = useRef(null);
+    const mountRef = useRef(null);
+    const rafRef = useRef(0);
+    const pointerRef = useRef({ x: 0, y: 0 });
 
-  useEffect(() => {
-    const root = mountRef.current;
-    if (!root) return;
+    useEffect(() => {
+        const root = mountRef.current;
+        if (!root) return undefined;
 
-    // SCENE
-    const scene = new THREE.Scene();
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const isSmallViewport = window.innerWidth < 768;
 
-    // CAMERA
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 20;
+        const updatePointer = () => {
+            const { x, y } = pointerRef.current;
+            root.style.setProperty('--bg-pointer-x', `${x}px`);
+            root.style.setProperty('--bg-pointer-y', `${y}px`);
+        };
 
-    // RENDERER
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    root.appendChild(renderer.domElement);
+        if (!prefersReducedMotion && !isSmallViewport) {
+            const handlePointerMove = (event) => {
+                pointerRef.current = {
+                    x: event.clientX - window.innerWidth / 2,
+                    y: event.clientY - window.innerHeight / 2,
+                };
 
-    // PARTICLES / ORBS
-    const particleCount = 150;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 3);
+                if (rafRef.current) return;
 
-    // Textura de círculo suave (minimalista)
-    const createCircleTexture = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 64;
-      canvas.height = 64;
-      const ctx = canvas.getContext('2d');
-      const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-      gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-      gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.5)');
-      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(32, 32, 32, 0, Math.PI * 2);
-      ctx.fill();
-      return new THREE.CanvasTexture(canvas);
-    };
-    
-    // Tema Persona: (gradientes de roxo/magenta/ciano sutil)
-    // #f64f59(vermelho), #c471ed(roxo), #12c2e9(azul)
-    const colorPalette = [
-      new THREE.Color('#f64f59'),
-      new THREE.Color('#c471ed'),
-      new THREE.Color('#12c2e9')
-    ];
+                rafRef.current = window.requestAnimationFrame(() => {
+                    updatePointer();
+                    rafRef.current = 0;
+                });
+            };
 
-    for (let i = 0; i < particleCount; i++) {
-      // Posições espalhadas num raio AMPLO para cobrir monitores ultrawide
-      positions[i * 3] = (Math.random() - 0.5) * 200;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+            const handleResize = () => {
+                root.style.setProperty('--bg-scale', window.innerWidth > 1440 ? '1' : '0.92');
+            };
 
-      // Cores misturadas
-      const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-      colors[i * 3] = color.r;
-      colors[i * 3 + 1] = color.g;
-      colors[i * 3 + 2] = color.b;
-    }
+            handleResize();
+            document.addEventListener('pointermove', handlePointerMove, { passive: true });
+            window.addEventListener('resize', handleResize);
 
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            return () => {
+                if (rafRef.current) window.cancelAnimationFrame(rafRef.current);
+                document.removeEventListener('pointermove', handlePointerMove);
+                window.removeEventListener('resize', handleResize);
+            };
+        }
 
-    // Desenhando partículas redondas, muito sutis mas levemente maiores para visibilidade
-    const material = new THREE.PointsMaterial({
-      size: 1.5,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.7,
-      map: createCircleTexture(),
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
+        return undefined;
+    }, []);
 
-    const particles = new THREE.Points(geometry, material);
-    scene.add(particles);
+    return createPortal(
+        <div
+            ref={mountRef}
+            aria-hidden="true"
+            style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: -1,
+                pointerEvents: 'none',
+                overflow: 'hidden',
+                opacity: 0.72,
+                background:
+                    'radial-gradient(circle at 20% 20%, rgba(196, 113, 237, 0.08), transparent 32%), radial-gradient(circle at 80% 25%, rgba(18, 194, 233, 0.06), transparent 30%), radial-gradient(circle at 50% 90%, rgba(246, 79, 89, 0.05), transparent 28%), linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0))',
+                transform: 'scale(var(--bg-scale, 1))',
+                transition: 'transform 280ms ease, opacity 280ms ease',
+                contain: 'layout paint style',
+            }}
+        >
+            <style>{`
+                @keyframes persona-orb-drift-a {
+                    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+                    50% { transform: translate3d(22px, 18px, 0) scale(1.04); }
+                }
 
-    // TIMER & ANIMATION
-    let animationId;
-    let clock = new THREE.Clock(); 
+                @keyframes persona-orb-drift-b {
+                    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+                    50% { transform: translate3d(-18px, 24px, 0) scale(1.03); }
+                }
 
-    let mouseX = 0;
-    let mouseY = 0;
-    let targetX = 0;
-    let targetY = 0;
-    
-    const windowHalfX = window.innerWidth / 2;
-    const windowHalfY = window.innerHeight / 2;
+                @keyframes persona-orb-drift-c {
+                    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+                    50% { transform: translate3d(16px, -16px, 0) scale(1.05); }
+                }
 
-    const onDocumentMouseMove = (event) => {
-      // Sensibilidade do mouse muito reduzida para evitar movimentos bruscos
-      mouseX = (event.clientX - windowHalfX) * 0.01;
-      mouseY = (event.clientY - windowHalfY) * 0.01;
-    };
-    
-    document.addEventListener('mousemove', onDocumentMouseMove);
+                @media (prefers-reduced-motion: reduce) {
+                    .persona-bg-orb {
+                        animation: none !important;
+                    }
+                }
+            `}</style>
 
-    const animate = () => {
-      animationId = requestAnimationFrame(animate);
+            <div
+                style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundImage:
+                        'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+                    backgroundSize: '72px 72px',
+                    maskImage: 'linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.08) 35%, rgba(0,0,0,0.55))',
+                    opacity: 0.45,
+                }}
+            />
 
-      let delta = clock.getDelta();
-      let elapsed = clock.getElapsedTime();
+            <div
+                style={{
+                    position: 'absolute',
+                    inset: '-12%',
+                    background:
+                        'radial-gradient(circle at calc(50% + var(--bg-pointer-x, 0px) * 0.04) calc(50% + var(--bg-pointer-y, 0px) * 0.04), rgba(255,255,255,0.08), transparent 34%)',
+                    opacity: 0.5,
+                    transition: 'opacity 280ms ease',
+                }}
+            />
 
-      // Rotação suave constante
-      particles.rotation.y += delta * 0.05;
-      particles.rotation.x += delta * 0.02;
-
-      // Movimentação absurdamente sutil com o mouse (parallax amortecido)
-      targetX = mouseX * 0.02;
-      targetY = mouseY * 0.02;
-
-      particles.rotation.z += 0.01 * (targetX - particles.rotation.z);
-      camera.position.x += (targetX * 0.5 - camera.position.x) * 0.01;
-      camera.position.y += (-targetY * 0.5 - camera.position.y) * 0.01;
-      camera.lookAt(scene.position);
-
-      renderer.render(scene, camera);
-    };
-    animate();
-
-    // RESIZE
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-    window.addEventListener('resize', handleResize);
-
-    // CLEANUP
-    return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', handleResize);
-      document.removeEventListener('mousemove', onDocumentMouseMove);
-      
-      geometry.dispose();
-      material.dispose();
-      renderer.dispose();
-      root.removeChild(renderer.domElement);
-    };
-  }, []);
-
-  return createPortal(
-    <div
-      ref={mountRef}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        zIndex: -1, // fica por trás do app
-        pointerEvents: 'none', // ignore mouse clicks/hovers para a UI embaixo
-        opacity: 0.8 // opacidade base
-      }}
-    />,
-    document.body
-  );
+            {blobs.map((blob, index) => (
+                <span
+                    key={blob.id}
+                    className="persona-bg-orb"
+                    style={{
+                        position: 'absolute',
+                        width: `${blob.size}px`,
+                        height: `${blob.size}px`,
+                        borderRadius: '999px',
+                        top: blob.top,
+                        bottom: blob.bottom,
+                        left: blob.left,
+                        right: blob.right,
+                        background: `radial-gradient(circle at 35% 35%, ${blob.color}, transparent 70%)`,
+                        filter: 'blur(42px)',
+                        opacity: 0.95,
+                        mixBlendMode: 'screen',
+                        transform: `translate3d(calc(var(--bg-pointer-x, 0px) * ${blob.driftX * 0.02}), calc(var(--bg-pointer-y, 0px) * ${blob.driftY * 0.02}), 0)`,
+                        animation: `persona-orb-drift-${String.fromCharCode(97 + index)} ${blob.duration} ease-in-out infinite`,
+                    }}
+                />
+            ))}
+        </div>,
+        document.body,
+    );
 }

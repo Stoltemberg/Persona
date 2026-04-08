@@ -1,9 +1,12 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext({});
 
 export const useAuth = () => useContext(AuthContext);
+
+const getPayloadProfileId = (payload, key = 'profile_id') => payload?.new?.[key] || payload?.old?.[key] || null;
+const REALTIME_DEDUP_WINDOW_MS = 750;
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -17,6 +20,28 @@ export function AuthProvider({ children }) {
     const [outgoingRequest, setOutgoingRequest] = useState(null);
     const [lastPartnerUpdate, setLastPartnerUpdate] = useState(localStorage.getItem('last_partner_update') || null);
     const [lastViewedTransactions, setLastViewedTransactions] = useState(localStorage.getItem('last_viewed_transactions') || null);
+    const recentRealtimeDispatches = useRef(new Map());
+
+    const shouldSkipDuplicateRealtime = (signature) => {
+        const now = Date.now();
+        const lastSeen = recentRealtimeDispatches.current.get(signature) || 0;
+
+        if (now - lastSeen < REALTIME_DEDUP_WINDOW_MS) {
+            return true;
+        }
+
+        recentRealtimeDispatches.current.set(signature, now);
+
+        if (recentRealtimeDispatches.current.size > 64) {
+            for (const [key, timestamp] of recentRealtimeDispatches.current.entries()) {
+                if (now - timestamp >= REALTIME_DEDUP_WINDOW_MS) {
+                    recentRealtimeDispatches.current.delete(key);
+                }
+            }
+        }
+
+        return false;
+    };
 
     useEffect(() => {
         // Check active session
@@ -54,6 +79,23 @@ export function AuthProvider({ children }) {
         window.addEventListener('focus', handleFocus);
 
         const handleRealtimePayload = (payload) => {
+            const table = payload?.table;
+            const eventType = payload?.eventType;
+            const rowId = payload?.new?.id || payload?.old?.id || 'unknown';
+            const changeFingerprint = JSON.stringify(payload?.new || payload?.old || {});
+            const signature = `${table}:${eventType}:${rowId}:${changeFingerprint}`;
+
+            if (shouldSkipDuplicateRealtime(signature)) {
+                return;
+            }
+
+            const payloadProfileId = getPayloadProfileId(payload);
+            const isRelevantProfile = payloadProfileId === user.id || payloadProfileId === profile?.partner_id;
+
+            if (!isRelevantProfile) {
+                return;
+            }
+
             if (payload.eventType === 'INSERT' && payload.table === 'transactions') {
                 if (payload.new?.profile_id === profile?.partner_id) {
                     const now = new Date().toISOString();

@@ -18,6 +18,7 @@ export default function Wallets() {
     const { user, planTier, partnerProfile } = useAuth();
     const { addToast, addActionToast } = useToast();
     const [wallets, setWallets] = useState([]);
+    const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [walletToEdit, setWalletToEdit] = useState(null);
@@ -32,8 +33,18 @@ export default function Wallets() {
     useEffect(() => {
         if (!user) return undefined;
 
-        fetchWallets();
-        const handleSync = () => fetchWallets();
+        fetchWalletData();
+        const handleSync = (event) => {
+            const table = event?.detail?.table;
+
+            if (!table || table === 'wallets') {
+                fetchWallets();
+            }
+
+            if (!table || table === 'transactions') {
+                fetchTransactions();
+            }
+        };
         window.addEventListener('supabase-sync', handleSync);
         return () => window.removeEventListener('supabase-sync', handleSync);
     }, [user]);
@@ -47,45 +58,72 @@ export default function Wallets() {
         try {
             const { data, error } = await supabase
                 .from('wallets')
-                .select('*')
+                .select('id, name, type, initial_balance, profile_id, created_at')
                 .order('created_at', { ascending: true });
 
             if (error) throw error;
-
-            const { data: transactionsData, error: transactionsError } = await supabase
-                .from('transactions')
-                .select('*');
-
-            if (transactionsError) throw transactionsError;
-
-            const walletsWithBalance = (data || []).map((wallet) => {
-                const walletTransactions = (transactionsData || []).filter((transaction) => transaction.wallet_id === wallet.id);
-                const income = walletTransactions
-                    .filter((transaction) => transaction.type === 'income')
-                    .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
-                const expense = walletTransactions
-                    .filter((transaction) => transaction.type === 'expense')
-                    .reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
-
-                return {
-                    ...wallet,
-                    current_balance: (parseFloat(wallet.initial_balance) || 0) + income - expense,
-                };
-            });
-
-            setWallets(walletsWithBalance);
+            setWallets(data || []);
         } catch (error) {
             console.error('Error fetching wallets:', error);
+        }
+    };
+
+    const fetchTransactions = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('transactions')
+                .select('id, amount, type, wallet_id');
+
+            if (error) throw error;
+            setTransactions(data || []);
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+        }
+    };
+
+    const fetchWalletData = async () => {
+        setLoading(true);
+
+        try {
+            const [walletResponse, transactionResponse] = await Promise.all([
+                supabase.from('wallets').select('id, name, type, initial_balance, profile_id, created_at').order('created_at', { ascending: true }),
+                supabase.from('transactions').select('id, amount, type, wallet_id'),
+            ]);
+
+            if (walletResponse.error) throw walletResponse.error;
+            if (transactionResponse.error) throw transactionResponse.error;
+
+            setWallets(walletResponse.data || []);
+            setTransactions(transactionResponse.data || []);
+        } catch (error) {
+            console.error('Error fetching wallet data:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const totalBalance = wallets.reduce((sum, wallet) => sum + Number(wallet.current_balance || 0), 0);
-    const negativeWallets = wallets.filter((wallet) => Number(wallet.current_balance || 0) < 0).length;
+    const walletsWithBalance = useMemo(() => wallets.map((wallet) => {
+        let income = 0;
+        let expense = 0;
+
+        transactions.forEach((transaction) => {
+            if (transaction.wallet_id !== wallet.id) return;
+            const amount = Number(transaction.amount || 0);
+            if (transaction.type === 'income') income += amount;
+            if (transaction.type === 'expense') expense += amount;
+        });
+
+        return {
+            ...wallet,
+            current_balance: (parseFloat(wallet.initial_balance) || 0) + income - expense,
+        };
+    }), [wallets, transactions]);
+
+    const totalBalance = walletsWithBalance.reduce((sum, wallet) => sum + Number(wallet.current_balance || 0), 0);
+    const negativeWallets = walletsWithBalance.filter((wallet) => Number(wallet.current_balance || 0) < 0).length;
     const topWallet = useMemo(
-        () => wallets.slice().sort((a, b) => Number(b.current_balance || 0) - Number(a.current_balance || 0))[0] || null,
-        [wallets],
+        () => walletsWithBalance.slice().sort((a, b) => Number(b.current_balance || 0) - Number(a.current_balance || 0))[0] || null,
+        [walletsWithBalance],
     );
 
     const handleOpenNew = () => {
@@ -199,8 +237,8 @@ export default function Wallets() {
                 subtitle="Organize saldos, transferencia entre contas e distribuicao do dinheiro em um layout mais limpo."
             >
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    {wallets.length > 0 && (
-                        <Button onClick={() => setIsTransferOpen(true)} variant="ghost" icon={ArrowRightLeft} disabled={wallets.length < 2}>
+                    {walletsWithBalance.length > 0 && (
+                        <Button onClick={() => setIsTransferOpen(true)} variant="ghost" icon={ArrowRightLeft} disabled={walletsWithBalance.length < 2}>
                             Transferir
                         </Button>
                     )}
@@ -227,7 +265,7 @@ export default function Wallets() {
                         </div>
                         <span className="app-summary-label">Carteiras ativas</span>
                     </div>
-                    <strong className="app-summary-value">{wallets.length}</strong>
+                    <strong className="app-summary-value">{walletsWithBalance.length}</strong>
                 </Card>
                 <Card hover={false} className={`app-summary-card ${negativeWallets > 0 ? 'app-summary-card-danger' : 'app-summary-card-success'}`}>
                     <div className="app-summary-topline">
@@ -248,7 +286,7 @@ export default function Wallets() {
                         <Skeleton key={index} width="100%" height="220px" borderRadius="20px" />
                     ))}
                 </div>
-            ) : wallets.length === 0 ? (
+            ) : walletsWithBalance.length === 0 ? (
                 <EmptyState
                     icon={Wallet}
                     title="Nenhuma carteira encontrada"
@@ -259,7 +297,7 @@ export default function Wallets() {
             ) : (
                 <div className="app-list-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
                     <AnimatePresence mode="popLayout">
-                        {wallets.map((wallet, index) => {
+                        {walletsWithBalance.map((wallet, index) => {
                             const Icon = getIcon(wallet.type);
                             const isNegative = Number(wallet.current_balance || 0) < 0;
 

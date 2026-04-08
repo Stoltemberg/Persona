@@ -14,6 +14,26 @@ const highlights = [
     { icon: ShieldCheck, title: 'Privacidade em primeiro lugar', text: 'Controle seus dados com seguranca.' },
 ];
 
+const shellVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            duration: 0.5,
+            staggerChildren: 0.08,
+        },
+    },
+};
+
+const panelVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.45, ease: 'easeOut' },
+    },
+};
+
 export default function Login() {
     const { signIn, signUp, user } = useAuth();
     const [isSignUp, setIsSignUp] = useState(false);
@@ -52,7 +72,12 @@ export default function Login() {
     };
 
     return (
-        <main className="public-shell login-surface">
+        <motion.main
+            className="public-shell login-surface"
+            variants={shellVariants}
+            initial="hidden"
+            animate="visible"
+        >
             <Helmet>
                 <title>{isSignUp ? 'Criar Conta | Persona' : 'Acessar Persona | Login'}</title>
                 <meta name="description" content="Entre na Persona e organize sua vida financeira com uma experiencia mais clara, moderna e confiavel." />
@@ -60,14 +85,20 @@ export default function Login() {
             </Helmet>
 
             <div className="public-auth-grid">
-                <section className="public-auth-hero">
+                <motion.section className="public-auth-hero" variants={panelVariants}>
                     <span className="dashboard-kicker">Centro de comando financeiro</span>
                     <h1>Seu dinheiro com mais clareza, contexto e continuidade.</h1>
                     <p>Entre para acompanhar saldos, planejar metas e transformar movimentacoes em decisoes simples de acompanhar.</p>
 
-                    <div className="public-auth-highlight-grid">
+                    <motion.div className="public-auth-highlight-grid" variants={shellVariants}>
                         {highlights.map(({ icon: Icon, title, text }) => (
-                            <article key={title} className="public-auth-highlight-card">
+                            <motion.article
+                                key={title}
+                                className="public-auth-highlight-card"
+                                variants={panelVariants}
+                                whileHover={{ y: -3, scale: 1.01 }}
+                                transition={{ duration: 0.2 }}
+                            >
                                 <span className="app-inline-icon">
                                     <Icon size={18} />
                                 </span>
@@ -75,15 +106,16 @@ export default function Login() {
                                     <strong>{title}</strong>
                                     <span>{text}</span>
                                 </div>
-                            </article>
+                            </motion.article>
                         ))}
-                    </div>
-                </section>
+                    </motion.div>
+                </motion.section>
 
                 <motion.section
-                    layout
                     className="public-card public-auth-card"
-                    transition={{ duration: 0.35, type: 'spring', stiffness: 120 }}
+                    variants={panelVariants}
+                    whileHover={{ y: -2 }}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
                 >
                     <span className="dashboard-kicker">{isSignUp ? 'Criar conta' : 'Entrar'}</span>
                     <h2>{isSignUp ? 'Comece agora' : 'Bem-vindo de volta'}</h2>
@@ -153,6 +185,6 @@ export default function Login() {
                     </div>
                 </motion.section>
             </div>
-        </main>
+        </motion.main>
     );
 }

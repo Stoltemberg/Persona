@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
@@ -30,6 +30,32 @@ const formatDateInput = (value) => {
 const sortTransactions = (items) => (
     [...items].sort((a, b) => new Date(b.date) - new Date(a.date))
 );
+
+const pageVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.35,
+            ease: [0.22, 1, 0.36, 1],
+            staggerChildren: 0.06,
+            delayChildren: 0.04,
+        },
+    },
+};
+
+const sectionVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -10 },
+};
+
+const listVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.05 } },
+    exit: { opacity: 0, y: -8 },
+};
 
 export default function Transactions() {
     const { user, profile, markTransactionsAsRead } = useAuth();
@@ -68,9 +94,16 @@ export default function Transactions() {
             fetchCategories();
             fetchWallets();
 
-            const handleSync = () => {
-                fetchTransactions();
-                fetchWallets();
+            const handleSync = (event) => {
+                const table = event?.detail?.table;
+
+                if (!table || table === 'transactions') {
+                    fetchTransactions();
+                }
+
+                if (!table || table === 'wallets') {
+                    fetchWallets();
+                }
             };
 
             window.addEventListener('supabase-sync', handleSync);
@@ -93,7 +126,7 @@ export default function Transactions() {
     }, [activeFilter, searchQuery, startDate, endDate, setSearchParams]);
 
     const fetchWallets = async () => {
-        const { data } = await supabase.from('wallets').select('*').order('created_at', { ascending: true });
+        const { data } = await supabase.from('wallets').select('id, name, type, initial_balance, profile_id, created_at').order('created_at', { ascending: true });
         setWallets(data || []);
 
         if (data && data.length > 0 && !selectedWalletId) {
@@ -105,20 +138,20 @@ export default function Transactions() {
         try {
             const { data, error } = await supabase
                 .from('transactions')
-                .select('*')
+                .select('id, description, amount, type, category, wallet_id, date, profile_id, expense_type')
                 .order('date', { ascending: false });
 
             if (error) throw error;
             setTransactions(data || []);
         } catch (error) {
-            console.error('Erro ao buscar transações:', error);
+            console.error('Erro ao buscar transacoes:', error);
         } finally {
             setLoading(false);
         }
     };
 
     const fetchCategories = async () => {
-        const { data } = await supabase.from('categories').select('*');
+        const { data } = await supabase.from('categories').select('id, name, type, color, icon');
         setCategories(data || []);
     };
 
@@ -187,7 +220,7 @@ export default function Transactions() {
 
         try {
             if (!selectedWalletId) {
-                throw new Error('Selecione uma carteira para registrar esta transação.');
+                throw new Error('Selecione uma carteira para registrar esta transacao.');
             }
 
             const payload = {
@@ -242,7 +275,7 @@ export default function Transactions() {
 
             await fetchTransactions();
             handleCloseModal();
-            addToast(transactionToEdit ? 'Transação atualizada.' : 'Transação criada.', 'success');
+            addToast(transactionToEdit ? 'Transacao atualizada.' : 'Transacao criada.', 'success');
 
             if (!transactionToEdit && newTx) {
                 window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: newTx }));
@@ -250,7 +283,7 @@ export default function Transactions() {
                 window.dispatchEvent(new Event('transaction-updated'));
             }
         } catch (error) {
-            addToast(error.message || 'Erro ao salvar transação.', 'error');
+            addToast(error.message || 'Erro ao salvar transacao.', 'error');
         } finally {
             setSubmitting(false);
         }
@@ -264,7 +297,7 @@ export default function Transactions() {
         } catch (error) {
             console.error('Erro ao excluir:', error);
             setTransactions((prev) => sortTransactions([...prev, transaction]));
-            addToast('Não foi possível excluir a transação.', 'error');
+            addToast('Nao foi possivel excluir a transacao.', 'error');
         }
     };
 
@@ -281,7 +314,7 @@ export default function Transactions() {
 
         pendingDeleteTimers.current.set(id, timer);
 
-        addActionToast('Transação removida.', 'Desfazer', () => {
+        addActionToast('Transacao removida.', 'Desfazer', () => {
             const pendingTimer = pendingDeleteTimers.current.get(id);
             if (pendingTimer) {
                 clearTimeout(pendingTimer);
@@ -298,7 +331,7 @@ export default function Transactions() {
 
     const normalizedSearch = searchQuery.trim().toLowerCase();
 
-    const filteredTransactions = transactions.filter((tx) => {
+    const filteredTransactions = useMemo(() => transactions.filter((tx) => {
         if (activeFilter === 'me' && tx.profile_id !== user.id) return false;
         if (activeFilter === 'partner' && tx.profile_id !== profile?.partner_id) return false;
 
@@ -326,14 +359,14 @@ export default function Transactions() {
 
         const target = `${tx.description} ${tx.category || ''}`.toLowerCase();
         return target.includes(normalizedSearch);
-    });
+    }), [transactions, activeFilter, user.id, profile?.partner_id, startDate, endDate, normalizedSearch]);
 
-    const filteredIncome = filteredTransactions
+    const filteredIncome = useMemo(() => filteredTransactions
         .filter((tx) => tx.type === 'income')
-        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
-    const filteredExpense = filteredTransactions
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0), [filteredTransactions]);
+    const filteredExpense = useMemo(() => filteredTransactions
         .filter((tx) => tx.type === 'expense')
-        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0), [filteredTransactions]);
     const hasActiveFilters = Boolean(searchQuery || startDate || endDate || activeFilter !== 'all');
 
     const clearFilters = () => {
@@ -345,7 +378,7 @@ export default function Transactions() {
 
     const handleOpenExport = () => {
         if (filteredTransactions.length === 0) {
-            addToast('Sem transações para exportar no filtro atual.', 'error');
+            addToast('Sem transacoes para exportar no filtro atual.', 'error');
             return;
         }
 
@@ -363,13 +396,14 @@ export default function Transactions() {
         const { exportTransactionsToExcel } = await import('../lib/exportUtils');
         exportTransactionsToExcel(filteredTransactions);
         setIsExportModalOpen(false);
-        addToast('Planilha compatível gerada com sucesso.', 'success');
+        addToast('Planilha compativel gerada com sucesso.', 'success');
     };
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
+        <motion.div className="container" style={{ paddingBottom: '80px' }} variants={pageVariants} initial="hidden" animate="visible">
+            <motion.div variants={sectionVariants}>
             <PageHeader
-                title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Transações</span></span>}
+                title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{'Transa\u00E7\u00F5es'}</span></span>}
             >
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <Button onClick={handleOpenExport} variant="ghost" icon={Download} title="Exportar dados" style={{ padding: '0.6rem' }} />
@@ -378,10 +412,13 @@ export default function Transactions() {
                     </Button>
                 </div>
             </PageHeader>
+            </motion.div>
 
-            <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+            <motion.div variants={sectionVariants}>
+                <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+            </motion.div>
 
-            <div className="transactions-toolbar">
+            <motion.div className="transactions-toolbar" variants={sectionVariants}>
                 <DateRangePicker
                     startDate={startDate ? new Date(startDate.split('-')[0], startDate.split('-')[1] - 1, startDate.split('-')[2]) : null}
                     endDate={endDate ? new Date(endDate.split('-')[0], endDate.split('-')[1] - 1, endDate.split('-')[2]) : null}
@@ -412,8 +449,8 @@ export default function Transactions() {
                         type="search"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Buscar por descrição ou categoria"
-                        aria-label="Buscar transações"
+                        placeholder={'Buscar por descri\u00E7\u00E3o ou categoria'}
+                        aria-label={'Buscar transa\u00E7\u00F5es'}
                     />
                     {searchQuery && (
                         <button type="button" onClick={() => setSearchQuery('')} aria-label="Limpar busca">
@@ -427,9 +464,9 @@ export default function Transactions() {
                         Limpar filtros
                     </Button>
                 )}
-            </div>
+            </motion.div>
 
-            <div className="transactions-summary">
+            <motion.div className="transactions-summary" variants={sectionVariants}>
                 <Card hover={false} className="transactions-summary-card">
                     <span className="transactions-summary-label">Resultados</span>
                     <strong>{filteredTransactions.length}</strong>
@@ -441,51 +478,85 @@ export default function Transactions() {
                     </strong>
                 </Card>
                 <Card hover={false} className="transactions-summary-card">
-                    <span className="transactions-summary-label">Saídas filtradas</span>
+                    <span className="transactions-summary-label">{'Sa\u00EDdas filtradas'}</span>
                     <strong style={{ color: 'var(--color-danger)' }}>
                         R$ {filteredExpense.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </strong>
                 </Card>
-            </div>
+            </motion.div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <AnimatePresence mode="wait" initial={false}>
                 {loading ? (
-                    Array(5).fill(0).map((_, index) => (
-                        <Skeleton key={index} width="100%" height="72px" borderRadius="16px" />
-                    ))
-                ) : transactions.length === 0 ? (
-                    <EmptyState
-                        icon={ArrowUpRight}
-                        title="Nenhuma transação ainda"
-                        description="Comece registrando seus ganhos e gastos para ver o poder do dashboard."
-                        actionText="Nova Transação"
-                        onAction={handleOpenNew}
-                    />
-                ) : filteredTransactions.length === 0 ? (
-                    <EmptyState
-                        icon={Search}
-                        title="Nenhum resultado encontrado"
-                        description="Tente ajustar período, parceiro ou busca para localizar outras movimentações."
-                        actionText="Limpar filtros"
-                        onAction={clearFilters}
-                    />
-                ) : (
-                    <AnimatePresence mode="popLayout">
-                        {filteredTransactions.map((tx, index) => (
-                            <TransactionItem
-                                key={tx.id}
-                                transaction={tx}
-                                categories={categories}
-                                onEdit={handleOpenEdit}
-                                onDelete={handleDeleteTransaction}
-                                index={index}
-                            />
+                    <motion.div
+                        key="transactions-loading"
+                        style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+                        variants={listVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                    >
+                        {Array(5).fill(0).map((_, index) => (
+                            <Skeleton key={index} width="100%" height="72px" borderRadius="16px" />
                         ))}
-                    </AnimatePresence>
+                    </motion.div>
+                ) : transactions.length === 0 ? (
+                    <motion.div
+                        key="transactions-empty"
+                        variants={sectionVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                    >
+                        <EmptyState
+                            icon={ArrowUpRight}
+                            title={'Nenhuma transa\u00E7\u00E3o ainda'}
+                            description="Comece registrando seus ganhos e gastos para ver o poder do dashboard."
+                            actionText={'Nova Transa\u00E7\u00E3o'}
+                            onAction={handleOpenNew}
+                        />
+                    </motion.div>
+                ) : filteredTransactions.length === 0 ? (
+                    <motion.div
+                        key="transactions-filtered-empty"
+                        variants={sectionVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                    >
+                        <EmptyState
+                            icon={Search}
+                            title="Nenhum resultado encontrado"
+                            description="Tente ajustar periodo, parceiro ou busca para localizar outras movimentacoes."
+                            actionText="Limpar filtros"
+                            onAction={clearFilters}
+                        />
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key={`transactions-list-${activeFilter}-${searchQuery}-${startDate}-${endDate}`}
+                        style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+                        variants={listVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                    >
+                        <AnimatePresence mode="popLayout">
+                            {filteredTransactions.map((tx, index) => (
+                                <TransactionItem
+                                    key={tx.id}
+                                    transaction={tx}
+                                    categories={categories}
+                                    onEdit={handleOpenEdit}
+                                    onDelete={handleDeleteTransaction}
+                                    index={index}
+                                />
+                            ))}
+                        </AnimatePresence>
+                    </motion.div>
                 )}
-            </div>
+            </AnimatePresence>
 
-            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={transactionToEdit ? 'Editar Transação' : 'Nova Transação'}>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={transactionToEdit ? 'Editar Transa\u00E7\u00E3o' : 'Nova Transa\u00E7\u00E3o'}>
                 <TransactionForm
                     amount={amount}
                     onAmountChange={setAmount}
@@ -510,28 +581,28 @@ export default function Transactions() {
                     description={description}
                     onDescriptionChange={handleDescriptionChange}
                     onSubmit={handleSaveTransaction}
-                    submitLabel={transactionToEdit ? 'Salvar alterações' : 'Salvar'}
+                    submitLabel={transactionToEdit ? 'Salvar alteracoes' : 'Salvar'}
                     loading={submitting}
                 />
             </Modal>
 
-            <Modal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} title="Exportar transações">
+            <Modal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} title={'Exportar transa\u00E7\u00F5es'}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <div className="surface-secondary" style={{ padding: '1rem', borderRadius: '12px' }}>
                         <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '0.35rem' }}>Escolha o formato</strong>
                         <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                            CSV abre mais rápido em planilhas e mantém a exportação leve. A planilha compatível abre no Excel sem carregar a dependência pesada anterior.
+                            CSV abre mais rapido em planilhas e mantem a exportacao leve. A planilha compativel abre no Excel sem carregar a dependencia pesada anterior.
                         </p>
                     </div>
 
                     <Button type="button" className="btn-primary" onClick={handleExportCsv} style={{ width: '100%', justifyContent: 'center' }}>
-                        Exportar CSV rápido
+                        Exportar CSV rapido
                     </Button>
                     <Button type="button" variant="ghost" onClick={handleExportExcel} style={{ width: '100%', justifyContent: 'center' }}>
-                        Exportar planilha compatível
+                        Exportar planilha compativel
                     </Button>
                 </div>
             </Modal>
-        </div>
+        </motion.div>
     );
 }

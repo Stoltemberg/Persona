@@ -3,7 +3,6 @@ import { Check, Crown, Shield, Zap } from 'lucide-react';
 import { Modal } from './Modal';
 import { Button } from './Button';
 import { Input } from './Input';
-import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
 
@@ -38,11 +37,10 @@ const tiers = [
 ];
 
 export function UpgradeModal({ isOpen, onClose }) {
-    const { user, fetchProfile } = useAuth();
     const { addToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [couponCode, setCouponCode] = useState('');
-    const [redeeming, setRedeeming] = useState(false);
+    const [appliedCoupon, setAppliedCoupon] = useState('');
     const [selectedTier, setSelectedTier] = useState('complete');
 
     const handleUpgrade = async (tierId) => {
@@ -58,7 +56,10 @@ export function UpgradeModal({ isOpen, onClose }) {
             if (!session) throw new Error('Sessao invalida.');
 
             const { data, error } = await supabase.functions.invoke('create-checkout', {
-                body: { tier: tierId },
+                body: {
+                    tier: tierId,
+                    couponCode: appliedCoupon || null,
+                },
                 headers: { Authorization: `Bearer ${session.access_token}` },
             });
 
@@ -74,26 +75,20 @@ export function UpgradeModal({ isOpen, onClose }) {
         }
     };
 
-    const handleRedeemCoupon = async (event) => {
+    const handleApplyCoupon = async (event) => {
         event.preventDefault();
         if (!couponCode.trim()) return;
 
-        setRedeeming(true);
-
         try {
-            const { data, error } = await supabase.rpc('redeem_coupon', { coupon_code: couponCode.toUpperCase() });
+            const normalizedCoupon = couponCode.trim().toUpperCase();
+            const { data, error } = await supabase.rpc('redeem_coupon', { coupon_code: normalizedCoupon });
             if (error) throw error;
 
-            if (data.success) {
-                addToast(`Cupom aplicado. Plano: ${data.tier}`, 'success');
-                await fetchProfile(user.id);
-                onClose();
-            }
+            setAppliedCoupon(normalizedCoupon);
+            addToast(`Cupom validado. Desconto preparado para o plano ${data?.tier || 'selecionado'}.`, 'success');
         } catch (error) {
-            console.error('Redeem error:', error);
-            addToast(error.message || 'Erro ao resgatar cupom.', 'error');
-        } finally {
-            setRedeeming(false);
+            console.error('Coupon apply error:', error);
+            addToast(error.message || 'Nao foi possivel validar o cupom.', 'error');
         }
     };
 
@@ -109,8 +104,8 @@ export function UpgradeModal({ isOpen, onClose }) {
                 <CardCouponForm
                     couponCode={couponCode}
                     onCouponChange={setCouponCode}
-                    onSubmit={handleRedeemCoupon}
-                    redeeming={redeeming}
+                    appliedCoupon={appliedCoupon}
+                    onSubmit={handleApplyCoupon}
                 />
 
                 <div className="upgrade-tier-grid">
@@ -166,7 +161,7 @@ export function UpgradeModal({ isOpen, onClose }) {
     );
 }
 
-function CardCouponForm({ couponCode, onCouponChange, onSubmit, redeeming }) {
+function CardCouponForm({ couponCode, onCouponChange, appliedCoupon, onSubmit }) {
     return (
         <div className="app-section-card upgrade-coupon-card">
             <div className="app-list-card-main">
@@ -185,10 +180,15 @@ function CardCouponForm({ couponCode, onCouponChange, onSubmit, redeeming }) {
                     value={couponCode}
                     onChange={(event) => onCouponChange(event.target.value)}
                 />
-                <Button type="submit" variant="ghost" loading={redeeming}>
+                <Button type="submit" variant="ghost">
                     Aplicar
                 </Button>
             </form>
+            {appliedCoupon && (
+                <p className="text-muted" style={{ margin: 0 }}>
+                    Cupom preparado para o checkout: <strong style={{ color: 'var(--text-main)' }}>{appliedCoupon}</strong>
+                </p>
+            )}
         </div>
     );
 }

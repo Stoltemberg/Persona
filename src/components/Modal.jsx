@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { X } from 'lucide-react';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -24,9 +23,12 @@ export function Modal({ isOpen, onClose, title, children }) {
                 className="modal-content"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h3>{title}</h3>
-                    <button className="btn-ghost btn-icon" onClick={onClose}>
+                <div className="modal-header">
+                    <div>
+                        <span className="modal-kicker">Painel rapido</span>
+                        <h3>{title}</h3>
+                    </div>
+                    <button type="button" className="btn-ghost btn-icon" onClick={onClose} aria-label="Fechar modal">
                         <X size={20} />
                     </button>
                 </div>

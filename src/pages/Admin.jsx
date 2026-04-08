@@ -1,37 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { Plus, Ticket, Trash2, TrendingUp, Users } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
-import { Navigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
-import { Layout } from '../components/Layout';
-import { Users, Ticket, TrendingUp, Trash2, Plus } from 'lucide-react';
+import { PageHeader } from '../components/PageHeader';
 import { useToast } from '../context/ToastContext';
 
 export default function Admin() {
-    const { user, role, loading } = useAuth();
+    const { role, loading } = useAuth();
     const { addToast, addActionToast } = useToast();
-
-    // Dashboard Stats
-    const [stats, setStats] = useState({
-        totalUsers: 0,
-        proUsers: 0,
-        activeCoupons: 0
-    });
-
-    // Coupons State
+    const [stats, setStats] = useState({ totalUsers: 0, proUsers: 0, activeCoupons: 0 });
     const [coupons, setCoupons] = useState([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
     const pendingDeleteTimers = useRef(new Map());
-
-    // New Coupon Form
     const [newCoupon, setNewCoupon] = useState({
         code: '',
         discount_percent: 0,
-        target_tier: 'intermediate', // free, intermediate, complete
+        target_tier: 'intermediate',
         max_uses: 100,
-        expires_at: ''
+        expires_at: '',
     });
 
     useEffect(() => {
@@ -48,33 +38,32 @@ export default function Admin() {
 
     const fetchStats = async () => {
         try {
-            // Count users
             const { count: userCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
-
-            // Count pro users (Coupons/New Logic)
-            const { count: tierCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true })
+            const { count: tierCount } = await supabase
+                .from('profiles')
+                .select('*', { count: 'exact', head: true })
                 .in('plan_tier', ['intermediate', 'complete']);
 
-            // Count pro users (Legacy Subscriptions)
             const now = new Date().toISOString();
-            const { count: subCount } = await supabase.from('subscriptions')
+            const { count: subCount } = await supabase
+                .from('subscriptions')
                 .select('*', { count: 'exact', head: true })
                 .gt('current_period_end', now);
 
-            // Count active coupons
-            const { count: couponCount } = await supabase.from('coupons').select('*', { count: 'exact', head: true }).eq('active', true);
+            const { count: couponCount } = await supabase
+                .from('coupons')
+                .select('*', { count: 'exact', head: true })
+                .eq('active', true);
 
             setStats({
                 totalUsers: userCount || 0,
                 proUsers: (tierCount || 0) + (subCount || 0),
-                activeCoupons: couponCount || 0
+                activeCoupons: couponCount || 0,
             });
         } catch (error) {
             console.error('Error fetching stats:', error);
         }
     };
-
-
 
     const fetchCoupons = async () => {
         try {
@@ -88,32 +77,33 @@ export default function Admin() {
             setCoupons(data || []);
         } catch (error) {
             console.error('Error fetching coupons:', error);
-            addToast('Erro ao carregar cupons', 'error');
+            addToast('Erro ao carregar cupons.', 'error');
         } finally {
             setIsLoadingData(false);
         }
     };
 
-    const handleCreateCoupon = async (e) => {
-        e.preventDefault();
+    const handleCreateCoupon = async (event) => {
+        event.preventDefault();
+
         try {
-            const { data, error } = await supabase.from('coupons').insert([{
+            const { error } = await supabase.from('coupons').insert([{
                 code: newCoupon.code.toUpperCase(),
-                discount_percent: parseInt(newCoupon.discount_percent),
+                discount_percent: parseInt(newCoupon.discount_percent, 10),
                 target_tier: newCoupon.target_tier,
-                max_uses: parseInt(newCoupon.max_uses),
-                expires_at: newCoupon.expires_at ? new Date(newCoupon.expires_at).toISOString() : null
-            }]).select();
+                max_uses: parseInt(newCoupon.max_uses, 10),
+                expires_at: newCoupon.expires_at ? new Date(newCoupon.expires_at).toISOString() : null,
+            }]);
 
             if (error) throw error;
 
-            addToast('Cupom criado com sucesso!', 'success');
+            addToast('Cupom criado com sucesso.', 'success');
             setNewCoupon({ code: '', discount_percent: 0, target_tier: 'intermediate', max_uses: 100, expires_at: '' });
             fetchCoupons();
             fetchStats();
         } catch (error) {
             console.error('Error creating coupon:', error);
-            addToast('Erro ao criar cupom. Verifique se o código já existe.', 'error');
+            addToast('Erro ao criar cupom. Verifique se o codigo ja existe.', 'error');
         }
     };
 
@@ -149,145 +139,157 @@ export default function Admin() {
     };
 
     if (loading) return <div className="flex-center" style={{ height: '100vh' }}>Carregando...</div>;
-
-    if (role !== 'admin') {
-        return <Navigate to="/" />;
-    }
+    if (role !== 'admin') return <Navigate to="/" />;
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-            <header className="page-header" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
-                <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                        Painel <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Admin</span>
-                    </h1>
-                    <p style={{ opacity: 0.6 }}>Gerencie usuários e promoções</p>
-                </div>
-            </header>
+        <div className="container fade-in app-page-shell" style={{ paddingBottom: '80px' }}>
+            <PageHeader
+                title={<span>Painel <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Admin</span></span>}
+                subtitle="Acompanhe a base ativa e gerencie cupons usando o mesmo padrao visual das outras areas."
+            />
 
-            {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
-                <Card className="glass-card-hover">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                        <div style={{ padding: '0.8rem', background: 'rgba(18, 194, 233, 0.1)', borderRadius: '12px', color: '#12c2e9' }}>
-                            <Users size={24} />
+            <div className="app-summary-grid">
+                <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                    <div className="app-summary-topline">
+                        <div className="app-summary-icon app-summary-icon-neutral">
+                            <Users size={18} />
                         </div>
-                        <h3 style={{ margin: 0 }}>Total Usuários</h3>
+                        <span className="app-summary-label">Usuarios</span>
                     </div>
-                    <p style={{ fontSize: '2rem', fontWeight: 700, margin: 0 }}>{stats.totalUsers}</p>
+                    <strong className="app-summary-value">{stats.totalUsers}</strong>
                 </Card>
 
-                <Card className="glass-card-hover">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                        <div style={{ padding: '0.8rem', background: 'rgba(255, 215, 0, 0.1)', borderRadius: '12px', color: '#FFD700' }}>
-                            <TrendingUp size={24} />
+                <Card hover={false} className="app-summary-card app-summary-card-success">
+                    <div className="app-summary-topline">
+                        <div className="app-summary-icon app-summary-icon-success">
+                            <TrendingUp size={18} />
                         </div>
-                        <h3 style={{ margin: 0 }}>Assinantes PRO</h3>
+                        <span className="app-summary-label">Assinantes ativos</span>
                     </div>
-                    <p style={{ fontSize: '2rem', fontWeight: 700, margin: 0 }}>{stats.proUsers}</p>
+                    <strong className="app-summary-value">{stats.proUsers}</strong>
                 </Card>
 
-                <Card className="glass-card-hover">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                        <div style={{ padding: '0.8rem', background: 'rgba(246, 79, 89, 0.1)', borderRadius: '12px', color: '#f64f59' }}>
-                            <Ticket size={24} />
+                <Card hover={false} className="app-summary-card app-summary-card-danger">
+                    <div className="app-summary-topline">
+                        <div className="app-summary-icon app-summary-icon-danger">
+                            <Ticket size={18} />
                         </div>
-                        <h3 style={{ margin: 0 }}>Cupons Ativos</h3>
+                        <span className="app-summary-label">Cupons ativos</span>
                     </div>
-                    <p style={{ fontSize: '2rem', fontWeight: 700, margin: 0 }}>{stats.activeCoupons}</p>
+                    <strong className="app-summary-value">{stats.activeCoupons}</strong>
                 </Card>
             </div>
 
-
-
-            {/* Coupons Management */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start', marginTop: '3rem' }} className="admin-grid">
-                <div>
-                    <h2 style={{ marginBottom: '1.5rem' }}>Criar Novo Cupom</h2>
-                    <Card>
-                        <form onSubmit={handleCreateCoupon} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <Input
-                                label="Código do Cupom"
-                                value={newCoupon.code}
-                                onChange={e => setNewCoupon({ ...newCoupon, code: e.target.value })}
-                                placeholder="EX: WELCOME2024"
-                                required
-                            />
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                <Input
-                                    label="Desconto (%)"
-                                    type="number"
-                                    value={newCoupon.discount_percent}
-                                    onChange={e => setNewCoupon({ ...newCoupon, discount_percent: e.target.value })}
-                                />
-                                <div className="input-group">
-                                    <label>Plano Alvo</label>
-                                    <select
-                                        className="input-field"
-                                        value={newCoupon.target_tier}
-                                        onChange={e => setNewCoupon({ ...newCoupon, target_tier: e.target.value })}
-                                    >
-                                        <option value="free">Grátis (Apenas test)</option>
-                                        <option value="intermediate">Intermediário</option>
-                                        <option value="complete">Completo</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                <Input
-                                    label="Max Usos"
-                                    type="number"
-                                    value={newCoupon.max_uses}
-                                    onChange={e => setNewCoupon({ ...newCoupon, max_uses: e.target.value })}
-                                />
-                                <Input
-                                    label="Validade (Opcional)"
-                                    type="date"
-                                    value={newCoupon.expires_at}
-                                    onChange={e => setNewCoupon({ ...newCoupon, expires_at: e.target.value })}
-                                />
-                            </div>
-
-                            <Button type="submit" className="btn-primary" style={{ marginTop: '1rem' }}>
-                                <Plus size={18} /> Criar Cupom
-                            </Button>
-                        </form>
-                    </Card>
-                </div>
-
-                <div>
-                    <h2 style={{ marginBottom: '1.5rem' }}>Cupons Existentes</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {coupons.map(coupon => (
-                            <Card key={coupon.id} style={{ padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <h4 style={{ margin: 0, fontSize: '1.1rem' }}>{coupon.code}</h4>
-                                        <span style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', borderRadius: '4px', background: 'rgba(255,255,255,0.1)' }}>
-                                            {coupon.target_tier}
-                                        </span>
-                                    </div>
-                                    <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                                        Usos: {coupon.used_count} / {coupon.max_uses} • Exp: {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() : 'Nunca'}
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={() => handleDeleteCoupon(coupon.id)}
-                                    style={{ background: 'none', border: 'none', color: '#f64f59', cursor: 'pointer', padding: '0.5rem' }}
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-                            </Card>
-                        ))}
-                        {coupons.length === 0 && (
-                            <p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>Nenhum cupom encontrado.</p>
-                        )}
+            <div className="app-two-column-grid">
+                <Card className="app-section-card">
+                    <div className="app-section-header">
+                        <div>
+                            <h3>Novo cupom</h3>
+                            <p>Crie codigos promocionais com limite de uso e prazo opcional.</p>
+                        </div>
                     </div>
-                </div>
+
+                    <form onSubmit={handleCreateCoupon} className="admin-coupon-form">
+                        <Input
+                            label="Codigo do cupom"
+                            value={newCoupon.code}
+                            onChange={(event) => setNewCoupon({ ...newCoupon, code: event.target.value })}
+                            placeholder="EX: WELCOME2026"
+                            required
+                        />
+
+                        <div className="admin-form-grid">
+                            <Input
+                                label="Desconto (%)"
+                                type="number"
+                                value={newCoupon.discount_percent}
+                                onChange={(event) => setNewCoupon({ ...newCoupon, discount_percent: event.target.value })}
+                            />
+                            <div className="input-group">
+                                <label>Plano alvo</label>
+                                <select
+                                    className="input-field"
+                                    value={newCoupon.target_tier}
+                                    onChange={(event) => setNewCoupon({ ...newCoupon, target_tier: event.target.value })}
+                                >
+                                    <option value="free">Gratis</option>
+                                    <option value="intermediate">Intermediario</option>
+                                    <option value="complete">Completo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="admin-form-grid">
+                            <Input
+                                label="Maximo de usos"
+                                type="number"
+                                value={newCoupon.max_uses}
+                                onChange={(event) => setNewCoupon({ ...newCoupon, max_uses: event.target.value })}
+                            />
+                            <Input
+                                label="Validade"
+                                type="date"
+                                value={newCoupon.expires_at}
+                                onChange={(event) => setNewCoupon({ ...newCoupon, expires_at: event.target.value })}
+                            />
+                        </div>
+
+                        <Button type="submit" className="btn-primary" style={{ justifyContent: 'center' }}>
+                            <Plus size={18} />
+                            Criar cupom
+                        </Button>
+                    </form>
+                </Card>
+
+                <Card className="app-section-card">
+                    <div className="app-section-header">
+                        <div>
+                            <h3>Cupons existentes</h3>
+                            <p>Revise uso, validade e remova codigos que nao fazem mais sentido.</p>
+                        </div>
+                    </div>
+
+                    {isLoadingData ? (
+                        <p className="text-muted">Carregando cupons...</p>
+                    ) : coupons.length === 0 ? (
+                        <div className="app-empty-inline">
+                            <Ticket size={16} />
+                            <span>Nenhum cupom criado ate o momento.</span>
+                        </div>
+                    ) : (
+                        <div className="app-stack-list">
+                            {coupons.map((coupon) => (
+                                <Card key={coupon.id} hover={false} className="app-list-card admin-coupon-row">
+                                    <div className="app-list-card-main">
+                                        <span className="app-inline-icon">
+                                            <Ticket size={16} />
+                                        </span>
+                                        <div>
+                                            <strong>{coupon.code}</strong>
+                                            <span>
+                                                {coupon.target_tier} • {coupon.used_count} / {coupon.max_uses} usos
+                                            </span>
+                                            <span style={{ display: 'block', marginTop: '0.2rem' }}>
+                                                {coupon.expires_at ? `Expira em ${new Date(coupon.expires_at).toLocaleDateString('pt-BR')}` : 'Sem validade'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDeleteCoupon(coupon.id)}
+                                        className="btn-ghost btn-icon"
+                                        style={{ color: '#f64f59' }}
+                                        aria-label={`Remover cupom ${coupon.code}`}
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
+                </Card>
             </div>
         </div>
-
     );
 }

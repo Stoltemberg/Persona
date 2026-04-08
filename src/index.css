@@ -4108,3 +4108,577 @@ option {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* =========================================
+   35. Shared Dialogs, Public Pages and App Prompts
+   ========================================= */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h3 {
+  color: var(--text-main);
+  margin-top: 0.35rem;
+}
+
+.modal-kicker {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.app-switch {
+  width: 46px;
+  height: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease, opacity 0.25s ease;
+}
+
+.app-switch.is-on {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.28);
+}
+
+.app-switch:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.app-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s ease;
+}
+
+.app-switch.is-on .app-switch-thumb {
+  transform: translateX(20px);
+}
+
+.install-prompt-shell {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  bottom: calc(5.75rem + env(safe-area-inset-bottom));
+  z-index: 110;
+}
+
+.install-prompt-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.install-prompt-icon {
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--color-brand);
+}
+
+.install-prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upcoming-bill-card {
+  align-items: center;
+}
+
+.upcoming-bill-card.is-urgent {
+  border-color: rgba(255, 107, 107, 0.18);
+  background: linear-gradient(180deg, rgba(255, 107, 107, 0.08), rgba(255, 255, 255, 0.03));
+}
+
+.upcoming-bill-icon-danger {
+  background: rgba(255, 107, 107, 0.12);
+  color: #ff7f7f;
+}
+
+.upcoming-bill-icon-neutral {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.upcoming-bill-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.upcoming-bill-amount {
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.upcoming-bill-pay {
+  color: var(--color-success);
+}
+
+.upgrade-modal-shell {
+  display: grid;
+  gap: 1rem;
+}
+
+.upgrade-modal-hero {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.upgrade-modal-hero h3 {
+  color: var(--text-main);
+}
+
+.upgrade-coupon-card {
+  padding: 1rem;
+}
+
+.upgrade-coupon-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.upgrade-tier-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.upgrade-tier-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.upgrade-tier-card.is-selected {
+  border-color: rgba(212, 175, 55, 0.28);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.upgrade-tier-card.tone-success.is-selected {
+  border-color: rgba(48, 209, 88, 0.28);
+  background: rgba(48, 209, 88, 0.08);
+}
+
+.upgrade-tier-card.tone-neutral.is-selected {
+  border-color: rgba(18, 194, 233, 0.26);
+  background: rgba(18, 194, 233, 0.08);
+}
+
+.upgrade-tier-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.upgrade-tier-price {
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.upgrade-tier-features {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.upgrade-tier-feature {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.admin-coupon-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-coupon-row {
+  align-items: center;
+}
+
+.public-shell {
+  min-height: 100vh;
+  padding: 7rem 1rem 2rem;
+  background:
+    radial-gradient(circle at top left, rgba(212, 175, 55, 0.1), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(18, 194, 233, 0.08), transparent 28%),
+    var(--bg-deep);
+}
+
+.public-centered-shell {
+  display: grid;
+  place-items: center;
+}
+
+.public-card {
+  width: min(960px, 100%);
+  margin: 0 auto;
+  padding: 1.5rem;
+  border-radius: 28px;
+  background: rgba(10, 10, 11, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 22px 40px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(16px);
+}
+
+.public-message-card {
+  max-width: 560px;
+  display: grid;
+  gap: 1rem;
+  text-align: center;
+  justify-items: center;
+}
+
+.public-message-card h1 {
+  font-size: clamp(4rem, 10vw, 6.5rem);
+}
+
+.public-legal-shell {
+  width: min(920px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+}
+
+.public-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.public-legal-card {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.public-legal-card h1,
+.public-legal-card h3 {
+  color: var(--text-main);
+}
+
+.public-legal-card section {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.public-legal-date {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.login-surface {
+  display: grid;
+  align-items: center;
+}
+
+.public-auth-grid {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(380px, 0.9fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.public-auth-hero {
+  display: grid;
+  gap: 1rem;
+  align-content: center;
+}
+
+.public-auth-hero h1 {
+  max-width: 12ch;
+}
+
+.public-auth-hero p {
+  max-width: 58ch;
+  font-size: 1rem;
+}
+
+.public-auth-highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.public-auth-highlight-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.public-auth-highlight-card strong {
+  display: block;
+  color: var(--text-main);
+  margin-bottom: 0.2rem;
+}
+
+.public-auth-highlight-card span {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.public-auth-card {
+  max-width: 460px;
+  display: grid;
+  gap: 0.85rem;
+  align-self: center;
+}
+
+.public-auth-card h2 {
+  color: var(--text-main);
+}
+
+.public-auth-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.public-form-alert {
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.public-form-alert.is-error {
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.22);
+  color: #ff8f8f;
+}
+
+.public-form-alert.is-success {
+  background: rgba(48, 209, 88, 0.1);
+  border: 1px solid rgba(48, 209, 88, 0.22);
+  color: #7ce9a0;
+}
+
+.public-auth-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+.landing-preview-panel {
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.landing-preview-metric {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.landing-preview-metric strong {
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--text-main);
+}
+
+.landing-preview-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.landing-preview-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.landing-preview-item span {
+  color: var(--text-secondary);
+}
+
+.landing-preview-item strong {
+  color: var(--text-main);
+}
+
+.landing-feature-card {
+  padding: 2rem;
+}
+
+.landing-feature-icon {
+  width: fit-content;
+  padding: 1rem;
+  background: rgba(17, 153, 142, 0.1);
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  color: #38ef7d;
+}
+
+.landing-pricing-card {
+  position: relative;
+  padding: 2rem;
+  overflow: visible;
+}
+
+.landing-pricing-card.is-featured {
+  border-color: var(--landing-card-accent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--landing-card-accent) 18%, transparent);
+}
+
+.landing-pricing-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  background: var(--landing-card-accent);
+  color: #000;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.landing-pricing-price {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 1rem 0;
+  color: var(--text-main);
+}
+
+.landing-pricing-price span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.landing-pricing-card ul {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+  margin-bottom: 2rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.landing-pricing-card li {
+  display: flex;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+}
+
+/* =========================================
+   36. FAB Refinement
+   ========================================= */
+.fab-btn {
+  z-index: 110;
+}
+
+.fab-btn.liquid-fab-override {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
+  color: var(--color-brand) !important;
+}
+
+.fab-btn.liquid-fab-override .fab-btn-ring {
+  display: none;
+}
+
+.fab-btn.liquid-fab-override:hover {
+  transform: scale(1.04) !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+.fab-modal-form .input-group {
+  margin-bottom: 0;
+}
+
+.fab-modal-form .app-filter-chip {
+  min-height: 40px;
+}
+
+@media (max-width: 1024px) {
+  .public-auth-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-auth-card {
+    max-width: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .install-prompt-card,
+  .upcoming-bill-card,
+  .upgrade-tier-head,
+  .public-auth-toggle {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .upcoming-bill-actions,
+  .install-prompt-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .upgrade-coupon-form,
+  .admin-form-grid,
+  .public-auth-highlight-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-shell {
+    padding-top: 6rem;
+  }
+}

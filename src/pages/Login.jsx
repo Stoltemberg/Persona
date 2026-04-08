@@ -1,11 +1,18 @@
 import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
+import { Compass, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
-import { Navigate } from 'react-router-dom';
-import { TrendingUp, Plane, Zap, Shield, Star } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Helmet } from 'react-helmet-async';
+
+const highlights = [
+    { icon: Sparkles, title: 'Categorias inteligentes', text: 'Organize lancamentos com menos friccao.' },
+    { icon: TrendingUp, title: 'Planejamento claro', text: 'Entenda metas, limites e oportunidades.' },
+    { icon: Compass, title: 'Direcao diaria', text: 'Use o dashboard como centro de comando.' },
+    { icon: ShieldCheck, title: 'Privacidade em primeiro lugar', text: 'Controle seus dados com seguranca.' },
+];
 
 export default function Login() {
     const { signIn, signUp, user } = useAuth();
@@ -13,15 +20,14 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [notice, setNotice] = useState(null);
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [fullName, setFullName] = useState('');
 
     if (user) return <Navigate to="/" />;
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (event) => {
+        event.preventDefault();
         setLoading(true);
         setError(null);
         setNotice(null);
@@ -35,209 +41,117 @@ export default function Login() {
                 await signIn(email, password);
             }
         } catch (err) {
-            let errorMsg = err.message;
-            if (errorMsg.includes('Invalid login credentials')) errorMsg = 'E-mail ou senha incorretos.';
-            if (errorMsg.includes('User already registered')) errorMsg = 'Este e-mail já está cadastrado.';
-            if (errorMsg.includes('Password should be at least')) errorMsg = 'A senha deve ter pelo menos 6 caracteres.';
-
-            setError(errorMsg);
+            let message = err.message;
+            if (message.includes('Invalid login credentials')) message = 'E-mail ou senha incorretos.';
+            if (message.includes('User already registered')) message = 'Este e-mail ja esta cadastrado.';
+            if (message.includes('Password should be at least')) message = 'A senha deve ter pelo menos 6 caracteres.';
+            setError(message);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <main className="login-container">
+        <main className="public-shell login-surface">
             <Helmet>
                 <title>{isSignUp ? 'Criar Conta | Persona' : 'Acessar Persona | Login'}</title>
-                <meta name="description" content="Acesse ou crie sua conta no Persona. O gerenciador financeiro mais inteligente e elegante." />
+                <meta name="description" content="Entre na Persona e organize sua vida financeira com uma experiencia mais clara, moderna e confiavel." />
                 <link rel="canonical" href="https://persona.dev.br/login" />
             </Helmet>
 
-            <div className="container login-grid">
-                <div className="fade-in login-hero">
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '50px', marginBottom: '1.5rem', border: '1px solid var(--glass-border)' }}>
-                        <Star size={14} fill="var(--color-brand)" stroke="var(--color-brand)" />
-                        <span style={{ fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.05em', color: 'var(--text-secondary)' }}>O FUTURO DAS FINANÇAS</span>
+            <div className="public-auth-grid">
+                <section className="public-auth-hero">
+                    <span className="dashboard-kicker">Centro de comando financeiro</span>
+                    <h1>Seu dinheiro com mais clareza, contexto e continuidade.</h1>
+                    <p>Entre para acompanhar saldos, planejar metas e transformar movimentacoes em decisoes simples de acompanhar.</p>
+
+                    <div className="public-auth-highlight-grid">
+                        {highlights.map(({ icon: Icon, title, text }) => (
+                            <article key={title} className="public-auth-highlight-card">
+                                <span className="app-inline-icon">
+                                    <Icon size={18} />
+                                </span>
+                                <div>
+                                    <strong>{title}</strong>
+                                    <span>{text}</span>
+                                </div>
+                            </article>
+                        ))}
                     </div>
+                </section>
 
-                    <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1.1, marginBottom: '1.5rem' }}>
-                        Domine seu dinheiro <br />
-                        <span style={{ color: 'var(--text-muted)' }}>com elegância.</span>
-                    </h1>
+                <motion.section
+                    layout
+                    className="public-card public-auth-card"
+                    transition={{ duration: 0.35, type: 'spring', stiffness: 120 }}
+                >
+                    <span className="dashboard-kicker">{isSignUp ? 'Criar conta' : 'Entrar'}</span>
+                    <h2>{isSignUp ? 'Comece agora' : 'Bem-vindo de volta'}</h2>
+                    <p>{isSignUp ? 'Monte sua estrutura financeira em poucos minutos.' : 'Acesse sua rotina financeira de onde parou.'}</p>
 
-                    <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '3rem', maxWidth: '500px', lineHeight: 1.6 }}>
-                        Persona não é apenas uma planilha. É um sistema inteligente que categoriza, prevê e otimiza sua vida financeira.
-                    </p>
-
-                    <div className="login-features-grid">
-                        <div className="login-feature-item">
-                            <div style={{ padding: '0.8rem', background: 'var(--bg-card)', borderRadius: '12px', color: 'var(--text-main)', border: '1px solid var(--glass-border)' }}>
-                                <Zap size={24} />
-                            </div>
-                            <div>
-                                <h4 style={{ fontWeight: 700 }}>Smart IA</h4>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Auto-categorização</p>
-                            </div>
-                        </div>
-
-                        <div className="login-feature-item">
-                            <div style={{ padding: '0.8rem', background: 'var(--bg-card)', borderRadius: '12px', color: 'var(--text-main)', border: '1px solid var(--glass-border)' }}>
-                                <TrendingUp size={24} />
-                            </div>
-                            <div>
-                                <h4 style={{ fontWeight: 700 }}>Simulador</h4>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Projeção de futuro</p>
-                            </div>
-                        </div>
-
-                        <div className="login-feature-item">
-                            <div style={{ padding: '0.8rem', background: 'var(--bg-card)', borderRadius: '12px', color: 'var(--text-main)', border: '1px solid var(--glass-border)' }}>
-                                <Plane size={24} />
-                            </div>
-                            <div>
-                                <h4 style={{ fontWeight: 700 }}>Modo Viagem</h4>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Contextos dinâmicos</p>
-                            </div>
-                        </div>
-
-                        <div className="login-feature-item">
-                            <div style={{ padding: '0.8rem', background: 'var(--bg-card)', borderRadius: '12px', color: 'var(--text-main)', border: '1px solid var(--glass-border)' }}>
-                                <Shield size={24} />
-                            </div>
-                            <div>
-                                <h4 style={{ fontWeight: 700 }}>Privacidade</h4>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Modo Discreto</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="fade-in stagger-1 login-card-container">
-                    <motion.div
-                        layout
-                        className="glass-card"
-                        style={{ width: '100%', maxWidth: '420px', overflow: 'hidden', padding: '2.5rem' }}
-                        transition={{ duration: 0.4, type: 'spring', stiffness: 100 }}
-                    >
-                        <motion.h2 layout="position" style={{ textAlign: 'center', marginBottom: '0.5rem', fontSize: '1.75rem' }}>
-                            {isSignUp ? 'Criar Conta' : 'Acessar Persona'}
-                        </motion.h2>
-                        <motion.p layout="position" style={{ textAlign: 'center', color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '0.9rem' }}>
-                            {isSignUp ? 'Comece sua jornada financeira hoje.' : 'Bem-vindo de volta.'}
-                        </motion.p>
-
-                        <form onSubmit={handleSubmit}>
-                            <AnimatePresence initial={false}>
-                                {isSignUp && (
-                                    <motion.div
-                                        initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                                        animate={{ opacity: 1, height: 'auto', marginBottom: 16 }}
-                                        exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                        style={{ overflow: 'hidden' }}
-                                    >
-                                        <Input
-                                            label="Nome Completo"
-                                            placeholder="Seu nome"
-                                            value={fullName}
-                                            onChange={(e) => setFullName(e.target.value)}
-                                            required
-                                        />
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-
-                            <motion.div layout="position">
-                                <Input
-                                    label="Email"
-                                    type="email"
-                                    placeholder="exemplo@email.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </motion.div>
-
-                            <motion.div layout="position">
-                                <Input
-                                    label="Senha"
-                                    type="password"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    minLength={6}
-                                />
-                            </motion.div>
-
-                            {error && (
+                    <form onSubmit={handleSubmit} className="public-auth-form">
+                        <AnimatePresence initial={false}>
+                            {isSignUp && (
                                 <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    style={{
-                                        padding: '0.75rem',
-                                        background: 'rgba(246, 79, 89, 0.1)',
-                                        border: '1px solid rgba(246, 79, 89, 0.2)',
-                                        borderRadius: '8px',
-                                        color: '#f64f59',
-                                        marginBottom: '1.5rem',
-                                        fontSize: '0.9rem',
-                                        textAlign: 'center',
-                                    }}
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.25 }}
+                                    style={{ overflow: 'hidden' }}
                                 >
-                                    {error}
+                                    <Input
+                                        label="Nome completo"
+                                        placeholder="Seu nome"
+                                        value={fullName}
+                                        onChange={(event) => setFullName(event.target.value)}
+                                        required
+                                    />
                                 </motion.div>
                             )}
+                        </AnimatePresence>
 
-                            {notice && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    style={{
-                                        padding: '0.75rem',
-                                        background: 'rgba(48, 209, 88, 0.12)',
-                                        border: '1px solid rgba(48, 209, 88, 0.24)',
-                                        borderRadius: '8px',
-                                        color: '#30d158',
-                                        marginBottom: '1.5rem',
-                                        fontSize: '0.9rem',
-                                        textAlign: 'center',
-                                    }}
-                                >
-                                    {notice}
-                                </motion.div>
-                            )}
+                        <Input
+                            label="Email"
+                            type="email"
+                            placeholder="exemplo@email.com"
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
+                            required
+                        />
 
-                            <motion.div layout="position">
-                                <Button
-                                    type="submit"
-                                    className="btn-primary"
-                                    style={{ width: '100%', justifyContent: 'center', marginBottom: '1.5rem', marginTop: '0.5rem', height: '50px', fontSize: '1.1rem' }}
-                                    loading={loading}
-                                >
-                                    {isSignUp ? 'Começar agora' : 'Entrar'}
-                                </Button>
-                            </motion.div>
-                        </form>
+                        <Input
+                            label="Senha"
+                            type="password"
+                            placeholder="Digite sua senha"
+                            value={password}
+                            onChange={(event) => setPassword(event.target.value)}
+                            required
+                            minLength={6}
+                        />
 
-                        <motion.div layout="position" style={{ textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1.5rem' }}>
-                            <p className="text-small">
-                                {isSignUp ? 'Já tem cadastro?' : 'Novo por aqui?'}{' '}
-                                <button
-                                    className="toggle-btn"
-                                    onClick={() => {
-                                        setError(null);
-                                        setNotice(null);
-                                        setIsSignUp(!isSignUp);
-                                    }}
-                                >
-                                    {isSignUp ? 'Fazer login' : 'Criar conta'}
-                                </button>
-                            </p>
-                        </motion.div>
-                    </motion.div>
-                </div>
+                        {error && <div className="public-form-alert is-error">{error}</div>}
+                        {notice && <div className="public-form-alert is-success">{notice}</div>}
+
+                        <Button type="submit" className="btn-primary" loading={loading} style={{ width: '100%', justifyContent: 'center' }}>
+                            {isSignUp ? 'Criar conta' : 'Entrar'}
+                        </Button>
+                    </form>
+
+                    <div className="public-auth-toggle">
+                        <span>{isSignUp ? 'Ja tem cadastro?' : 'Novo por aqui?'}</span>
+                        <button
+                            type="button"
+                            className="toggle-btn"
+                            onClick={() => {
+                                setError(null);
+                                setNotice(null);
+                                setIsSignUp(!isSignUp);
+                            }}
+                        >
+                            {isSignUp ? 'Fazer login' : 'Criar conta'}
+                        </button>
+                    </div>
+                </motion.section>
             </div>
         </main>
     );

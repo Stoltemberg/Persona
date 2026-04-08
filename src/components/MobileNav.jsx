@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, Wallet, Menu as MenuIcon, X, Repeat, Plane, EyeOff, Eye, Tag, LogOut } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Eye, EyeOff, LayoutDashboard, LogOut, Menu as MenuIcon, Plane, Receipt, Repeat, Settings, Tag, Target, Wallet, X } from 'lucide-react';
 import { FAB } from './FAB';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
@@ -17,18 +17,18 @@ export function MobileNav() {
 
     const barItemsLeft = [
         { id: 'dashboard', icon: LayoutDashboard, path: '/dashboard', label: 'Dashboard' },
-        { id: 'transactions', icon: Receipt, path: '/transactions', label: 'Transações' },
+        { id: 'transactions', icon: Receipt, path: '/transactions', label: 'Transacoes' },
     ];
 
     const barItemsRight = [
-        { id: 'recurring', icon: Repeat, path: '/recurring', label: 'Contas Recorrentes' },
+        { id: 'recurring', icon: Repeat, path: '/recurring', label: 'Contas recorrentes' },
     ];
 
     const menuItems = [
         { icon: Wallet, label: 'Carteiras', path: '/wallets' },
         { icon: Tag, label: 'Categorias', path: '/categories' },
         { icon: Target, label: 'Planejamento', path: '/planning' },
-        { icon: Settings, label: 'Configurações', path: '/settings' },
+        { icon: Settings, label: 'Configuracoes', path: '/settings' },
     ];
 
     return (
@@ -50,13 +50,7 @@ export function MobileNav() {
                                 className={`liquid-nav-item ${isActive ? 'active' : ''}`}
                                 aria-label={item.label}
                             >
-                                {isActive && (
-                                    <motion.div
-                                        layoutId="liquid-bubble"
-                                        className="liquid-bubble"
-                                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                                    />
-                                )}
+                                {isActive && <motion.div layoutId="liquid-bubble" className="liquid-bubble" transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }} />}
                                 <item.icon className="liquid-icon" size={24} strokeWidth={isActive ? 2.5 : 1.5} />
                             </NavLink>
                         );
@@ -90,13 +84,7 @@ export function MobileNav() {
                                 className={`liquid-nav-item ${isActive ? 'active' : ''}`}
                                 aria-label={item.label}
                             >
-                                {isActive && (
-                                    <motion.div
-                                        layoutId="liquid-bubble"
-                                        className="liquid-bubble"
-                                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                                    />
-                                )}
+                                {isActive && <motion.div layoutId="liquid-bubble" className="liquid-bubble" transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }} />}
                                 <item.icon className="liquid-icon" size={24} strokeWidth={isActive ? 2.5 : 1.5} />
                             </NavLink>
                         );
@@ -105,16 +93,10 @@ export function MobileNav() {
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         className={`liquid-nav-item ${isMenuOpen ? 'active' : ''}`}
-                        aria-label={isMenuOpen ? 'Fechar Menu' : 'Abrir Menu'}
+                        aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
                         aria-expanded={isMenuOpen}
                     >
-                        {isMenuOpen && (
-                            <motion.div
-                                layoutId="liquid-bubble"
-                                className="liquid-bubble"
-                                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                            />
-                        )}
+                        {isMenuOpen && <motion.div layoutId="liquid-bubble" className="liquid-bubble" transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }} />}
                         {isMenuOpen ? <X className="liquid-icon" size={24} strokeWidth={2.5} /> : <MenuIcon className="liquid-icon" size={24} strokeWidth={1.5} />}
                     </button>
                 </div>
@@ -138,18 +120,18 @@ export function MobileNav() {
                                 exit={{ opacity: 0, y: 50, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                                 className="mobile-menu-grid"
-                                onClick={(e) => e.stopPropagation()}
+                                onClick={(event) => event.stopPropagation()}
                             >
-                                <div className="menu-drag-handle"></div>
+                                <div className="menu-drag-handle" />
 
                                 <div className="menu-toggles-row">
                                     <button onClick={togglePrivacy} className={`menu-toggle-btn ${isPrivacyMode ? 'active' : ''}`} aria-label={isPrivacyMode ? 'Mostrar valores' : 'Ocultar valores'}>
                                         <div className="toggle-icon-box">
                                             {isPrivacyMode ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                                         </div>
-                                        <span>{isPrivacyMode ? 'Oculto' : 'Visível'}</span>
+                                        <span>{isPrivacyMode ? 'Oculto' : 'Visivel'}</span>
                                     </button>
-                                    <button onClick={() => toggleEventMode(!isEventMode)} className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`} aria-label={isEventMode ? 'Sair Modo Viagem' : 'Modo Viagem'}>
+                                    <button onClick={() => toggleEventMode(!isEventMode)} className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`} aria-label={isEventMode ? 'Sair do modo viagem' : 'Modo viagem'}>
                                         <div className="toggle-icon-box"><Plane size={16} strokeWidth={1.5} /></div>
                                         <span>Viagem</span>
                                     </button>

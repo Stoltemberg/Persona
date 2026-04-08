@@ -66,12 +66,17 @@ export default function Dashboard() {
 
             if (templates && templates.length > 0) {
                 for (const tmpl of templates) {
+                    if (!tmpl.wallet_id) {
+                        console.warn('Recurring template skipped because it has no wallet_id:', tmpl.id);
+                        continue;
+                    }
+
                     const { error: txError } = await supabase.from('transactions').insert([{
                         description: tmpl.description,
                         amount: tmpl.amount,
                         type: tmpl.type,
                         category: tmpl.category,
-                        wallet_id: tmpl.wallet_id || null,
+                        wallet_id: tmpl.wallet_id,
                         expense_type: tmpl.expense_type,
                         date: new Date().toISOString(),
                         profile_id: user.id

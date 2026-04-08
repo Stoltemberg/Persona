@@ -186,12 +186,16 @@ export default function Transactions() {
         setSubmitting(true);
 
         try {
+            if (!selectedWalletId) {
+                throw new Error('Selecione uma carteira para registrar esta transação.');
+            }
+
             const payload = {
                 description,
                 amount: parseFloat(amount),
                 type,
                 category,
-                wallet_id: selectedWalletId || null,
+                wallet_id: selectedWalletId,
                 date,
                 profile_id: user.id,
                 expense_type: type === 'expense' ? expenseType : null,

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
@@ -7,52 +7,52 @@ import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { Skeleton } from '../components/Skeleton';
 import { EmptyState } from '../components/EmptyState';
-import { Plus, Trash2, Edit2, Calendar, Check, X, Repeat, Zap, TrendingUp } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, Repeat, Zap, TrendingUp, Wallet } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 import { PageHeader } from '../components/PageHeader';
+
+const getToday = () => new Date().toISOString().split('T')[0];
 
 export default function Recurring() {
     const { user } = useAuth();
     const { addToast, addActionToast } = useToast();
     const [templates, setTemplates] = useState([]);
+    const [wallets, setWallets] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [templateToEdit, setTemplateToEdit] = useState(null);
     const [submitting, setSubmitting] = useState(false);
 
-    // Form State
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('expense');
     const [category, setCategory] = useState('');
+    const [selectedWalletId, setSelectedWalletId] = useState('');
     const [frequency, setFrequency] = useState('monthly');
-    const [nextDueDate, setNextDueDate] = useState('');
+    const [nextDueDate, setNextDueDate] = useState(getToday());
     const [expenseType, setExpenseType] = useState('variable');
     const [filter, setFilter] = useState('all');
     const pendingDeleteTimers = useRef(new Map());
 
-    // Metrics
-    const activeTemplates = templates.filter(t => t.active);
-    const monthlyBurn = activeTemplates.filter(t => t.type === 'expense').reduce((acc, t) => acc + parseFloat(t.amount), 0);
-    const monthlyIncome = activeTemplates.filter(t => t.type === 'income').reduce((acc, t) => acc + parseFloat(t.amount), 0);
-
-    const filteredTemplates = templates.filter(t => {
-        if (filter === 'all') return true;
-        return t.type === filter;
-    });
-
     useEffect(() => {
-        if (user) {
-            fetchTemplates();
-        }
+        if (!user) return;
+        fetchTemplates();
+        fetchWallets();
     }, [user]);
 
     useEffect(() => () => {
         pendingDeleteTimers.current.forEach((timer) => clearTimeout(timer));
         pendingDeleteTimers.current.clear();
     }, []);
+
+    const activeTemplates = useMemo(() => templates.filter((item) => item.active), [templates]);
+    const monthlyBurn = activeTemplates
+        .filter((item) => item.type === 'expense')
+        .reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+    const monthlyIncome = activeTemplates
+        .filter((item) => item.type === 'income')
+        .reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+    const filteredTemplates = templates.filter((item) => filter === 'all' || item.type === filter);
 
     const fetchTemplates = async () => {
         try {
@@ -71,22 +71,22 @@ export default function Recurring() {
         }
     };
 
-    const handleOpenNew = () => {
-        setTemplateToEdit(null);
-        resetForm();
-        setIsModalOpen(true);
-    };
+    const fetchWallets = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('wallets')
+                .select('*')
+                .order('created_at', { ascending: true });
 
-    const handleOpenEdit = (tmpl) => {
-        setTemplateToEdit(tmpl);
-        setDescription(tmpl.description);
-        setAmount(tmpl.amount);
-        setType(tmpl.type);
-        setCategory(tmpl.category);
-        setFrequency(tmpl.frequency);
-        setNextDueDate(tmpl.next_due_date.split('T')[0]); // YYYY-MM-DD
-        setExpenseType(tmpl.expense_type || 'variable');
-        setIsModalOpen(true);
+            if (error) throw error;
+            setWallets(data || []);
+
+            if (data && data.length > 0 && !selectedWalletId) {
+                setSelectedWalletId(data[0].id);
+            }
+        } catch (error) {
+            console.error('Error fetching wallets:', error);
+        }
     };
 
     const resetForm = () => {
@@ -94,25 +94,56 @@ export default function Recurring() {
         setAmount('');
         setType('expense');
         setCategory('');
+        setSelectedWalletId(wallets[0]?.id || '');
         setFrequency('monthly');
-        setNextDueDate(new Date().toISOString().split('T')[0]);
+        setNextDueDate(getToday());
         setExpenseType('variable');
+        setTemplateToEdit(null);
+    };
+
+    const handleOpenNew = () => {
+        resetForm();
+        setIsModalOpen(true);
+    };
+
+    const handleOpenEdit = (template) => {
+        setTemplateToEdit(template);
+        setDescription(template.description);
+        setAmount(String(template.amount));
+        setType(template.type);
+        setCategory(template.category);
+        setSelectedWalletId(template.wallet_id || wallets[0]?.id || '');
+        setFrequency(template.frequency);
+        setNextDueDate(template.next_due_date?.split('T')[0] || getToday());
+        setExpenseType(template.expense_type || 'variable');
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        resetForm();
     };
 
     const handleSave = async (e) => {
         e.preventDefault();
         setSubmitting(true);
+
         try {
+            if (!selectedWalletId) {
+                throw new Error('Selecione a carteira desta recorrência.');
+            }
+
             const payload = {
                 description,
                 amount: parseFloat(amount),
                 type,
                 category,
+                wallet_id: selectedWalletId,
                 frequency,
                 next_due_date: new Date(nextDueDate).toISOString(),
                 expense_type: type === 'expense' ? expenseType : null,
                 profile_id: user.id,
-                active: true
+                active: true,
             };
 
             let error;
@@ -132,10 +163,10 @@ export default function Recurring() {
             if (error) throw error;
 
             await fetchTemplates();
-            setIsModalOpen(false);
-            addToast(templateToEdit ? 'Recorrência atualizada!' : 'Recorrência criada!', 'success');
+            handleCloseModal();
+            addToast(templateToEdit ? 'Recorrência atualizada.' : 'Recorrência criada.', 'success');
         } catch (error) {
-            addToast(error.message, 'error');
+            addToast(error.message || 'Erro ao salvar recorrência.', 'error');
         } finally {
             setSubmitting(false);
         }
@@ -180,9 +211,9 @@ export default function Recurring() {
 
             if (error) throw error;
 
-            setTemplates(templates.map(t =>
-                t.id === id ? { ...t, active: !currentStatus } : t
-            ));
+            setTemplates((prev) => prev.map((item) => (
+                item.id === id ? { ...item, active: !currentStatus } : item
+            )));
             addToast(currentStatus ? 'Recorrência pausada.' : 'Recorrência ativada.', 'success');
         } catch (error) {
             addToast('Erro ao atualizar status.', 'error');
@@ -204,13 +235,12 @@ export default function Recurring() {
 
             {loading ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {Array(3).fill(0).map((_, i) => (
-                        <Skeleton key={i} width="100%" height="90px" borderRadius="16px" />
+                    {Array(3).fill(0).map((_, index) => (
+                        <Skeleton key={index} width="100%" height="90px" borderRadius="16px" />
                     ))}
                 </div>
             ) : (
                 <>
-                    {/* Metrics Cards - Responsive Grid */}
                     <div className="grid-responsive mb-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
                         <Card className="glass-card glow-on-hover" style={{ padding: '1.5rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
@@ -235,7 +265,6 @@ export default function Recurring() {
                         </Card>
                     </div>
 
-                    {/* Filter Tabs */}
                     <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
                         <Button
                             variant={filter === 'all' ? 'primary' : 'ghost'}
@@ -264,48 +293,60 @@ export default function Recurring() {
                         <EmptyState
                             icon={Repeat}
                             title="Nenhuma recorrência encontrada"
-                            description={filter === 'all' ? "Configure pagamentos automáticos como aluguel, assinaturas ou salário." : "Nenhum item neste filtro."}
+                            description={filter === 'all' ? 'Configure pagamentos automáticos como aluguel, assinaturas ou salário.' : 'Nenhum item neste filtro.'}
                             actionText="Criar Recorrência"
                             onAction={handleOpenNew}
                         />
                     ) : (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                            {filteredTemplates.map((tmpl, index) => (
-                                <Card key={tmpl.id} className="fade-in glass-card" style={{ animationDelay: `${index * 0.05}s`, opacity: tmpl.active ? 1 : 0.6, borderLeft: tmpl.active && tmpl.type === 'expense' ? '4px solid #f64f59' : (tmpl.active ? '4px solid #12c2e9' : '4px solid transparent') }}>
+                            {filteredTemplates.map((template, index) => (
+                                <Card
+                                    key={template.id}
+                                    className="fade-in glass-card"
+                                    style={{
+                                        animationDelay: `${index * 0.05}s`,
+                                        opacity: template.active ? 1 : 0.6,
+                                        borderLeft: template.active && template.type === 'expense'
+                                            ? '4px solid #f64f59'
+                                            : (template.active ? '4px solid #12c2e9' : '4px solid transparent'),
+                                    }}
+                                >
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                                         <div style={{
                                             padding: '0.8rem',
                                             borderRadius: '12px',
-                                            background: tmpl.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
-                                            color: tmpl.type === 'income' ? '#12c2e9' : '#f64f59'
+                                            background: template.type === 'income' ? 'rgba(18, 194, 233, 0.1)' : 'rgba(246, 79, 89, 0.1)',
+                                            color: template.type === 'income' ? '#12c2e9' : '#f64f59',
                                         }}>
                                             <Repeat size={20} />
                                         </div>
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             <button
-                                                onClick={() => toggleActive(tmpl.id, tmpl.active)}
+                                                onClick={() => toggleActive(template.id, template.active)}
                                                 className="btn-ghost btn-icon"
-                                                title={tmpl.active ? "Pausar" : "Ativar"}
-                                                style={{ color: tmpl.active ? '#00ebc7' : 'var(--text-muted)' }}
+                                                title={template.active ? 'Pausar' : 'Ativar'}
+                                                style={{ color: template.active ? '#00ebc7' : 'var(--text-muted)' }}
                                             >
-                                                {tmpl.active ? <Check size={18} /> : <X size={18} />}
+                                                {template.active ? <Check size={18} /> : <X size={18} />}
                                             </button>
-                                            <button onClick={() => handleOpenEdit(tmpl)} className="btn-ghost btn-icon" title="Editar"><Edit2 size={18} /></button>
-                                            <button onClick={() => handleDelete(tmpl.id)} className="btn-ghost btn-icon" style={{ color: '#f64f59' }} title="Excluir"><Trash2 size={18} /></button>
+                                            <button onClick={() => handleOpenEdit(template)} className="btn-ghost btn-icon" title="Editar"><Edit2 size={18} /></button>
+                                            <button onClick={() => handleDelete(template.id)} className="btn-ghost btn-icon" style={{ color: '#f64f59' }} title="Excluir"><Trash2 size={18} /></button>
                                         </div>
                                     </div>
 
-                                    <h3 style={{ fontSize: '1.1rem', marginBottom: '0.3rem' }}>{tmpl.description}</h3>
-                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{tmpl.category} • {tmpl.frequency === 'monthly' ? 'Mensal' : 'Semanal'}</p>
+                                    <h3 style={{ fontSize: '1.1rem', marginBottom: '0.3rem' }}>{template.description}</h3>
+                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                                        {template.category} • {(wallets.find((wallet) => wallet.id === template.wallet_id)?.name || 'Sem carteira')} • {template.frequency === 'monthly' ? 'Mensal' : 'Semanal'}
+                                    </p>
 
                                     <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <div>
                                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Próxima</p>
-                                            <p style={{ fontSize: '0.9rem' }}>{new Date(tmpl.next_due_date).toLocaleDateString('pt-BR')}</p>
+                                            <p style={{ fontSize: '0.9rem' }}>{new Date(template.next_due_date).toLocaleDateString('pt-BR')}</p>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
-                                            <p style={{ fontSize: '1.2rem', fontWeight: 600, color: tmpl.type === 'income' ? '#12c2e9' : '#f64f59' }}>
-                                                R$ {parseFloat(tmpl.amount).toFixed(2).replace('.', ',')}
+                                            <p style={{ fontSize: '1.2rem', fontWeight: 600, color: template.type === 'income' ? '#12c2e9' : '#f64f59' }}>
+                                                R$ {parseFloat(template.amount).toFixed(2).replace('.', ',')}
                                             </p>
                                         </div>
                                     </div>
@@ -316,7 +357,7 @@ export default function Recurring() {
                 </>
             )}
 
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={templateToEdit ? "Editar Recorrência" : "Nova Recorrência"}>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={templateToEdit ? 'Editar Recorrência' : 'Nova Recorrência'}>
                 <form onSubmit={handleSave}>
                     <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                         <Button
@@ -362,6 +403,26 @@ export default function Recurring() {
                     />
 
                     <div className="input-group" style={{ marginBottom: '1rem' }}>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Carteira</label>
+                        <select
+                            value={selectedWalletId}
+                            onChange={(e) => setSelectedWalletId(e.target.value)}
+                            className="input-field"
+                            required
+                        >
+                            {wallets.length === 0 ? (
+                                <option value="">Cadastre uma carteira primeiro</option>
+                            ) : (
+                                wallets.map((wallet) => (
+                                    <option key={wallet.id} value={wallet.id}>
+                                        {wallet.name}
+                                    </option>
+                                ))
+                            )}
+                        </select>
+                    </div>
+
+                    <div className="input-group" style={{ marginBottom: '1rem' }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Frequência</label>
                         <select
                             value={frequency}
@@ -372,6 +433,21 @@ export default function Recurring() {
                             <option value="weekly">Semanal</option>
                         </select>
                     </div>
+
+                    {type === 'expense' && (
+                        <div className="input-group" style={{ marginBottom: '1rem' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Tipo de gasto</label>
+                            <select
+                                value={expenseType}
+                                onChange={(e) => setExpenseType(e.target.value)}
+                                className="input-field"
+                            >
+                                <option value="fixed">Fixo</option>
+                                <option value="variable">Variável</option>
+                                <option value="lifestyle">Lazer</option>
+                            </select>
+                        </div>
+                    )}
 
                     <Input
                         label="Próximo Vencimento"

@@ -9,12 +9,14 @@ export function UpcomingBills() {
     const { user } = useAuth();
     const { addToast } = useToast();
     const [bills, setBills] = useState([]);
+    const [wallets, setWallets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [processingId, setProcessingId] = useState(null);
 
     useEffect(() => {
         if (user) {
             fetchUpcomingBills();
+            fetchWallets();
         }
     }, [user]);
 
@@ -61,9 +63,23 @@ export function UpcomingBills() {
         }
     };
 
+    const fetchWallets = async () => {
+        const { data, error } = await supabase.from('wallets').select('*');
+        if (error) {
+            console.error('Error fetching wallets:', error);
+            return;
+        }
+
+        setWallets(data || []);
+    };
+
     const handlePayBill = async (bill) => {
         setProcessingId(bill.id);
         try {
+            if (!bill.wallet_id) {
+                throw new Error('Edite esta recorrência e selecione uma carteira antes de marcar como paga.');
+            }
+
             // 1. Create Transaction
             const { data: txData, error: txError } = await supabase
                 .from('transactions')
@@ -72,6 +88,7 @@ export function UpcomingBills() {
                     amount: bill.amount,
                     type: 'expense',
                     category: bill.category,
+                    wallet_id: bill.wallet_id,
                     expense_type: bill.expense_type,
                     date: new Date().toISOString(), // Paid "now"
                     profile_id: user.id
@@ -172,6 +189,9 @@ export function UpcomingBills() {
                                     </h4>
                                     <p style={{ fontSize: '0.8rem', color: isUrgent ? 'var(--color-danger)' : 'var(--text-muted)' }}>
                                         {diffDays === 0 ? 'Vence hoje' : diffDays === 1 ? 'Vence amanhã' : `Vence em ${diffDays} dias`}
+                                    </p>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                                        Carteira: {wallets.find((wallet) => wallet.id === bill.wallet_id)?.name || 'não definida'}
                                     </p>
                                 </div>
                             </div>

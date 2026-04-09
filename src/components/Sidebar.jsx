@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom';
 import { NavLink } from 'react-router-dom';
 import clsx from 'clsx';
 import { Eye, EyeOff, LayoutDashboard, LogOut, Plane, Receipt, Repeat, Settings, Tag, Target, Wallet } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
@@ -64,10 +65,21 @@ export function Sidebar() {
                                 clsx('nav-item', isActive ? 'active' : '', item.label === 'Transacoes' && hasNewPartnerUpdates && 'indicator-pulse')
                             }
                         >
-                            <div>
-                                <item.icon size={20} />
-                            </div>
-                            <span>{item.label}</span>
+                            {({ isActive }) => (
+                                <>
+                                    {isActive && (
+                                        <motion.span
+                                            layoutId="sidebar-nav-highlight"
+                                            className="sidebar-nav-highlight"
+                                            transition={{ type: 'spring', stiffness: 360, damping: 32, mass: 0.9 }}
+                                        />
+                                    )}
+                                    <div className="nav-item-icon">
+                                        <item.icon size={20} />
+                                    </div>
+                                    <span>{item.label}</span>
+                                </>
+                            )}
                         </NavLink>
                     ))}
                 </nav>

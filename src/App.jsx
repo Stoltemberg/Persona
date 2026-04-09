@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useAuth } from './hooks/useAuth';
 import React, { Suspense } from 'react';
 import { Layout } from './components/Layout';
@@ -42,21 +42,6 @@ const LoadingScreen = () => (
   </div>
 );
 
-const APP_ROUTE_PREFIXES = [
-  '/dashboard',
-  '/transactions',
-  '/recurring',
-  '/planning',
-  '/analysis',
-  '/goals',
-  '/budgets',
-  '/simulator',
-  '/settings',
-  '/wallets',
-  '/categories',
-  '/admin',
-];
-
 // Protected Route Wrapper
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -93,10 +78,7 @@ function App() {
 }
 
 const AnimatedRoutes = () => {
-  const location = useLocation();
   const reducedMotion = useReducedMotion();
-  const isAppRoute = APP_ROUTE_PREFIXES.some((path) => location.pathname.startsWith(path));
-  const routeKey = isAppRoute ? 'app-shell' : location.pathname;
 
   const pageTransition = {
     initial: reducedMotion ? { opacity: 0 } : { opacity: 0, y: 14, scale: 0.992 },
@@ -105,35 +87,33 @@ const AnimatedRoutes = () => {
   };
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <Routes location={location} key={routeKey}>
-        <Route path="/" element={<PageTransition variants={pageTransition}><Home /></PageTransition>} />
-        <Route path="/login" element={<PageTransition variants={pageTransition}><Login /></PageTransition>} />
-        <Route path="/terms" element={<PageTransition variants={pageTransition}><Terms /></PageTransition>} />
-        <Route path="/privacy" element={<PageTransition variants={pageTransition}><Privacy /></PageTransition>} />
+    <Routes>
+      <Route path="/" element={<PageTransition variants={pageTransition}><Home /></PageTransition>} />
+      <Route path="/login" element={<PageTransition variants={pageTransition}><Login /></PageTransition>} />
+      <Route path="/terms" element={<PageTransition variants={pageTransition}><Terms /></PageTransition>} />
+      <Route path="/privacy" element={<PageTransition variants={pageTransition}><Privacy /></PageTransition>} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route element={<Layout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/recurring" element={<Recurring />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/recurring" element={<Recurring />} />
 
-            <Route path="/planning" element={<Planning />} />
-            <Route path="/analysis" element={<Navigate to="/planning?tab=analysis" replace />} />
-            <Route path="/goals" element={<Navigate to="/planning?tab=goals" replace />} />
-            <Route path="/budgets" element={<Navigate to="/planning?tab=budgets" replace />} />
-            <Route path="/simulator" element={<Navigate to="/planning?tab=simulator" replace />} />
+          <Route path="/planning" element={<Planning />} />
+          <Route path="/analysis" element={<Navigate to="/planning?tab=analysis" replace />} />
+          <Route path="/goals" element={<Navigate to="/planning?tab=goals" replace />} />
+          <Route path="/budgets" element={<Navigate to="/planning?tab=budgets" replace />} />
+          <Route path="/simulator" element={<Navigate to="/planning?tab=simulator" replace />} />
 
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/wallets" element={<Wallets />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/admin" element={<Admin />} />
-          </Route>
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/wallets" element={<Wallets />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/admin" element={<Admin />} />
         </Route>
+      </Route>
 
-        <Route path="*" element={<PageTransition variants={pageTransition}><NotFound /></PageTransition>} />
-      </Routes>
-    </AnimatePresence>
+      <Route path="*" element={<PageTransition variants={pageTransition}><NotFound /></PageTransition>} />
+    </Routes>
   );
 };
 

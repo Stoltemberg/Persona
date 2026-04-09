@@ -919,6 +919,7 @@ option {
 
 /* Nav Item Base */
 .nav-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -931,6 +932,8 @@ option {
   font-weight: 500;
   font-size: 0.9rem;
   cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .nav-item:focus-visible, .sidebar-header-btn:focus-visible, .liquid-nav-item:focus-visible {
@@ -944,7 +947,6 @@ option {
 }
 
 .nav-item.active {
-  background: rgba(212, 175, 55, 0.12);
   color: var(--color-brand) !important;
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15), inset 0 0 1px rgba(212, 175, 55, 0.4);
@@ -961,9 +963,30 @@ option {
 }
 
 .light .nav-item.active {
-  background: #000000;
   color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.sidebar-nav-highlight {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.16), transparent 48%),
+    linear-gradient(135deg, rgba(212, 175, 55, 0.22), rgba(212, 175, 55, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: -1;
+}
+
+.light .sidebar-nav-highlight {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0.74));
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.nav-item-icon,
+.nav-item > span {
+  position: relative;
+  z-index: 1;
 }
 
 /* Sidebar Panel */
@@ -4016,6 +4039,7 @@ option {
 }
 
 .planning-tab-button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
@@ -4026,12 +4050,42 @@ option {
   color: var(--text-secondary);
   cursor: pointer;
   font: inherit;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.24s ease, border-color 0.24s ease, background 0.24s ease, box-shadow 0.24s ease;
 }
 
 .planning-tab-button.is-active {
-  background: rgba(212, 175, 55, 0.14);
   color: var(--text-main);
   border-color: rgba(212, 175, 55, 0.26);
+  box-shadow: 0 10px 30px rgba(212, 175, 55, 0.08);
+}
+
+.planning-tab-highlight {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), transparent 48%),
+    linear-gradient(135deg, rgba(212, 175, 55, 0.24), rgba(212, 175, 55, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: -1;
+}
+
+.planning-tab-label {
+  position: relative;
+  z-index: 1;
+}
+
+.planning-tab-button > svg {
+  position: relative;
+  z-index: 1;
+}
+
+.planning-tab-panel {
+  position: relative;
+  transform-origin: top center;
+  will-change: transform, opacity, filter;
 }
 
 .planning-month-switcher {

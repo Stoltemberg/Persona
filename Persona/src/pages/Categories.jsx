@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Edit2, Plus, Tag, Trash2, TrendingDown, TrendingUp } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { PageHeader } from '../components/PageHeader';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../app/providers/ToastContext';
 import { CategoryIcon, CATEGORY_ICON_OPTIONS, normalizeCategoryIcon } from '../utils/categoryIcons';
 
 const DEFAULT_ICON = 'tag';

@@ -13,8 +13,8 @@ import {
     User,
     Wallet,
 } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
-import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../features/auth/useAuth';
+import { useTheme } from '../app/providers/ThemeContext';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
@@ -22,7 +22,7 @@ import { Input } from '../components/Input';
 import { Switch } from '../components/Switch';
 import { Modal } from '../components/Modal';
 import { PageHeader } from '../components/PageHeader';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../app/providers/ToastContext';
 import { exportDataToExcel } from '../lib/exportUtils';
 import { UpgradeModal } from '../components/UpgradeModal';
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
@@ -9,7 +9,7 @@ import { Plus, Trash2, Edit2, TrendingUp, Lightbulb, AlertTriangle, Star } from 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { EmptyState } from '../components/EmptyState';
 import { PageHeader } from '../components/PageHeader';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../app/providers/ToastContext';
 
 const sortGoals = (items) => [...items].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
@@ -122,7 +122,7 @@ export default function Goals({ isTab }) {
         } catch (error) {
             console.error('Error deleting goal:', error);
             setGoals((prev) => sortGoals([...prev, goal]));
-            addToast('Não foi possível excluir a meta.', 'error');
+            addToast('NÃ£o foi possÃ­vel excluir a meta.', 'error');
         }
     };
 
@@ -161,7 +161,7 @@ export default function Goals({ isTab }) {
 
         try {
             const amount = parseFloat(depositAmount);
-            if (!amount || amount <= 0) throw new Error('Informe um valor válido para o aporte.');
+            if (!amount || amount <= 0) throw new Error('Informe um valor vÃ¡lido para o aporte.');
 
             const newAmount = parseFloat(selectedGoal.current_amount) + amount;
             const { error } = await supabase.from('goals').update({ current_amount: newAmount }).eq('id', selectedGoal.id);
@@ -192,7 +192,7 @@ export default function Goals({ isTab }) {
 
     const getAdvice = (goal) => {
         const remaining = goal.target_amount - goal.current_amount;
-        if (remaining <= 0) return { text: 'Meta atingida. Você está pronta para comemorar.', color: '#00ebc7', icon: Star };
+        if (remaining <= 0) return { text: 'Meta atingida. VocÃª estÃ¡ pronta para comemorar.', color: '#00ebc7', icon: Star };
 
         const progress = (goal.current_amount / goal.target_amount) * 100;
 
@@ -202,24 +202,24 @@ export default function Goals({ isTab }) {
             const daysLeft = Math.ceil((deadlineDate - today) / (1000 * 60 * 60 * 24));
 
             if (daysLeft < 0) return { text: 'O prazo passou, mas a meta continua viva. Replaneje e siga em frente.', color: '#f64f59', icon: AlertTriangle };
-            if (daysLeft < 30 && progress < 80) return { text: 'Estamos na reta final. Tente reforçar o aporte deste mês.', color: '#f64f59', icon: TrendingUp };
+            if (daysLeft < 30 && progress < 80) return { text: 'Estamos na reta final. Tente reforÃ§ar o aporte deste mÃªs.', color: '#f64f59', icon: TrendingUp };
         }
 
-        if (progress < 15) return { text: 'O começo é a parte mais difícil. Um primeiro aporte pequeno já cria tração.', color: '#c471ed', icon: Lightbulb };
-        if (progress < 50) return { text: `Ótimo ritmo. Faltam apenas R$ ${remaining.toLocaleString('pt-BR')} para completar.`, color: '#12c2e9', icon: TrendingUp };
-        if (progress < 80) return { text: 'Você já passou da metade. Mantendo a consistência, essa meta fica logo logo no passado.', color: '#4f29f0', icon: TrendingUp };
-        return { text: 'Quase lá. Falta pouco para transformar esse plano em conquista.', color: '#00ebc7', icon: Star };
+        if (progress < 15) return { text: 'O comeÃ§o Ã© a parte mais difÃ­cil. Um primeiro aporte pequeno jÃ¡ cria traÃ§Ã£o.', color: '#c471ed', icon: Lightbulb };
+        if (progress < 50) return { text: `Ã“timo ritmo. Faltam apenas R$ ${remaining.toLocaleString('pt-BR')} para completar.`, color: '#12c2e9', icon: TrendingUp };
+        if (progress < 80) return { text: 'VocÃª jÃ¡ passou da metade. Mantendo a consistÃªncia, essa meta fica logo logo no passado.', color: '#4f29f0', icon: TrendingUp };
+        return { text: 'Quase lÃ¡. Falta pouco para transformar esse plano em conquista.', color: '#00ebc7', icon: Star };
     };
 
     const tips = [
-        'Reduzindo uma fatia dos gastos variáveis, você acelera qualquer objetivo com menos esforço do que parece.',
-        'O hábito de poupar importa mais do que começar grande. Consistência vence entusiasmo passageiro.',
-        "Pequenos gastos invisíveis são como vazamentos. O 'só hoje' costuma custar mais do que parece.",
-        'Uma meta sem plano é só um desejo. Aqui ela já virou acompanhamento de verdade.',
-        'Liberdade financeira é ter mais escolha sobre como viver o seu tempo.',
-        'Preço é o que você paga. Valor é o que permanece com você.',
-        'O melhor investimento que você pode fazer é em si mesmo.',
-        'Juros compostos funcionam para quem constrói paciência e regularidade.',
+        'Reduzindo uma fatia dos gastos variÃ¡veis, vocÃª acelera qualquer objetivo com menos esforÃ§o do que parece.',
+        'O hÃ¡bito de poupar importa mais do que comeÃ§ar grande. ConsistÃªncia vence entusiasmo passageiro.',
+        "Pequenos gastos invisÃ­veis sÃ£o como vazamentos. O 'sÃ³ hoje' costuma custar mais do que parece.",
+        'Uma meta sem plano Ã© sÃ³ um desejo. Aqui ela jÃ¡ virou acompanhamento de verdade.',
+        'Liberdade financeira Ã© ter mais escolha sobre como viver o seu tempo.',
+        'PreÃ§o Ã© o que vocÃª paga. Valor Ã© o que permanece com vocÃª.',
+        'O melhor investimento que vocÃª pode fazer Ã© em si mesmo.',
+        'Juros compostos funcionam para quem constrÃ³i paciÃªncia e regularidade.',
     ];
 
     const [currentTip, setCurrentTip] = useState(tips[0]);
@@ -261,7 +261,7 @@ export default function Goals({ isTab }) {
                 <Card hover={false}>
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Total acumulado</p>
                     <h3 style={{ color: 'var(--text-main)', fontSize: '1.8rem' }}>{currencyFormatter(totalSaved)}</h3>
-                    <p style={{ fontSize: '0.85rem', marginTop: '0.4rem' }}>{completionRate.toFixed(0)}% do objetivo total já construído.</p>
+                    <p style={{ fontSize: '0.85rem', marginTop: '0.4rem' }}>{completionRate.toFixed(0)}% do objetivo total jÃ¡ construÃ­do.</p>
                 </Card>
                 <Card hover={false}>
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Objetivo total</p>
@@ -341,7 +341,7 @@ export default function Goals({ isTab }) {
 
                                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                                     <span>Restam {currencyFormatter(Math.max(remaining, 0))}</span>
-                                    <span>{safeProgress.toFixed(0)}% concluído</span>
+                                    <span>{safeProgress.toFixed(0)}% concluÃ­do</span>
                                 </div>
 
                                 <div style={{ width: '100%', height: '8px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
@@ -364,12 +364,12 @@ export default function Goals({ isTab }) {
 
             <Modal isOpen={isModalOpen} onClose={handleCloseGoalModal} title={goalToEdit ? 'Editar Meta' : 'Nova Meta'}>
                 <form onSubmit={handleSaveGoal}>
-                    <Input label="Título" placeholder="Ex: Reserva de Emergência" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                    <Input label="TÃ­tulo" placeholder="Ex: Reserva de EmergÃªncia" value={title} onChange={(e) => setTitle(e.target.value)} required />
                     <Input label="Valor Alvo (R$)" type="number" step="0.01" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} required />
-                    <Input label="Valor Atual (R$)" type="number" step="0.01" value={currentAmount} onChange={(e) => setCurrentAmount(e.target.value)} note="Use o botão 'Adicionar Dinheiro' no card para atualizações futuras." />
+                    <Input label="Valor Atual (R$)" type="number" step="0.01" value={currentAmount} onChange={(e) => setCurrentAmount(e.target.value)} note="Use o botÃ£o 'Adicionar Dinheiro' no card para atualizaÃ§Ãµes futuras." />
                     <Input label="Prazo (Opcional)" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
                     <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} loading={submitting}>
-                        {goalToEdit ? 'Salvar Alterações' : 'Criar Meta'}
+                        {goalToEdit ? 'Salvar AlteraÃ§Ãµes' : 'Criar Meta'}
                     </Button>
                 </form>
             </Modal>
@@ -377,12 +377,12 @@ export default function Goals({ isTab }) {
             <Modal isOpen={isDepositModalOpen} onClose={() => setIsDepositModalOpen(false)} title="Adicionar Economia">
                 <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                     <h3 style={{ color: '#c471ed' }}>{selectedGoal?.title}</h3>
-                    <p>Quanto você quer guardar hoje?</p>
+                    <p>Quanto vocÃª quer guardar hoje?</p>
                 </div>
                 <form onSubmit={handleDeposit}>
                     <Input autoFocus type="number" step="0.01" placeholder="0,00" value={depositAmount} onChange={(e) => setDepositAmount(e.target.value)} style={{ fontSize: '2rem', textAlign: 'center', padding: '1rem' }} required />
                     <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} loading={submitting}>
-                        Confirmar Depósito
+                        Confirmar DepÃ³sito
                     </Button>
                 </form>
             </Modal>

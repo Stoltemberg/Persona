@@ -4,9 +4,9 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Eye, EyeOff, LayoutDashboard, LogOut, Menu as MenuIcon, Plane, Receipt, Repeat, Settings, Tag, Target, Wallet, X } from 'lucide-react';
 import { FAB } from './FAB';
-import { usePrivacy } from '../context/PrivacyContext';
-import { useEvent } from '../context/EventContext';
-import { useAuth } from '../hooks/useAuth';
+import { usePrivacy } from '../app/providers/PrivacyContext';
+import { useEvent } from '../app/providers/EventContext';
+import { useAuth } from '../features/auth/useAuth';
 
 export function MobileNav() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);

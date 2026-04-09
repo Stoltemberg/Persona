@@ -1,15 +1,15 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { Sidebar } from './Sidebar';
-import { MobileNav } from './MobileNav';
-import { FAB } from './FAB';
-import { InstallPrompt } from './InstallPrompt';
-import { usePrivacy } from '../context/PrivacyContext';
-import { useEvent } from '../context/EventContext';
+import { Sidebar } from '../../components/Sidebar';
+import { MobileNav } from '../../components/MobileNav';
+import { FAB } from '../../components/FAB';
+import { InstallPrompt } from '../../components/InstallPrompt';
+import { usePrivacy } from '../providers/PrivacyContext';
+import { useEvent } from '../providers/EventContext';
 import { Eye, EyeOff, Plane } from 'lucide-react';
 import clsx from 'clsx';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
-export function Layout() {
+export function AppLayout() {
     const location = useLocation();
     const reducedMotion = useReducedMotion();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
@@ -71,7 +71,7 @@ export function Layout() {
                 <MobileNav />
             </div>
 
-            <FAB className="desktop-fab" />
+            <FAB />
             <InstallPrompt />
 
         </div>

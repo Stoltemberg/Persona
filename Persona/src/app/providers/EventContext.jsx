@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../../features/auth/useAuth';
 
 const EventContext = createContext();
 
@@ -8,7 +7,6 @@ export function EventProvider({ children }) {
     const { user } = useAuth();
     const [isEventMode, setIsEventMode] = useState(false);
     const [activeEvent, setActiveEvent] = useState(null);
-    const [events, setEvents] = useState([]);
 
     // For MVP, "Events" are just Wallets with a specific type or metadata, OR we simulate it.
     // Let's assume we use a specific Wallet as an Event container for now to avoid schema changes.

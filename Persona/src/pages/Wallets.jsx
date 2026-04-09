@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRightLeft, Banknote, CreditCard, Landmark, Plus, Trash2, Edit2, Wallet } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
@@ -9,7 +9,7 @@ import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { Skeleton } from '../components/Skeleton';
 import { PageHeader } from '../components/PageHeader';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../app/providers/ToastContext';
 import { UpgradeModal } from '../components/UpgradeModal';
 import { EmptyState } from '../components/EmptyState';
 import { TransferModal } from '../components/TransferModal';

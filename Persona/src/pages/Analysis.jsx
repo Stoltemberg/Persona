@@ -1,7 +1,7 @@
-﻿import { useEffect, useMemo, useState, Suspense, lazy } from 'react';
+import { useEffect, useMemo, useState, Suspense, lazy } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';

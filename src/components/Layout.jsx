@@ -8,6 +8,23 @@ import { useEvent } from '../context/EventContext';
 import { Eye, EyeOff, Plane } from 'lucide-react';
 import clsx from 'clsx';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+
+const NAVIGATION_ORDER = [
+    '/dashboard',
+    '/transactions',
+    '/recurring',
+    '/planning',
+    '/wallets',
+    '/categories',
+    '/settings',
+    '/admin',
+];
+
+const getRouteIndex = (pathname) => {
+    const matchedIndex = NAVIGATION_ORDER.findIndex((path) => pathname.startsWith(path));
+    return matchedIndex === -1 ? NAVIGATION_ORDER.length : matchedIndex;
+};
 
 export function Layout() {
     const location = useLocation();
@@ -15,11 +32,33 @@ export function Layout() {
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
     const { isEventMode, toggleEventMode } = useEvent();
     const routeKey = location.pathname;
+    const previousRouteRef = useRef(routeKey);
+    const [transitionDirection, setTransitionDirection] = useState(1);
+
+    useEffect(() => {
+        const previousRoute = previousRouteRef.current;
+        if (previousRoute === routeKey) {
+            return;
+        }
+
+        const previousIndex = getRouteIndex(previousRoute);
+        const nextIndex = getRouteIndex(routeKey);
+        setTransitionDirection(nextIndex >= previousIndex ? 1 : -1);
+        previousRouteRef.current = routeKey;
+    }, [routeKey]);
 
     const pageVariants = {
-        initial: reducedMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.995 },
-        animate: { opacity: 1, y: 0, scale: 1 },
-        exit: reducedMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.995 },
+        initial: (direction) => (
+            reducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, x: direction > 0 ? 30 : -30, y: 10, scale: 0.992, filter: 'blur(6px)' }
+        ),
+        animate: { opacity: 1, x: 0, y: 0, scale: 1, filter: 'blur(0px)' },
+        exit: (direction) => (
+            reducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, x: direction > 0 ? -22 : 22, y: -6, scale: 0.992, filter: 'blur(4px)' }
+        ),
     };
 
     return (
@@ -50,14 +89,15 @@ export function Layout() {
             {/* Main Content Area */}
             <main className="main-content">
                 <div className="content-wrapper">
-                    <AnimatePresence mode="wait" initial={false}>
+                    <AnimatePresence mode="wait" initial={false} custom={transitionDirection}>
                         <motion.div
                             key={routeKey}
+                            custom={transitionDirection}
                             initial="initial"
                             animate="animate"
                             exit="exit"
                             variants={pageVariants}
-                            transition={{ type: 'spring', stiffness: 320, damping: 30, mass: 0.9 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 32, mass: 0.92 }}
                             style={{ width: '100%', willChange: 'transform, opacity' }}
                         >
                             <Outlet />

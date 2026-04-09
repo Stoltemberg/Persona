@@ -1,6 +1,6 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { PieChart, Target, Wallet, TrendingUp } from 'lucide-react';
 import { PageHeader } from '../components/PageHeader';
 
@@ -48,17 +48,14 @@ const pageVariants = {
     },
 };
 
-const sectionVariants = {
-    hidden: { opacity: 0, y: 12 },
-    visible: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -10 },
-};
-
 export default function Planning() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const reducedMotion = useReducedMotion();
     const requestedTab = searchParams.get('tab');
     const activeTab = VALID_TABS.includes(requestedTab) ? requestedTab : 'analysis';
     const activeConfig = TAB_CONFIG[activeTab];
+    const previousTabRef = useRef(activeTab);
+    const [transitionDirection, setTransitionDirection] = useState(1);
 
     useEffect(() => {
         if (!VALID_TABS.includes(requestedTab)) {
@@ -66,7 +63,44 @@ export default function Planning() {
         }
     }, [requestedTab, setSearchParams]);
 
+    useEffect(() => {
+        const previousTab = previousTabRef.current;
+        if (previousTab === activeTab) {
+            return;
+        }
+
+        const previousIndex = VALID_TABS.indexOf(previousTab);
+        const nextIndex = VALID_TABS.indexOf(activeTab);
+        setTransitionDirection(nextIndex >= previousIndex ? 1 : -1);
+        previousTabRef.current = activeTab;
+    }, [activeTab]);
+
     const handleTabChange = (tab) => setSearchParams({ tab });
+
+    const sectionVariants = {
+        hidden: { opacity: 0, y: 12 },
+        visible: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -10 },
+    };
+
+    const tabPanelVariants = {
+        enter: (direction) => (
+            reducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, x: direction > 0 ? 28 : -28, scale: 0.985, filter: 'blur(6px)' }
+        ),
+        center: {
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+        },
+        exit: (direction) => (
+            reducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, x: direction > 0 ? -20 : 20, scale: 0.992, filter: 'blur(4px)' }
+        ),
+    };
 
     const renderContent = () => {
         switch (activeTab) {
@@ -113,21 +147,33 @@ export default function Planning() {
                             whileTap={{ scale: 0.98 }}
                             transition={{ duration: 0.2 }}
                         >
+                            {isActive && (
+                                <motion.span
+                                    layoutId="planning-tab-highlight"
+                                    className="planning-tab-highlight"
+                                    transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.9 }}
+                                />
+                            )}
                             <Icon size={16} />
-                            <span>{label}</span>
+                            <span className="planning-tab-label">{label}</span>
                         </motion.button>
                     );
                 })}
             </motion.div>
 
-            <AnimatePresence mode="wait" initial={false}>
+            <AnimatePresence mode="wait" initial={false} custom={transitionDirection}>
                 <motion.div
                     key={activeTab}
-                    variants={sectionVariants}
-                    initial="hidden"
-                    animate="visible"
+                    className="planning-tab-panel"
+                    custom={transitionDirection}
+                    variants={tabPanelVariants}
+                    initial="enter"
+                    animate="center"
                     exit="exit"
-                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{
+                        duration: reducedMotion ? 0.16 : 0.34,
+                        ease: [0.22, 1, 0.36, 1],
+                    }}
                 >
                     <Suspense fallback={<div className="app-empty-inline">Carregando aba...</div>}>
                         {renderContent()}

@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { useLocation, useOutlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { MobileNav } from './MobileNav';
 import { FAB } from './FAB';
@@ -7,7 +7,7 @@ import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
 import { Eye, EyeOff, Plane } from 'lucide-react';
 import clsx from 'clsx';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
 const NAVIGATION_ORDER = [
@@ -28,6 +28,7 @@ const getRouteIndex = (pathname) => {
 
 export function Layout() {
     const location = useLocation();
+    const outlet = useOutlet();
     const reducedMotion = useReducedMotion();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
     const { isEventMode, toggleEventMode } = useEvent();
@@ -89,20 +90,17 @@ export function Layout() {
             {/* Main Content Area */}
             <main className="main-content">
                 <div className="content-wrapper">
-                    <AnimatePresence mode="wait" initial={false} custom={transitionDirection}>
-                        <motion.div
-                            key={routeKey}
-                            custom={transitionDirection}
-                            initial="initial"
-                            animate="animate"
-                            exit="exit"
-                            variants={pageVariants}
-                            transition={{ type: 'spring', stiffness: 300, damping: 32, mass: 0.92 }}
-                            style={{ width: '100%', willChange: 'transform, opacity' }}
-                        >
-                            <Outlet />
-                        </motion.div>
-                    </AnimatePresence>
+                    <motion.div
+                        key={routeKey}
+                        custom={transitionDirection}
+                        initial="initial"
+                        animate="animate"
+                        variants={pageVariants}
+                        transition={{ type: 'spring', stiffness: 300, damping: 32, mass: 0.92 }}
+                        style={{ width: '100%', willChange: 'transform, opacity' }}
+                    >
+                        {outlet}
+                    </motion.div>
                 </div>
             </main>
 

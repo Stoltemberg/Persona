@@ -720,7 +720,6 @@ export default function Dashboard() {
                                         <motion.div
                                             key={transaction.id}
                                             className={`glass-card dashboard-tx-card ${newTxId === transaction.id ? 'animate-slide-in' : ''}`}
-                                            style={{ opacity: 0 }}
                                             variants={itemVariants}
                                         >
                                             <div className="dashboard-tx-left">

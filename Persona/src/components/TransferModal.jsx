@@ -37,17 +37,17 @@ export function TransferModal({ isOpen, onClose, wallets, onTransferSuccess }) {
 
         try {
             const numAmount = parseFloat(amount);
-            if (!numAmount || numAmount <= 0) throw new Error('Valor invÃ¡lido.');
+            if (!numAmount || numAmount <= 0) throw new Error('Valor inválido.');
 
             const sourceWallet = wallets.find(w => w.id === sourceWalletId);
             const destWallet = wallets.find(w => w.id === destWalletId);
 
             // 1. Create Expense in Source
             const { error: error1 } = await supabase.from('transactions').insert([{
-                description: `TransferÃªncia para ${destWallet.name}`,
+                description: `Transferência para ${destWallet.name}`,
                 amount: numAmount,
                 type: 'expense',
-                category: 'TransferÃªncia',
+                category: 'Transferência',
                 wallet_id: sourceWalletId,
                 date: new Date(date).toISOString(),
                 profile_id: user.id,
@@ -60,27 +60,27 @@ export function TransferModal({ isOpen, onClose, wallets, onTransferSuccess }) {
                 description: `Recebido de ${sourceWallet.name}`,
                 amount: numAmount,
                 type: 'income',
-                category: 'TransferÃªncia',
+                category: 'Transferência',
                 wallet_id: destWalletId,
                 date: new Date(date).toISOString(),
                 profile_id: user.id
             }]);
             if (error2) throw error2;
 
-            addToast('TransferÃªncia realizada com sucesso!', 'success');
+            addToast('Transferência realizada com sucesso!', 'success');
             onTransferSuccess();
             onClose();
             setAmount('');
         } catch (error) {
             console.error(error);
-            addToast('Erro ao realizar transferÃªncia.', 'error');
+            addToast('Erro ao realizar transferência.', 'error');
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Nova TransferÃªncia">
+        <Modal isOpen={isOpen} onClose={onClose} title="Nova Transferência">
             <form onSubmit={handleTransfer}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
                     <div className="input-group">
@@ -135,7 +135,7 @@ export function TransferModal({ isOpen, onClose, wallets, onTransferSuccess }) {
                 />
 
                 <Button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem' }} loading={submitting}>
-                    Confirmar TransferÃªncia
+                    Confirmar Transferência
                 </Button>
             </form>
         </Modal>

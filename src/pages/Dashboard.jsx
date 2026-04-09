@@ -51,6 +51,25 @@ const itemVariants = {
 
 const ThreeBackground = lazy(() => import('../components/ThreeBackground').then((module) => ({ default: module.ThreeBackground })));
 
+const fetchRecurringTemplatesCompat = async (builderFactory) => {
+    const primaryResponse = await builderFactory(true);
+
+    if (primaryResponse.error?.code !== '42703') {
+        return primaryResponse;
+    }
+
+    const fallbackResponse = await builderFactory(false);
+
+    if (fallbackResponse.error) {
+        return fallbackResponse;
+    }
+
+    return {
+        data: (fallbackResponse.data || []).map((template) => ({ ...template, wallet_id: null })),
+        error: null,
+    };
+};
+
 export default function Dashboard() {
     const { user, profile, partnerProfile, incomingRequest, fetchProfile } = useAuth();
     const { isPrivacyMode } = usePrivacy();
@@ -145,11 +164,19 @@ export default function Dashboard() {
     const checkRecurring = async () => {
         try {
             const now = new Date();
-            const { data: templates } = await supabase
-                .from('recurring_templates')
-                .select('id, description, amount, type, category, wallet_id, expense_type, frequency, next_due_date')
-                .eq('active', true)
-                .lte('next_due_date', now.toISOString());
+            const { data: templates, error } = await fetchRecurringTemplatesCompat((includeWalletId) => {
+                const fields = includeWalletId
+                    ? 'id, description, amount, type, category, wallet_id, expense_type, frequency, next_due_date'
+                    : 'id, description, amount, type, category, expense_type, frequency, next_due_date';
+
+                return supabase
+                    .from('recurring_templates')
+                    .select(fields)
+                    .eq('active', true)
+                    .lte('next_due_date', now.toISOString());
+            });
+
+            if (error) throw error;
 
             if (!templates?.length) return;
 

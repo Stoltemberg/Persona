@@ -53,6 +53,21 @@ export function UpcomingBills() {
                 .lte('next_due_date', nextWeek.toISOString())
                 .order('next_due_date', { ascending: true });
 
+            if (error?.code === '42703') {
+                const fallbackResponse = await supabase
+                    .from('recurring_templates')
+                    .select('id, description, amount, category, expense_type, next_due_date, frequency, type')
+                    .eq('type', 'expense')
+                    .eq('active', true)
+                    .lte('next_due_date', nextWeek.toISOString())
+                    .order('next_due_date', { ascending: true });
+
+                if (fallbackResponse.error) throw fallbackResponse.error;
+
+                setBills((fallbackResponse.data || []).map((bill) => ({ ...bill, wallet_id: null })));
+                return;
+            }
+
             if (error) throw error;
             setBills(data || []);
         } catch (error) {

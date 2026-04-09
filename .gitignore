@@ -1,3 +1,17 @@
+# Workspace-local metadata
+.codex/
+.git-persona-backup/
+
+# App dependencies and build artifacts
+node_modules
+dist
+dist-ssr
+Persona/node_modules/
+Persona/dist/
+Persona/dist-ssr/
+Persona/.agents/
+Persona/.git-persona-backup/
+
 # Logs
 logs
 *.log
@@ -7,10 +21,15 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Local overrides and secrets
 *.local
+.env
+.env.*
+!.env.example
+Persona/.env
+Persona/.env.*
+!Persona/.env.example
+.temp_skills
 
 # Editor directories and files
 .vscode/*

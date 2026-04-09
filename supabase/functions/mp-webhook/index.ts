@@ -136,14 +136,16 @@ serve(async (req) => {
             return new Response('OK', { status: 200 })
         }
 
-        const [userId, rawTier = 'complete', rawCouponCode = '', checkoutReference = ''] = String(paymentData.external_reference || '').split('|')
+        const externalReference = String(paymentData.external_reference || '')
+        const referenceParts = externalReference.split('|')
+        const userId = referenceParts[0] || ''
+        const rawTier = referenceParts[1] || 'complete'
+        const checkoutReference = referenceParts.at(-1) || ''
         const tier = rawTier as keyof typeof tierCatalog
 
         if (!userId || !checkoutReference || !(tier in tierCatalog)) {
             return new Response('Invalid external reference', { status: 400 })
         }
-
-        const externalReference = [userId, tier, rawCouponCode, checkoutReference].join('|')
 
         const { data: checkoutIntent, error: checkoutIntentError } = await supabaseAdmin
             .from('checkout_intents')
@@ -156,11 +158,10 @@ serve(async (req) => {
             return new Response('Checkout intent not found', { status: 400 })
         }
 
-        const couponMatches = (checkoutIntent.coupon_code || '') === rawCouponCode
         const userMatches = checkoutIntent.user_id === userId
         const tierMatches = checkoutIntent.tier === tier
 
-        if (!couponMatches || !userMatches || !tierMatches) {
+        if (!userMatches || !tierMatches) {
             console.error('Checkout intent mismatch', {
                 paymentId,
                 externalReference,
@@ -213,23 +214,12 @@ serve(async (req) => {
             return new Response('DB Error', { status: 500 })
         }
 
-        if (rawCouponCode) {
-            const { error: incrementError } = await supabaseAdmin.rpc('increment_coupon_usage', {
-                coupon_code: rawCouponCode
-            })
-
-            if (incrementError) {
-                console.error('Error incrementing coupon usage:', incrementError)
-            }
-        }
-
         const { error: processedError } = await supabaseAdmin
             .from('processed_payments')
             .insert({
                 payment_id: String(paymentId),
                 user_id: userId,
                 tier,
-                coupon_code: rawCouponCode || null,
             })
 
         if (processedError) {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Edit2, Plus, Repeat, Trash2, TrendingUp, Wallet, X, Zap } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
@@ -9,7 +9,7 @@ import { Modal } from '../components/Modal';
 import { Skeleton } from '../components/Skeleton';
 import { EmptyState } from '../components/EmptyState';
 import { PageHeader } from '../components/PageHeader';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../app/providers/ToastContext';
 
 const getToday = () => new Date().toISOString().split('T')[0];
 

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { AlertCircle, Calendar, Check, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { formatCurrency } from '../utils/format';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../app/providers/ToastContext';
 import { Card } from './Card';
 
 export function UpcomingBills() {

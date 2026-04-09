@@ -12,13 +12,13 @@ import {
     Target,
     Wallet,
 } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/Button';
 import { OnboardingTour } from '../components/OnboardingTour';
 import { Skeleton } from '../components/Skeleton';
 import { useDashboardAnimations } from '../hooks/useDashboardAnimations';
-import { usePrivacy } from '../context/PrivacyContext';
+import { usePrivacy } from '../app/providers/PrivacyContext';
 import { CountUp } from '../components/CountUp';
 import { PageHeader } from '../components/PageHeader';
 import { PartnerFilter } from '../components/PartnerFilter';

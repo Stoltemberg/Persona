@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { Edit2, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { Card } from './Card';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { CategoryIcon } from '../utils/categoryIcons';
 
 export const TransactionItem = React.memo(function TransactionItem({ transaction, categories, onEdit, onDelete, index }) {
@@ -113,7 +113,7 @@ export const TransactionItem = React.memo(function TransactionItem({ transaction
                                 )}
                             </h4>
                             <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                                {transaction.category} • {new Date(transaction.date).toLocaleDateString('pt-BR')}
+                                {transaction.category} â€¢ {new Date(transaction.date).toLocaleDateString('pt-BR')}
                                 {transaction.expense_type && (
                                     <span style={{
                                         marginLeft: '0.5rem',
@@ -123,7 +123,7 @@ export const TransactionItem = React.memo(function TransactionItem({ transaction
                                         fontSize: '0.75rem',
                                     }}>
                                         {transaction.expense_type === 'fixed' && 'Fixo'}
-                                        {transaction.expense_type === 'variable' && 'Variável'}
+                                        {transaction.expense_type === 'variable' && 'VariÃ¡vel'}
                                         {transaction.expense_type === 'lifestyle' && 'Lazer'}
                                     </span>
                                 )}

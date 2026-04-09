@@ -3,7 +3,7 @@ import { Check, Crown, Shield, Zap } from 'lucide-react';
 import { Modal } from './Modal';
 import { Button } from './Button';
 import { supabase } from '../lib/supabase';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../app/providers/ToastContext';
 
 const paidTierPrices = {
     intermediate: 14.9,

@@ -15,10 +15,10 @@ Aplicacao web de gestao financeira pessoal com frontend em React + Vite e backen
 ## Estrutura
 
 - `src/`: frontend da aplicacao
+- `src/app/`: composicao principal da aplicacao, router, layout e providers globais
+- `src/features/auth/`: estado e regras de autenticacao
 - `src/pages/`: telas e rotas principais
 - `src/components/`: componentes reutilizaveis de UI e blocos de tela
-- `src/context/`: providers globais
-- `src/hooks/`: hooks de autenticacao e comportamento
 - `src/lib/`: integracoes e helpers de infraestrutura
 - `src/utils/`: utilitarios de formatacao e regras leves
 - `public/`: arquivos publicos estaticos
@@ -74,8 +74,11 @@ Variaveis usadas em operacao, scripts e funcoes:
 
 ## Arquitetura de execucao
 
-- O bootstrap da app acontece em [`src/main.jsx`](C:\Users\tutor\OneDrive\Documentos\New project\Persona\src\main.jsx), com os providers globais de auth, tema, eventos, privacidade e toast.
-- O roteamento principal fica em [`src/App.jsx`](C:\Users\tutor\OneDrive\Documentos\New project\Persona\src\App.jsx), incluindo lazy loading de paginas, guardas de autenticacao e transicoes.
+- O bootstrap da app acontece em [`src/main.jsx`](C:\Users\tutor\OneDrive\Documentos\New project\Persona\src\main.jsx).
+- A composicao de providers fica em [`src/app/providers/AppProviders.jsx`](C:\Users\tutor\OneDrive\Documentos\New project\Persona\src\app\providers\AppProviders.jsx).
+- O roteamento principal fica em [`src/app/router/AppRouter.jsx`](C:\Users\tutor\OneDrive\Documentos\New project\Persona\src\app\router\AppRouter.jsx), com lazy loading, guardas de autenticacao e transicoes.
+- O layout protegido fica em [`src/app/layout/AppLayout.jsx`](C:\Users\tutor\OneDrive\Documentos\New project\Persona\src\app\layout\AppLayout.jsx).
+- O estado de autenticacao fica em [`src/features/auth/useAuth.jsx`](C:\Users\tutor\OneDrive\Documentos\New project\Persona\src\features\auth\useAuth.jsx).
 - A conexao com Supabase fica em [`src/lib/supabase.js`](C:\Users\tutor\OneDrive\Documentos\New project\Persona\src\lib\supabase.js).
 
 ## Deploy

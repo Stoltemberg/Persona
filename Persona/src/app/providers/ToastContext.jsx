@@ -1,6 +1,6 @@
 import { createContext, useContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { FeedbackCardStack } from '../components/FeedbackCardStack';
+import { FeedbackCardStack } from '../../components/FeedbackCardStack';
 
 const ToastContext = createContext();
 

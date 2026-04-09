@@ -4,8 +4,8 @@ import { Input } from './Input';
 import { Button } from './Button';
 import { ArrowRightLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../hooks/useAuth';
-import { useToast } from '../context/ToastContext';
+import { useAuth } from '../features/auth/useAuth';
+import { useToast } from '../app/providers/ToastContext';
 
 export function TransferModal({ isOpen, onClose, wallets, onTransferSuccess }) {
     const { user } = useAuth();
@@ -37,17 +37,17 @@ export function TransferModal({ isOpen, onClose, wallets, onTransferSuccess }) {
 
         try {
             const numAmount = parseFloat(amount);
-            if (!numAmount || numAmount <= 0) throw new Error('Valor inválido.');
+            if (!numAmount || numAmount <= 0) throw new Error('Valor invÃ¡lido.');
 
             const sourceWallet = wallets.find(w => w.id === sourceWalletId);
             const destWallet = wallets.find(w => w.id === destWalletId);
 
             // 1. Create Expense in Source
             const { error: error1 } = await supabase.from('transactions').insert([{
-                description: `Transferência para ${destWallet.name}`,
+                description: `TransferÃªncia para ${destWallet.name}`,
                 amount: numAmount,
                 type: 'expense',
-                category: 'Transferência',
+                category: 'TransferÃªncia',
                 wallet_id: sourceWalletId,
                 date: new Date(date).toISOString(),
                 profile_id: user.id,
@@ -60,27 +60,27 @@ export function TransferModal({ isOpen, onClose, wallets, onTransferSuccess }) {
                 description: `Recebido de ${sourceWallet.name}`,
                 amount: numAmount,
                 type: 'income',
-                category: 'Transferência',
+                category: 'TransferÃªncia',
                 wallet_id: destWalletId,
                 date: new Date(date).toISOString(),
                 profile_id: user.id
             }]);
             if (error2) throw error2;
 
-            addToast('Transferência realizada com sucesso!', 'success');
+            addToast('TransferÃªncia realizada com sucesso!', 'success');
             onTransferSuccess();
             onClose();
             setAmount('');
         } catch (error) {
             console.error(error);
-            addToast('Erro ao realizar transferência.', 'error');
+            addToast('Erro ao realizar transferÃªncia.', 'error');
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Nova Transferência">
+        <Modal isOpen={isOpen} onClose={onClose} title="Nova TransferÃªncia">
             <form onSubmit={handleTransfer}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
                     <div className="input-group">
@@ -135,7 +135,7 @@ export function TransferModal({ isOpen, onClose, wallets, onTransferSuccess }) {
                 />
 
                 <Button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem' }} loading={submitting}>
-                    Confirmar Transferência
+                    Confirmar TransferÃªncia
                 </Button>
             </form>
         </Modal>

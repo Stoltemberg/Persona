@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import { Compass, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 

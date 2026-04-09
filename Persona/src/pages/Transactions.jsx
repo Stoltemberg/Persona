@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
@@ -9,7 +9,7 @@ import { Modal } from '../components/Modal';
 import { Plus, ArrowUpRight, Download, Search, X } from 'lucide-react';
 import { Skeleton } from '../components/Skeleton';
 
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../app/providers/ToastContext';
 import { EmptyState } from '../components/EmptyState';
 import { getSmartCategory } from '../utils/smartCategories';
 import { TransactionItem } from '../components/TransactionItem';

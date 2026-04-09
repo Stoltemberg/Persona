@@ -1,6 +1,6 @@
 import React from 'react';
 import { User, Users, Heart } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/useAuth';
 import { Skeleton } from './Skeleton';
 import clsx from 'clsx';
 

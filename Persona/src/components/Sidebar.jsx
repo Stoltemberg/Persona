@@ -2,9 +2,9 @@ import { createPortal } from 'react-dom';
 import { NavLink } from 'react-router-dom';
 import clsx from 'clsx';
 import { Eye, EyeOff, LayoutDashboard, LogOut, Plane, Receipt, Repeat, Settings, Tag, Target, Wallet } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
-import { usePrivacy } from '../context/PrivacyContext';
-import { useEvent } from '../context/EventContext';
+import { useAuth } from '../features/auth/useAuth';
+import { usePrivacy } from '../app/providers/PrivacyContext';
+import { useEvent } from '../app/providers/EventContext';
 
 export function Sidebar() {
     const { signOut, role, hasNewPartnerUpdates } = useAuth();

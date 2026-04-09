@@ -11,6 +11,11 @@ const paidTierPrices = {
     complete: 29.9,
 };
 
+const tierLabels = {
+    intermediate: 'One',
+    complete: 'Duo',
+};
+
 const tiers = [
     {
         id: 'free',
@@ -85,12 +90,27 @@ export function UpgradeModal({ isOpen, onClose }) {
             });
 
             if (error) throw error;
-            if (data?.init_point) {
-                window.location.href = data.init_point;
+            if (!data?.init_point) {
+                throw new Error('Checkout sem URL de redirecionamento.')
             }
+
+            const expectedPrice = couponMeta?.discount_percent
+                ? Number((paidTierPrices[tierId] * (1 - couponMeta.discount_percent / 100)).toFixed(2))
+                : paidTierPrices[tierId]
+
+            const tierMatches = data?.tier === tierId
+            const priceMatches = typeof data?.final_price === 'number' && Math.abs(data.final_price - expectedPrice) <= 0.01
+            const titleMatches = !data?.plan_title || data.plan_title === `Persona ${tierLabels[tierId]} (Acesso 30 dias)`
+            const responseIsValidated = data?.checkout_validated === true
+
+            if (!tierMatches || !priceMatches || !titleMatches || !responseIsValidated) {
+                throw new Error('A resposta do checkout nao confirmou o plano selecionado.')
+            }
+
+            window.location.href = data.init_point;
         } catch (error) {
             console.error('Checkout error:', error);
-            addToast('Erro ao iniciar pagamento.', 'error');
+            addToast(error.message || 'Erro ao iniciar pagamento.', 'error');
         } finally {
             setLoading(false);
         }

@@ -128,6 +128,14 @@ serve(async (req) => {
             throw new Error(`MP Error: ${JSON.stringify(data)}`)
         }
 
+        const preferenceItem = data?.items?.[0]
+        const preferencePrice = Number(preferenceItem?.unit_price ?? finalPrice)
+        const preferenceTitle = preferenceItem?.title ?? plan.title
+
+        if (Math.abs(preferencePrice - finalPrice) > 0.01 || preferenceTitle !== plan.title) {
+            throw new Error('Checkout mismatch: Mercado Pago retornou um plano diferente do solicitado.')
+        }
+
         const { error: checkoutIntentError } = await supabaseAdmin
             .from('checkout_intents')
             .upsert({
@@ -159,8 +167,10 @@ serve(async (req) => {
                 external_reference: externalReference,
                 checkout_reference: checkoutReference,
                 tier,
+                plan_title: plan.title,
                 final_price: finalPrice,
                 coupon_code: normalizedCoupon || null,
+                checkout_validated: true,
             }),
             {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },

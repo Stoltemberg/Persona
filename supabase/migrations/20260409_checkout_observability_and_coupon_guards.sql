@@ -1,6 +1,8 @@
 ALTER TABLE public.checkout_intents
 ADD COLUMN IF NOT EXISTS app_url text,
 ADD COLUMN IF NOT EXISTS coupon_validation_tier text CHECK (coupon_validation_tier IN ('intermediate', 'complete')),
+ADD COLUMN IF NOT EXISTS plan_title text,
+ADD COLUMN IF NOT EXISTS checkout_validated boolean NOT NULL DEFAULT false,
 ADD COLUMN IF NOT EXISTS mp_init_point text,
 ADD COLUMN IF NOT EXISTS mp_sandbox_init_point text,
 ADD COLUMN IF NOT EXISTS mp_preference_payload jsonb,

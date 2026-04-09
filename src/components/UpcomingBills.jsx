@@ -1,30 +1,40 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { AlertCircle, Calendar, Check, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
-import { Check, AlertCircle, Calendar, Clock } from 'lucide-react';
 import { formatCurrency } from '../utils/format';
 import { useToast } from '../context/ToastContext';
+import { Card } from './Card';
 
 export function UpcomingBills() {
     const { user } = useAuth();
     const { addToast } = useToast();
     const [bills, setBills] = useState([]);
+    const [wallets, setWallets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [processingId, setProcessingId] = useState(null);
 
     useEffect(() => {
         if (user) {
             fetchUpcomingBills();
+            fetchWallets();
+
+            const handleSync = (event) => {
+                const table = event?.detail?.table;
+
+                if (!table || table === 'recurring_templates' || table === 'transactions') {
+                    fetchUpcomingBills();
+                }
+
+                if (!table || table === 'wallets') {
+                    fetchWallets();
+                }
+            };
+
+            window.addEventListener('supabase-sync', handleSync);
+            return () => window.removeEventListener('supabase-sync', handleSync);
         }
     }, [user]);
-
-    // Listen for transaction updates to refresh this list 
-    // (in case a bill was paid from another place, though unlikely for this specific view)
-    useEffect(() => {
-        const handleUpdate = () => fetchUpcomingBills();
-        window.addEventListener('transaction-inserted', handleUpdate);
-        return () => window.removeEventListener('transaction-inserted', handleUpdate);
-    }, []);
 
     const fetchUpcomingBills = async () => {
         try {
@@ -37,22 +47,13 @@ export function UpcomingBills() {
 
             const { data, error } = await supabase
                 .from('recurring_templates')
-                .select('*')
-
+                .select('id, description, amount, category, wallet_id, expense_type, next_due_date, frequency, type')
                 .eq('type', 'expense')
                 .eq('active', true)
                 .lte('next_due_date', nextWeek.toISOString())
                 .order('next_due_date', { ascending: true });
 
             if (error) throw error;
-
-            // Filter out past due dates that are arguably "overdue" or handled by auto-process?
-            // For now, let's show anything <= 7 days from now, even if it's today or slightly past 
-            // (if the auto-runner hasn't caught it yet).
-            // Actually, we should filter >= today to avoid showing old stuff if the user hasn't opened app in months.
-            // But let's assume the main app logic handles "catching up".
-            // We'll just show what the DB says is the *next* due date.
-
             setBills(data || []);
         } catch (error) {
             console.error('Error fetching upcoming bills:', error);
@@ -61,10 +62,24 @@ export function UpcomingBills() {
         }
     };
 
+    const fetchWallets = async () => {
+        const { data, error } = await supabase.from('wallets').select('id, name');
+        if (error) {
+            console.error('Error fetching wallets:', error);
+            return;
+        }
+
+        setWallets(data || []);
+    };
+
     const handlePayBill = async (bill) => {
         setProcessingId(bill.id);
+
         try {
-            // 1. Create Transaction
+            if (!bill.wallet_id) {
+                throw new Error('Edite esta recorrencia e selecione uma carteira antes de marcar como paga.');
+            }
+
             const { data: txData, error: txError } = await supabase
                 .from('transactions')
                 .insert([{
@@ -72,22 +87,21 @@ export function UpcomingBills() {
                     amount: bill.amount,
                     type: 'expense',
                     category: bill.category,
+                    wallet_id: bill.wallet_id,
                     expense_type: bill.expense_type,
-                    date: new Date().toISOString(), // Paid "now"
-                    profile_id: user.id
+                    date: new Date().toISOString(),
+                    profile_id: user.id,
                 }])
                 .select();
 
             if (txError) throw txError;
 
-            // 2. Update Next Due Date
             const currentDueDate = new Date(bill.next_due_date);
-            let nextDate = new Date(currentDueDate);
+            const nextDate = new Date(currentDueDate);
 
             if (bill.frequency === 'weekly') {
                 nextDate.setDate(nextDate.getDate() + 7);
             } else {
-                // Monthly
                 nextDate.setMonth(nextDate.getMonth() + 1);
             }
 
@@ -95,22 +109,19 @@ export function UpcomingBills() {
                 .from('recurring_templates')
                 .update({
                     last_generated_date: new Date().toISOString(),
-                    next_due_date: nextDate.toISOString()
+                    next_due_date: nextDate.toISOString(),
                 })
                 .eq('id', bill.id);
 
             if (updateError) throw updateError;
 
-            addToast('Conta paga com sucesso!', 'success');
+            addToast('Conta registrada como paga.', 'success');
 
-            // Dispatch event to update dashboard balance/outcome
-            if (txData && txData[0]) {
+            if (txData?.[0]) {
                 window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: txData[0] }));
             }
 
-            // Remove from local list immediately
-            setBills(prev => prev.filter(b => b.id !== bill.id));
-
+            setBills((prev) => prev.filter((item) => item.id !== bill.id));
         } catch (error) {
             console.error('Error paying bill:', error);
             addToast('Erro ao registrar pagamento.', 'error');
@@ -122,22 +133,20 @@ export function UpcomingBills() {
     if (loading || bills.length === 0) return null;
 
     return (
-        <section className="fade-in" style={{ marginBottom: '2rem' }}>
-            <h3 style={{
-                fontSize: '1rem',
-                fontWeight: 600,
-                marginBottom: '1rem',
-                color: 'var(--text-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem'
-            }}>
-                <Calendar size={16} /> Próximos Vencimentos
-            </h3>
+        <section className="dashboard-panel upcoming-widget-container">
+            <div className="dashboard-panel-head">
+                <div>
+                    <span className="dashboard-panel-kicker">
+                        <Calendar size={14} />
+                        Proximos vencimentos
+                    </span>
+                    <h3 className="dashboard-panel-title">Contas dos proximos 7 dias</h3>
+                    <p className="dashboard-panel-subtitle">Priorize o que vence primeiro e registre o pagamento sem sair do dashboard.</p>
+                </div>
+            </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {bills.map(bill => {
+            <div className="app-stack-list">
+                {bills.map((bill) => {
                     const dueDate = new Date(bill.next_due_date);
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
@@ -145,58 +154,37 @@ export function UpcomingBills() {
 
                     const diffTime = dueDate - today;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
                     const isUrgent = diffDays <= 3;
+                    const walletName = wallets.find((wallet) => wallet.id === bill.wallet_id)?.name || 'Carteira nao definida';
 
                     return (
-                        <div key={bill.id} className="glass-card" style={{
-                            padding: '1rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            borderLeft: isUrgent ? '4px solid var(--color-danger)' : '4px solid transparent',
-                            background: isUrgent ? 'rgba(255, 69, 58, 0.05)' : 'var(--bg-card)',
-                            boxShadow: isUrgent ? 'none' : 'var(--glass-shadow)',
-                            transition: 'all 0.2s ease'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div className="icon-container" style={{
-                                    background: isUrgent ? 'rgba(255, 69, 58, 0.1)' : undefined,
-                                    color: isUrgent ? 'var(--color-danger)' : 'var(--text-secondary)'
-                                }}>
-                                    {isUrgent ? <AlertCircle size={20} /> : <Clock size={20} />}
-                                </div>
+                        <Card key={bill.id} hover={false} className={`app-list-card upcoming-bill-card${isUrgent ? ' is-urgent' : ''}`}>
+                            <div className="app-list-card-main">
+                                <span className={`app-inline-icon ${isUrgent ? 'upcoming-bill-icon-danger' : 'upcoming-bill-icon-neutral'}`}>
+                                    {isUrgent ? <AlertCircle size={18} /> : <Clock size={18} />}
+                                </span>
                                 <div>
-                                    <h4 style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-main)' }}>
-                                        {bill.description}
-                                    </h4>
-                                    <p style={{ fontSize: '0.8rem', color: isUrgent ? 'var(--color-danger)' : 'var(--text-muted)' }}>
-                                        {diffDays === 0 ? 'Vence hoje' : diffDays === 1 ? 'Vence amanhã' : `Vence em ${diffDays} dias`}
-                                    </p>
+                                    <strong>{bill.description}</strong>
+                                    <span>
+                                        {diffDays === 0 ? 'Vence hoje' : diffDays === 1 ? 'Vence amanha' : `Vence em ${diffDays} dias`}
+                                    </span>
+                                    <span style={{ display: 'block', marginTop: '0.2rem' }}>{walletName}</span>
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                                    {formatCurrency(bill.amount)}
-                                </span>
+                            <div className="upcoming-bill-actions">
+                                <strong className="upcoming-bill-amount">{formatCurrency(bill.amount)}</strong>
                                 <button
+                                    type="button"
                                     onClick={() => handlePayBill(bill)}
                                     disabled={processingId === bill.id}
-                                    className="btn-ghost"
-                                    style={{
-                                        padding: '0.5rem',
-                                        borderRadius: '50%',
-                                        background: isUrgent ? 'rgba(255, 69, 58, 0.1)' : 'rgba(48, 209, 88, 0.1)',
-                                        color: isUrgent ? 'var(--color-danger)' : 'var(--color-success)',
-                                        opacity: processingId === bill.id ? 0.5 : 1
-                                    }}
+                                    className="btn-ghost btn-icon upcoming-bill-pay"
                                     title="Marcar como pago"
                                 >
                                     <Check size={18} />
                                 </button>
                             </div>
-                        </div>
+                        </Card>
                     );
                 })}
             </div>

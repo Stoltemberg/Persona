@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { AlertCircle, Save, Wallet } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
-import { PieChart, Wallet, AlertCircle, CheckCircle, Save } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { PageHeader } from '../components/PageHeader';
 import { UpgradeModal } from '../components/UpgradeModal';
+import { CategoryIcon } from '../utils/categoryIcons';
 
 export default function Budgets({ isTab }) {
     const { user, planTier } = useAuth();
@@ -19,14 +21,14 @@ export default function Budgets({ isTab }) {
     const [showUpgrade, setShowUpgrade] = useState(false);
 
     useEffect(() => {
-        if (user) {
-            fetchData();
-            loadBudgets();
+        if (!user) return undefined;
 
-            const handleSync = () => fetchData();
-            window.addEventListener('supabase-sync', handleSync);
-            return () => window.removeEventListener('supabase-sync', handleSync);
-        }
+        fetchData();
+        loadBudgets();
+
+        const handleSync = () => fetchData();
+        window.addEventListener('supabase-sync', handleSync);
+        return () => window.removeEventListener('supabase-sync', handleSync);
     }, [user]);
 
     const fetchData = async () => {
@@ -35,23 +37,20 @@ export default function Budgets({ isTab }) {
             const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
             const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString();
 
-            // Fetch Categories
-            const { data: cats } = await supabase
+            const { data: categoriesData } = await supabase
                 .from('categories')
                 .select('*')
-                .eq('type', 'expense'); // Only expense categories for budgets
+                .eq('type', 'expense');
 
-            // Fetch Transactions for this month
-            const { data: txs } = await supabase
+            const { data: transactionsData } = await supabase
                 .from('transactions')
                 .select('*')
-                
                 .eq('type', 'expense')
                 .gte('date', startOfMonth)
                 .lte('date', endOfMonth);
 
-            setCategories(cats || []);
-            setTransactions(txs || []);
+            setCategories(categoriesData || []);
+            setTransactions(transactionsData || []);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -61,15 +60,13 @@ export default function Budgets({ isTab }) {
 
     const loadBudgets = () => {
         const saved = localStorage.getItem('persona_budgets');
-        if (saved) {
-            setBudgets(JSON.parse(saved));
-        }
+        if (saved) setBudgets(JSON.parse(saved));
     };
 
     const saveBudget = (categoryId, limit) => {
-        const newBudgets = { ...budgets, [categoryId]: parseFloat(limit) };
-        setBudgets(newBudgets);
-        localStorage.setItem('persona_budgets', JSON.stringify(newBudgets));
+        const nextBudgets = { ...budgets, [categoryId]: parseFloat(limit) || 0 };
+        setBudgets(nextBudgets);
+        localStorage.setItem('persona_budgets', JSON.stringify(nextBudgets));
         setEditingId(null);
     };
 
@@ -78,7 +75,7 @@ export default function Budgets({ isTab }) {
         if (planTier === 'intermediate') maxBudgets = 10;
         if (planTier === 'complete') maxBudgets = Infinity;
 
-        const activeBudgetsCount = Object.values(budgets).filter(v => parseFloat(v) > 0).length;
+        const activeBudgetsCount = Object.values(budgets).filter((value) => parseFloat(value) > 0).length;
 
         if (currentLimit === 0 && activeBudgetsCount >= maxBudgets) {
             setShowUpgrade(true);
@@ -89,149 +86,152 @@ export default function Budgets({ isTab }) {
         setTempLimit(currentLimit);
     };
 
-    const getSpent = (categoryName) => {
-        return transactions
-            .filter(t => t.category === categoryName)
-            .reduce((sum, t) => sum + t.amount, 0);
-    };
+    const getSpent = (categoryName) => (
+        transactions
+            .filter((transaction) => transaction.category === categoryName)
+            .reduce((sum, transaction) => sum + transaction.amount, 0)
+    );
 
-    const formatCurrency = (val) => {
-        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
-    };
+    const formatCurrency = (value) => (
+        new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+    );
 
-    if (loading) return <div className="container fade-in">Carregando orçamentos...</div>;
+    if (loading) return <div className="container fade-in">Carregando orcamentos...</div>;
 
-    const totalBudget = Object.values(budgets).reduce((a, b) => a + b, 0);
-    const totalSpent = transactions.reduce((a, b) => a + b.amount, 0);
+    const totalBudget = Object.values(budgets).reduce((sum, value) => sum + value, 0);
+    const totalSpent = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
     const totalProgress = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+    const categoriesWithBudget = Object.values(budgets).filter((value) => Number(value) > 0).length;
 
     return (
-        <div className={isTab ? "fade-in" : "container fade-in"} style={{ paddingBottom: '80px' }}>
+        <div className={isTab ? 'fade-in app-page-shell' : 'container fade-in app-page-shell'} style={{ paddingBottom: '80px' }}>
             {!isTab && (
-                <header className="flex-between mb-2 flex-wrap gap-1" style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
-                    <div>
-                        <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                            Meus <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Orçamentos</span>
-                        </h1>
-                        <p className="text-muted" style={{ opacity: 0.6 }}>Defina limites e economize</p>
-                    </div>
-                </header>
+                <PageHeader
+                    title={<span>Meus <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Orcamentos</span></span>}
+                    subtitle="Defina limites claros e enxergue o que esta consumindo o seu mes."
+                />
             )}
 
-            {/* Overview Card */}
-            <Card className="glass-card mb-2" style={{ background: 'linear-gradient(135deg, rgba(18, 194, 233, 0.1), rgba(196, 113, 237, 0.1))' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1rem' }}>
+            <Card className="glass-card app-overview-card">
+                <div className="app-section-header">
                     <div>
-                        <p className="text-muted text-small uppercase">Total Gasto / Limite</p>
-                        <h2 style={{ fontSize: '2rem' }}>
-                            {formatCurrency(totalSpent)}
-                            <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 400 }}> / {formatCurrency(totalBudget)}</span>
-                        </h2>
+                        <h3>Panorama do mes</h3>
+                        <p>Quanto ja saiu em relacao ao teto que voce definiu.</p>
                     </div>
-                    <div className="icon-box">
-                        <Wallet size={24} color="var(--color-2)" />
+                    <div className="app-summary-icon app-summary-icon-neutral">
+                        <Wallet size={18} />
                     </div>
                 </div>
 
-                <div className="progress-bar-container bg-track" style={{ height: '12px', borderRadius: '12px', overflow: 'hidden' }}>
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${Math.min(totalProgress, 100)}%` }}
-                        transition={{ duration: 1 }}
-                        style={{
-                            height: '100%',
-                            background: totalProgress > 100 ? '#f64f59' : 'linear-gradient(90deg, var(--color-4), var(--color-2))',
-                            borderRadius: '12px'
-                        }}
-                    />
+                <div className="app-summary-grid">
+                    <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                        <span className="app-summary-label">Total gasto</span>
+                        <strong className="app-summary-value">{formatCurrency(totalSpent)}</strong>
+                    </Card>
+                    <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                        <span className="app-summary-label">Limite total</span>
+                        <strong className="app-summary-value">{formatCurrency(totalBudget)}</strong>
+                    </Card>
+                    <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                        <span className="app-summary-label">Categorias com limite</span>
+                        <strong className="app-summary-value">{categoriesWithBudget}</strong>
+                    </Card>
                 </div>
-                <p className="text-right text-small mt-1" style={{ color: totalProgress > 100 ? '#f64f59' : 'var(--text-muted)' }}>
-                    {totalProgress.toFixed(1)}% utilizado
-                </p>
+
+                <div className="app-progress-shell">
+                    <div className="app-progress-track">
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(totalProgress, 100)}%` }}
+                            transition={{ duration: 1 }}
+                            className={`app-progress-fill${totalProgress > 100 ? ' is-danger' : ''}`}
+                        />
+                    </div>
+                    <p className="app-progress-label">{totalProgress.toFixed(1)}% utilizado</p>
+                </div>
             </Card>
 
-            <div className="grid-responsive" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                {categories.map(cat => {
-                    const spent = getSpent(cat.name);
-                    const limit = budgets[cat.id] || 0;
+            <div className="app-list-grid">
+                {categories.map((category) => {
+                    const spent = getSpent(category.name);
+                    const limit = budgets[category.id] || 0;
                     const progress = limit > 0 ? (spent / limit) * 100 : 0;
                     const isOver = progress > 100;
 
                     return (
-                        <Card key={cat.id} className="glass-card hover-scale">
-                            <div className="flex-between mb-1">
-                                <div className="flex-align-center gap-1">
-                                    <span style={{ fontSize: '1.5rem' }}>{cat.icon}</span>
-                                    <h3 style={{ margin: 0 }}>{cat.name}</h3>
-                                </div>
-                                {editingId === cat.id ? (
-                                    <Button onClick={() => saveBudget(cat.id, tempLimit)} className="btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>
-                                        <Save size={14} style={{ marginRight: '4px' }} /> Salvar
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        onClick={() => handleOpenEdit(cat.id, limit)}
-                                        className="btn-ghost"
-                                        style={{
-                                            fontSize: '0.8rem',
-                                            padding: '0.4rem 0.8rem',
-                                            border: '1px solid var(--glass-border)',
-                                            color: 'var(--text-main)'
-                                        }}
-                                    >
-                                        {limit === 0 ? 'Definir Limite' : 'Editar'}
-                                    </Button>
-                                )}
-                            </div>
-
-                            <div style={{ marginBottom: '1rem' }}>
-                                {editingId === cat.id ? (
-                                    <Input
-                                        type="number"
-                                        value={tempLimit}
-                                        onChange={(e) => setTempLimit(e.target.value)}
-                                        placeholder="0,00"
-                                        autoFocus
-                                        style={{ marginBottom: 0 }}
-                                    />
-                                ) : (
-                                    <div className="flex-between" style={{ alignItems: 'baseline' }}>
-                                        <span style={{ fontSize: '1.25rem', fontWeight: 600 }}>{formatCurrency(spent)}</span>
-                                        <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>de {formatCurrency(limit)}</span>
+                        <Card key={category.id} hover className="app-list-card app-budget-card">
+                            <div className="app-section-header">
+                                <div className="app-list-card-main">
+                                    <span className="app-inline-icon" style={{ color: category.color || 'var(--text-main)' }}>
+                                        <CategoryIcon icon={category.icon} size={18} />
+                                    </span>
+                                    <div>
+                                        <strong>{category.name}</strong>
+                                        <span>{limit === 0 ? 'Sem limite definido' : 'Limite configurado'}</span>
                                     </div>
+                                </div>
+
+                                {editingId === category.id ? (
+                                    <Button onClick={() => saveBudget(category.id, tempLimit)} className="btn-primary">
+                                        <Save size={14} /> Salvar
+                                    </Button>
+                                ) : (
+                                    <Button variant="ghost" onClick={() => handleOpenEdit(category.id, limit)}>
+                                        {limit === 0 ? 'Definir limite' : 'Editar'}
+                                    </Button>
                                 )}
                             </div>
 
-                            {/* Progress Bar */}
-                            <div className="bg-track" style={{ height: '8px', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${Math.min(progress, 100)}%` }}
-                                    style={{
-                                        height: '100%',
-                                        background: isOver ? '#f64f59' : cat.color || 'var(--text-main)',
-                                        borderRadius: '4px'
-                                    }}
+                            {editingId === category.id ? (
+                                <Input
+                                    type="number"
+                                    value={tempLimit}
+                                    onChange={(event) => setTempLimit(event.target.value)}
+                                    placeholder="0,00"
+                                    autoFocus
                                 />
-                            </div>
+                            ) : (
+                                <>
+                                    <div className="app-budget-values">
+                                        <strong>{formatCurrency(spent)}</strong>
+                                        <span>de {formatCurrency(limit)}</span>
+                                    </div>
 
-                            <div className="flex-between mt-1 text-small">
-                                <span style={{ color: isOver ? '#f64f59' : 'var(--text-muted)' }}>
-                                    {isOver ? 'Limite excedido!' : `${(limit - spent) > 0 ? formatCurrency(limit - spent) + ' restantes' : ''}`}
-                                </span>
-                                <span style={{ fontWeight: 600, color: isOver ? '#f64f59' : 'var(--text-muted)' }}>{progress.toFixed(0)}%</span>
-                            </div>
+                                    <div className="app-progress-track">
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${Math.min(progress, 100)}%` }}
+                                            className={`app-progress-fill${isOver ? ' is-danger' : ''}`}
+                                            style={{ background: isOver ? undefined : (category.color || 'var(--color-brand)') }}
+                                        />
+                                    </div>
+
+                                    <div className="app-budget-footer">
+                                        <span className={isOver ? 'is-danger' : ''}>
+                                            {isOver ? 'Limite excedido' : limit > 0 ? `${formatCurrency(Math.max(limit - spent, 0))} restantes` : 'Defina um teto para acompanhar'}
+                                        </span>
+                                        <span>{progress.toFixed(0)}%</span>
+                                    </div>
+                                </>
+                            )}
                         </Card>
                     );
                 })}
             </div>
 
             {categories.length === 0 && (
-                <div className="text-center text-muted" style={{ padding: '4rem' }}>
+                <div className="app-empty-inline" style={{ padding: '2rem 0' }}>
                     Nenhuma categoria de despesa encontrada.
                 </div>
             )}
-            
+
+            {totalProgress > 100 && (
+                <div className="app-inline-warning">
+                    <AlertCircle size={16} />
+                    <span>Seu total de gastos ja passou do limite definido para este mes.</span>
+                </div>
+            )}
+
             <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
         </div>
     );

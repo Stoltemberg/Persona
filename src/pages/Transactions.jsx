@@ -1,52 +1,91 @@
-import { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
-import { Plus, ArrowUpRight, ArrowDownLeft, Trash2, Edit2, Download } from 'lucide-react';
+import { Plus, ArrowUpRight, Download, Search, X } from 'lucide-react';
 import { Skeleton } from '../components/Skeleton';
 
 import { useToast } from '../context/ToastContext';
 import { EmptyState } from '../components/EmptyState';
-import { exportTransactionsToExcel } from '../lib/exportUtils';
 import { getSmartCategory } from '../utils/smartCategories';
 import { TransactionItem } from '../components/TransactionItem';
 import { DateRangePicker } from '../components/DateRangePicker';
 import { PageHeader } from '../components/PageHeader';
 import { PartnerFilter } from '../components/PartnerFilter';
+import { TransactionForm } from '../components/TransactionForm';
+
+const getToday = () => new Date().toISOString().split('T')[0];
+
+const formatDateInput = (value) => {
+    if (!value) return getToday();
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return getToday();
+    return parsed.toISOString().split('T')[0];
+};
+
+const sortTransactions = (items) => (
+    [...items].sort((a, b) => new Date(b.date) - new Date(a.date))
+);
+
+const pageVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.35,
+            ease: [0.22, 1, 0.36, 1],
+            staggerChildren: 0.06,
+            delayChildren: 0.04,
+        },
+    },
+};
+
+const sectionVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -10 },
+};
+
+const listVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.05 } },
+    exit: { opacity: 0, y: -8 },
+};
 
 export default function Transactions() {
     const { user, profile, markTransactionsAsRead } = useAuth();
-    const { addToast } = useToast();
+    const { addToast, addActionToast } = useToast();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-    const [activeFilter, setActiveFilter] = useState('all');
+    const [activeFilter, setActiveFilter] = useState(searchParams.get('filter') || 'all');
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+    const [startDate, setStartDate] = useState(searchParams.get('start') || '');
+    const [endDate, setEndDate] = useState(searchParams.get('end') || '');
 
-    // Form State
     const [transactionToEdit, setTransactionToEdit] = useState(null);
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
+    const [date, setDate] = useState(getToday());
     const [type, setType] = useState('expense');
     const [category, setCategory] = useState('');
     const [expenseType, setExpenseType] = useState('variable');
     const [isRecurring, setIsRecurring] = useState(false);
 
-    // Filter State
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-
-    // Wallets State
     const [wallets, setWallets] = useState([]);
     const [selectedWalletId, setSelectedWalletId] = useState('');
 
-    // Category State
     const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState(null); // Stores the full object
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const pendingDeleteTimers = useRef(new Map());
 
     useEffect(() => {
         if (user) {
@@ -55,21 +94,41 @@ export default function Transactions() {
             fetchCategories();
             fetchWallets();
 
-            const handleSync = () => {
-                fetchTransactions();
-                fetchWallets();
+            const handleSync = (event) => {
+                const table = event?.detail?.table;
+
+                if (!table || table === 'transactions') {
+                    fetchTransactions();
+                }
+
+                if (!table || table === 'wallets') {
+                    fetchWallets();
+                }
             };
+
             window.addEventListener('supabase-sync', handleSync);
             return () => window.removeEventListener('supabase-sync', handleSync);
         }
     }, [user]);
 
-    // ... fetchTransactions ...
+    useEffect(() => () => {
+        pendingDeleteTimers.current.forEach((timer) => clearTimeout(timer));
+        pendingDeleteTimers.current.clear();
+    }, []);
+
+    useEffect(() => {
+        const nextParams = new URLSearchParams();
+        if (activeFilter !== 'all') nextParams.set('filter', activeFilter);
+        if (searchQuery.trim()) nextParams.set('q', searchQuery.trim());
+        if (startDate) nextParams.set('start', startDate);
+        if (endDate) nextParams.set('end', endDate);
+        setSearchParams(nextParams, { replace: true });
+    }, [activeFilter, searchQuery, startDate, endDate, setSearchParams]);
 
     const fetchWallets = async () => {
-        const { data } = await supabase.from('wallets').select('*');
+        const { data } = await supabase.from('wallets').select('id, name, type, initial_balance, profile_id, created_at').order('created_at', { ascending: true });
         setWallets(data || []);
-        // Set default wallet if none selected or available
+
         if (data && data.length > 0 && !selectedWalletId) {
             setSelectedWalletId(data[0].id);
         }
@@ -79,25 +138,56 @@ export default function Transactions() {
         try {
             const { data, error } = await supabase
                 .from('transactions')
-                .select('*')
+                .select('id, description, amount, type, category, wallet_id, date, profile_id, expense_type')
                 .order('date', { ascending: false });
 
             if (error) throw error;
             setTransactions(data || []);
         } catch (error) {
-            console.error('Erro ao buscar transações:', error);
+            console.error('Erro ao buscar transacoes:', error);
         } finally {
             setLoading(false);
         }
     };
 
     const fetchCategories = async () => {
-        const { data } = await supabase.from('categories').select('*');
+        const { data } = await supabase.from('categories').select('id, name, type, color, icon');
         setCategories(data || []);
     };
 
-    const handleOpenNew = () => {
+    const resetForm = () => {
+        setDescription('');
+        setAmount('');
+        setDate(getToday());
+        setType('expense');
+        setCategory('');
+        setExpenseType('variable');
         setTransactionToEdit(null);
+        setSelectedCategory(null);
+        setIsRecurring(false);
+        setSelectedWalletId(wallets[0]?.id || '');
+    };
+
+    const handleTypeChange = (nextType) => {
+        setType(nextType);
+        setCategory('');
+        setSelectedCategory(null);
+    };
+
+    const handleDescriptionChange = (value) => {
+        setDescription(value);
+
+        if (!transactionToEdit && value.length > 2 && !category) {
+            const smartMatch = getSmartCategory(value, categories);
+            if (smartMatch) {
+                if (smartMatch.type !== type) setType(smartMatch.type);
+                setCategory(smartMatch.name);
+                setSelectedCategory(smartMatch);
+            }
+        }
+    };
+
+    const handleOpenNew = () => {
         resetForm();
         setIsModalOpen(true);
     };
@@ -105,35 +195,43 @@ export default function Transactions() {
     const handleOpenEdit = (tx) => {
         setTransactionToEdit(tx);
         setDescription(tx.description);
-        setAmount(tx.amount);
+        setAmount(String(tx.amount));
+        setDate(formatDateInput(tx.date));
         setType(tx.type);
         setCategory(tx.category || '');
         setExpenseType(tx.expense_type || 'variable');
         setSelectedWalletId(tx.wallet_id || (wallets.length > 0 ? wallets[0].id : ''));
         setIsRecurring(false);
 
-        // Try to match existing string category to a category object for UI highlight
-        const match = categories.find(c => c.name === tx.category && c.type === tx.type);
+        const match = categories.find((item) => item.name === tx.category && item.type === tx.type);
         setSelectedCategory(match || null);
 
         setIsModalOpen(true);
     };
 
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        resetForm();
+    };
+
     const handleSaveTransaction = async (e) => {
         e.preventDefault();
         setSubmitting(true);
+
         try {
+            if (!selectedWalletId) {
+                throw new Error('Selecione uma carteira para registrar esta transacao.');
+            }
+
             const payload = {
                 description,
                 amount: parseFloat(amount),
                 type,
                 category,
-                // If editing, keep original date or update? Let's keep original date for now unless we add a date picker
-                // Actually, let's allow updating date if we had a field, but we don't. 
-                // Creating new: use now(). Editing: keep existing date.
-                date: transactionToEdit ? transactionToEdit.date : new Date().toISOString(),
+                wallet_id: selectedWalletId,
+                date,
                 profile_id: user.id,
-                expense_type: type === 'expense' ? expenseType : null
+                expense_type: type === 'expense' ? expenseType : null,
             };
 
             let error;
@@ -153,9 +251,8 @@ export default function Transactions() {
                 error = insertError;
                 if (data) newTx = data[0];
 
-                // Handle Recurring Creation (Only for new transactions for now)
                 if (!error && isRecurring) {
-                    const nextDate = new Date();
+                    const nextDate = new Date(date);
                     nextDate.setMonth(nextDate.getMonth() + 1);
 
                     const { error: recurError } = await supabase.from('recurring_templates').insert([{
@@ -163,196 +260,288 @@ export default function Transactions() {
                         amount: parseFloat(amount),
                         type,
                         category,
+                        wallet_id: selectedWalletId,
                         expense_type: type === 'expense' ? expenseType : null,
                         frequency: 'monthly',
                         next_due_date: nextDate.toISOString(),
-                        profile_id: user.id
+                        profile_id: user.id,
                     }]);
 
-                    if (recurError) console.error("Error creating recurring template:", recurError);
+                    if (recurError) console.error('Error creating recurring template:', recurError);
                 }
             }
 
             if (error) throw error;
 
             await fetchTransactions();
-            setIsModalOpen(false);
-            resetForm();
+            handleCloseModal();
+            addToast(transactionToEdit ? 'Transacao atualizada.' : 'Transacao criada.', 'success');
 
-            if (transactionToEdit) {
-                addToast('Transação atualizada!', 'success');
+            if (!transactionToEdit && newTx) {
+                window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: newTx }));
             } else {
-                // No toast for new, just animation
-                if (newTx) {
-                    window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: newTx }));
-                }
+                window.dispatchEvent(new Event('transaction-updated'));
             }
-
         } catch (error) {
-            addToast(error.message, 'error');
+            addToast(error.message || 'Erro ao salvar transacao.', 'error');
         } finally {
             setSubmitting(false);
         }
     };
 
-    const resetForm = () => {
-        setDescription('');
-        setAmount('');
-        setType('expense');
-        setCategory('');
-        setExpenseType('variable');
-        setTransactionToEdit(null);
-        setSelectedCategory(null);
-        setIsRecurring(false);
-    };
-
-    const handleDeleteTransaction = async (id) => {
-        if (!confirm('Tem certeza que deseja excluir esta transação?')) return;
+    const commitDeleteTransaction = async (transaction) => {
         try {
-            const { error } = await supabase.from('transactions').delete().eq('id', id);
+            const { error } = await supabase.from('transactions').delete().eq('id', transaction.id);
             if (error) throw error;
-            setTransactions(transactions.filter(t => t.id !== id));
+            window.dispatchEvent(new Event('transaction-updated'));
         } catch (error) {
             console.error('Erro ao excluir:', error);
-            alert('Erro ao excluir transação.');
+            setTransactions((prev) => sortTransactions([...prev, transaction]));
+            addToast('Nao foi possivel excluir a transacao.', 'error');
         }
     };
 
-    const handleExport = () => {
-        if (transactions.length === 0) {
-            addToast('Sem transações para exportar.', 'error');
-            return;
+    const handleDeleteTransaction = (id) => {
+        const transaction = transactions.find((item) => item.id === id);
+        if (!transaction) return;
+
+        setTransactions((prev) => prev.filter((item) => item.id !== id));
+
+        const timer = setTimeout(() => {
+            pendingDeleteTimers.current.delete(id);
+            commitDeleteTransaction(transaction);
+        }, 5000);
+
+        pendingDeleteTimers.current.set(id, timer);
+
+        addActionToast('Transacao removida.', 'Desfazer', () => {
+            const pendingTimer = pendingDeleteTimers.current.get(id);
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                pendingDeleteTimers.current.delete(id);
+                setTransactions((prev) => sortTransactions([...prev, transaction]));
+            }
+        }, 'info');
+    };
+
+    const availableCategories = useMemo(
+        () => categories.filter((item) => item.type === type),
+        [categories, type],
+    );
+
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+
+    const filteredTransactions = useMemo(() => transactions.filter((tx) => {
+        if (activeFilter === 'me' && tx.profile_id !== user.id) return false;
+        if (activeFilter === 'partner' && tx.profile_id !== profile?.partner_id) return false;
+
+        const txDate = new Date(tx.date);
+        txDate.setHours(0, 0, 0, 0);
+
+        let start = null;
+        let end = null;
+
+        if (startDate) {
+            const [year, month, day] = startDate.split('-');
+            start = new Date(Number(year), Number(month) - 1, Number(day));
         }
 
-        // Use the filtered transactions if needed, but usually export all is preferred or explicitly filtered.
-        // Let's filter based on the current date filters if active.
-        const filteredTransactions = transactions.filter(tx => {
-            if (!startDate && !endDate) return true;
-            const txDate = new Date(tx.date);
-            txDate.setHours(0, 0, 0, 0);
+        if (endDate) {
+            const [year, month, day] = endDate.split('-');
+            end = new Date(Number(year), Number(month) - 1, Number(day));
+            end.setHours(23, 59, 59, 999);
+        }
 
-            let start = null;
-            let end = null;
+        if (start && txDate < start) return false;
+        if (end && txDate > end) return false;
 
-            if (startDate) {
-                const [y, m, d] = startDate.split('-');
-                start = new Date(Number(y), Number(m) - 1, Number(d));
-            }
+        if (!normalizedSearch) return true;
 
-            if (endDate) {
-                const [y, m, d] = endDate.split('-');
-                end = new Date(Number(y), Number(m) - 1, Number(d));
-                end.setHours(23, 59, 59, 999);
-            }
+        const target = `${tx.description} ${tx.category || ''}`.toLowerCase();
+        return target.includes(normalizedSearch);
+    }), [transactions, activeFilter, user.id, profile?.partner_id, startDate, endDate, normalizedSearch]);
 
-            if (start && txDate < start) return false;
-            if (end && txDate > end) return false;
+    const filteredIncome = useMemo(() => filteredTransactions
+        .filter((tx) => tx.type === 'income')
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0), [filteredTransactions]);
+    const filteredExpense = useMemo(() => filteredTransactions
+        .filter((tx) => tx.type === 'expense')
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0), [filteredTransactions]);
+    const hasActiveFilters = Boolean(searchQuery || startDate || endDate || activeFilter !== 'all');
 
-            return true;
-        });
+    const clearFilters = () => {
+        setSearchQuery('');
+        setStartDate('');
+        setEndDate('');
+        setActiveFilter('all');
+    };
 
+    const handleOpenExport = () => {
         if (filteredTransactions.length === 0) {
-            addToast('Nenhuma transação encontrada no período selecionado.', 'error');
+            addToast('Sem transacoes para exportar no filtro atual.', 'error');
             return;
         }
 
-        exportTransactionsToExcel(filteredTransactions);
+        setIsExportModalOpen(true);
     };
 
-    // Filter categories for the modal based on current type
-    const availableCategories = categories.filter(c => c.type === type);
+    const handleExportCsv = async () => {
+        const { exportTransactionsToCsv } = await import('../lib/exportUtils');
+        exportTransactionsToCsv(filteredTransactions);
+        setIsExportModalOpen(false);
+        addToast('CSV gerado com sucesso.', 'success');
+    };
+
+    const handleExportExcel = async () => {
+        const { exportTransactionsToExcel } = await import('../lib/exportUtils');
+        exportTransactionsToExcel(filteredTransactions);
+        setIsExportModalOpen(false);
+        addToast('Planilha compativel gerada com sucesso.', 'success');
+    };
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
+        <motion.div className="container" style={{ paddingBottom: '80px' }} variants={pageVariants} initial="hidden" animate="visible">
+            <motion.div variants={sectionVariants}>
             <PageHeader
-                title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Transações</span></span>}
+                title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{'Transa\u00E7\u00F5es'}</span></span>}
             >
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Button onClick={handleExport} variant="ghost" icon={Download} title="Exportar para Excel" style={{ padding: '0.6rem' }} />
+                    <Button onClick={handleOpenExport} variant="ghost" icon={Download} title="Exportar dados" style={{ padding: '0.6rem' }} />
                     <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
                         Nova
                     </Button>
                 </div>
             </PageHeader>
+            </motion.div>
 
-            <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+            <motion.div variants={sectionVariants}>
+                <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+            </motion.div>
 
-            {/* Date Filters */}
-            <div className="date-filters" style={{ marginBottom: '1.5rem' }}>
+            <motion.div className="transactions-toolbar" variants={sectionVariants}>
                 <DateRangePicker
                     startDate={startDate ? new Date(startDate.split('-')[0], startDate.split('-')[1] - 1, startDate.split('-')[2]) : null}
                     endDate={endDate ? new Date(endDate.split('-')[0], endDate.split('-')[1] - 1, endDate.split('-')[2]) : null}
                     onChange={({ start, end }) => {
                         if (start) {
-                            // Formatting to YYYY-MM-DD manually to avoid timezone issues or use format from date-fns
-                            const y = start.getFullYear();
-                            const m = String(start.getMonth() + 1).padStart(2, '0');
-                            const d = String(start.getDate()).padStart(2, '0');
-                            setStartDate(`${y}-${m}-${d}`);
+                            const year = start.getFullYear();
+                            const month = String(start.getMonth() + 1).padStart(2, '0');
+                            const day = String(start.getDate()).padStart(2, '0');
+                            setStartDate(`${year}-${month}-${day}`);
                         } else {
                             setStartDate('');
                         }
 
                         if (end) {
-                            const y = end.getFullYear();
-                            const m = String(end.getMonth() + 1).padStart(2, '0');
-                            const d = String(end.getDate()).padStart(2, '0');
-                            setEndDate(`${y}-${m}-${d}`);
+                            const year = end.getFullYear();
+                            const month = String(end.getMonth() + 1).padStart(2, '0');
+                            const day = String(end.getDate()).padStart(2, '0');
+                            setEndDate(`${year}-${month}-${day}`);
                         } else {
                             setEndDate('');
                         }
                     }}
                 />
-            </div>
 
-            {/* Transaction List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {loading ? (
-                    Array(5).fill(0).map((_, i) => (
-                        <Skeleton key={i} width="100%" height="72px" borderRadius="16px" />
-                    ))
-                ) : transactions.length === 0 ? (
-                    <EmptyState
-                        icon={ArrowUpRight}
-                        title="Nenhuma transação ainda"
-                        description="Comece registrando seus ganhos e gastos para ver o poder do dashboard."
-                        actionText="Nova Transação"
-                        onAction={handleOpenNew}
+                <div className="transactions-search">
+                    <Search size={16} />
+                    <input
+                        type="search"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder={'Buscar por descri\u00E7\u00E3o ou categoria'}
+                        aria-label={'Buscar transa\u00E7\u00F5es'}
                     />
+                    {searchQuery && (
+                        <button type="button" onClick={() => setSearchQuery('')} aria-label="Limpar busca">
+                            <X size={14} />
+                        </button>
+                    )}
+                </div>
+
+                {hasActiveFilters && (
+                    <Button variant="ghost" onClick={clearFilters}>
+                        Limpar filtros
+                    </Button>
+                )}
+            </motion.div>
+
+            <motion.div className="transactions-summary" variants={sectionVariants}>
+                <Card hover={false} className="transactions-summary-card">
+                    <span className="transactions-summary-label">Resultados</span>
+                    <strong>{filteredTransactions.length}</strong>
+                </Card>
+                <Card hover={false} className="transactions-summary-card">
+                    <span className="transactions-summary-label">Entradas filtradas</span>
+                    <strong style={{ color: 'var(--color-success)' }}>
+                        R$ {filteredIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </strong>
+                </Card>
+                <Card hover={false} className="transactions-summary-card">
+                    <span className="transactions-summary-label">{'Sa\u00EDdas filtradas'}</span>
+                    <strong style={{ color: 'var(--color-danger)' }}>
+                        R$ {filteredExpense.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </strong>
+                </Card>
+            </motion.div>
+
+            <AnimatePresence mode="wait" initial={false}>
+                {loading ? (
+                    <motion.div
+                        key="transactions-loading"
+                        style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+                        variants={listVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                    >
+                        {Array(5).fill(0).map((_, index) => (
+                            <Skeleton key={index} width="100%" height="72px" borderRadius="16px" />
+                        ))}
+                    </motion.div>
+                ) : transactions.length === 0 ? (
+                    <motion.div
+                        key="transactions-empty"
+                        variants={sectionVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                    >
+                        <EmptyState
+                            icon={ArrowUpRight}
+                            title={'Nenhuma transa\u00E7\u00E3o ainda'}
+                            description="Comece registrando seus ganhos e gastos para ver o poder do dashboard."
+                            actionText={'Nova Transa\u00E7\u00E3o'}
+                            onAction={handleOpenNew}
+                        />
+                    </motion.div>
+                ) : filteredTransactions.length === 0 ? (
+                    <motion.div
+                        key="transactions-filtered-empty"
+                        variants={sectionVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                    >
+                        <EmptyState
+                            icon={Search}
+                            title="Nenhum resultado encontrado"
+                            description="Tente ajustar periodo, parceiro ou busca para localizar outras movimentacoes."
+                            actionText="Limpar filtros"
+                            onAction={clearFilters}
+                        />
+                    </motion.div>
                 ) : (
-
-                    <AnimatePresence mode="popLayout">
-                        {transactions
-                            .filter(tx => {
-                                // First apply partner filter
-                                if (activeFilter === 'me' && tx.profile_id !== user.id) return false;
-                                if (activeFilter === 'partner' && tx.profile_id !== profile?.partner_id) return false;
-
-                                // Then apply date filter
-                                if (!startDate && !endDate) return true;
-                                const txDate = new Date(tx.date);
-                                txDate.setHours(0, 0, 0, 0);
-
-                                let start = null;
-                                let end = null;
-
-                                if (startDate) {
-                                    const [y, m, d] = startDate.split('-');
-                                    start = new Date(Number(y), Number(m) - 1, Number(d));
-                                }
-
-                                if (endDate) {
-                                    const [y, m, d] = endDate.split('-');
-                                    end = new Date(Number(y), Number(m) - 1, Number(d));
-                                    end.setHours(23, 59, 59, 999);
-                                }
-
-                                if (start && txDate < start) return false;
-                                if (end && txDate > end) return false;
-
-                                return true;
-                            })
-                            .map((tx, index) => (
+                    <motion.div
+                        key={`transactions-list-${activeFilter}-${searchQuery}-${startDate}-${endDate}`}
+                        style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+                        variants={listVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                    >
+                        <AnimatePresence mode="popLayout">
+                            {filteredTransactions.map((tx, index) => (
                                 <TransactionItem
                                     key={tx.id}
                                     transaction={tx}
@@ -362,161 +551,58 @@ export default function Transactions() {
                                     index={index}
                                 />
                             ))}
-                    </AnimatePresence>
+                        </AnimatePresence>
+                    </motion.div>
                 )}
-            </div>
+            </AnimatePresence>
 
-            {/* Add/Edit Transaction Modal */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={transactionToEdit ? "Editar Transação" : "Nova Transação"}>
-                <form onSubmit={handleSaveTransaction}>
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <Button
-                            type="button"
-                            className={type === 'expense' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'expense' ? 'var(--color-danger)' : undefined, border: type === 'expense' ? 'none' : undefined, color: type === 'expense' ? '#fff' : undefined }}
-                            onClick={() => { setType('expense'); setCategory(''); setSelectedCategory(null); }}
-                        >
-                            Despesa
-                        </Button>
-                        <Button
-                            type="button"
-                            className={type === 'income' ? 'btn-primary' : 'btn-ghost'}
-                            style={{ flex: 1, justifyContent: 'center', background: type === 'income' ? 'var(--color-success)' : undefined, border: type === 'income' ? 'none' : undefined, color: type === 'income' ? '#fff' : undefined }}
-                            onClick={() => { setType('income'); setCategory(''); setSelectedCategory(null); }}
-                        >
-                            Receita
-                        </Button>
-                    </div>
-
-                    <Input
-                        label="Valor"
-                        placeholder="0,00"
-                        type="number"
-                        step="0.01"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        required
-                    />
-
-                    {/* Category Selection Grid */}
-                    <div className="input-group" style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                            Categoria
-                        </label>
-                        {availableCategories.length > 0 ? (
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '0.5rem' }}>
-                                {availableCategories.map(cat => (
-                                    <div
-                                        key={cat.id}
-                                        onClick={() => {
-                                            setCategory(cat.name);
-                                            setSelectedCategory(cat);
-                                        }}
-                                        className={!selectedCategory || selectedCategory.id !== cat.id ? 'surface-secondary' : ''}
-                                        style={{
-                                            padding: '0.5rem',
-                                            borderRadius: '8px',
-                                            background: selectedCategory?.id === cat.id ? `${cat.color}40` : undefined,
-                                            border: selectedCategory?.id === cat.id ? `1px solid ${cat.color}` : '1px solid transparent',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: '0.2rem',
-                                            transition: 'all 0.2s',
-                                            textAlign: 'center'
-                                        }}
-                                    >
-                                        <div style={{ fontSize: '1.5rem' }}>{cat.icon}</div>
-                                        <div style={{ fontSize: '0.7rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', color: 'var(--text-main)' }}>{cat.name}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="surface-secondary" style={{ padding: '1rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                                <p>Nenhuma categoria criada.</p>
-                                <Button type="button" variant="ghost" className="btn-primary" style={{ marginTop: '0.5rem', fontSize: '0.8rem' }} onClick={() => window.location.href = '/categories'}>Criar Agora</Button>
-                            </div>
-                        )}
-                        {/* Fallback Input if needed (hidden or optional? Let's hide it if categories exist) */}
-                    </div>
-
-                    {/* Mandatory Expense Type Selection */}
-                    {type === 'expense' && (
-                        <div className="input-group" style={{ marginBottom: '1rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 500 }}>
-                                Tipo de Gasto <span style={{ color: '#f64f59' }}>*</span>
-                            </label>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
-                                {[
-                                    { value: 'fixed', label: 'Fixo', icon: '🔒' },
-                                    { value: 'variable', label: 'Variável', icon: '💳' },
-                                    { value: 'lifestyle', label: 'Lazer', icon: '🍿' }
-                                ].map((opt) => (
-                                    <div
-                                        key={opt.value}
-                                        onClick={() => setExpenseType(opt.value)}
-                                        className={expenseType !== opt.value ? 'surface-secondary' : ''}
-                                        style={{
-                                            padding: '0.75rem 0.5rem',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            textAlign: 'center',
-                                            background: expenseType === opt.value ? 'rgba(246, 79, 89, 0.2)' : undefined,
-                                            border: expenseType === opt.value ? '1px solid #f64f59' : '1px solid transparent',
-                                            transition: 'all 0.2s',
-                                            color: 'var(--text-main)'
-                                        }}
-                                    >
-                                        <div style={{ fontSize: '1.2rem', marginBottom: '0.2rem' }}>{opt.icon}</div>
-                                        <div style={{ fontSize: '0.8rem', fontWeight: expenseType === opt.value ? 600 : 400 }}>{opt.label}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {!transactionToEdit && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-                            <input
-                                type="checkbox"
-                                id="recurring"
-                                checked={isRecurring}
-                                onChange={(e) => setIsRecurring(e.target.checked)}
-                                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                            />
-                            <label htmlFor="recurring" style={{ cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500 }}>
-                                Repetir mensalmente?
-                            </label>
-                        </div>
-                    )}
-
-                    <Input
-                        label="Descrição"
-                        placeholder="Ex: Supermercado"
-                        value={description}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            setDescription(val);
-
-                            // Smart Category (Only if adding new or category is empty)
-                            if (!transactionToEdit && val.length > 2 && !category) {
-                                const smartMatch = getSmartCategory(val, categories);
-                                if (smartMatch) {
-                                    if (smartMatch.type !== type) setType(smartMatch.type);
-                                    setCategory(smartMatch.name);
-                                    setSelectedCategory(smartMatch);
-                                }
-                            }
-                        }}
-                        required
-                    />
-
-                    <Button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} loading={submitting}>
-                        {transactionToEdit ? "Salvar Alterações" : "Salvar"}
-                    </Button>
-                </form>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={transactionToEdit ? 'Editar Transa\u00E7\u00E3o' : 'Nova Transa\u00E7\u00E3o'}>
+                <TransactionForm
+                    amount={amount}
+                    onAmountChange={setAmount}
+                    date={date}
+                    onDateChange={setDate}
+                    type={type}
+                    onTypeChange={handleTypeChange}
+                    wallets={wallets}
+                    selectedWalletId={selectedWalletId}
+                    onWalletChange={setSelectedWalletId}
+                    availableCategories={availableCategories}
+                    selectedCategory={selectedCategory}
+                    onCategorySelect={(cat) => {
+                        setCategory(cat.name);
+                        setSelectedCategory(cat);
+                    }}
+                    expenseType={expenseType}
+                    onExpenseTypeChange={setExpenseType}
+                    showRecurringToggle={!transactionToEdit}
+                    isRecurring={isRecurring}
+                    onRecurringChange={setIsRecurring}
+                    description={description}
+                    onDescriptionChange={handleDescriptionChange}
+                    onSubmit={handleSaveTransaction}
+                    submitLabel={transactionToEdit ? 'Salvar alteracoes' : 'Salvar'}
+                    loading={submitting}
+                />
             </Modal>
-        </div >
+
+            <Modal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} title={'Exportar transa\u00E7\u00F5es'}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className="surface-secondary" style={{ padding: '1rem', borderRadius: '12px' }}>
+                        <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '0.35rem' }}>Escolha o formato</strong>
+                        <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                            CSV abre mais rapido em planilhas e mantem a exportacao leve. A planilha compativel abre no Excel sem carregar a dependencia pesada anterior.
+                        </p>
+                    </div>
+
+                    <Button type="button" className="btn-primary" onClick={handleExportCsv} style={{ width: '100%', justifyContent: 'center' }}>
+                        Exportar CSV rapido
+                    </Button>
+                    <Button type="button" variant="ghost" onClick={handleExportExcel} style={{ width: '100%', justifyContent: 'center' }}>
+                        Exportar planilha compativel
+                    </Button>
+                </div>
+            </Modal>
+        </motion.div>
     );
 }

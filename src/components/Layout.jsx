@@ -7,11 +7,20 @@ import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
 import { Eye, EyeOff, Plane } from 'lucide-react';
 import clsx from 'clsx';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 export function Layout() {
     const location = useLocation();
+    const reducedMotion = useReducedMotion();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
     const { isEventMode, toggleEventMode } = useEvent();
+    const routeKey = location.pathname;
+
+    const pageVariants = {
+        initial: reducedMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.995 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        exit: reducedMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.995 },
+    };
 
     return (
         <div className="app-layout">
@@ -41,7 +50,19 @@ export function Layout() {
             {/* Main Content Area */}
             <main className="main-content">
                 <div className="content-wrapper">
-                    <Outlet />
+                    <AnimatePresence mode="wait" initial={false}>
+                        <motion.div
+                            key={routeKey}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            variants={pageVariants}
+                            transition={{ type: 'spring', stiffness: 320, damping: 30, mass: 0.9 }}
+                            style={{ width: '100%', willChange: 'transform, opacity' }}
+                        >
+                            <Outlet />
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
             </main>
 

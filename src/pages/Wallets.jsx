@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowRightLeft, Banknote, CreditCard, Landmark, Plus, Trash2, Edit2, Wallet } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
@@ -7,21 +8,18 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Modal } from '../components/Modal';
 import { Skeleton } from '../components/Skeleton';
-import { Wallet, Plus, Trash2, Edit2, CreditCard, Banknote, Landmark } from 'lucide-react';
-
+import { PageHeader } from '../components/PageHeader';
 import { useToast } from '../context/ToastContext';
 import { UpgradeModal } from '../components/UpgradeModal';
 import { EmptyState } from '../components/EmptyState';
 import { TransferModal } from '../components/TransferModal';
-import { ArrowRightLeft } from 'lucide-react';
 
 export default function Wallets() {
-    const { user, isPro, planTier, partnerProfile } = useAuth();
-    const { addToast } = useToast();
+    const { user, planTier, partnerProfile } = useAuth();
+    const { addToast, addActionToast } = useToast();
     const [wallets, setWallets] = useState([]);
+    const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [walletToEdit, setWalletToEdit] = useState(null);
     const [name, setName] = useState('');
@@ -30,32 +28,103 @@ export default function Wallets() {
     const [submitting, setSubmitting] = useState(false);
     const [showUpgrade, setShowUpgrade] = useState(false);
     const [isTransferOpen, setIsTransferOpen] = useState(false);
+    const pendingDeleteTimers = useRef(new Map());
 
     useEffect(() => {
-        if (user) {
-            fetchWallets();
+        if (!user) return undefined;
 
-            const handleSync = () => fetchWallets();
-            window.addEventListener('supabase-sync', handleSync);
-            return () => window.removeEventListener('supabase-sync', handleSync);
-        }
+        fetchWalletData();
+        const handleSync = (event) => {
+            const table = event?.detail?.table;
+
+            if (!table || table === 'wallets') {
+                fetchWallets();
+            }
+
+            if (!table || table === 'transactions') {
+                fetchTransactions();
+            }
+        };
+        window.addEventListener('supabase-sync', handleSync);
+        return () => window.removeEventListener('supabase-sync', handleSync);
     }, [user]);
+
+    useEffect(() => () => {
+        pendingDeleteTimers.current.forEach((timer) => clearTimeout(timer));
+        pendingDeleteTimers.current.clear();
+    }, []);
 
     const fetchWallets = async () => {
         try {
             const { data, error } = await supabase
                 .from('wallets')
-                .select('*')
+                .select('id, name, type, initial_balance, profile_id, created_at')
                 .order('created_at', { ascending: true });
 
             if (error) throw error;
             setWallets(data || []);
         } catch (error) {
             console.error('Error fetching wallets:', error);
+        }
+    };
+
+    const fetchTransactions = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('transactions')
+                .select('id, amount, type, wallet_id');
+
+            if (error) throw error;
+            setTransactions(data || []);
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+        }
+    };
+
+    const fetchWalletData = async () => {
+        setLoading(true);
+
+        try {
+            const [walletResponse, transactionResponse] = await Promise.all([
+                supabase.from('wallets').select('id, name, type, initial_balance, profile_id, created_at').order('created_at', { ascending: true }),
+                supabase.from('transactions').select('id, amount, type, wallet_id'),
+            ]);
+
+            if (walletResponse.error) throw walletResponse.error;
+            if (transactionResponse.error) throw transactionResponse.error;
+
+            setWallets(walletResponse.data || []);
+            setTransactions(transactionResponse.data || []);
+        } catch (error) {
+            console.error('Error fetching wallet data:', error);
         } finally {
             setLoading(false);
         }
     };
+
+    const walletsWithBalance = useMemo(() => wallets.map((wallet) => {
+        let income = 0;
+        let expense = 0;
+
+        transactions.forEach((transaction) => {
+            if (transaction.wallet_id !== wallet.id) return;
+            const amount = Number(transaction.amount || 0);
+            if (transaction.type === 'income') income += amount;
+            if (transaction.type === 'expense') expense += amount;
+        });
+
+        return {
+            ...wallet,
+            current_balance: (parseFloat(wallet.initial_balance) || 0) + income - expense,
+        };
+    }), [wallets, transactions]);
+
+    const totalBalance = walletsWithBalance.reduce((sum, wallet) => sum + Number(wallet.current_balance || 0), 0);
+    const negativeWallets = walletsWithBalance.filter((wallet) => Number(wallet.current_balance || 0) < 0).length;
+    const topWallet = useMemo(
+        () => walletsWithBalance.slice().sort((a, b) => Number(b.current_balance || 0) - Number(a.current_balance || 0))[0] || null,
+        [walletsWithBalance],
+    );
 
     const handleOpenNew = () => {
         let maxWallets = 1;
@@ -66,6 +135,7 @@ export default function Wallets() {
             setShowUpgrade(true);
             return;
         }
+
         setWalletToEdit(null);
         setName('');
         setType('checking');
@@ -81,16 +151,16 @@ export default function Wallets() {
         setIsModalOpen(true);
     };
 
-    const handleSaveWallet = async (e) => {
-        e.preventDefault();
+    const handleSaveWallet = async (event) => {
+        event.preventDefault();
         setSubmitting(true);
+
         try {
             const payload = {
                 name,
                 type,
-                // color: 'neutral', // Deprecated
                 initial_balance: parseFloat(initialBalance) || 0,
-                profile_id: user.id
+                profile_id: user.id,
             };
 
             if (walletToEdit) {
@@ -110,176 +180,219 @@ export default function Wallets() {
             setIsModalOpen(false);
             addToast(walletToEdit ? 'Carteira atualizada.' : 'Carteira criada.', 'success');
         } catch (error) {
-            addToast(error.message, 'error');
+            addToast(error.message || 'Erro ao salvar carteira.', 'error');
         } finally {
             setSubmitting(false);
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('Tem certeza? Isso pode afetar transações antigas.')) return;
-        try {
-            const { error } = await supabase.from('wallets').delete().eq('id', id);
-            if (error) throw error;
-            setWallets(wallets.filter(w => w.id !== id));
-            addToast('Carteira excluída.', 'success');
-        } catch (error) {
-            addToast('Erro ao excluir carteira.', 'error');
-        }
+    const handleDelete = (id) => {
+        const wallet = wallets.find((item) => item.id === id);
+        if (!wallet) return;
+
+        setWallets((prev) => prev.filter((item) => item.id !== id));
+
+        const timer = setTimeout(async () => {
+            pendingDeleteTimers.current.delete(id);
+
+            try {
+                const { error } = await supabase.from('wallets').delete().eq('id', id);
+                if (error) throw error;
+                addToast('Carteira excluida.', 'success');
+            } catch (error) {
+                setWallets((prev) => [...prev, wallet].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+                addToast('Erro ao excluir carteira.', 'error');
+            }
+        }, 5000);
+
+        pendingDeleteTimers.current.set(id, timer);
+
+        addActionToast('Carteira removida.', 'Desfazer', () => {
+            const pendingTimer = pendingDeleteTimers.current.get(id);
+            if (pendingTimer) {
+                clearTimeout(pendingTimer);
+                pendingDeleteTimers.current.delete(id);
+                setWallets((prev) => [...prev, wallet].sort((a, b) => new Date(a.created_at) - new Date(b.created_at)));
+            }
+        }, 'info');
     };
 
-    const getIcon = (type) => {
-        switch (type) {
-            case 'cash': return <Banknote />;
-            case 'credit_card': return <CreditCard />;
-            case 'investment': return <Landmark />;
-            default: return <Wallet />;
+    const getIcon = (walletType) => {
+        switch (walletType) {
+            case 'cash':
+                return Banknote;
+            case 'credit_card':
+                return CreditCard;
+            case 'investment':
+                return Landmark;
+            default:
+                return Wallet;
         }
     };
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3rem', paddingTop: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
-                <div>
-                    <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                        Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Carteiras</span>
-                    </h1>
-                    <p style={{ opacity: 0.6 }}>Gerencie suas contas bancárias e dinheiro físico</p>
-                </div>
-                {!loading && wallets.length > 0 && (
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: '100%', maxWidth: '300px' }}>
-                        <Button onClick={() => setIsTransferOpen(true)} variant="ghost" icon={ArrowRightLeft} disabled={wallets.length < 2} title={wallets.length < 2 ? "Precisa de pelo menos 2 carteiras" : "Transferir"} style={{ flex: '1', minWidth: '120px' }}>
+        <div className="container fade-in app-page-shell" style={{ paddingBottom: '80px' }}>
+            <PageHeader
+                title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Carteiras</span></span>}
+                subtitle="Organize saldos, transferencia entre contas e distribuicao do dinheiro em um layout mais limpo."
+            >
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    {walletsWithBalance.length > 0 && (
+                        <Button onClick={() => setIsTransferOpen(true)} variant="ghost" icon={ArrowRightLeft} disabled={walletsWithBalance.length < 2}>
                             Transferir
                         </Button>
-                        <Button onClick={handleOpenNew} icon={Plus} style={{ flex: '1', minWidth: '120px' }}>
-                            Nova Carteira
-                        </Button>
+                    )}
+                    <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
+                        Nova carteira
+                    </Button>
+                </div>
+            </PageHeader>
+
+            <div className="app-summary-grid">
+                <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                    <div className="app-summary-topline">
+                        <div className="app-summary-icon app-summary-icon-neutral">
+                            <Wallet size={18} />
+                        </div>
+                        <span className="app-summary-label">Saldo consolidado</span>
                     </div>
-                )}
-            </header>
+                    <strong className="app-summary-value">R$ {totalBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
+                </Card>
+                <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                    <div className="app-summary-topline">
+                        <div className="app-summary-icon app-summary-icon-neutral">
+                            <Banknote size={18} />
+                        </div>
+                        <span className="app-summary-label">Carteiras ativas</span>
+                    </div>
+                    <strong className="app-summary-value">{walletsWithBalance.length}</strong>
+                </Card>
+                <Card hover={false} className={`app-summary-card ${negativeWallets > 0 ? 'app-summary-card-danger' : 'app-summary-card-success'}`}>
+                    <div className="app-summary-topline">
+                        <div className={`app-summary-icon ${negativeWallets > 0 ? 'app-summary-icon-danger' : 'app-summary-icon-success'}`}>
+                            <Landmark size={18} />
+                        </div>
+                        <span className="app-summary-label">Ponto de atencao</span>
+                    </div>
+                    <strong className="app-summary-value">
+                        {negativeWallets > 0 ? `${negativeWallets} com saldo negativo` : (topWallet ? topWallet.name : 'Tudo em ordem')}
+                    </strong>
+                </Card>
+            </div>
 
             {loading ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                    {Array(3).fill(0).map((_, i) => (
-                        <Skeleton key={i} width="100%" height="200px" borderRadius="24px" />
+                <div className="app-list-grid">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                        <Skeleton key={index} width="100%" height="220px" borderRadius="20px" />
                     ))}
                 </div>
+            ) : walletsWithBalance.length === 0 ? (
+                <EmptyState
+                    icon={Wallet}
+                    title="Nenhuma carteira encontrada"
+                    description="Adicione contas bancarias, caixa ou investimentos para o painel refletir onde seu dinheiro esta."
+                    actionText="Criar primeira carteira"
+                    onAction={handleOpenNew}
+                />
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div className="app-list-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
                     <AnimatePresence mode="popLayout">
-                        {wallets.map((wallet, index) => (
-                            <Card 
-                                key={wallet.id} 
-                                layout="position"
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                                transition={{ duration: 0.3, ease: 'easeOut', opacity: { delay: index * 0.04 }, y: { delay: index * 0.04 } }} 
-                            >
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-                                    <div style={{
-                                        padding: '1rem',
-                                        borderRadius: '14px',
-                                        background: 'rgba(255,255,255,0.05)',
-                                        color: 'var(--text-main)',
-                                        border: '1px solid rgba(255,255,255,0.1)'
-                                    }}>
-                                        {getIcon(wallet.type)}
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <button onClick={() => handleOpenEdit(wallet)} className="btn-ghost" title="Editar"><Edit2 size={18} /></button>
-                                        <button onClick={() => handleDelete(wallet.id)} className="btn-ghost" style={{ color: '#f64f59' }} title="Excluir"><Trash2 size={18} /></button>
-                                    </div>
-                                </div>
+                        {walletsWithBalance.map((wallet, index) => {
+                            const Icon = getIcon(wallet.type);
+                            const isNegative = Number(wallet.current_balance || 0) < 0;
 
-                                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    {wallet.name}
+                            return (
+                                <Card
+                                    key={wallet.id}
+                                    className="app-section-card"
+                                    layout="position"
+                                    initial={{ opacity: 0, y: 8 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                                    transition={{ duration: 0.3, ease: 'easeOut', opacity: { delay: index * 0.04 }, y: { delay: index * 0.04 } }}
+                                >
+                                    <div className="app-section-header">
+                                        <div className="app-list-card-main">
+                                            <span className="app-inline-icon">
+                                                <Icon size={18} />
+                                            </span>
+                                            <div>
+                                                <strong>{wallet.name}</strong>
+                                                <span>{wallet.type.replace('_', ' ')}</span>
+                                            </div>
+                                        </div>
+                                        <div className="app-list-card-actions">
+                                            <button onClick={() => handleOpenEdit(wallet)} className="btn-ghost btn-icon" title="Editar">
+                                                <Edit2 size={16} />
+                                            </button>
+                                            <button onClick={() => handleDelete(wallet.id)} className="btn-ghost btn-icon" style={{ color: '#f64f59' }} title="Excluir">
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     {wallet.profile_id && wallet.profile_id !== user.id && (
-                                        <span style={{ 
-                                            fontSize: '0.65rem', 
-                                            padding: '0.15rem 0.4rem', 
-                                            background: 'rgba(255,255,255,0.05)', 
-                                            color: 'var(--text-main)', 
-                                            borderRadius: '12px', 
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            fontWeight: 500,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.3rem'
-                                        }}>
+                                        <div className="dashboard-partner-chip" style={{ marginLeft: 0 }}>
                                             {partnerProfile?.avatar_url ? (
-                                                <img src={partnerProfile.avatar_url} alt="Partner" style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+                                                <img src={partnerProfile.avatar_url} alt="Parceiro" style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
                                             ) : (
-                                                <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: 'rgba(246, 79, 89, 0.2)', color: '#f64f59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.55rem', fontWeight: 700 }}>
+                                                <div className="dashboard-partner-fallback">
                                                     {(partnerProfile?.nickname || partnerProfile?.full_name || 'P')[0].toUpperCase()}
                                                 </div>
                                             )}
                                             {partnerProfile?.nickname || partnerProfile?.full_name?.split(' ')[0] || 'Parceiro'}
-                                        </span>
+                                        </div>
                                     )}
-                                </h3>
-                                <p style={{ opacity: 0.7, fontSize: '0.9rem', textTransform: 'capitalize' }}>{wallet.type.replace('_', ' ')}</p>
 
-                            <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Saldo Inicial</p>
-                                <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>R$ {parseFloat(wallet.initial_balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                            </div>
-                        </Card>
-                    ))}
-
-                    {wallets.length === 0 && (
-                        <motion.div key="empty" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} style={{ gridColumn: '1/-1' }}>
-                            <EmptyState
-                                icon={Wallet}
-                                title="Nenhuma carteira encontrada"
-                                description="Adicione suas contas bancárias, dinheiro físico ou cartões para começar a controlar seu patrimônio."
-                                actionText="Criar Primeira Carteira"
-                                onAction={handleOpenNew}
-                            />
-                        </motion.div>
-                    )}
+                                    <div className="app-summary-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                                        <Card hover={false} className={`app-summary-card ${isNegative ? 'app-summary-card-danger' : 'app-summary-card-success'}`}>
+                                            <span className="app-summary-label">Saldo atual</span>
+                                            <strong className="app-summary-value">R$ {Number(wallet.current_balance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
+                                        </Card>
+                                        <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                                            <span className="app-summary-label">Saldo inicial</span>
+                                            <strong className="app-summary-value">R$ {parseFloat(wallet.initial_balance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
+                                        </Card>
+                                    </div>
+                                </Card>
+                            );
+                        })}
                     </AnimatePresence>
                 </div>
             )}
 
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={walletToEdit ? "Editar Carteira" : "Nova Carteira"}>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={walletToEdit ? 'Editar carteira' : 'Nova carteira'}>
                 <form onSubmit={handleSaveWallet}>
                     <Input
-                        label="Nome da Carteira"
-                        placeholder="Ex: Nubank, Carteira Física"
+                        label="Nome da carteira"
+                        placeholder="Ex: Nubank, Carteira fisica"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(event) => setName(event.target.value)}
                         required
                     />
 
                     <div className="input-group" style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Tipo</label>
-                        <select
-                            value={type}
-                            onChange={(e) => setType(e.target.value)}
-                            className="input-field"
-                        >
-                            <option value="checking">Conta Corrente</option>
-                            <option value="savings">Poupança</option>
-                            <option value="cash">Dinheiro Físico</option>
-                            <option value="credit_card">Cartão de Crédito</option>
+                        <label>Tipo</label>
+                        <select value={type} onChange={(event) => setType(event.target.value)} className="input-field">
+                            <option value="checking">Conta corrente</option>
+                            <option value="savings">Poupanca</option>
+                            <option value="cash">Dinheiro fisico</option>
+                            <option value="credit_card">Cartao de credito</option>
                             <option value="investment">Investimentos</option>
                         </select>
                     </div>
 
                     <Input
-                        label="Saldo Inicial (R$)"
+                        label="Saldo inicial (R$)"
                         type="number"
                         step="0.01"
                         placeholder="0,00"
                         value={initialBalance}
-                        onChange={(e) => setInitialBalance(e.target.value)}
+                        onChange={(event) => setInitialBalance(event.target.value)}
                     />
 
-                    {/* Color Picker Removed for Apple Style */}
-
-                    <Button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem' }} loading={submitting}>
-                        {walletToEdit ? "Salvar Alterações" : "Criar Carteira"}
+                    <Button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem', justifyContent: 'center' }} loading={submitting}>
+                        {walletToEdit ? 'Salvar alteracoes' : 'Criar carteira'}
                     </Button>
                 </form>
             </Modal>

@@ -1,14 +1,38 @@
 import { Link } from 'react-router-dom';
-import { Button } from '../components/Button';
-import { ArrowRight, Check, Sparkles, Zap, LayoutDashboard, Database, HandCoins, Target, ShieldCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
+import { ArrowRight, Check, Compass, ShieldCheck, Sparkles, Target, Wallet } from 'lucide-react';
+import { Button } from '../components/Button';
+
+const pageVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            duration: 0.45,
+            staggerChildren: 0.08,
+        },
+    },
+};
+
+const revealVariants = {
+    hidden: { opacity: 0, y: 18 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.45, ease: 'easeOut' },
+    },
+};
 
 export default function Landing() {
     return (
-        <main className="landing-page fade-in">
+        <motion.main className="landing-page fade-in" variants={pageVariants} initial="hidden" animate="visible">
             <Helmet>
                 <title>Persona - Seu sistema operacional financeiro</title>
-                <meta name="description" content="Reimagine sua vida financeira com uma experiência visual moderna: planejamento, automações, metas e decisões mais inteligentes em um só lugar." />
+                <meta
+                    name="description"
+                    content="Planeje, acompanhe e evolua sua rotina financeira com uma experiencia mais clara, integrada e confiavel."
+                />
                 <script type="application/ld+json">
                     {`
                         {
@@ -18,13 +42,13 @@ export default function Landing() {
                             "applicationCategory": "FinanceApplication",
                             "operatingSystem": "Web",
                             "url": "https://persona.dev.br/",
-                            "description": "Plataforma financeira para planejar, automatizar e evoluir suas decisões com clareza."
+                            "description": "Plataforma financeira para planejar, automatizar e evoluir decisoes com clareza."
                         }
                     `}
                 </script>
             </Helmet>
 
-            <header className="landing-header">
+            <motion.header className="landing-header" variants={revealVariants}>
                 <div className="landing-container landing-header-content">
                     <div className="landing-brand">
                         <div className="landing-brand-icon" />
@@ -34,93 +58,102 @@ export default function Landing() {
                         <Button className="btn-primary">Entrar</Button>
                     </Link>
                 </div>
-            </header>
+            </motion.header>
 
-            <section className="landing-hero">
+            <motion.section className="landing-hero" variants={revealVariants}>
                 <div className="landing-container landing-hero-grid">
-                    <div className="landing-hero-copy">
+                    <motion.div className="landing-hero-copy" variants={pageVariants}>
                         <div className="landing-pill fade-in stagger-1">
-                            <Sparkles size={16} /> Reimagine suas finanças pessoais e familiares
+                            <Sparkles size={16} />
+                            Financas pessoais e familiares em um fluxo mais claro
                         </div>
-                        <h1 className="text-gradient fade-in stagger-2">
-                            Seu dinheiro com direção, contexto e tranquilidade.
-                        </h1>
+                        <h1 className="text-gradient fade-in stagger-2">Seu dinheiro com direcao, visibilidade e tranquilidade.</h1>
                         <p className="fade-in stagger-3">
-                            A Persona virou seu centro de comando financeiro: organiza rotinas, mostra oportunidades e transforma números em decisões simples.
+                            A Persona organiza saldos, metas, recorrencias e planejamento em uma experiencia unica para voce agir com menos ruido.
                         </p>
                         <div className="landing-hero-actions fade-in stagger-4">
                             <Link to="/login">
                                 <Button className="btn-primary" style={{ padding: '1rem 2rem', fontSize: '1rem' }}>
-                                    Experimentar agora <ArrowRight />
+                                    Experimentar agora
+                                    <ArrowRight />
                                 </Button>
                             </Link>
-                            <a className="landing-inline-link" href="#roadmap">Ver como funciona</a>
+                            <a className="landing-inline-link" href="#recursos">Ver recursos</a>
                         </div>
                         <div className="landing-highlights fade-in stagger-5">
-                            <Badge icon={HandCoins} text="Fluxo de caixa em tempo real" />
-                            <Badge icon={Target} text="Metas com acompanhamento inteligente" />
-                            <Badge icon={ShieldCheck} text="Privacidade e segurança por padrão" />
+                            <Badge icon={Wallet} text="Carteiras, transacoes e saldos no mesmo lugar" />
+                            <Badge icon={Target} text="Metas e orcamentos acompanhados em tempo real" />
+                            <Badge icon={ShieldCheck} text="Privacidade, seguranca e controle por padrao" />
                         </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="landing-preview-card fade-in stagger-5">
-                        <img
-                            src="/dashboard-preview.png"
-                            alt="Persona Dashboard"
-                        />
-                    </div>
+                    <motion.article
+                        className="landing-preview-card fade-in stagger-5 landing-preview-panel"
+                        variants={revealVariants}
+                        whileHover={{ y: -4, scale: 1.01 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <div className="landing-preview-metric">
+                            <span className="dashboard-kicker">Resumo do mes</span>
+                            <strong>R$ 8.450,00</strong>
+                            <p>Saldo consolidado com proximos vencimentos e meta principal em destaque.</p>
+                        </div>
+                        <div className="landing-preview-list">
+                            <PreviewItem title="Carteiras" value="4 ativas" />
+                            <PreviewItem title="Metas" value="2 em andamento" />
+                            <PreviewItem title="Recorrencias" value="6 automatizadas" />
+                        </div>
+                    </motion.article>
                 </div>
-            </section>
+            </motion.section>
 
-            <section id="roadmap" aria-label="Recursos" className="landing-section">
+            <motion.section id="recursos" aria-label="Recursos" className="landing-section" variants={revealVariants}>
                 <div className="landing-container">
-                    <h2 className="landing-section-title">Tudo que você precisa para ganhar previsibilidade</h2>
+                    <h2 className="landing-section-title">Tudo que voce precisa para ganhar previsibilidade</h2>
                     <div className="landing-grid">
-                        <FeatureCard icon={LayoutDashboard} title="Controle Total" text="Dashboard intuitivo com todas as suas contas em um só lugar." />
-                        <FeatureCard icon={Database} title="Organização Automática" text="Categorias inteligentes e filtros poderosos para suas transações." />
-                        <FeatureCard icon={Zap} title="Planejamento Real" text="Defina orçamentos e alcance suas metas financeiras mais rápido." />
+                        <FeatureCard icon={Compass} title="Painel com contexto" text="Veja prioridades, saldos e proximos passos em uma unica superficie." />
+                        <FeatureCard icon={Wallet} title="Operacao financeira organizada" text="Registre receitas, despesas e recorrencias sem perder a origem do dinheiro." />
+                        <FeatureCard icon={Target} title="Planejamento acionavel" text="Metas, simulacoes e orcamentos ficam conectados ao dia a dia." />
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
-            <section className="landing-section landing-pricing">
+            <motion.section className="landing-section landing-pricing" variants={revealVariants}>
                 <div className="landing-container">
-                    <h2 className="text-gradient landing-section-title">Planos para cada estágio da sua jornada</h2>
+                    <h2 className="text-gradient landing-section-title">Planos para cada fase da sua rotina</h2>
 
                     <div className="landing-pricing-grid">
                         <PricingCard
                             title="Free"
                             price="R$ 0"
-                            features={['1 Carteira', '5 Orçamentos', 'Análise Básica']}
+                            features={['1 carteira', '5 orcamentos', 'Analise basica']}
                         />
                         <PricingCard
                             title="One"
                             price="R$ 14,90"
-                            features={['3 Carteiras', '10 Orçamentos', 'Análise Básica']}
-                            buttonText="Assinar One"
                             color="#12c2e9"
+                            features={['3 carteiras', '10 orcamentos', 'Analise basica']}
                         />
                         <PricingCard
                             title="Duo"
                             price="R$ 29,90"
                             featured
-                            features={['Carteiras Ilimitadas', 'IA Financeira', 'Exportação Excel', 'Modo Casal', 'Orçamentos Ilimitados']}
-                            buttonText="Assinar Duo"
                             color="#FFD700"
+                            features={['Carteiras ilimitadas', 'IA financeira', 'Exportacao completa', 'Modo casal', 'Orcamentos ilimitados']}
                         />
                     </div>
                 </div>
-            </section>
+            </motion.section>
 
-            <footer className="landing-footer">
+            <motion.footer className="landing-footer" variants={revealVariants}>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-                    <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Termos de Uso</Link>
+                    <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Termos de uso</Link>
                     <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacidade</Link>
                 </div>
                 <p>© 2026 Persona Finance. Todos os direitos reservados.</p>
-                <address style={{ marginTop: '1rem', fontStyle: 'normal', fontSize: '0.8rem', opacity: 0.6 }}>São Paulo, SP - Brasil</address>
-            </footer>
-        </main>
+                <address style={{ marginTop: '1rem', fontStyle: 'normal', fontSize: '0.8rem', opacity: 0.6 }}>Sao Paulo, SP - Brasil</address>
+            </motion.footer>
+        </motion.main>
     );
 }
 
@@ -135,63 +168,58 @@ function Badge({ icon: Icon, text }) {
 
 function FeatureCard({ icon: Icon, title, text }) {
     return (
-        <article className="glass-card" style={{ padding: '2rem' }}>
-            <div style={{ padding: '1rem', background: 'rgba(17, 153, 142, 0.1)', borderRadius: '12px', width: 'fit-content', marginBottom: '1rem', color: '#38ef7d' }}>
+        <motion.article
+            className="glass-card landing-feature-card"
+            variants={revealVariants}
+            whileHover={{ y: -6, scale: 1.01 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
+            <div className="landing-feature-icon">
                 <Icon size={24} />
             </div>
-            <h3 style={{ marginBottom: '0.5rem' }}>{title}</h3>
-            <p style={{ color: 'var(--text-muted)' }}>{text}</p>
-        </article>
+            <h3>{title}</h3>
+            <p>{text}</p>
+        </motion.article>
     );
 }
 
-function PricingCard({ title, price, features, featured, buttonText = "Começar", color = "#38ef7d" }) {
+function PreviewItem({ title, value }) {
     return (
-        <article className="glass-card" style={{
-            padding: '2rem',
-            width: '100%',
-            border: featured ? `1px solid ${color}` : '1px solid var(--glass-border)',
-            position: 'relative',
-            overflow: 'visible',
-            boxShadow: featured ? `0 0 20px ${color}20` : 'none'
-        }}>
-            {featured && (
-                <div style={{
-                    position: 'absolute',
-                    top: -12,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    background: color,
-                    color: '#000',
-                    padding: '0.2rem 1rem',
-                    borderRadius: '20px',
-                    fontSize: '0.8rem',
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap'
-                }}>
-                    MAIS POPULAR
-                </div>
-            )}
+        <div className="landing-preview-item">
+            <span>{title}</span>
+            <strong>{value}</strong>
+        </div>
+    );
+}
+
+function PricingCard({ title, price, features, featured, color = '#38ef7d' }) {
+    return (
+        <motion.article
+            className={`glass-card landing-pricing-card${featured ? ' is-featured' : ''}`}
+            style={{ '--landing-card-accent': color }}
+            variants={revealVariants}
+            whileHover={{ y: -6, scale: 1.01 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
+            {featured && <div className="landing-pricing-badge">Mais escolhido</div>}
             <h3>{title}</h3>
-            <div style={{ fontSize: '3rem', fontWeight: 700, margin: '1rem 0' }}>{price}<span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-muted)' }}>/mês</span></div>
-            <ul style={{ listStyle: 'none', padding: 0, textAlign: 'left', marginBottom: '2rem' }}>
-                {features.map((f, i) => (
-                    <li key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem', color: 'var(--text-secondary)' }}>
-                        <Check size={18} color={color} /> {f}
+            <div className="landing-pricing-price">
+                {price}
+                <span>/mes</span>
+            </div>
+            <ul>
+                {features.map((feature) => (
+                    <li key={feature}>
+                        <Check size={18} color={color} />
+                        {feature}
                     </li>
                 ))}
             </ul>
             <Link to="/login">
-                <Button className={featured ? 'btn-primary' : 'btn-ghost'} style={{
-                    width: '100%',
-                    justifyContent: 'center',
-                    background: featured ? color : 'transparent',
-                    borderColor: featured ? color : 'var(--glass-border)',
-                    color: featured ? '#000' : 'inherit'
-                }}>
-                    {buttonText}
+                <Button className={featured ? 'btn-primary' : 'btn-ghost'} style={{ width: '100%', justifyContent: 'center' }}>
+                    Comecar
                 </Button>
             </Link>
-        </article>
+        </motion.article>
     );
 }

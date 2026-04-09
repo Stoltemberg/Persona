@@ -1,33 +1,63 @@
-import { useState, useEffect } from 'react';
+﻿import { useEffect, useMemo, useState, Suspense, lazy } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import { PageHeader } from '../components/PageHeader';
 import { PartnerFilter } from '../components/PartnerFilter';
+import { AnalysisChartsFallback } from '../components/analysis/AnalysisChartsFallback';
+
+const AnalysisCharts = lazy(() => import('../components/analysis/AnalysisCharts').then((module) => ({ default: module.AnalysisCharts })));
 
 export default function Analysis({ isTab }) {
     const { user, profile } = useAuth();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const tabParam = searchParams.get('tab');
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeFilter, setActiveFilter] = useState('all');
-
-    // Date State (Native JS)
-    const [currentDate, setCurrentDate] = useState(new Date());
+    const [activeFilter, setActiveFilter] = useState(searchParams.get('scope') || 'all');
     const [selectedType, setSelectedType] = useState(null);
+    const [chartsReady, setChartsReady] = useState(false);
+
+    const initialMonth = searchParams.get('month');
+    const [currentDate, setCurrentDate] = useState(() => {
+        if (!initialMonth) return new Date();
+        const [year, month] = initialMonth.split('-').map(Number);
+        if (!year || !month) return new Date();
+        return new Date(year, month - 1, 1);
+    });
 
     useEffect(() => {
-        if (user) fetchTransactions();
+        if (!user) return undefined;
+
+        fetchTransactions();
+        const handleSync = (event) => {
+            if (!event?.detail?.table || event.detail.table === 'transactions') {
+                fetchTransactions();
+            }
+        };
+
+        window.addEventListener('supabase-sync', handleSync);
+        return () => window.removeEventListener('supabase-sync', handleSync);
     }, [user]);
+
+    useEffect(() => {
+        const nextParams = new URLSearchParams();
+        if (tabParam) nextParams.set('tab', tabParam);
+        nextParams.set('month', `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`);
+        if (activeFilter !== 'all') nextParams.set('scope', activeFilter);
+        setSearchParams(nextParams, { replace: true });
+    }, [activeFilter, currentDate, setSearchParams, tabParam]);
+
+    useEffect(() => {
+        const raf = window.requestAnimationFrame(() => setChartsReady(true));
+        return () => window.cancelAnimationFrame(raf);
+    }, []);
 
     const fetchTransactions = async () => {
         try {
-            const { data, error } = await supabase
-                .from('transactions')
-                .select('*');
-            // Fetch all (income + expense) for balance calc
-
+            const { data, error } = await supabase.from('transactions').select('id, description, amount, type, date, expense_type, profile_id, category');
             if (error) throw error;
             setTransactions(data || []);
         } catch (error) {
@@ -37,305 +67,188 @@ export default function Analysis({ isTab }) {
         }
     };
 
-    // --- Date Helpers ---
+    const formatMonth = (date) => date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
     const changeMonth = (offset) => {
-        const newDate = new Date(currentDate);
-        newDate.setMonth(newDate.getMonth() + offset);
-        setCurrentDate(newDate);
+        const nextDate = new Date(currentDate);
+        nextDate.setMonth(nextDate.getMonth() + offset);
+        setCurrentDate(nextDate);
     };
 
-    const formatMonth = (date) => {
-        return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-    };
+    const monthlyTransactions = useMemo(() => (
+        transactions.filter((transaction) => {
+            if (activeFilter === 'me' && transaction.profile_id !== user.id) return false;
+            if (activeFilter === 'partner' && transaction.profile_id !== profile?.partner_id) return false;
 
-    // --- Filtering & Stats ---
-    const getMonthlyTransactions = () => {
-        return transactions.filter(tx => {
-            // Apply Partner Filter
-            if (activeFilter === 'me' && tx.profile_id !== user.id) return false;
-            if (activeFilter === 'partner' && tx.profile_id !== profile?.partner_id) return false;
+            const transactionDate = new Date(transaction.date);
+            return transactionDate.getMonth() === currentDate.getMonth()
+                && transactionDate.getFullYear() === currentDate.getFullYear();
+        })
+    ), [transactions, activeFilter, user?.id, profile?.partner_id, currentDate]);
 
-            const txDate = new Date(tx.date); // Assumes YYYY-MM-DD or ISO
-            return txDate.getMonth() === currentDate.getMonth() &&
-                txDate.getFullYear() === currentDate.getFullYear();
-        });
-    };
-
-    const monthlyData = getMonthlyTransactions();
-
-    const stats = monthlyData.reduce((acc, tx) => {
-        const val = parseFloat(tx.amount);
-        if (tx.type === 'income') {
-            acc.income += val;
-        } else {
-            acc.expense += val;
-        }
-        return acc;
+    const stats = monthlyTransactions.reduce((accumulator, transaction) => {
+        const value = parseFloat(transaction.amount);
+        if (transaction.type === 'income') accumulator.income += value;
+        else accumulator.expense += value;
+        return accumulator;
     }, { income: 0, expense: 0 });
 
     const balance = stats.income - stats.expense;
 
-    // --- Chart Data (Expenses Only) ---
-    const processChartData = () => {
+    const chartData = useMemo(() => {
         const totals = { fixed: 0, variable: 0, lifestyle: 0 };
 
-        monthlyData.filter(t => t.type === 'expense').forEach(tx => {
-            const val = parseFloat(tx.amount);
-            if (tx.expense_type === 'fixed') totals.fixed += val;
-            else if (tx.expense_type === 'variable') totals.variable += val;
-            else if (tx.expense_type === 'lifestyle') totals.lifestyle += val;
-            // Fallback if null? usually variable
-            else totals.variable += val;
-        });
+        monthlyTransactions
+            .filter((transaction) => transaction.type === 'expense')
+            .forEach((transaction) => {
+                const value = parseFloat(transaction.amount);
+                if (transaction.expense_type === 'fixed') totals.fixed += value;
+                else if (transaction.expense_type === 'lifestyle') totals.lifestyle += value;
+                else totals.variable += value;
+            });
 
         return [
-            { name: 'Fixo', value: totals.fixed, color: '#5A445D', key: 'fixed' },     // Muted Aubergine
-            { name: 'Variável', value: totals.variable, color: '#D4AF37', key: 'variable' }, // Champagne Gold
-            { name: 'Lazer', value: totals.lifestyle, color: '#3E5A74', key: 'lifestyle' }  // Slate Blue
-        ].filter(d => d.value > 0);
-    };
+            { name: 'Fixo', value: totals.fixed, color: '#5A445D', key: 'fixed' },
+            { name: 'Variavel', value: totals.variable, color: '#D4AF37', key: 'variable' },
+            { name: 'Lazer', value: totals.lifestyle, color: '#3E5A74', key: 'lifestyle' },
+        ].filter((item) => item.value > 0);
+    }, [monthlyTransactions]);
 
-    // --- Trend Data (Last 6 Months) ---
-    const processTrendData = () => {
+    const trendData = useMemo(() => {
         const trend = [];
         const today = new Date();
 
-        // Generate last 6 months keys
-        for (let i = 5; i >= 0; i--) {
-            const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+        for (let index = 5; index >= 0; index -= 1) {
+            const date = new Date(today.getFullYear(), today.getMonth() - index, 1);
             trend.push({
-                monthStr: d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''),
-                monthIndex: d.getMonth(),
-                year: d.getFullYear(),
+                monthStr: date.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''),
+                monthIndex: date.getMonth(),
+                year: date.getFullYear(),
                 income: 0,
-                expense: 0
+                expense: 0,
             });
         }
 
-        transactions.forEach(tx => {
-            // Apply Partner Filter for trends too
-            if (activeFilter === 'me' && tx.profile_id !== user.id) return;
-            if (activeFilter === 'partner' && tx.profile_id !== profile?.partner_id) return;
+        transactions.forEach((transaction) => {
+            if (activeFilter === 'me' && transaction.profile_id !== user.id) return;
+            if (activeFilter === 'partner' && transaction.profile_id !== profile?.partner_id) return;
 
-            const txDate = new Date(tx.date);
-            const match = trend.find(t => t.monthIndex === txDate.getMonth() && t.year === txDate.getFullYear());
-            if (match) {
-                if (tx.type === 'income') match.income += parseFloat(tx.amount);
-                else match.expense += parseFloat(tx.amount);
-            }
+            const transactionDate = new Date(transaction.date);
+            const match = trend.find((item) => item.monthIndex === transactionDate.getMonth() && item.year === transactionDate.getFullYear());
+            if (!match) return;
+
+            if (transaction.type === 'income') match.income += parseFloat(transaction.amount);
+            else match.expense += parseFloat(transaction.amount);
         });
 
         return trend;
-    };
+    }, [transactions, activeFilter, user?.id, profile?.partner_id]);
 
-    const trendData = processTrendData();
-
-    const chartData = processChartData();
-    const totalExpenses = chartData.reduce((acc, curr) => acc + curr.value, 0);
+    const totalExpenses = chartData.reduce((sum, item) => sum + item.value, 0);
+    const selectedTransactions = useMemo(() => (
+        monthlyTransactions
+            .filter((transaction) => transaction.type === 'expense' && (transaction.expense_type === selectedType || (!transaction.expense_type && selectedType === 'variable')))
+            .sort((a, b) => b.amount - a.amount)
+    ), [monthlyTransactions, selectedType]);
 
     return (
-        <div className={isTab ? "fade-in" : "container fade-in"} style={{ paddingBottom: '80px' }}>
+        <div className={isTab ? 'fade-in app-page-shell' : 'container fade-in app-page-shell'} style={{ paddingBottom: '80px' }}>
             {!isTab && (
                 <PageHeader
-                    title={<span>Análise <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Mensal</span></span>}
-                    subtitle="Resumo financeiro completo"
+                    title={<span>Analise <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Mensal</span></span>}
+                    subtitle="Resumo claro do comportamento financeiro e do resultado do mes."
                 />
             )}
 
             <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
 
-            {/* Month Selector */}
-            <div className="glass-pill-nav">
-                <button
-                    onClick={() => changeMonth(-1)}
-                    className="btn-ghost"
-                    style={{
-                        padding: '0.6rem',
-                        borderRadius: '50%',
-                        transition: 'all 0.2s'
-                    }}
-                >
-                    <ChevronLeft size={20} />
+            <div className="glass-card planning-month-switcher">
+                <button type="button" className="btn-ghost btn-icon" onClick={() => changeMonth(-1)} aria-label="Mes anterior">
+                    <ChevronLeft size={18} />
                 </button>
-
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    lineHeight: 1.2
-                }}>
-                    <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.6 }}>Mês de Referência</span>
-                    <span style={{ fontSize: '1rem', fontWeight: 700, textTransform: 'capitalize', letterSpacing: '0.02em' }}>
-                        {formatMonth(currentDate)}
-                    </span>
+                <div className="planning-month-copy">
+                    <span>Mes de referencia</span>
+                    <strong>{formatMonth(currentDate)}</strong>
                 </div>
-
-                <button
-                    onClick={() => changeMonth(1)}
-                    className="btn-ghost"
-                    style={{
-                        padding: '0.6rem',
-                        borderRadius: '50%',
-                        transition: 'all 0.2s'
-                    }}
-                >
-                    <ChevronRight size={20} />
+                <button type="button" className="btn-ghost btn-icon" onClick={() => changeMonth(1)} aria-label="Proximo mes">
+                    <ChevronRight size={18} />
                 </button>
             </div>
 
-
-            {/* Summary Cards */}
-            <div className="grid-responsive mb-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
-                <Card className="glass-card stagger-1 flex-align-center gap-15 surface-secondary" style={{ padding: '1.5rem', border: 'none' }}>
-                    <div className="icon-container" style={{ color: 'var(--color-success)' }}>
-                        <TrendingUp size={24} />
+            <div className="app-summary-grid">
+                <Card hover={false} className="app-summary-card app-summary-card-success">
+                    <div className="app-summary-topline">
+                        <div className="app-summary-icon app-summary-icon-success">
+                            <TrendingUp size={18} />
+                        </div>
+                        <span className="app-summary-label">Entradas</span>
                     </div>
-                    <div>
-                        <p className="text-muted text-small">Entradas</p>
-                        <h2 style={{ color: 'var(--color-success)' }}>R$ {stats.income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h2>
-                    </div>
+                    <strong className="app-summary-value">R$ {stats.income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
                 </Card>
-
-                <Card className="glass-card stagger-2 flex-align-center gap-15 surface-secondary" style={{ padding: '1.5rem', border: 'none' }}>
-                    <div className="icon-container" style={{ color: 'var(--color-danger)' }}>
-                        <TrendingDown size={24} />
+                <Card hover={false} className="app-summary-card app-summary-card-danger">
+                    <div className="app-summary-topline">
+                        <div className="app-summary-icon app-summary-icon-danger">
+                            <TrendingDown size={18} />
+                        </div>
+                        <span className="app-summary-label">Saidas</span>
                     </div>
-                    <div>
-                        <p className="text-muted text-small">Saídas</p>
-                        <h2 style={{ color: 'var(--color-danger)' }}>R$ {stats.expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h2>
-                    </div>
+                    <strong className="app-summary-value">R$ {stats.expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
                 </Card>
-
-                <Card className="glass-card stagger-3 flex-align-center gap-15 surface-secondary" style={{ padding: '1.5rem', border: 'none' }}>
-                    <div className="icon-container" style={{ color: 'var(--text-main)' }}>
-                        <Wallet size={24} />
+                <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                    <div className="app-summary-topline">
+                        <div className="app-summary-icon app-summary-icon-neutral">
+                            <Wallet size={18} />
+                        </div>
+                        <span className="app-summary-label">Saldo mensal</span>
                     </div>
-                    <div>
-                        <p className="text-muted text-small">Saldo Mensal</p>
-                        <h2 style={{ color: balance >= 0 ? 'var(--color-success)' : 'var(--color-danger)' }}>
-                            R$ {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                        </h2>
-                    </div>
+                    <strong className="app-summary-value">R$ {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
                 </Card>
             </div>
 
+            {chartsReady ? (
+                <Suspense fallback={<AnalysisChartsFallback />}>
+                    <AnalysisCharts
+                        chartData={chartData}
+                        selectedType={selectedType}
+                        onSelectType={setSelectedType}
+                        totalExpenses={totalExpenses}
+                        trendData={trendData}
+                    />
+                </Suspense>
+            ) : (
+                <AnalysisChartsFallback />
+            )}
 
-            {/* Charts & Breakdown */}
-            <div className="grid-responsive">
-
-                {/* Chart Area */}
-                <Card className="glass-card fade-in stagger-1" style={{ minHeight: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <h3 style={{ alignSelf: 'flex-start', marginBottom: '1rem' }}>Distribuição de Gastos</h3>
-
-                    {chartData.length > 0 ? (
-                        <div style={{ width: '100%', height: '300px', position: 'relative' }}>
-                            <ResponsiveContainer>
-                                <PieChart>
-                                    <Pie
-                                        data={chartData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={80}
-                                        outerRadius={110}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                        onClick={(data) => setSelectedType(prev => prev === data.key ? null : data.key)}
-                                        style={{ cursor: 'pointer', filter: 'drop-shadow(0px 0px 10px rgba(255,255,255,0.1))' }}
-                                        animationBegin={0}
-                                        animationDuration={1500}
-                                    >
-                                        {chartData.map((entry, index) => (
-                                            <Cell
-                                                key={`cell-${index}`}
-                                                fill={entry.color}
-                                                stroke={selectedType === entry.key ? '#fff' : 'none'}
-                                                strokeWidth={2}
-                                                style={{ opacity: selectedType && selectedType !== entry.key ? 0.3 : 1, transition: 'all 0.3s', cursor: 'pointer' }}
-                                            />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--glass-border)', borderRadius: '12px', boxShadow: 'var(--glass-shadow)' }}
-                                        itemStyle={{ color: 'var(--text-main)' }}
-                                        formatter={(value) => `R$ ${value.toFixed(2)}`}
-                                    />
-                                    <Legend verticalAlign="bottom" height={36} />
-                                </PieChart>
-                            </ResponsiveContainer>
-                            <div style={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -60%)',
-                                textAlign: 'center'
-                            }}>
-                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Despesas</span>
-                                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)' }}>R$ {totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</div>
-                            </div>
+            {selectedType && (
+                <Card className="glass-card app-section-card">
+                    <div className="app-section-header">
+                        <div>
+                            <h3>Detalhes</h3>
+                            <p>{selectedType === 'fixed' ? 'Gastos fixos' : selectedType === 'variable' ? 'Gastos variaveis' : 'Lazer'}</p>
                         </div>
-                    ) : (
-                        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', flexDirection: 'column', gap: '1rem' }}>
-                            <div className="icon-container" style={{ opacity: 0.5 }}>
-                                <Wallet size={32} />
-                            </div>
-                            <p>Sem despesas neste mês</p>
-                        </div>
-                    )}
-                </Card>
+                        <button type="button" className="btn-ghost" onClick={() => setSelectedType(null)}>
+                            Fechar
+                        </button>
+                    </div>
 
-                {/* Breakdown List */}
-                <div className="flex-column gap-1">
-                    {chartData.map((item, index) => (
-                        <Card key={item.name} className={`glass-card fade-in stagger-${index + 1} flex-between`}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: item.color }} />
-                                <div>
-                                    <h4 style={{ fontSize: '1.1rem' }}>{item.name}</h4>
-                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                                        {((item.value / totalExpenses) * 100).toFixed(1)}% do total
+                    <div className="app-stack-list">
+                        {selectedTransactions.map((transaction) => (
+                            <Card key={transaction.id} hover={false} className="app-list-card">
+                                <div className="app-list-card-main">
+                                    <div>
+                                        <strong>{transaction.description}</strong>
+                                        <span>{transaction.category} {'·'} {new Date(transaction.date).toLocaleDateString('pt-BR')}</span>
                                     </div>
                                 </div>
-                            </div>
-                            <div style={{ fontWeight: 600, fontSize: '1.2rem' }}>
-                                R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                            </div>
-                        </Card>
-                    ))}
-
-                    {chartData.length === 0 && (
-                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                            <p>Nenhum dado para categorizar.</p>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Detailed Transaction List for Selected Type */}
-            {selectedType && (
-                <div className="fade-in mt-2" style={{ animationDuration: '0.4s' }}>
-                    <div className="flex-between mb-1">
-                        <h3>Detalhes: {selectedType === 'fixed' ? 'Gastos Fixos' : selectedType === 'variable' ? 'Gastos Variáveis' : 'Lazer'}</h3>
-                        <button onClick={() => setSelectedType(null)} className="btn-ghost text-small">Fechar X</button>
+                                <strong style={{ color: '#f64f59' }}>
+                                    - R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}
+                                </strong>
+                            </Card>
+                        ))}
                     </div>
-
-                    <div className="grid-responsive gap-1" style={{ gridTemplateColumns: '1fr' }}>
-                        {monthlyData
-                            .filter(t => t.type === 'expense' && (t.expense_type === selectedType || (!t.expense_type && selectedType === 'variable')))
-                            .sort((a, b) => b.amount - a.amount)
-                            .map((tx, i) => (
-                                <Card key={tx.id} className="glass-card flex-between" style={{ padding: '1rem' }}>
-                                    <div>
-                                        <div className="text-bold">{tx.description}</div>
-                                        <div className="text-muted text-small">{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</div>
-                                    </div>
-                                    <div className="text-bold" style={{ color: '#f64f59' }}>
-                                        - R$ {parseFloat(tx.amount).toFixed(2).replace('.', ',')}
-                                    </div>
-                                </Card>
-                            ))}
-                    </div>
-                </div>
+                </Card>
             )}
+
+            {loading && <div className="app-empty-inline">Carregando analise...</div>}
         </div>
     );
 }

@@ -1,113 +1,139 @@
-import { useState } from 'react';
-import { PageHeader } from '../components/PageHeader';
-import { Button } from '../components/Button';
+import { lazy, Suspense, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { PieChart, Target, Wallet, TrendingUp } from 'lucide-react';
+import { PageHeader } from '../components/PageHeader';
 
-// Import Views
-import Analysis from './Analysis';
-import Goals from './Goals';
-import Budgets from './Budgets';
-import Simulator from './Simulator';
+const Analysis = lazy(() => import('./Analysis'));
+const Goals = lazy(() => import('./Goals'));
+const Budgets = lazy(() => import('./Budgets'));
+const Simulator = lazy(() => import('./Simulator'));
+
+const VALID_TABS = ['analysis', 'goals', 'budgets', 'simulator'];
+
+const TAB_CONFIG = {
+    analysis: {
+        label: 'Analise',
+        subtitle: 'Entenda seu ritmo de gastos e o resultado do mes.',
+        icon: PieChart,
+    },
+    goals: {
+        label: 'Metas',
+        subtitle: 'Acompanhe o que esta em foco e onde vale acelerar.',
+        icon: Target,
+    },
+    budgets: {
+        label: 'Orcamentos',
+        subtitle: 'Defina limites claros para nao perder o controle.',
+        icon: Wallet,
+    },
+    simulator: {
+        label: 'Simulador',
+        subtitle: 'Projete cenarios e enxergue o impacto da consistencia.',
+        icon: TrendingUp,
+    },
+};
+
+const pageVariants = {
+    hidden: { opacity: 0, y: 14 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.35,
+            ease: [0.22, 1, 0.36, 1],
+            staggerChildren: 0.06,
+            delayChildren: 0.04,
+        },
+    },
+};
+
+const sectionVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -10 },
+};
 
 export default function Planning() {
-    const [activeTab, setActiveTab] = useState('analysis');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const requestedTab = searchParams.get('tab');
+    const activeTab = VALID_TABS.includes(requestedTab) ? requestedTab : 'analysis';
+    const activeConfig = TAB_CONFIG[activeTab];
+
+    useEffect(() => {
+        if (!VALID_TABS.includes(requestedTab)) {
+            setSearchParams({ tab: 'analysis' }, { replace: true });
+        }
+    }, [requestedTab, setSearchParams]);
+
+    const handleTabChange = (tab) => setSearchParams({ tab });
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'analysis': return <Analysis isTab={true} />;
-            case 'goals': return <Goals isTab={true} />;
-            case 'budgets': return <Budgets isTab={true} />;
-            case 'simulator': return <Simulator isTab={true} />;
-            default: return <Analysis isTab={true} />;
-        }
-    };
-
-    const getTitle = () => {
-        switch (activeTab) {
-            case 'analysis': return <span>Análise <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Financeira</span></span>;
-            case 'goals': return <span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Metas</span></span>;
-            case 'budgets': return <span>Meus <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Orçamentos</span></span>;
-            case 'simulator': return <span>Simulador de <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Investimentos</span></span>;
-            default: return 'Planejamento Financeiro';
-        }
-    };
-
-    const getSubtitle = () => {
-        switch (activeTab) {
-            case 'analysis': return "Entenda seus hábitos de consumo";
-            case 'goals': return "Acompanhe e realize seus sonhos";
-            case 'budgets': return "Defina limites e economize";
-            case 'simulator': return "Projete seu futuro financeiro";
-            default: return "";
+            case 'analysis':
+                return <Analysis isTab />;
+            case 'goals':
+                return <Goals isTab />;
+            case 'budgets':
+                return <Budgets isTab />;
+            case 'simulator':
+                return <Simulator isTab />;
+            default:
+                return <Analysis isTab />;
         }
     };
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-            <PageHeader
-                title={getTitle()}
-                subtitle={getSubtitle()}
-            />
+        <motion.div
+            className="container app-page-shell"
+            style={{ paddingBottom: '80px' }}
+            variants={pageVariants}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.div variants={sectionVariants}>
+                <PageHeader
+                    title={<span>Planejamento <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Financeiro</span></span>}
+                    subtitle={activeConfig.subtitle}
+                />
+            </motion.div>
 
-            {/* Tab Navigation - Sticky & Scrollable */}
-            <div className="glass-panel" style={{
-                padding: '0.5rem',
-                marginBottom: '1.5rem',
-                display: 'flex',
-                gap: '0.5rem',
-                overflowX: 'auto',
-                whiteSpace: 'nowrap',
-                scrollbarWidth: 'none',
-                position: 'sticky',
-                top: '0',
-                zIndex: 10,
-                backdropFilter: 'blur(12px)',
-                background: 'var(--glass-bg)',
-                borderBottom: '1px solid var(--glass-border)',
-                margin: '0 -1rem 1.5rem -1rem', // Negative margin to span full width on mobile
-                borderRadius: '0 0 16px 16px', // Rounded only at bottom
-                width: 'calc(100% + 2rem)' //Compensate for negative margins
-            }}>
-                <Button
-                    variant={activeTab === 'analysis' ? 'primary' : 'ghost'}
-                    onClick={() => setActiveTab('analysis')}
-                    icon={PieChart}
-                    style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
-                >
-                    Análise
-                </Button>
-                <Button
-                    variant={activeTab === 'goals' ? 'primary' : 'ghost'}
-                    onClick={() => setActiveTab('goals')}
-                    icon={Target}
-                    style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
-                >
-                    Metas
-                </Button>
-                <Button
-                    variant={activeTab === 'budgets' ? 'primary' : 'ghost'}
-                    onClick={() => setActiveTab('budgets')}
-                    icon={Wallet}
-                    style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
-                >
-                    Orçamentos
-                </Button>
-                <Button
-                    variant={activeTab === 'simulator' ? 'primary' : 'ghost'}
-                    onClick={() => setActiveTab('simulator')}
-                    icon={TrendingUp}
-                    style={{ borderRadius: '12px', flex: '0 0 auto', padding: '0.6rem 1rem', fontSize: '0.9rem' }}
-                >
-                    Simulador
-                </Button>
-                {/* Spacer for right padding */}
-                <div style={{ width: '0.5rem', flex: '0 0 auto' }}></div>
-            </div>
+            <motion.div className="glass-card planning-tabs" variants={sectionVariants}>
+                {VALID_TABS.map((tab) => {
+                    const { icon: Icon, label } = TAB_CONFIG[tab];
+                    const isActive = activeTab === tab;
 
-            {/* Content Area */}
-            <div className="fade-in" key={activeTab}>
-                {renderContent()}
-            </div>
-        </div>
+                    return (
+                        <motion.button
+                            key={tab}
+                            type="button"
+                            className={`planning-tab-button${isActive ? ' is-active' : ''}`}
+                            onClick={() => handleTabChange(tab)}
+                            whileHover={{ y: -1, scale: 1.01 }}
+                            whileTap={{ scale: 0.98 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <Icon size={16} />
+                            <span>{label}</span>
+                        </motion.button>
+                    );
+                })}
+            </motion.div>
+
+            <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                    key={activeTab}
+                    variants={sectionVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                >
+                    <Suspense fallback={<div className="app-empty-inline">Carregando aba...</div>}>
+                        {renderContent()}
+                    </Suspense>
+                </motion.div>
+            </AnimatePresence>
+        </motion.div>
     );
 }

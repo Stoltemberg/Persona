@@ -1,9 +1,12 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext({});
 
 export const useAuth = () => useContext(AuthContext);
+
+const getPayloadProfileId = (payload, key = 'profile_id') => payload?.new?.[key] || payload?.old?.[key] || null;
+const REALTIME_DEDUP_WINDOW_MS = 750;
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -17,6 +20,28 @@ export function AuthProvider({ children }) {
     const [outgoingRequest, setOutgoingRequest] = useState(null);
     const [lastPartnerUpdate, setLastPartnerUpdate] = useState(localStorage.getItem('last_partner_update') || null);
     const [lastViewedTransactions, setLastViewedTransactions] = useState(localStorage.getItem('last_viewed_transactions') || null);
+    const recentRealtimeDispatches = useRef(new Map());
+
+    const shouldSkipDuplicateRealtime = (signature) => {
+        const now = Date.now();
+        const lastSeen = recentRealtimeDispatches.current.get(signature) || 0;
+
+        if (now - lastSeen < REALTIME_DEDUP_WINDOW_MS) {
+            return true;
+        }
+
+        recentRealtimeDispatches.current.set(signature, now);
+
+        if (recentRealtimeDispatches.current.size > 64) {
+            for (const [key, timestamp] of recentRealtimeDispatches.current.entries()) {
+                if (now - timestamp >= REALTIME_DEDUP_WINDOW_MS) {
+                    recentRealtimeDispatches.current.delete(key);
+                }
+            }
+        }
+
+        return false;
+    };
 
     useEffect(() => {
         // Check active session
@@ -54,10 +79,24 @@ export function AuthProvider({ children }) {
         window.addEventListener('focus', handleFocus);
 
         const handleRealtimePayload = (payload) => {
-            console.log('Realtime change received!', payload);
-            
+            const table = payload?.table;
+            const eventType = payload?.eventType;
+            const rowId = payload?.new?.id || payload?.old?.id || 'unknown';
+            const changeFingerprint = JSON.stringify(payload?.new || payload?.old || {});
+            const signature = `${table}:${eventType}:${rowId}:${changeFingerprint}`;
+
+            if (shouldSkipDuplicateRealtime(signature)) {
+                return;
+            }
+
+            const payloadProfileId = getPayloadProfileId(payload);
+            const isRelevantProfile = payloadProfileId === user.id || payloadProfileId === profile?.partner_id;
+
+            if (!isRelevantProfile) {
+                return;
+            }
+
             if (payload.eventType === 'INSERT' && payload.table === 'transactions') {
-                // If the new transaction is from the partner
                 if (payload.new?.profile_id === profile?.partner_id) {
                     const now = new Date().toISOString();
                     setLastPartnerUpdate(now);
@@ -65,8 +104,7 @@ export function AuthProvider({ children }) {
                 }
                 window.dispatchEvent(new CustomEvent('transaction-inserted', { detail: { id: payload.new?.id } }));
             }
-            
-            // Fire global sync event
+
             window.dispatchEvent(new CustomEvent('supabase-sync', { detail: payload }));
         };
 
@@ -81,7 +119,7 @@ export function AuthProvider({ children }) {
             window.removeEventListener('focus', handleFocus);
             supabase.removeChannel(channel);
         };
-    }, [user]);
+    }, [user, profile?.partner_id]);
 
     const fetchProfile = async (userId) => {
         try {
@@ -116,13 +154,8 @@ export function AuthProvider({ children }) {
                 setProfile(finalData);
                 if (finalData.role) setRole(finalData.role);
                 if (finalData.plan_tier) setPlanTier(finalData.plan_tier);
+                setIsPro(finalData.plan_tier === 'complete' || finalData.plan_tier === 'intermediate');
 
-                // Keep compatibility with isPro boolean
-                if (finalData.plan_tier === 'complete' || finalData.plan_tier === 'intermediate') {
-                    setIsPro(true);
-                }
-
-                // Fetch partner profile if exists
                 if (finalData.partner_id) {
                     const { data: pData } = await supabase
                         .from('profiles')
@@ -157,11 +190,8 @@ export function AuthProvider({ children }) {
                 }
             }
 
-            // Optional: Still check DB function if needed, but local profile data is faster usually
-            // Check subscription status (Legacy check or extra validation)
             const { data: isProData, error: proError } = await supabase.rpc('is_pro');
             if (!proError) {
-                // If the RPC says pro, ensure we mark as pro (handling legacy subscriptions)
                 if (isProData) setIsPro(true);
             }
         } catch (error) {
@@ -191,18 +221,6 @@ export function AuthProvider({ children }) {
         if (error) throw error;
         return data;
     };
-    // Actually signIn code in previous file:
-    /*
-    const signIn = async (email, password) => {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-        if (error) throw error;
-        return data;
-    };
-    */
-    // I should only replace the top part properly.
 
     const signOut = async () => {
         try {

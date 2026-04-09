@@ -1,11 +1,10 @@
+import { createPortal } from 'react-dom';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Receipt, Target, Settings, LogOut, PieChart, Wallet, Repeat, Eye, EyeOff, Calendar, TrendingUp, Plane } from 'lucide-react';
+import clsx from 'clsx';
+import { Eye, EyeOff, LayoutDashboard, LogOut, Plane, Receipt, Repeat, Settings, Tag, Target, Wallet } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { usePrivacy } from '../context/PrivacyContext';
 import { useEvent } from '../context/EventContext';
-import clsx from 'clsx';
-
-import { createPortal } from 'react-dom';
 
 export function Sidebar() {
     const { signOut, role, hasNewPartnerUpdates } = useAuth();
@@ -14,88 +13,73 @@ export function Sidebar() {
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-        { icon: Receipt, label: 'Transações', path: '/transactions' },
+        { icon: Receipt, label: 'Transacoes', path: '/transactions' },
         { icon: Repeat, label: 'Recorrentes', path: '/recurring' },
         { icon: Target, label: 'Planejamento', path: '/planning' },
-        { icon: Settings, label: 'Configurações', path: '/settings' },
+        { icon: Wallet, label: 'Carteiras', path: '/wallets' },
+        { icon: Tag, label: 'Categorias', path: '/categories' },
+        { icon: Settings, label: 'Configuracoes', path: '/settings' },
     ];
 
     if (role === 'admin') {
         navItems.push({ icon: Receipt, label: 'Admin', path: '/admin' });
     }
 
-    const sidebarContent = (
-        <aside className="glass-panel sidebar-panel">
-            <div className="sidebar-header">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                    <h1 style={{ fontSize: '1.5rem', marginBottom: 0, fontWeight: 600, color: 'var(--text-main)' }}>Persona</h1>
-                    <button
-                        onClick={togglePrivacy}
-                        className="sidebar-header-btn"
-                        title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
-                        aria-label={isPrivacyMode ? "Mostrar valores monetários" : "Ocultar valores monetários"}
-                    >
-                        {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                    <button
-                        onClick={() => toggleEventMode(!isEventMode)}
-                        className="sidebar-header-btn"
-                        style={{ color: isEventMode ? 'var(--text-main)' : undefined }}
-                        title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
-                        aria-label={isEventMode ? "Sair do Modo Viagem" : "Entrar no Modo Viagem"}
-                    >
-                        <Plane size={18} />
-                    </button>
-                </div>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Professional Finance</p>
-            </div>
-
-            <nav className="sidebar-nav">
-                {navItems.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        aria-label={item.label}
-                        className={({ isActive }) => clsx(
-                            'nav-item',
-                            isActive ? 'active' : '',
-                            item.label === 'Transações' && hasNewPartnerUpdates && 'indicator-pulse'
-                        )}
-                    >
-                        {({ isActive }) => (
-                            <>
-                                <div>
-                                    <item.icon size={20} />
-                                </div>
-                                <span>
-                                    {item.label}
-                                </span>
-                            </>
-                        )}
-                    </NavLink>
-                ))}
-            </nav>
-
-            <button
-                onClick={signOut}
-                className="logout-btn"
-                aria-label="Sair da conta"
-            >
-
-                <div>
-                    <LogOut size={22} />
-                </div>
-                <span>Sair</span>
-            </button>
-        </aside>
-
-    );
-
-    // Use Portal to render outside of the app root (avoiding transforms)
     return createPortal(
         <div className="sidebar-container">
-            {sidebarContent}
+            <aside className="glass-panel sidebar-panel">
+                <div className="sidebar-header">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                        <h1 style={{ fontSize: '1.5rem', marginBottom: 0, fontWeight: 600, color: 'var(--text-main)' }}>Persona</h1>
+                        <button
+                            onClick={togglePrivacy}
+                            className="sidebar-header-btn"
+                            title={isPrivacyMode ? 'Mostrar valores' : 'Esconder valores'}
+                            aria-label={isPrivacyMode ? 'Mostrar valores monetarios' : 'Ocultar valores monetarios'}
+                        >
+                            {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                        <button
+                            onClick={() => toggleEventMode(!isEventMode)}
+                            className="sidebar-header-btn"
+                            style={{ color: isEventMode ? 'var(--text-main)' : undefined }}
+                            title={isEventMode ? 'Sair do modo viagem' : 'Modo viagem'}
+                            aria-label={isEventMode ? 'Sair do modo viagem' : 'Entrar no modo viagem'}
+                        >
+                            <Plane size={18} />
+                        </button>
+                    </div>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                        Professional Finance
+                    </p>
+                </div>
+
+                <nav className="sidebar-nav">
+                    {navItems.map((item) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            aria-label={item.label}
+                            className={({ isActive }) =>
+                                clsx('nav-item', isActive ? 'active' : '', item.label === 'Transacoes' && hasNewPartnerUpdates && 'indicator-pulse')
+                            }
+                        >
+                            <div>
+                                <item.icon size={20} />
+                            </div>
+                            <span>{item.label}</span>
+                        </NavLink>
+                    ))}
+                </nav>
+
+                <button onClick={signOut} className="logout-btn" aria-label="Sair da conta">
+                    <div>
+                        <LogOut size={22} />
+                    </div>
+                    <span>Sair</span>
+                </button>
+            </aside>
         </div>,
-        document.body
+        document.body,
     );
 }

@@ -1,32 +1,53 @@
+import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+    Bell,
+    CreditCard,
+    Download,
+    Heart,
+    Lock,
+    Monitor,
+    Moon,
+    Shield,
+    Sun,
+    User,
+    Wallet,
+} from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../context/ThemeContext';
+import { supabase } from '../lib/supabase';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Switch } from '../components/Switch';
 import { Modal } from '../components/Modal';
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { useTheme } from '../context/ThemeContext';
-import { User, Bell, Shield, Wallet, Moon, Sun, Monitor, Camera, Zap, Maximize, Heart } from 'lucide-react';
-import { Link } from 'react-router-dom';
-
+import { PageHeader } from '../components/PageHeader';
 import { useToast } from '../context/ToastContext';
 import { exportDataToExcel } from '../lib/exportUtils';
 import { UpgradeModal } from '../components/UpgradeModal';
-import { Lock } from 'lucide-react';
 
 const AVATAR_PRESETS = [
     'linear-gradient(135deg, #c471ed, #f64f59)',
     'linear-gradient(135deg, #12c2e9, #c471ed)',
     'linear-gradient(135deg, #f64f59, #f7797d)',
     'linear-gradient(135deg, #11998e, #38ef7d)',
-    'linear-gradient(135deg, #FFD700, #FDB931)'
+    'linear-gradient(135deg, #FFD700, #FDB931)',
 ];
 
 export default function Settings() {
-    const { profile, user, isPro, planTier, partnerProfile, incomingRequest, outgoingRequest, fetchProfile } = useAuth();
+    const {
+        profile,
+        user,
+        isPro,
+        planTier,
+        partnerProfile,
+        incomingRequest,
+        outgoingRequest,
+        fetchProfile,
+    } = useAuth();
     const { theme, changeTheme } = useTheme();
-    const { addToast } = useToast();
+    const { addToast, addConfirmationCard } = useToast();
+
     const [loading, setLoading] = useState(false);
     const [fullName, setFullName] = useState(profile?.full_name || '');
     const [partnerTagInput, setPartnerTagInput] = useState('');
@@ -38,66 +59,86 @@ export default function Settings() {
     const [selectedAvatar, setSelectedAvatar] = useState(AVATAR_PRESETS[0]);
     const [notifications, setNotifications] = useState({
         budget: true,
-        weekly: false
+        weekly: false,
     });
 
     useEffect(() => {
+        setFullName(profile?.full_name || '');
+    }, [profile?.full_name]);
+
+    useEffect(() => {
         if (!user) return;
-        supabase.from('subscriptions')
+
+        supabase
+            .from('subscriptions')
             .select('*')
             .eq('user_id', user.id)
             .maybeSingle()
             .then(({ data }) => setSubscription(data));
 
-        // Load persisted avatar if any (mock implementation)
         const savedAvatar = localStorage.getItem('user_avatar_gradient');
         if (savedAvatar) setSelectedAvatar(savedAvatar);
     }, [user]);
 
-    const handleUpdateProfile = async (e) => {
-        e.preventDefault();
+    const planLabel = useMemo(() => {
+        if (planTier === 'complete') return 'Plano Completo';
+        if (planTier === 'intermediate') return 'Plano Intermediario';
+        return 'Plano Gratuito';
+    }, [planTier]);
+
+    const partnerStatus = useMemo(() => {
+        if (partnerProfile) return 'Conectado';
+        if (outgoingRequest) return 'Convite pendente';
+        if (incomingRequest) return 'Convite recebido';
+        return 'Disponivel';
+    }, [incomingRequest, outgoingRequest, partnerProfile]);
+
+    const handleUpdateProfile = async (event) => {
+        event.preventDefault();
         setLoading(true);
+
         try {
             const { error } = await supabase
                 .from('profiles')
                 .update({ full_name: fullName })
                 .eq('id', user.id);
 
-            localStorage.setItem('user_avatar_gradient', selectedAvatar);
-
             if (error) throw error;
-            addToast('Perfil atualizado com sucesso!', 'success');
+
+            localStorage.setItem('user_avatar_gradient', selectedAvatar);
+            addConfirmationCard('Perfil atualizado', 'Seu nome e estilo visual foram salvos.');
+            await fetchProfile(user.id);
         } catch (error) {
-            console.error(error);
             addToast('Erro ao atualizar perfil.', 'error');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleLinkPartner = async (e) => {
-        e.preventDefault();
+    const handleLinkPartner = async (event) => {
+        event.preventDefault();
         setLinkError('');
-        if (!partnerTagInput) {
-            setLinkError('Por favor, informe um ID válido.');
+
+        if (!partnerTagInput.trim()) {
+            setLinkError('Informe um ID valido.');
             return;
         }
-        setLoading(true);
-        try {
-            const { data, error } = await supabase.rpc('link_partner', { partner_tag: partnerTagInput.trim() });
-            
-            if (error) {
-                throw error;
-            }
 
-            addToast('Convite enviado com sucesso! Aguarde a aprovação.', 'success');
+        setLoading(true);
+
+        try {
+            const { error } = await supabase.rpc('link_partner', {
+                partner_tag: partnerTagInput.trim(),
+            });
+
+            if (error) throw error;
+
+            addConfirmationCard('Convite enviado', 'Agora e so aguardar a aprovacao do seu parceiro.');
             setPartnerTagInput('');
             setIsCoupleModalOpen(false);
             await fetchProfile(user.id);
-        } catch (err) {
-            console.error("Catch:", err);
-            const msg = err.message || 'Erro ao vincular conta';
-            setLinkError(msg);
+        } catch (error) {
+            setLinkError(error.message || 'Erro ao vincular conta.');
         } finally {
             setLoading(false);
         }
@@ -105,18 +146,32 @@ export default function Settings() {
 
     const handleUnlinkPartner = async () => {
         setLoading(true);
+
         try {
             const { error } = await supabase.rpc('unlink_partner');
-            if (error) {
-                throw error;
-            }
-            addToast('Contas desvinculadas.', 'info');
+            if (error) throw error;
+
+            addConfirmationCard('Vinculo removido', 'As contas deixaram de compartilhar dados.');
             setIsUnlinkModalOpen(false);
             await fetchProfile(user.id);
-        } catch (err) {
-            console.error("Catch:", err);
-            const msg = err.message || 'Erro ao desvincular conta';
-            addToast(msg, 'error');
+        } catch (error) {
+            addToast(error.message || 'Erro ao desvincular conta.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCancelInvite = async () => {
+        setLoading(true);
+
+        try {
+            const { error } = await supabase.rpc('cancel_partner_request');
+            if (error) throw error;
+
+            addConfirmationCard('Convite cancelado', 'O pedido de conexao foi removido.');
+            await fetchProfile(user.id);
+        } catch (error) {
+            addToast('Erro ao cancelar convite.', 'error');
         } finally {
             setLoading(false);
         }
@@ -129,30 +184,39 @@ export default function Settings() {
         }
 
         setLoading(true);
+
         try {
-            addToast('Gerando relatório...', 'info');
+            addToast('Preparando relatorio.', 'info');
 
-            // Fetch fresh data
-            const { data: allTransactions } = await supabase.from('transactions').select('*');
-            const { data: allWallets } = await supabase.from('wallets').select('*');
-            const { data: allGoals } = await supabase.from('goals').select('*');
-            const { data: allBudgets } = await supabase.from('budgets').select('*');
+            const [
+                { data: allTransactions, error: transactionsError },
+                { data: allWallets, error: walletsError },
+                { data: allGoals, error: goalsError },
+                { data: allBudgets, error: budgetsError },
+                { data: expenseCategories, error: categoriesError },
+            ] = await Promise.all([
+                supabase.from('transactions').select('*'),
+                supabase.from('wallets').select('*'),
+                supabase.from('goals').select('*'),
+                supabase.from('budgets').select('*'),
+                supabase.from('categories').select('*').eq('type', 'expense'),
+            ]);
 
-            // Fetch categories correctly as per Budgets.jsx logic if possible, or just all expense categories
-            const { data: expenseCategories } = await supabase.from('categories').select('*').eq('type', 'expense');
+            if (transactionsError || walletsError || goalsError || budgetsError || categoriesError) {
+                throw transactionsError || walletsError || goalsError || budgetsError || categoriesError;
+            }
 
             await exportDataToExcel(
-                profile?.full_name || 'Usuário',
+                profile?.full_name || 'Usuario',
                 allTransactions || [],
                 allWallets || [],
                 allGoals || [],
                 expenseCategories || [],
-                allBudgets || []
+                allBudgets || [],
             );
 
-            addToast('Relatório baixado com sucesso!', 'success');
-        } catch (err) {
-            console.error(err);
+            addConfirmationCard('Relatorio exportado', 'O arquivo foi baixado no seu dispositivo.');
+        } catch (error) {
             addToast('Erro ao exportar dados.', 'error');
         } finally {
             setLoading(false);
@@ -160,342 +224,414 @@ export default function Settings() {
     };
 
     return (
-        <div className="container fade-in" style={{ paddingBottom: '80px' }}>
-            <header style={{ marginBottom: '3rem', paddingTop: '1rem' }}>
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                    Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Configurações</span>
-                </h1>
-                <p style={{ opacity: 0.6 }}>Gerencie sua conta e preferências</p>
-            </header>
+        <div className="container fade-in app-page-shell" style={{ paddingBottom: '80px' }}>
+            <PageHeader
+                title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Configuracoes</span></span>}
+                subtitle="Centralize plano, perfil, modo casal e preferencias em uma tela mais organizada."
+            >
+                <Button variant="ghost" icon={Download} onClick={handleExport} disabled={loading}>
+                    Exportar dados
+                </Button>
+            </PageHeader>
 
-            <div className="grid-responsive">
-
-                {/* Plan Settings */}
-                <Card className="glass-card fade-in stagger-1" style={{ border: isPro ? '1px solid #38ef7d' : '1px solid var(--glass-border)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <div className="icon-container" style={{ background: isPro ? 'rgba(56, 239, 125, 0.1)' : undefined, color: isPro ? '#38ef7d' : undefined }}>
-                            <Shield size={24} />
+            <div className="app-summary-grid">
+                <Card hover={false} className={`app-summary-card ${isPro ? 'app-summary-card-success' : 'app-summary-card-neutral'}`}>
+                    <div className="app-summary-topline">
+                        <div className={`app-summary-icon ${isPro ? 'app-summary-icon-success' : 'app-summary-icon-neutral'}`}>
+                            <Shield size={18} />
                         </div>
-                        <div>
-                            <h3>Meu Plano</h3>
-                            <p style={{ fontSize: '0.85rem', color: isPro ? '#38ef7d' : 'var(--text-muted)' }}>
-                                {isPro ? 'Membro Premium' : 'Plano Gratuito'}
-                            </p>
+                        <span className="app-summary-label">Plano atual</span>
+                    </div>
+                    <strong className="app-summary-value">{planLabel}</strong>
+                </Card>
+
+                <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                    <div className="app-summary-topline">
+                        <div className="app-summary-icon app-summary-icon-neutral">
+                            <Heart size={18} />
+                        </div>
+                        <span className="app-summary-label">Modo casal</span>
+                    </div>
+                    <strong className="app-summary-value">{partnerStatus}</strong>
+                </Card>
+
+                <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                    <div className="app-summary-topline">
+                        <div className="app-summary-icon app-summary-icon-neutral">
+                            {theme === 'light' ? <Sun size={18} /> : theme === 'dark' ? <Moon size={18} /> : <Monitor size={18} />}
+                        </div>
+                        <span className="app-summary-label">Aparencia</span>
+                    </div>
+                    <strong className="app-summary-value">
+                        {theme === 'light' ? 'Claro' : theme === 'dark' ? 'Escuro' : 'Sistema'}
+                    </strong>
+                </Card>
+            </div>
+
+            <div className="app-list-grid" style={{ alignItems: 'start' }}>
+                <Card className="app-section-card">
+                    <div className="app-section-header">
+                        <div className="app-list-card-main">
+                            <span className="app-inline-icon">
+                                <Shield size={18} />
+                            </span>
+                            <div>
+                                <strong>Plano e beneficios</strong>
+                                <span>Veja o que esta ativo e quais recursos voce pode liberar.</span>
+                            </div>
                         </div>
                     </div>
 
-                    {isPro ? (
-                        <div style={{ padding: '1rem', background: 'rgba(56, 239, 125, 0.05)', borderRadius: '12px', border: '1px solid rgba(56, 239, 125, 0.2)' }}>
-                            <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem' }}>Status: <strong style={{ color: '#38ef7d' }}>ATIVO</strong></p>
-                            {subscription?.valid_until ? (
-                                <p style={{ fontSize: '0.9rem' }}>Válido até: <strong>{new Date(subscription.valid_until).toLocaleDateString('pt-BR')}</strong></p>
-                            ) : subscription?.current_period_end ? (
-                                <p style={{ fontSize: '0.9rem' }}>Válido até: <strong>{new Date(subscription.current_period_end).toLocaleDateString('pt-BR')}</strong></p>
-                            ) : (
-                                <p style={{ fontSize: '0.9rem' }}>Ciclo: <strong>Mensal</strong></p>
-                            )}
-                        </div>
-                    ) : (
-                        <div>
-                            <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-                                Você está no plano gratuito. Faça upgrade para liberar todos os recursos.
-                            </p>
-                            <Button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setShowUpgrade(true)}>
-                                Quero ser PRO
-                            </Button>
-                        </div>
+                    <div className="app-summary-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                        <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                            <span className="app-summary-label">Status</span>
+                            <strong className="app-summary-value">{isPro ? 'Premium ativo' : 'Plano free'}</strong>
+                        </Card>
+                        <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                            <span className="app-summary-label">Renovacao</span>
+                            <strong className="app-summary-value">
+                                {subscription?.valid_until
+                                    ? new Date(subscription.valid_until).toLocaleDateString('pt-BR')
+                                    : subscription?.current_period_end
+                                        ? new Date(subscription.current_period_end).toLocaleDateString('pt-BR')
+                                        : 'Sem data definida'}
+                            </strong>
+                        </Card>
+                    </div>
+
+                    <p className="text-muted" style={{ margin: 0 }}>
+                        {isPro
+                            ? 'Seu plano ja libera mais carteiras, insights e exportacoes avancadas.'
+                            : 'Faca upgrade para desbloquear exportacao completa, modo casal e mais carteiras.'}
+                    </p>
+
+                    {!isPro && (
+                        <Button className="btn-primary" onClick={() => setShowUpgrade(true)} style={{ justifyContent: 'center' }}>
+                            Conhecer planos
+                        </Button>
                     )}
                 </Card>
 
-                {/* Profile Settings */}
-                <Card className="glass-card fade-in stagger-1">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                        <div className="icon-container">
-                            <User size={24} />
+                <Card className="app-section-card">
+                    <div className="app-section-header">
+                        <div className="app-list-card-main">
+                            <span className="app-inline-icon">
+                                <User size={18} />
+                            </span>
+                            <div>
+                                <strong>Perfil</strong>
+                                <span>Atualize nome, email e identidade visual da sua conta.</span>
+                            </div>
                         </div>
-                        <h3>Perfil</h3>
                     </div>
 
-                    <form onSubmit={handleUpdateProfile}>
-                        <div style={{ display: 'grid', gap: '1rem' }}>
-                            <div className="flex-start gap-1">
-                                <div className="avatar-preview" style={{ background: selectedAvatar }}>
-                                    {profile?.full_name?.[0] || user?.email?.[0]?.toUpperCase()}
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <p className="text-small mb-05" style={{ fontWeight: 500 }}>Estilo do Avatar</p>
-                                    <div className="flex-align-center gap-05" style={{ flexWrap: 'wrap' }}>
-                                        {AVATAR_PRESETS.map((grad, i) => (
-                                            <button
-                                                key={i}
-                                                type="button"
-                                                onClick={() => setSelectedAvatar(grad)}
-                                                className={`avatar-option ${selectedAvatar === grad ? 'selected' : ''}`}
-                                                style={{ background: grad }}
-                                                aria-label={`Select avatar style ${i + 1}`}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
+                    <form onSubmit={handleUpdateProfile} style={{ display: 'grid', gap: '1rem' }}>
+                        <div className="app-list-card-main" style={{ alignItems: 'flex-start' }}>
+                            <div
+                                aria-hidden="true"
+                                style={{
+                                    width: '56px',
+                                    height: '56px',
+                                    borderRadius: '18px',
+                                    background: selectedAvatar,
+                                    display: 'grid',
+                                    placeItems: 'center',
+                                    color: '#fff',
+                                    fontWeight: 700,
+                                    flexShrink: 0,
+                                }}
+                            >
+                                {(fullName || user?.email || 'P')[0]?.toUpperCase()}
                             </div>
 
-
-                            <Input
-                                label="Nome Completo"
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
-                            />
-                            <Input
-                                label="Email"
-                                value={user?.email}
-                                disabled
-                                style={{ opacity: 0.7 }}
-                            />
-
-                            <Button type="submit" className="btn-primary" style={{ marginTop: '1rem' }} loading={loading}>
-                                Salvar Alterações
-                            </Button>
+                            <div style={{ width: '100%' }}>
+                                <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Estilo do avatar</strong>
+                                <span style={{ display: 'block', color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.75rem' }}>
+                                    Escolha um visual simples para aparecer nos cards e areas compartilhadas.
+                                </span>
+                                <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                                    {AVATAR_PRESETS.map((gradient) => (
+                                        <button
+                                            key={gradient}
+                                            type="button"
+                                            aria-label="Selecionar estilo de avatar"
+                                            onClick={() => setSelectedAvatar(gradient)}
+                                            style={{
+                                                width: '34px',
+                                                height: '34px',
+                                                borderRadius: '50%',
+                                                border: selectedAvatar === gradient ? '2px solid var(--text-main)' : '1px solid var(--glass-border)',
+                                                background: gradient,
+                                                cursor: 'pointer',
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         </div>
+
+                        <Input label="Nome completo" value={fullName} onChange={(event) => setFullName(event.target.value)} />
+                        <Input label="Email" value={user?.email || ''} disabled note="O email atual e usado para login." />
+
+                        <Button type="submit" className="btn-primary" loading={loading} style={{ justifyContent: 'center' }}>
+                            Salvar perfil
+                        </Button>
                     </form>
                 </Card>
 
-                {/* Couple Mode Settings */}
-                <Card className="glass-card fade-in stagger-2">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                        <div className="icon-container" style={{ background: 'rgba(246, 79, 89, 0.1)', color: '#f64f59' }}>
-                            <Heart size={24} />
-                        </div>
-                        <div>
-                            <h3>Modo Casal</h3>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                                Seu ID: <strong style={{color: 'var(--text-main)'}}>{profile?.nickname}#{profile?.discriminator}</strong>
-                            </p>
+                <Card className="app-section-card">
+                    <div className="app-section-header">
+                        <div className="app-list-card-main">
+                            <span className="app-inline-icon">
+                                <Heart size={18} />
+                            </span>
+                            <div>
+                                <strong>Modo casal</strong>
+                                <span>Compartilhe carteiras, metas e movimentacoes com outra pessoa.</span>
+                            </div>
                         </div>
                     </div>
 
+                    <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                        <span className="app-summary-label">Seu ID</span>
+                        <strong className="app-summary-value">
+                            {profile?.nickname && profile?.discriminator ? `${profile.nickname}#${profile.discriminator}` : 'Gerando identificador'}
+                        </strong>
+                    </Card>
+
                     {partnerProfile ? (
-                        <div style={{ background: 'var(--bg-elevated)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
-                            <div className="flex-align-center gap-1 mb-1" style={{ marginBottom: '1rem' }}>
-                                <div className="avatar-preview" style={{ width: '40px', height: '40px', fontSize: '1rem' }}>
-                                    {partnerProfile?.full_name?.[0] || partnerProfile?.nickname?.[0]?.toUpperCase() || 'P'}
-                                </div>
+                        <>
+                            <div className="app-list-card-main" style={{ justifyContent: 'space-between' }}>
                                 <div>
-                                    <p style={{ fontWeight: 600, margin: 0 }}>{partnerProfile?.full_name || partnerProfile?.nickname}</p>
-                                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
-                                        {partnerProfile?.nickname}#{partnerProfile?.discriminator}
-                                    </p>
+                                    <strong>{partnerProfile.full_name || partnerProfile.nickname}</strong>
+                                    <span>{partnerProfile.nickname}#{partnerProfile.discriminator}</span>
                                 </div>
+                                <span className="dashboard-partner-chip" style={{ marginLeft: 0 }}>Conectado</span>
                             </div>
-                            <Button 
-                                variant="ghost" 
-                                style={{ width: '100%', color: '#f64f59', border: '1px solid rgba(246, 79, 89, 0.2)', justifyContent: 'center' }}
+                            <Button
+                                variant="ghost"
                                 onClick={() => setIsUnlinkModalOpen(true)}
                                 disabled={loading}
+                                style={{ justifyContent: 'center', color: '#f64f59' }}
                             >
-                                Desfazer Vínculo
+                                Remover vinculo
                             </Button>
-                        </div>
+                        </>
                     ) : outgoingRequest ? (
-                        <div style={{ background: 'var(--bg-elevated)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
-                            <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-                                Convite pendente enviado para <strong>{outgoingRequest.nickname}</strong>. Aguardando aceite.
+                        <>
+                            <p className="text-muted" style={{ margin: 0 }}>
+                                Convite pendente enviado para <strong>{outgoingRequest.nickname}</strong>. Voce pode cancelar se precisar ajustar o destinatario.
                             </p>
-                            <Button 
-                                variant="ghost" 
-                                style={{ width: '100%', color: 'var(--text-main)', border: '1px solid var(--glass-border)', justifyContent: 'center' }}
-                                onClick={async () => {
-                                    setLoading(true);
-                                    try {
-                                        await supabase.rpc('cancel_partner_request');
-                                        addToast('Convite cancelado.', 'info');
-                                        fetchProfile(user.id);
-                                    } catch(e) { console.error(e) } finally { setLoading(false) }
-                                }}
-                                disabled={loading}
-                            >
-                                Cancelar Convite
+                            <Button variant="ghost" onClick={handleCancelInvite} disabled={loading} style={{ justifyContent: 'center' }}>
+                                Cancelar convite
                             </Button>
-                        </div>
+                        </>
                     ) : incomingRequest ? (
-                        <div style={{ background: 'var(--bg-elevated)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
-                            <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-                                <strong>{incomingRequest.nickname}</strong> enviou um convite! Aceite-o no seu Dashboard.
+                        <>
+                            <p className="text-muted" style={{ margin: 0 }}>
+                                <strong>{incomingRequest.nickname}</strong> enviou um convite. A confirmacao acontece no dashboard principal.
                             </p>
-                            <Link to="/" style={{textDecoration: 'none'}}>
-                                <Button type="button" className="btn-primary" style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', width: '100%', justifyContent: 'center' }}>
-                                    Ir para o Dashboard
+                            <Link to="/" style={{ textDecoration: 'none' }}>
+                                <Button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                                    Ir para o dashboard
                                 </Button>
                             </Link>
-                        </div>
+                        </>
                     ) : (
-                        <div>
-                            <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-                                Compartilhe transações, limites e carteiras com seu(ua) parceiro(a). O Modo Casal sincroniza ambas as contas perfeitamente.
+                        <>
+                            <p className="text-muted" style={{ margin: 0 }}>
+                                Use o modo casal para compartilhar a mesma visao financeira com limites, metas e movimentacoes sincronizadas.
                             </p>
-                            <Button type="button" className="btn-primary" onClick={() => {
-                                if (planTier !== 'complete') {
-                                    setShowUpgrade(true);
-                                    return;
-                                }
-                                setIsCoupleModalOpen(true);
-                            }} style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', width: '100%', justifyContent: 'center' }}>
-                                Convidar Parceiro(a)
+                            <Button
+                                className="btn-primary"
+                                onClick={() => {
+                                    if (planTier !== 'complete') {
+                                        setShowUpgrade(true);
+                                        return;
+                                    }
+                                    setIsCoupleModalOpen(true);
+                                }}
+                                style={{ justifyContent: 'center' }}
+                            >
+                                Conectar parceiro
                             </Button>
-                        </div>
+                        </>
                     )}
                 </Card>
 
-                {/* Appearance Settings */}
-                <Card className="glass-card fade-in stagger-2">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                        <div className="icon-container">
-                            <Sun size={24} />
+                <Card className="app-section-card">
+                    <div className="app-section-header">
+                        <div className="app-list-card-main">
+                            <span className="app-inline-icon">
+                                <Sun size={18} />
+                            </span>
+                            <div>
+                                <strong>Aparencia</strong>
+                                <span>Escolha o clima visual da interface e mantenha a leitura confortavel.</span>
+                            </div>
                         </div>
-                        <h3>Aparência</h3>
                     </div>
 
-                    <div className="grid-2">
+                    <div className="app-chip-row">
                         {[
                             { id: 'light', icon: Sun, label: 'Claro' },
-                            { id: 'dark', icon: Moon, label: 'Escuro' }
-                        ].map((t) => (
+                            { id: 'dark', icon: Moon, label: 'Escuro' },
+                            { id: 'system', icon: Monitor, label: 'Sistema' },
+                        ].map(({ id, icon: Icon, label }) => (
                             <button
-                                key={t.id}
-                                onClick={() => changeTheme(t.id)}
-                                className={`theme-btn ${theme === t.id ? 'active' : ''}`}
+                                key={id}
+                                type="button"
+                                className={`app-filter-chip${theme === id ? ' is-active' : ''}`}
+                                onClick={() => changeTheme(id)}
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}
                             >
-                                <t.icon size={24} />
-                                <span className="text-small">{t.label}</span>
+                                <Icon size={16} />
+                                {label}
                             </button>
                         ))}
                     </div>
+
+                    <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                        <span className="app-summary-label">Tema selecionado</span>
+                        <strong className="app-summary-value">
+                            {theme === 'light' ? 'Claro' : theme === 'dark' ? 'Escuro' : 'Sistema'}
+                        </strong>
+                    </Card>
                 </Card>
 
-                {/* Other Settings Placeholders */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                    <Card className="glass-card fade-in stagger-2">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                            <div className="icon-container" style={{ background: 'rgba(18, 194, 233, 0.1)', color: '#12c2e9' }}>
-                                <Wallet size={24} />
+                <Card className="app-section-card">
+                    <div className="app-section-header">
+                        <div className="app-list-card-main">
+                            <span className="app-inline-icon">
+                                <Wallet size={18} />
+                            </span>
+                            <div>
+                                <strong>Financas e dados</strong>
+                                <span>Atalhos rapidos para exportacao e organizacao da estrutura financeira.</span>
                             </div>
-                            <h3>Finanças</h3>
                         </div>
+                    </div>
 
-                        <Button
-                            variant="ghost"
-                            className="btn-primary"
-                            style={{
-                                width: '100%',
-                                marginBottom: '1rem',
-                                justifyContent: 'center',
-                                background: planTier !== 'complete'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'linear-gradient(135deg, #11998e, #38ef7d)',
-                                border: planTier !== 'complete' ? '1px solid rgba(255,255,255,0.1)' : 'none',
-                                opacity: planTier !== 'complete' ? 0.7 : 1
-                            }}
-                            onClick={handleExport}
-                            disabled={loading}
-                        >
-                            {planTier !== 'complete' && <Lock size={16} style={{ marginRight: '0.5rem' }} />}
-                            Exportar Relatório (Excel)
-                        </Button>
+                    <div className="app-summary-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                        <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                            <span className="app-summary-label">Exportacao</span>
+                            <strong className="app-summary-value">{planTier === 'complete' ? 'Liberada' : 'Plano completo'}</strong>
+                        </Card>
+                        <Card hover={false} className="app-summary-card app-summary-card-neutral">
+                            <span className="app-summary-label">Atalhos</span>
+                            <strong className="app-summary-value">Carteiras e categorias</strong>
+                        </Card>
+                    </div>
 
-                        {!isPro && (
-                            <Button
-                                className="btn-primary"
-                                style={{
-                                    width: '100%',
-                                    marginBottom: '1rem',
-                                    justifyContent: 'center',
-                                    background: 'linear-gradient(135deg, #FFD700, #FDB931)',
-                                    color: '#000',
-                                    fontWeight: 'bold'
-                                }}
-                                onClick={() => setShowUpgrade(true)}
-                            >
-                                Assinar um Plano 💎
-                            </Button>
-                        )}
+                    <Button onClick={handleExport} disabled={loading} className="btn-primary" style={{ justifyContent: 'center' }}>
+                        {planTier !== 'complete' && <Lock size={16} />}
+                        Exportar relatorio completo
+                    </Button>
 
-                        <Link to="/wallets" style={{ textDecoration: 'none' }} className="hide-on-mobile">
-                            <Button variant="ghost" className="btn-primary" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
-                                Gerenciar Carteiras
+                    <div style={{ display: 'grid', gap: '0.75rem' }}>
+                        <Link to="/wallets" style={{ textDecoration: 'none' }}>
+                            <Button variant="ghost" style={{ width: '100%', justifyContent: 'center' }} icon={Wallet}>
+                                Abrir carteiras
                             </Button>
                         </Link>
-                        <Link to="/categories" style={{ textDecoration: 'none' }} className="hide-on-mobile">
-                            <Button variant="ghost" className="btn-ghost" style={{ width: '100%', marginBottom: '1rem', justifyContent: 'center' }}>
-                                Gerenciar Categorias
+                        <Link to="/categories" style={{ textDecoration: 'none' }}>
+                            <Button variant="ghost" style={{ width: '100%', justifyContent: 'center' }} icon={CreditCard}>
+                                Abrir categorias
                             </Button>
                         </Link>
-                        <p className="text-muted text-small">Organize suas contas, cartões e categorias.</p>
-                    </Card>
+                    </div>
+                </Card>
 
-                    <Card className="glass-card fade-in stagger-3">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                            <div className="icon-container">
-                                <Bell size={24} />
+                <Card className="app-section-card">
+                    <div className="app-section-header">
+                        <div className="app-list-card-main">
+                            <span className="app-inline-icon">
+                                <Bell size={18} />
+                            </span>
+                            <div>
+                                <strong>Notificacoes</strong>
+                                <span>Defina quais alertas voce quer acompanhar com mais frequencia.</span>
                             </div>
-                            <h3>Notificações</h3>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                            <span>Alertas de Orçamento</span>
-                            <Switch
-                                checked={notifications.budget}
-                                onChange={(val) => setNotifications(prev => ({ ...prev, budget: val }))}
-                            />
+                    </div>
+
+                    <div className="app-list-card-main" style={{ justifyContent: 'space-between' }}>
+                        <div>
+                            <strong>Alertas de orcamento</strong>
+                            <span>Avisos quando categorias se aproximam do limite.</span>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span>Resumo Semanal</span>
-                            <Switch
-                                checked={notifications.weekly}
-                                onChange={(val) => setNotifications(prev => ({ ...prev, weekly: val }))}
-                            />
+                        <Switch
+                            checked={notifications.budget}
+                            onChange={(value) => setNotifications((prev) => ({ ...prev, budget: value }))}
+                        />
+                    </div>
+
+                    <div className="app-list-card-main" style={{ justifyContent: 'space-between' }}>
+                        <div>
+                            <strong>Resumo semanal</strong>
+                            <span>Visao rapida para revisar gastos e entradas mais importantes.</span>
                         </div>
-                    </Card>
-                </div>
+                        <Switch
+                            checked={notifications.weekly}
+                            onChange={(value) => setNotifications((prev) => ({ ...prev, weekly: value }))}
+                        />
+                    </div>
+                </Card>
             </div>
+
             <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />
 
-            <Modal isOpen={isCoupleModalOpen} onClose={() => setIsCoupleModalOpen(false)} title="Enviar Convite">
+            <Modal isOpen={isCoupleModalOpen} onClose={() => setIsCoupleModalOpen(false)} title="Conectar parceiro">
                 <form onSubmit={handleLinkPartner}>
-                    <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--text-muted)' }}>
-                        Digite o ID da sua esposa, marido ou parceiro(a) para compartilhar finanças. 
-                        O ID pode ser encontrado na tela de configurações da conta dele(a).
+                    <p className="text-muted" style={{ marginBottom: '1.25rem' }}>
+                        Digite o ID da outra conta para enviar um convite e ativar o modo casal.
                     </p>
                     <Input
-                        label="ID do Parceiro(a)"
+                        label="ID do parceiro"
                         placeholder="Ex: maria#1234"
                         value={partnerTagInput}
-                        onChange={(e) => {
-                            setPartnerTagInput(e.target.value);
+                        onChange={(event) => {
+                            setPartnerTagInput(event.target.value);
                             setLinkError('');
                         }}
                         error={linkError}
                         required
                     />
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                        <Button type="button" variant="ghost" onClick={() => { setIsCoupleModalOpen(false); setLinkError(''); setPartnerTagInput(''); }} style={{ flex: 1, justifyContent: 'center' }}>
-                            Cancelar
+
+                    <div style={{ display: 'grid', gap: '0.75rem', marginTop: '1.5rem' }}>
+                        <Button type="submit" className="btn-primary" loading={loading} style={{ justifyContent: 'center' }}>
+                            Enviar convite
                         </Button>
-                        <Button type="submit" className="btn-primary" loading={loading} style={{ background: 'linear-gradient(135deg, #f64f59, #f7797d)', border: 'none', color: '#fff', flex: 1, justifyContent: 'center' }}>
-                            Enviar
+                        <Button type="button" variant="ghost" onClick={() => setIsCoupleModalOpen(false)} style={{ justifyContent: 'center' }}>
+                            Cancelar
                         </Button>
                     </div>
                 </form>
             </Modal>
 
-            <Modal isOpen={isUnlinkModalOpen} onClose={() => setIsUnlinkModalOpen(false)} title="Desfazer Vínculo">
-                <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: 'var(--text-muted)' }}>
-                    Tem certeza que deseja desvincular sua conta de {partnerProfile?.full_name || partnerProfile?.nickname}?
-                    Vocês deixarão de compartilhar as transações, metas e carteiras imediatamente.
+            <Modal isOpen={isUnlinkModalOpen} onClose={() => setIsUnlinkModalOpen(false)} title="Remover vinculo">
+                <p className="text-muted" style={{ marginBottom: '1.25rem' }}>
+                    Tem certeza que deseja encerrar o compartilhamento com {partnerProfile?.full_name || partnerProfile?.nickname}?
                 </p>
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                    <Button type="button" variant="ghost" onClick={() => setIsUnlinkModalOpen(false)} disabled={loading} style={{ flex: 1, justifyContent: 'center' }}>
-                        Cancelar
+
+                <div style={{ display: 'grid', gap: '0.75rem' }}>
+                    <Button
+                        type="button"
+                        className="btn-primary"
+                        onClick={handleUnlinkPartner}
+                        loading={loading}
+                        style={{ justifyContent: 'center' }}
+                    >
+                        Confirmar remocao
                     </Button>
-                    <Button type="button" className="btn-primary" onClick={handleUnlinkPartner} loading={loading} style={{ background: 'var(--color-danger)', border: 'none', color: '#fff', flex: 1, justifyContent: 'center' }}>
-                        Sim, Desvincular
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => setIsUnlinkModalOpen(false)}
+                        disabled={loading}
+                        style={{ justifyContent: 'center' }}
+                    >
+                        Manter vinculo
                     </Button>
                 </div>
             </Modal>

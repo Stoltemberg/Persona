@@ -4261,17 +4261,6 @@ option {
   color: var(--text-main);
 }
 
-.upgrade-coupon-card {
-  padding: 1rem;
-}
-
-.upgrade-coupon-form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.75rem;
-  align-items: end;
-}
-
 .upgrade-tier-grid {
   display: grid;
   gap: 0.85rem;
@@ -4327,21 +4316,6 @@ option {
   gap: 0.5rem;
   color: var(--text-secondary);
   font-size: 0.88rem;
-}
-
-.admin-form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.85rem;
-}
-
-.admin-coupon-form {
-  display: grid;
-  gap: 1rem;
-}
-
-.admin-coupon-row {
-  align-items: center;
 }
 
 .public-shell {
@@ -4684,8 +4658,6 @@ option {
     justify-content: space-between;
   }
 
-  .upgrade-coupon-form,
-  .admin-form-grid,
   .public-auth-highlight-grid {
     grid-template-columns: 1fr;
   }

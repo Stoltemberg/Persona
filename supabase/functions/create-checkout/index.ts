@@ -28,65 +28,33 @@ serve(async (req) => {
     }
 
     try {
+        const authHeader = req.headers.get('Authorization')
+        if (!authHeader) throw new Error('Missing Authorization header')
+
+        const token = authHeader.replace('Bearer ', '').trim()
+        if (!token) throw new Error('Missing access token')
+
         const supabaseAdmin = createClient(
             Deno.env.get('SUPABASE_URL') ?? '',
             Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
         )
 
-        const supabaseClient = createClient(
-            Deno.env.get('SUPABASE_URL') ?? '',
-            Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-            { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
-        )
+        const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
+        if (userError || !user) throw new Error(`User not found: ${userError?.message || 'invalid token'}`)
 
-        const { data: { user } } = await supabaseClient.auth.getUser()
-        if (!user) throw new Error('User not found')
-
-        const { tier, couponCode } = await req.json()
+        const { tier } = await req.json()
         if (!tier || !(tier in tierCatalog)) {
             throw new Error('Invalid tier')
         }
 
         const plan = tierCatalog[tier as keyof typeof tierCatalog]
         let finalPrice = plan.price
-        let normalizedCoupon = ''
-
-        if (couponCode) {
-            normalizedCoupon = String(couponCode).trim().toUpperCase()
-
-            const { data: coupon, error: couponError } = await supabaseAdmin
-                .from('coupons')
-                .select('*')
-                .eq('code', normalizedCoupon)
-                .eq('active', true)
-                .maybeSingle()
-
-            if (couponError || !coupon) {
-                throw new Error('Cupom invalido ou expirado.')
-            }
-
-            if (coupon.expires_at && new Date(coupon.expires_at).getTime() < Date.now()) {
-                throw new Error('Cupom expirado.')
-            }
-
-            if (coupon.max_uses !== null && coupon.used_count >= coupon.max_uses) {
-                throw new Error('Limite de uso do cupom atingido.')
-            }
-
-            if (coupon.target_tier && coupon.target_tier !== tier) {
-                throw new Error('Este cupom nao e valido para o plano selecionado.')
-            }
-
-            if (coupon.discount_percent) {
-                finalPrice = Number((plan.price * (1 - coupon.discount_percent / 100)).toFixed(2))
-            }
-        }
 
         const mpAccessToken = Deno.env.get('MP_ACCESS_TOKEN')
         if (!mpAccessToken) throw new Error('Missing MP_ACCESS_TOKEN')
 
         const checkoutReference = crypto.randomUUID()
-        const externalReference = [user.id, tier, normalizedCoupon, checkoutReference].join('|')
+        const externalReference = [user.id, tier, checkoutReference].join('|')
         const appUrl = resolveAppUrl(req)
 
         const body = {
@@ -109,7 +77,6 @@ serve(async (req) => {
             metadata: {
                 user_id: user.id,
                 tier,
-                coupon_code: normalizedCoupon || null,
                 checkout_reference: checkoutReference,
             }
         }
@@ -142,11 +109,9 @@ serve(async (req) => {
                 external_reference: externalReference,
                 user_id: user.id,
                 tier,
-                coupon_code: normalizedCoupon || null,
                 expected_amount: finalPrice,
                 currency_id: 'BRL',
                 app_url: appUrl,
-                coupon_validation_tier: tier,
                 mp_preference_id: data.id ?? null,
                 mp_init_point: data.init_point ?? null,
                 mp_sandbox_init_point: data.sandbox_init_point ?? null,
@@ -169,7 +134,6 @@ serve(async (req) => {
                 tier,
                 plan_title: plan.title,
                 final_price: finalPrice,
-                coupon_code: normalizedCoupon || null,
                 checkout_validated: true,
             }),
             {

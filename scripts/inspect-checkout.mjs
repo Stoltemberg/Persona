@@ -78,7 +78,6 @@ try {
         status: intent.status,
         tier: intent.tier,
         plan_title: intent.plan_title,
-        coupon_code: intent.coupon_code,
         expected_amount: intent.expected_amount,
         checkout_validated: intent.checkout_validated,
         verified_amount: intent.verified_amount,

@@ -42,6 +42,21 @@ const LoadingScreen = () => (
   </div>
 );
 
+const APP_ROUTE_PREFIXES = [
+  '/dashboard',
+  '/transactions',
+  '/recurring',
+  '/planning',
+  '/analysis',
+  '/goals',
+  '/budgets',
+  '/simulator',
+  '/settings',
+  '/wallets',
+  '/categories',
+  '/admin',
+];
+
 // Protected Route Wrapper
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -80,7 +95,8 @@ function App() {
 const AnimatedRoutes = () => {
   const location = useLocation();
   const reducedMotion = useReducedMotion();
-  const routeKey = location.pathname;
+  const isAppRoute = APP_ROUTE_PREFIXES.some((path) => location.pathname.startsWith(path));
+  const routeKey = isAppRoute ? 'app-shell' : location.pathname;
 
   const pageTransition = {
     initial: reducedMotion ? { opacity: 0 } : { opacity: 0, y: 14, scale: 0.992 },

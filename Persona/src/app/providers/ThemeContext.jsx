@@ -39,6 +39,23 @@ const darkVars = {
     '--input-bg': 'rgba(255, 255, 255, 0.03)',
 };
 
+const applyTheme = (theme) => {
+    const root = window.document.documentElement;
+    root.classList.remove('dark', 'light');
+
+    let resolvedTheme = theme;
+    if (theme === 'system') {
+        resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    root.classList.add(resolvedTheme);
+
+    const vars = resolvedTheme === 'light' ? lightVars : darkVars;
+    Object.entries(vars).forEach(([key, value]) => {
+        root.style.setProperty(key, value);
+    });
+};
+
 export function ThemeProvider({ children }) {
     const [theme, setTheme] = useState('dark'); // 'dark', 'light', 'system'
 
@@ -49,29 +66,10 @@ export function ThemeProvider({ children }) {
         applyTheme(saved);
     }, []);
 
-    const applyTheme = (t) => {
-        const root = window.document.documentElement;
-        // Remove all theme classes first
-        root.classList.remove('dark', 'light');
-
-        let resolvedTheme = t;
-        if (t === 'system') {
-            resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-
-        root.classList.add(resolvedTheme);
-
-        // Apply CSS variables directly via JavaScript
-        const vars = resolvedTheme === 'light' ? lightVars : darkVars;
-        Object.entries(vars).forEach(([key, value]) => {
-            root.style.setProperty(key, value);
-        });
-    };
-
-    const changeTheme = (t) => {
-        setTheme(t);
-        localStorage.setItem('persona-theme', t);
-        applyTheme(t);
+    const changeTheme = (nextTheme) => {
+        setTheme(nextTheme);
+        localStorage.setItem('persona-theme', nextTheme);
+        applyTheme(nextTheme);
     };
 
     return (

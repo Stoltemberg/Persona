@@ -12,10 +12,6 @@ export default function Simulator({ isTab }) {
     const [interestRate, setInterestRate] = useState(10);
     const [data, setData] = useState([]);
 
-    useEffect(() => {
-        calculateGrowth();
-    }, [monthlySaving, initialAmount, years, interestRate]);
-
     const calculateGrowth = () => {
         const nextData = [];
         let currentAmount = parseFloat(initialAmount) || 0;
@@ -37,6 +33,10 @@ export default function Simulator({ isTab }) {
 
         setData(nextData);
     };
+
+    useEffect(() => {
+        calculateGrowth();
+    }, [monthlySaving, initialAmount, years, interestRate]);
 
     const finalAmount = data.length > 0 ? data[data.length - 1].amount : 0;
     const totalInvested = data.length > 0 ? data[data.length - 1].invested : 0;

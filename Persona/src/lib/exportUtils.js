@@ -82,15 +82,15 @@ const buildWorkbookXml = (worksheets) => `<?xml version="1.0"?>
             <Font ss:FontName="Calibri" ss:Size="12" ss:Bold="1" ss:Color="#4F29F0" />
         </Style>
         <Style ss:ID="Currency">
-            <NumberFormat ss:Format="&quot;R$&quot;\ #,##0.00" />
+            <NumberFormat ss:Format="&quot;R$&quot; #,##0.00" />
         </Style>
         <Style ss:ID="CurrencyPositive">
             <Font ss:Color="#1E8E3E" ss:Bold="1" />
-            <NumberFormat ss:Format="&quot;R$&quot;\ #,##0.00" />
+            <NumberFormat ss:Format="&quot;R$&quot; #,##0.00" />
         </Style>
         <Style ss:ID="CurrencyNegative">
             <Font ss:Color="#D93025" ss:Bold="1" />
-            <NumberFormat ss:Format="&quot;R$&quot;\ #,##0.00" />
+            <NumberFormat ss:Format="&quot;R$&quot; #,##0.00" />
         </Style>
         <Style ss:ID="Percentage">
             <NumberFormat ss:Format="0.0%" />

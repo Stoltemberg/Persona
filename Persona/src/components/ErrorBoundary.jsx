@@ -41,7 +41,7 @@ export class ErrorBoundary extends React.Component {
                             Voltar ao Início
                         </Button>
                     </div>
-                    {process.env.NODE_ENV === 'development' && (
+                    {import.meta.env.DEV && (
                         <pre style={{
                             marginTop: '2rem',
                             padding: '1rem',

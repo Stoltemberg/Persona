@@ -41,3 +41,10 @@ Persona/.env.*
 *.njsproj
 *.sln
 *.sw?
+
+# Security & Temp
+.env
+.env.*
+!.env.example
+.temp_skills
+.codex/

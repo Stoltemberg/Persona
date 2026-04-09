@@ -242,6 +242,9 @@ serve(async (req) => {
             .update({
                 status: 'paid',
                 mp_payment_id: String(paymentId),
+                verified_amount: paidAmount,
+                verified_currency: paymentData.currency_id,
+                mp_payment_payload: paymentData,
                 updated_at: new Date().toISOString(),
             })
             .eq('external_reference', externalReference)

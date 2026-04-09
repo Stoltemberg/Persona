@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, Crown, Shield, Zap } from 'lucide-react';
 import { Modal } from './Modal';
 import { Button } from './Button';
 import { Input } from './Input';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
+
+const paidTierPrices = {
+    intermediate: 14.9,
+    complete: 29.9,
+};
 
 const tiers = [
     {
@@ -41,7 +46,23 @@ export function UpgradeModal({ isOpen, onClose }) {
     const [loading, setLoading] = useState(false);
     const [couponCode, setCouponCode] = useState('');
     const [appliedCoupon, setAppliedCoupon] = useState('');
+    const [couponMeta, setCouponMeta] = useState(null);
     const [selectedTier, setSelectedTier] = useState('complete');
+    const selectedPaidPrice = paidTierPrices[selectedTier] ?? 0;
+    const discountedPrice = couponMeta?.discount_percent
+        ? Number((selectedPaidPrice * (1 - couponMeta.discount_percent / 100)).toFixed(2))
+        : selectedPaidPrice;
+
+    useEffect(() => {
+        if (!appliedCoupon || !couponMeta?.tier || couponMeta.tier === selectedTier) {
+            return;
+        }
+
+        setAppliedCoupon('');
+        setCouponMeta(null);
+        setCouponCode('');
+        addToast('O cupom removido nao vale para o plano selecionado.', 'info');
+    }, [addToast, appliedCoupon, couponMeta, selectedTier]);
 
     const handleUpgrade = async (tierId) => {
         if (tierId === 'free') {
@@ -81,11 +102,23 @@ export function UpgradeModal({ isOpen, onClose }) {
 
         try {
             const normalizedCoupon = couponCode.trim().toUpperCase();
-            const { data, error } = await supabase.rpc('redeem_coupon', { coupon_code: normalizedCoupon });
+            const { data, error } = await supabase.rpc('redeem_coupon', {
+                coupon_code: normalizedCoupon,
+                selected_tier: selectedTier,
+            });
             if (error) throw error;
 
+            if (data?.valid_for_selected_tier === false) {
+                setAppliedCoupon('');
+                setCouponMeta(null);
+                setCouponCode('');
+                addToast(`Esse cupom vale apenas para o plano ${data.tier}.`, 'error');
+                return;
+            }
+
             setAppliedCoupon(normalizedCoupon);
-            addToast(`Cupom validado. Desconto preparado para o plano ${data?.tier || 'selecionado'}.`, 'success');
+            setCouponMeta(data ?? null);
+            addToast(`Cupom validado para o plano ${data?.tier || selectedTier}.`, 'success');
         } catch (error) {
             console.error('Coupon apply error:', error);
             addToast(error.message || 'Nao foi possivel validar o cupom.', 'error');
@@ -103,8 +136,15 @@ export function UpgradeModal({ isOpen, onClose }) {
 
                 <CardCouponForm
                     couponCode={couponCode}
-                    onCouponChange={setCouponCode}
+                    onCouponChange={(value) => {
+                        setCouponCode(value);
+                        if (appliedCoupon && value.trim().toUpperCase() !== appliedCoupon) {
+                            setAppliedCoupon('');
+                            setCouponMeta(null);
+                        }
+                    }}
                     appliedCoupon={appliedCoupon}
+                    couponMeta={couponMeta}
                     onSubmit={handleApplyCoupon}
                 />
 
@@ -146,6 +186,24 @@ export function UpgradeModal({ isOpen, onClose }) {
                     })}
                 </div>
 
+                {selectedTier !== 'free' && (
+                    <div className="app-section-card upgrade-coupon-card" style={{ paddingTop: '0.9rem', paddingBottom: '0.9rem' }}>
+                        <div className="app-list-card-main" style={{ justifyContent: 'space-between' }}>
+                            <div>
+                                <strong>Resumo do checkout</strong>
+                                <span>
+                                    {couponMeta?.discount_percent
+                                        ? `Desconto de ${couponMeta.discount_percent}% aplicado ao plano ${tiers.find((tier) => tier.id === selectedTier)?.name}.`
+                                        : 'Sem desconto aplicado no momento.'}
+                                </span>
+                            </div>
+                            <strong className="upgrade-tier-price">
+                                {discountedPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                            </strong>
+                        </div>
+                    </div>
+                )}
+
                 <Button
                     className="btn-primary"
                     style={{ width: '100%', justifyContent: 'center' }}
@@ -161,7 +219,7 @@ export function UpgradeModal({ isOpen, onClose }) {
     );
 }
 
-function CardCouponForm({ couponCode, onCouponChange, appliedCoupon, onSubmit }) {
+function CardCouponForm({ couponCode, onCouponChange, appliedCoupon, couponMeta, onSubmit }) {
     return (
         <div className="app-section-card upgrade-coupon-card">
             <div className="app-list-card-main">
@@ -187,6 +245,7 @@ function CardCouponForm({ couponCode, onCouponChange, appliedCoupon, onSubmit })
             {appliedCoupon && (
                 <p className="text-muted" style={{ margin: 0 }}>
                     Cupom preparado para o checkout: <strong style={{ color: 'var(--text-main)' }}>{appliedCoupon}</strong>
+                    {couponMeta?.discount_percent ? ` (${couponMeta.discount_percent}% off)` : ''}
                 </p>
             )}
         </div>

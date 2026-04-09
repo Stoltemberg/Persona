@@ -11,6 +11,17 @@ const tierCatalog = {
     complete: { price: 29.9, title: 'Persona Duo (Acesso 30 dias)' },
 } as const
 
+function resolveAppUrl(req: Request) {
+    const configuredUrl = Deno.env.get('APP_URL')?.trim()
+    if (configuredUrl) {
+        return configuredUrl.replace(/\/+$/, '')
+    }
+
+    const requestUrl = new URL(req.url)
+    const originHeader = req.headers.get('origin')?.trim()
+    return (originHeader || requestUrl.origin).replace(/\/+$/, '')
+}
+
 serve(async (req) => {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
@@ -76,6 +87,7 @@ serve(async (req) => {
 
         const checkoutReference = crypto.randomUUID()
         const externalReference = [user.id, tier, normalizedCoupon, checkoutReference].join('|')
+        const appUrl = resolveAppUrl(req)
 
         const body = {
             items: [
@@ -88,9 +100,9 @@ serve(async (req) => {
                 }
             ],
             back_urls: {
-                success: 'https://app-persona-demo.com/settings?status=success',
-                failure: 'https://app-persona-demo.com/settings?status=failure',
-                pending: 'https://app-persona-demo.com/settings?status=pending'
+                success: `${appUrl}/settings?status=success`,
+                failure: `${appUrl}/settings?status=failure`,
+                pending: `${appUrl}/settings?status=pending`
             },
             auto_return: 'approved',
             external_reference: externalReference,
@@ -125,7 +137,12 @@ serve(async (req) => {
                 coupon_code: normalizedCoupon || null,
                 expected_amount: finalPrice,
                 currency_id: 'BRL',
+                app_url: appUrl,
+                coupon_validation_tier: tier,
                 mp_preference_id: data.id ?? null,
+                mp_init_point: data.init_point ?? null,
+                mp_sandbox_init_point: data.sandbox_init_point ?? null,
+                mp_preference_payload: data ?? null,
                 status: 'pending',
                 updated_at: new Date().toISOString(),
             })
@@ -135,7 +152,16 @@ serve(async (req) => {
         }
 
         return new Response(
-            JSON.stringify({ init_point: data.init_point, final_price: finalPrice, coupon_code: normalizedCoupon || null }),
+            JSON.stringify({
+                init_point: data.init_point,
+                sandbox_init_point: data.sandbox_init_point ?? null,
+                preference_id: data.id ?? null,
+                external_reference: externalReference,
+                checkout_reference: checkoutReference,
+                tier,
+                final_price: finalPrice,
+                coupon_code: normalizedCoupon || null,
+            }),
             {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                 status: 200

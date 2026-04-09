@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { useLocation, useOutlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { MobileNav } from './MobileNav';
 import { FAB } from './FAB';
@@ -28,6 +28,7 @@ const getRouteIndex = (pathname) => {
 
 export function Layout() {
     const location = useLocation();
+    const outlet = useOutlet();
     const reducedMotion = useReducedMotion();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
     const { isEventMode, toggleEventMode } = useEvent();
@@ -100,7 +101,7 @@ export function Layout() {
                             transition={{ type: 'spring', stiffness: 300, damping: 32, mass: 0.92 }}
                             style={{ width: '100%', willChange: 'transform, opacity' }}
                         >
-                            <Outlet />
+                            {outlet}
                         </motion.div>
                     </AnimatePresence>
                 </div>

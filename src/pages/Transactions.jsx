@@ -400,15 +400,18 @@ export default function Transactions() {
     };
 
     return (
-        <motion.div className="container" style={{ paddingBottom: '80px' }} variants={pageVariants} initial="hidden" animate="visible">
+        <motion.div className="container app-page-shell" style={{ paddingBottom: '80px' }} variants={pageVariants} initial="hidden" animate="visible">
             <motion.div variants={sectionVariants}>
             <PageHeader
                 title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{'Transa\u00E7\u00F5es'}</span></span>}
+                subtitle="Movimentacoes em uma leitura mais limpa, com filtros, busca e exportacao tratados como parte do fluxo principal."
             >
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Button onClick={handleOpenExport} variant="ghost" icon={Download} title="Exportar dados" style={{ padding: '0.6rem' }} />
+                    <Button onClick={handleOpenExport} variant="ghost" icon={Download} title="Exportar dados">
+                        Exportar
+                    </Button>
                     <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">
-                        Nova
+                        Nova transacao
                     </Button>
                 </div>
             </PageHeader>
@@ -417,6 +420,24 @@ export default function Transactions() {
             <motion.div variants={sectionVariants}>
                 <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
             </motion.div>
+
+            <motion.section className="glass-card app-spotlight-card" variants={sectionVariants}>
+                <div className="app-spotlight-copy">
+                    <span className="app-spotlight-kicker">Fluxo editorial</span>
+                    <h3>Veja o que entrou, saiu e merece atencao sem poluicao visual.</h3>
+                    <p>Os filtros agora ficam mais integrados ao topo para a leitura das movimentacoes parecer parte do produto, nao um bloco genérico.</p>
+                </div>
+                <div className="app-spotlight-note">
+                    <div>
+                        <strong>{filteredTransactions.length} resultados no recorte atual</strong>
+                        <p>
+                            {hasActiveFilters
+                                ? 'O painel esta mostrando um recorte filtrado do seu historico.'
+                                : 'Sem filtros extras, voce esta vendo a leitura completa das movimentacoes.'}
+                        </p>
+                    </div>
+                </div>
+            </motion.section>
 
             <motion.div className="transactions-toolbar" variants={sectionVariants}>
                 <DateRangePicker

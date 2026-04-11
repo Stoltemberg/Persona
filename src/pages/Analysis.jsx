@@ -1,5 +1,6 @@
-﻿import { useEffect, useMemo, useState, Suspense, lazy } from 'react';
+import { useEffect, useMemo, useState, Suspense, lazy } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
@@ -9,6 +10,60 @@ import { PartnerFilter } from '../components/PartnerFilter';
 import { AnalysisChartsFallback } from '../components/analysis/AnalysisChartsFallback';
 
 const AnalysisCharts = lazy(() => import('../components/analysis/AnalysisCharts').then((module) => ({ default: module.AnalysisCharts })));
+
+function AnalysisBackdrop() {
+    const reducedMotion = useReducedMotion();
+
+    return (
+        <div
+            aria-hidden="true"
+            style={{
+                position: 'fixed',
+                inset: 0,
+                pointerEvents: 'none',
+                overflow: 'hidden',
+                zIndex: 0,
+            }}
+        >
+            <div
+                style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background:
+                        'radial-gradient(circle at 18% 18%, rgba(212, 175, 55, 0.12), transparent 26%), radial-gradient(circle at 78% 14%, rgba(0, 235, 199, 0.10), transparent 22%), radial-gradient(circle at 50% 82%, rgba(92, 132, 255, 0.09), transparent 24%)',
+                }}
+            />
+            <motion.div
+                style={{
+                    position: 'absolute',
+                    left: '-8%',
+                    top: '10%',
+                    width: '26vw',
+                    height: '26vw',
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, rgba(212, 175, 55, 0.16) 0%, rgba(212, 175, 55, 0.02) 65%, transparent 72%)',
+                    filter: 'blur(16px)',
+                }}
+                animate={reducedMotion ? {} : { x: [0, 24, 0], y: [0, -12, 0], scale: [1, 1.06, 1] }}
+                transition={reducedMotion ? {} : { duration: 19, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.div
+                style={{
+                    position: 'absolute',
+                    right: '-10%',
+                    bottom: '6%',
+                    width: '30vw',
+                    height: '30vw',
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, rgba(0, 235, 199, 0.14) 0%, rgba(0, 235, 199, 0.02) 64%, transparent 72%)',
+                    filter: 'blur(18px)',
+                }}
+                animate={reducedMotion ? {} : { x: [0, -18, 0], y: [0, 16, 0], scale: [1, 1.04, 1] }}
+                transition={reducedMotion ? {} : { duration: 22, repeat: Infinity, ease: 'easeInOut', delay: 1.2 }}
+            />
+        </div>
+    );
+}
 
 export default function Analysis({ isTab }) {
     const { user, profile } = useAuth();
@@ -151,104 +206,173 @@ export default function Analysis({ isTab }) {
     ), [monthlyTransactions, selectedType]);
 
     return (
-        <div className={isTab ? 'fade-in app-page-shell' : 'container fade-in app-page-shell'} style={{ paddingBottom: '80px' }}>
-            {!isTab && (
-                <PageHeader
-                    title={<span>Analise <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Mensal</span></span>}
-                    subtitle="Resumo claro do comportamento financeiro e do resultado do mes."
-                />
-            )}
+        <div
+            className={isTab ? 'fade-in app-page-shell' : 'container fade-in app-page-shell'}
+            style={{ paddingBottom: '96px', position: 'relative', isolation: 'isolate' }}
+        >
+            <AnalysisBackdrop />
 
-            <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
-
-            <div className="glass-card planning-month-switcher">
-                <button type="button" className="btn-ghost btn-icon" onClick={() => changeMonth(-1)} aria-label="Mes anterior">
-                    <ChevronLeft size={18} />
-                </button>
-                <div className="planning-month-copy">
-                    <span>Mes de referencia</span>
-                    <strong>{formatMonth(currentDate)}</strong>
-                </div>
-                <button type="button" className="btn-ghost btn-icon" onClick={() => changeMonth(1)} aria-label="Proximo mes">
-                    <ChevronRight size={18} />
-                </button>
-            </div>
-
-            <div className="app-summary-grid">
-                <Card hover={false} className="app-summary-card app-summary-card-success">
-                    <div className="app-summary-topline">
-                        <div className="app-summary-icon app-summary-icon-success">
-                            <TrendingUp size={18} />
-                        </div>
-                        <span className="app-summary-label">Entradas</span>
-                    </div>
-                    <strong className="app-summary-value">R$ {stats.income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
-                </Card>
-                <Card hover={false} className="app-summary-card app-summary-card-danger">
-                    <div className="app-summary-topline">
-                        <div className="app-summary-icon app-summary-icon-danger">
-                            <TrendingDown size={18} />
-                        </div>
-                        <span className="app-summary-label">Saidas</span>
-                    </div>
-                    <strong className="app-summary-value">R$ {stats.expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
-                </Card>
-                <Card hover={false} className="app-summary-card app-summary-card-neutral">
-                    <div className="app-summary-topline">
-                        <div className="app-summary-icon app-summary-icon-neutral">
-                            <Wallet size={18} />
-                        </div>
-                        <span className="app-summary-label">Saldo mensal</span>
-                    </div>
-                    <strong className="app-summary-value">R$ {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
-                </Card>
-            </div>
-
-            {chartsReady ? (
-                <Suspense fallback={<AnalysisChartsFallback />}>
-                    <AnalysisCharts
-                        chartData={chartData}
-                        selectedType={selectedType}
-                        onSelectType={setSelectedType}
-                        totalExpenses={totalExpenses}
-                        trendData={trendData}
+            <div style={{ position: 'relative', zIndex: 1 }}>
+                {!isTab && (
+                    <PageHeader
+                        title={<span>Analise <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Mensal</span></span>}
+                        subtitle="Leitura do mes em um layout mais denso, com foco no que precisa de decisao."
                     />
-                </Suspense>
-            ) : (
-                <AnalysisChartsFallback />
-            )}
+                )}
 
-            {selectedType && (
-                <Card className="glass-card app-section-card">
-                    <div className="app-section-header">
-                        <div>
-                            <h3>Detalhes</h3>
-                            <p>{selectedType === 'fixed' ? 'Gastos fixos' : selectedType === 'variable' ? 'Gastos variaveis' : 'Lazer'}</p>
+                <motion.section
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'minmax(0, 1.2fr) minmax(280px, 0.8fr)',
+                        gap: '1rem',
+                        marginBottom: '1rem',
+                        padding: '1.35rem',
+                        borderRadius: '28px',
+                        border: '1px solid var(--glass-border)',
+                        background: 'linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))',
+                        backdropFilter: 'blur(18px)',
+                        boxShadow: '0 18px 48px rgba(0, 0, 0, 0.16)',
+                    }}
+                >
+                    <div style={{ display: 'grid', gap: '0.75rem' }}>
+                        <span className="text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.16em', fontSize: '0.72rem' }}>
+                            Leitura atual
+                        </span>
+                        <strong style={{ fontSize: 'clamp(1.55rem, 2.2vw, 2.15rem)', lineHeight: 1.05 }}>
+                            {formatMonth(currentDate)}
+                        </strong>
+                        <p className="text-muted" style={{ margin: 0, maxWidth: '58ch', lineHeight: 1.65 }}>
+                            Comparativo do mes com entrada, saida e saldo, trazendo contexto de origem dos gastos e a evolucao recente.
+                        </p>
+                    </div>
+
+                    <div
+                        style={{
+                            display: 'grid',
+                            gap: '0.75rem',
+                            padding: '1rem',
+                            borderRadius: '22px',
+                            background: 'rgba(0,0,0,0.14)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            alignContent: 'start',
+                        }}
+                    >
+                        <div className="planning-month-switcher" style={{ margin: 0, padding: 0, border: 'none', background: 'transparent', boxShadow: 'none' }}>
+                            <button type="button" className="btn-ghost btn-icon" onClick={() => changeMonth(-1)} aria-label="Mes anterior">
+                                <ChevronLeft size={18} />
+                            </button>
+                            <div className="planning-month-copy">
+                                <span>Mes de referencia</span>
+                                <strong>{formatMonth(currentDate)}</strong>
+                            </div>
+                            <button type="button" className="btn-ghost btn-icon" onClick={() => changeMonth(1)} aria-label="Proximo mes">
+                                <ChevronRight size={18} />
+                            </button>
                         </div>
-                        <button type="button" className="btn-ghost" onClick={() => setSelectedType(null)}>
-                            Fechar
-                        </button>
+                        <div className="app-chip-row" style={{ justifyContent: 'flex-start' }}>
+                            <span className="app-filter-chip is-active" style={{ pointerEvents: 'none' }}>Receita</span>
+                            <span className="app-filter-chip" style={{ pointerEvents: 'none' }}>Despesas</span>
+                            <span className="app-filter-chip" style={{ pointerEvents: 'none' }}>Saldo</span>
+                        </div>
                     </div>
+                </motion.section>
 
-                    <div className="app-stack-list">
-                        {selectedTransactions.map((transaction) => (
-                            <Card key={transaction.id} hover={false} className="app-list-card">
-                                <div className="app-list-card-main">
-                                    <div>
-                                        <strong>{transaction.description}</strong>
-                                        <span>{transaction.category} {'·'} {new Date(transaction.date).toLocaleDateString('pt-BR')}</span>
+                <PartnerFilter activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+
+                <div
+                    className="app-summary-grid"
+                    style={{
+                        marginTop: '1rem',
+                        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                    }}
+                >
+                    <Card hover={false} className="app-summary-card app-summary-card-success" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                        <div className="app-summary-topline">
+                            <div className="app-summary-icon app-summary-icon-success">
+                                <TrendingUp size={18} />
+                            </div>
+                            <span className="app-summary-label">Entradas</span>
+                        </div>
+                        <strong className="app-summary-value">R$ {stats.income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
+                    </Card>
+                    <Card hover={false} className="app-summary-card app-summary-card-danger" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                        <div className="app-summary-topline">
+                            <div className="app-summary-icon app-summary-icon-danger">
+                                <TrendingDown size={18} />
+                            </div>
+                            <span className="app-summary-label">Saidas</span>
+                        </div>
+                        <strong className="app-summary-value">R$ {stats.expense.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
+                    </Card>
+                    <Card hover={false} className="app-summary-card app-summary-card-neutral" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                        <div className="app-summary-topline">
+                            <div className="app-summary-icon app-summary-icon-neutral">
+                                <Wallet size={18} />
+                            </div>
+                            <span className="app-summary-label">Saldo mensal</span>
+                        </div>
+                        <strong className="app-summary-value">R$ {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
+                    </Card>
+                </div>
+
+                <div style={{ marginTop: '1rem' }}>
+                    {chartsReady ? (
+                        <Suspense fallback={<AnalysisChartsFallback />}>
+                            <AnalysisCharts
+                                chartData={chartData}
+                                selectedType={selectedType}
+                                onSelectType={setSelectedType}
+                                totalExpenses={totalExpenses}
+                                trendData={trendData}
+                            />
+                        </Suspense>
+                    ) : (
+                        <AnalysisChartsFallback />
+                    )}
+                </div>
+
+                {selectedType && (
+                    <Card
+                        className="glass-card app-section-card"
+                        style={{
+                            marginTop: '1rem',
+                            borderRadius: '28px',
+                            background: 'rgba(255,255,255,0.04)',
+                        }}
+                    >
+                        <div className="app-section-header">
+                            <div>
+                                <h3>Detalhes</h3>
+                                <p>{selectedType === 'fixed' ? 'Gastos fixos' : selectedType === 'variable' ? 'Gastos variaveis' : 'Lazer'}</p>
+                            </div>
+                            <button type="button" className="btn-ghost" onClick={() => setSelectedType(null)}>
+                                Fechar
+                            </button>
+                        </div>
+
+                        <div className="app-stack-list">
+                            {selectedTransactions.map((transaction) => (
+                                <Card key={transaction.id} hover={false} className="app-list-card" style={{ background: 'rgba(0,0,0,0.12)' }}>
+                                    <div className="app-list-card-main">
+                                        <div>
+                                            <strong>{transaction.description}</strong>
+                                            <span>{transaction.category} {'·'} {new Date(transaction.date).toLocaleDateString('pt-BR')}</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <strong style={{ color: '#f64f59' }}>
-                                    - R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}
-                                </strong>
-                            </Card>
-                        ))}
-                    </div>
-                </Card>
-            )}
+                                    <strong style={{ color: '#f64f59' }}>
+                                        - R$ {parseFloat(transaction.amount).toFixed(2).replace('.', ',')}
+                                    </strong>
+                                </Card>
+                            ))}
+                        </div>
+                    </Card>
+                )}
 
-            {loading && <div className="app-empty-inline">Carregando analise...</div>}
+                {loading && <div className="app-empty-inline">Carregando analise...</div>}
+            </div>
         </div>
     );
 }

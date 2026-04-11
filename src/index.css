@@ -3,7 +3,7 @@
    ========================================= */
 
 /* ---- Fonts ---- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&family=Outfit:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap');
 
 /* =========================================
    1. Design Tokens (CSS Variables)
@@ -66,7 +66,7 @@
   --radius-pill: 9999px;
 
   /* Typography */
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 15px;
   font-weight: 400;
   letter-spacing: -0.015em;
@@ -174,7 +174,7 @@ textarea {
    3. Typography â€” SF Pro Hierarchy
    ========================================= */
 h1 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Fraunces', serif;
   font-size: 2.25rem;
   font-weight: 600;
   color: var(--text-main);
@@ -183,7 +183,7 @@ h1 {
 }
 
 h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -191,7 +191,7 @@ h2 {
 }
 
 h3 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--text-secondary);
@@ -4880,5 +4880,407 @@ html.light .feedback-card-secondary {
   .fab-modal-form * {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* =========================================
+   37. Visual Redesign Layer
+   ========================================= */
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+.app-shell > *:not(.app-ambient) {
+  position: relative;
+  z-index: 1;
+}
+
+.app-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.app-ambient-grid,
+.app-ambient-noise,
+.app-ambient-orb {
+  position: absolute;
+  inset: 0;
+}
+
+.app-ambient-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mask-image: radial-gradient(circle at center, black 28%, transparent 88%);
+  opacity: 0.16;
+}
+
+.light .app-ambient-grid,
+html.light .app-ambient-grid {
+  background-image:
+    linear-gradient(rgba(17, 24, 39, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 24, 39, 0.04) 1px, transparent 1px);
+}
+
+.app-ambient-noise {
+  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.045) 0.5px, transparent 0.5px);
+  background-size: 14px 14px;
+  opacity: 0.1;
+  mix-blend-mode: soft-light;
+}
+
+.app-ambient-orb {
+  filter: blur(90px);
+  opacity: 0.34;
+}
+
+.app-ambient-orb.orb-a {
+  inset: auto auto 58% -10%;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(210, 167, 87, 0.16) 0%, rgba(210, 167, 87, 0.06) 42%, transparent 74%);
+}
+
+.app-ambient-orb.orb-b {
+  inset: 12% -8% auto auto;
+  width: 28rem;
+  height: 28rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(88, 143, 255, 0.14) 0%, rgba(88, 143, 255, 0.05) 46%, transparent 74%);
+}
+
+.app-ambient-orb.orb-c {
+  inset: auto 16% -12% auto;
+  width: 24rem;
+  height: 24rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(76, 211, 194, 0.12) 0%, rgba(76, 211, 194, 0.04) 44%, transparent 74%);
+}
+
+.light .app-ambient-orb.orb-a,
+html.light .app-ambient-orb.orb-a {
+  background: radial-gradient(circle, rgba(184, 134, 11, 0.12) 0%, rgba(184, 134, 11, 0.05) 42%, transparent 74%);
+}
+
+.light .app-ambient-orb.orb-b,
+html.light .app-ambient-orb.orb-b {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.11) 0%, rgba(59, 130, 246, 0.04) 46%, transparent 74%);
+}
+
+.light .app-ambient-orb.orb-c,
+html.light .app-ambient-orb.orb-c {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.09) 0%, rgba(16, 185, 129, 0.03) 44%, transparent 74%);
+}
+
+body {
+  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #070708;
+  background-image:
+    radial-gradient(circle at top left, rgba(209, 162, 83, 0.1), transparent 24%),
+    radial-gradient(circle at right 12%, rgba(88, 143, 255, 0.08), transparent 22%),
+    linear-gradient(180deg, rgba(9, 10, 14, 0.98), rgba(6, 7, 10, 1));
+}
+
+html.light body,
+.light body {
+  background-color: #f4efe7;
+  background-image:
+    radial-gradient(circle at top left, rgba(184, 134, 11, 0.08), transparent 26%),
+    radial-gradient(circle at right 12%, rgba(59, 130, 246, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(247, 242, 235, 0.98), rgba(240, 235, 227, 1));
+}
+
+h1 {
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+h2,
+h3,
+.btn,
+.page-header-title,
+.landing-brand,
+.nav-item span,
+.mobile-menu-label {
+  letter-spacing: -0.02em;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #f3e5bf 0%, #d7a34f 44%, #77baf7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.container,
+.content-wrapper,
+.landing-container {
+  width: min(1220px, calc(100% - 2.2rem));
+}
+
+.main-content {
+  padding: 1.5rem 1rem 7rem;
+}
+
+.page-header {
+  align-items: end;
+  margin-bottom: 2.6rem !important;
+  padding-top: 0.5rem !important;
+}
+
+.page-header-copy {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 64ch;
+}
+
+.page-header-title {
+  font-family: "Fraunces", serif;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 600;
+  line-height: 0.98;
+  color: var(--text-main);
+}
+
+.page-header-subtitle {
+  max-width: 58ch;
+  opacity: 0.78 !important;
+  font-size: 0.98rem;
+}
+
+.page-header-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.glass-card,
+.public-card,
+.glass-panel {
+  background: linear-gradient(180deg, rgba(17, 18, 24, 0.8), rgba(10, 11, 16, 0.68));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+}
+
+.light .glass-card,
+.light .public-card,
+.light .glass-panel,
+html.light .glass-card,
+html.light .public-card,
+html.light .glass-panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(248, 244, 238, 0.78));
+  border: 1px solid rgba(79, 58, 41, 0.08);
+  box-shadow: 0 24px 60px rgba(60, 46, 30, 0.08);
+}
+
+.glass-card {
+  border-radius: 24px;
+  padding: 1.35rem;
+}
+
+.glass-card::before,
+.glass-card::after {
+  display: none;
+}
+
+.glass-card-hover:hover,
+.landing-preview-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+}
+
+.btn {
+  border-radius: 999px;
+  padding: 0.78rem 1.35rem;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #e4bd66 0%, #d29a3b 100%);
+  color: #111111;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 16px 26px rgba(210, 154, 59, 0.24);
+  filter: saturate(1.02);
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.light .btn-ghost,
+html.light .btn-ghost {
+  background: rgba(60, 45, 30, 0.04);
+  border-color: rgba(60, 45, 30, 0.08);
+}
+
+.sidebar-panel {
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(15, 16, 21, 0.88), rgba(9, 10, 14, 0.8));
+}
+
+.sidebar-header {
+  margin-bottom: 2rem;
+}
+
+.sidebar-header p {
+  font-size: 0.7rem !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase;
+}
+
+.nav-item,
+.logout-btn,
+.mobile-menu-item,
+.liquid-nav-item,
+.menu-toggle-btn {
+  border-radius: 18px;
+}
+
+.nav-item {
+  min-height: 54px;
+}
+
+.landing-page,
+.public-shell {
+  position: relative;
+}
+
+.landing-header {
+  background: rgba(12, 13, 19, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.light .landing-header,
+html.light .landing-header {
+  background: rgba(247, 242, 235, 0.72);
+  border-bottom-color: rgba(79, 58, 41, 0.08);
+}
+
+.landing-hero {
+  padding-top: 9rem;
+  padding-bottom: 5rem;
+  background:
+    radial-gradient(circle at 14% 16%, rgba(210, 154, 59, 0.16), transparent 28%),
+    radial-gradient(circle at 84% 10%, rgba(88, 143, 255, 0.14), transparent 26%),
+    linear-gradient(180deg, rgba(9, 10, 14, 0.08), transparent);
+}
+
+.landing-pill,
+.landing-badge,
+.dashboard-pill-badge,
+.dashboard-priority-badge,
+.modal-kicker {
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.app-loading-screen p,
+.public-auth-hero p,
+.landing-hero-copy p,
+.page-header-subtitle {
+  color: color-mix(in srgb, var(--text-secondary) 86%, white 14%);
+}
+
+.app-summary-meta {
+  margin-top: 0.55rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.app-spotlight-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.app-spotlight-copy h3 {
+  margin-bottom: 0.6rem;
+  font-size: clamp(1.5rem, 1.2rem + 0.8vw, 2rem);
+}
+
+.app-spotlight-copy p,
+.app-spotlight-note p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.app-spotlight-kicker {
+  display: inline-flex;
+  margin-bottom: 0.85rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.app-spotlight-note {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-radius: 22px;
+  padding: 1.15rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.app-spotlight-note strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text-main);
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 2rem;
+}
+
+.goal-card {
+  min-height: 100%;
+}
+
+@media (max-width: 900px) {
+  .page-header {
+    align-items: start;
+  }
+
+  .page-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .app-spotlight-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-ambient-orb {
+    display: none;
   }
 }

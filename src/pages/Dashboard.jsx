@@ -457,7 +457,7 @@ export default function Dashboard() {
 
     return (
         <>
-            {showBackground && (
+            {false && (
                 <Suspense fallback={null}>
                     <ThreeBackground />
                 </Suspense>
@@ -786,3 +786,5 @@ export default function Dashboard() {
         </>
     );
 }
+
+

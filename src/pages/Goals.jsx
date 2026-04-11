@@ -234,13 +234,12 @@ export default function Goals({ isTab }) {
     const primaryGoal = goals.find((goal) => goal.is_primary) || null;
     const completionRate = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
     const currencyFormatter = (value) => `R$ ${Number(value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-
     return (
-        <div className={isTab ? 'fade-in' : 'container fade-in'} style={{ paddingBottom: '80px' }}>
+        <div className={isTab ? 'fade-in app-page-shell' : 'container fade-in app-page-shell'} style={{ paddingBottom: '80px' }}>
             {!isTab && (
                 <PageHeader
                     title={<span>Metas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Financeiras</span></span>}
-                    subtitle="Acompanhe e realize seus sonhos"
+                    subtitle="Transforme objetivos em marcos visiveis, com leitura mais clara de progresso, foco e proximos aportes."
                 >
                     <Button onClick={handleOpenNew} icon={Plus} className="btn-primary">Nova Meta</Button>
                 </PageHeader>
@@ -252,18 +251,18 @@ export default function Goals({ isTab }) {
                 </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
-                <Card hover={false}>
+            <div className="app-summary-grid">
+                <Card hover={false} className="app-summary-card app-summary-card-neutral">
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Metas ativas</p>
                     <h3 style={{ color: 'var(--text-main)', fontSize: '1.8rem' }}>{goals.length}</h3>
                     <p style={{ fontSize: '0.85rem', marginTop: '0.4rem' }}>Acompanhe cada objetivo sem perder o contexto.</p>
                 </Card>
-                <Card hover={false}>
+                <Card hover={false} className="app-summary-card app-summary-card-success">
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Total acumulado</p>
                     <h3 style={{ color: 'var(--text-main)', fontSize: '1.8rem' }}>{currencyFormatter(totalSaved)}</h3>
                     <p style={{ fontSize: '0.85rem', marginTop: '0.4rem' }}>{completionRate.toFixed(0)}% do objetivo total já construído.</p>
                 </Card>
-                <Card hover={false}>
+                <Card hover={false} className="app-summary-card app-summary-card-neutral">
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Objetivo total</p>
                     <h3 style={{ color: 'var(--text-main)', fontSize: '1.8rem' }}>{currencyFormatter(totalTarget)}</h3>
                     <p style={{ fontSize: '0.85rem', marginTop: '0.4rem' }}>
@@ -272,15 +271,24 @@ export default function Goals({ isTab }) {
                 </Card>
             </div>
 
-            <div className="glass-panel panel-gradient-purple" style={{ padding: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'start', marginBottom: '1.5rem' }}>
-                <div className="icon-container"><Lightbulb size={24} /></div>
-                <div>
-                    <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>Dica do Persona IA</h3>
-                    <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>{currentTip}</p>
+            <div className="glass-card app-spotlight-card" style={{ marginBottom: '1.5rem' }}>
+                <div className="app-spotlight-copy">
+                    <span className="app-spotlight-kicker">Leitura editorial</span>
+                    <h3>Deixe cada meta com um peso real na tela</h3>
+                    <p>O objetivo aqui e enxergar progresso, prioridade e proximo aporte sem virar uma grade genérica de cards.</p>
+                </div>
+                <div className="app-spotlight-note">
+                    <div className="app-summary-icon app-summary-icon-neutral">
+                        <Lightbulb size={18} />
+                    </div>
+                    <div>
+                        <strong>Dica do momento</strong>
+                        <p>{currentTip}</p>
+                    </div>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
+            <div className="goals-grid">
                 {loading ? (
                     <p>Carregando...</p>
                 ) : goals.length === 0 ? (
@@ -299,7 +307,7 @@ export default function Goals({ isTab }) {
                         ];
 
                         return (
-                            <Card key={goal.id} className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', animationDelay: `${index * 0.1}s`, position: 'relative', overflow: 'visible' }}>
+                            <Card key={goal.id} className="fade-in goal-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', animationDelay: `${index * 0.1}s`, position: 'relative', overflow: 'visible' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <div>
                                         <h3 style={{ marginBottom: '0.2rem', color: 'var(--text-main)', fontWeight: 600, fontSize: '1.4rem' }}>{goal.title}</h3>

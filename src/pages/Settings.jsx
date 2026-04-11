@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
     Bell,
     CreditCard,
@@ -33,6 +34,60 @@ const AVATAR_PRESETS = [
     'linear-gradient(135deg, #11998e, #38ef7d)',
     'linear-gradient(135deg, #FFD700, #FDB931)',
 ];
+
+function SettingsBackdrop() {
+    const reducedMotion = useReducedMotion();
+
+    return (
+        <div
+            aria-hidden="true"
+            style={{
+                position: 'fixed',
+                inset: 0,
+                pointerEvents: 'none',
+                overflow: 'hidden',
+                zIndex: 0,
+            }}
+        >
+            <div
+                style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background:
+                        'radial-gradient(circle at 14% 16%, rgba(212, 175, 55, 0.11), transparent 24%), radial-gradient(circle at 82% 12%, rgba(92, 132, 255, 0.09), transparent 22%), radial-gradient(circle at 50% 88%, rgba(255, 255, 255, 0.05), transparent 24%)',
+                }}
+            />
+            <motion.div
+                style={{
+                    position: 'absolute',
+                    left: '-10%',
+                    top: '10%',
+                    width: '28vw',
+                    height: '28vw',
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, rgba(212, 175, 55, 0.16) 0%, rgba(212, 175, 55, 0.02) 64%, transparent 72%)',
+                    filter: 'blur(16px)',
+                }}
+                animate={reducedMotion ? {} : { x: [0, 24, 0], y: [0, -12, 0], scale: [1, 1.05, 1] }}
+                transition={reducedMotion ? {} : { duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.div
+                style={{
+                    position: 'absolute',
+                    right: '-10%',
+                    bottom: '8%',
+                    width: '30vw',
+                    height: '30vw',
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, rgba(92, 132, 255, 0.12) 0%, rgba(92, 132, 255, 0.02) 64%, transparent 72%)',
+                    filter: 'blur(18px)',
+                }}
+                animate={reducedMotion ? {} : { x: [0, -18, 0], y: [0, 14, 0], scale: [1, 1.04, 1] }}
+                transition={reducedMotion ? {} : { duration: 24, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+            />
+        </div>
+    );
+}
 
 export default function Settings() {
     const {
@@ -224,51 +279,94 @@ export default function Settings() {
     };
 
     return (
-        <div className="container fade-in app-page-shell" style={{ paddingBottom: '80px' }}>
-            <PageHeader
-                title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Configuracoes</span></span>}
-                subtitle="Centralize plano, perfil, modo casal e preferencias em uma tela mais organizada."
-            >
-                <Button variant="ghost" icon={Download} onClick={handleExport} disabled={loading}>
-                    Exportar relatorio completo
-                </Button>
-            </PageHeader>
+        <div className="container fade-in app-page-shell" style={{ paddingBottom: '96px', position: 'relative', isolation: 'isolate' }}>
+            <SettingsBackdrop />
 
-            <div className="app-summary-grid">
-                <Card hover={false} className={`app-summary-card ${isPro ? 'app-summary-card-success' : 'app-summary-card-neutral'}`}>
-                    <div className="app-summary-topline">
-                        <div className={`app-summary-icon ${isPro ? 'app-summary-icon-success' : 'app-summary-icon-neutral'}`}>
-                            <Shield size={18} />
-                        </div>
-                        <span className="app-summary-label">Plano atual</span>
+            <div style={{ position: 'relative', zIndex: 1 }}>
+                <PageHeader
+                    title={<span>Minhas <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Configuracoes</span></span>}
+                    subtitle="Conta, plano, tema, exportacao e modo casal em blocos mais claros e menos genéricos."
+                >
+                    <Button variant="ghost" icon={Download} onClick={handleExport} disabled={loading}>
+                        Exportar relatorio completo
+                    </Button>
+                </PageHeader>
+
+                <motion.section
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'minmax(0, 1.08fr) minmax(280px, 0.92fr)',
+                        gap: '1rem',
+                        padding: '1.35rem',
+                        borderRadius: '28px',
+                        border: '1px solid var(--glass-border)',
+                        background: 'linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))',
+                        backdropFilter: 'blur(18px)',
+                        boxShadow: '0 18px 48px rgba(0, 0, 0, 0.16)',
+                        marginBottom: '1rem',
+                    }}
+                >
+                    <div style={{ display: 'grid', gap: '0.75rem' }}>
+                        <span className="text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.16em', fontSize: '0.72rem' }}>
+                            Central de conta
+                        </span>
+                        <strong style={{ fontSize: 'clamp(1.55rem, 2.2vw, 2.15rem)', lineHeight: 1.05 }}>
+                            Ajustes pessoais com uma hierarquia mais limpa.
+                        </strong>
+                        <p className="text-muted" style={{ margin: 0, maxWidth: '58ch', lineHeight: 1.65 }}>
+                            Priorize o que muda a leitura da conta primeiro: identidade, plano, conexão e saída de dados.
+                        </p>
                     </div>
-                    <strong className="app-summary-value">{planLabel}</strong>
-                </Card>
 
-                <Card hover={false} className="app-summary-card app-summary-card-neutral">
-                    <div className="app-summary-topline">
-                        <div className="app-summary-icon app-summary-icon-neutral">
-                            <Heart size={18} />
-                        </div>
-                        <span className="app-summary-label">Modo casal</span>
+                    <div
+                        style={{
+                            display: 'grid',
+                            gap: '0.85rem',
+                            padding: '1rem',
+                            borderRadius: '22px',
+                            background: 'rgba(0,0,0,0.14)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            alignContent: 'start',
+                        }}
+                    >
+                        <Card hover={false} className={`app-summary-card ${isPro ? 'app-summary-card-success' : 'app-summary-card-neutral'}`} style={{ background: 'rgba(255,255,255,0.04)' }}>
+                            <div className="app-summary-topline">
+                                <div className={`app-summary-icon ${isPro ? 'app-summary-icon-success' : 'app-summary-icon-neutral'}`}>
+                                    <Shield size={18} />
+                                </div>
+                                <span className="app-summary-label">Plano atual</span>
+                            </div>
+                            <strong className="app-summary-value">{planLabel}</strong>
+                        </Card>
+
+                        <Card hover={false} className="app-summary-card app-summary-card-neutral" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                            <div className="app-summary-topline">
+                                <div className="app-summary-icon app-summary-icon-neutral">
+                                    <Heart size={18} />
+                                </div>
+                                <span className="app-summary-label">Modo casal</span>
+                            </div>
+                            <strong className="app-summary-value">{partnerStatus}</strong>
+                        </Card>
+
+                        <Card hover={false} className="app-summary-card app-summary-card-neutral" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                            <div className="app-summary-topline">
+                                <div className="app-summary-icon app-summary-icon-neutral">
+                                    {theme === 'light' ? <Sun size={18} /> : theme === 'dark' ? <Moon size={18} /> : <Monitor size={18} />}
+                                </div>
+                                <span className="app-summary-label">Aparencia</span>
+                            </div>
+                            <strong className="app-summary-value">
+                                {theme === 'light' ? 'Claro' : theme === 'dark' ? 'Escuro' : 'Sistema'}
+                            </strong>
+                        </Card>
                     </div>
-                    <strong className="app-summary-value">{partnerStatus}</strong>
-                </Card>
+                </motion.section>
 
-                <Card hover={false} className="app-summary-card app-summary-card-neutral">
-                    <div className="app-summary-topline">
-                        <div className="app-summary-icon app-summary-icon-neutral">
-                            {theme === 'light' ? <Sun size={18} /> : theme === 'dark' ? <Moon size={18} /> : <Monitor size={18} />}
-                        </div>
-                        <span className="app-summary-label">Aparencia</span>
-                    </div>
-                    <strong className="app-summary-value">
-                        {theme === 'light' ? 'Claro' : theme === 'dark' ? 'Escuro' : 'Sistema'}
-                    </strong>
-                </Card>
-            </div>
-
-            <div className="app-list-grid" style={{ alignItems: 'start' }}>
+                <div className="app-list-grid" style={{ alignItems: 'start', gap: '1rem' }}>
                 <Card className="app-section-card">
                     <div className="app-section-header">
                         <div className="app-list-card-main">
@@ -577,6 +675,7 @@ export default function Settings() {
                         />
                     </div>
                 </Card>
+            </div>
             </div>
 
             <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} />

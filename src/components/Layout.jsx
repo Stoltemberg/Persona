@@ -61,7 +61,6 @@ export function Layout() {
 
     return (
         <div className="app-layout">
-            <div className="mesh-background" />
             {/* Desktop Control Center */}
             <div className="desktop-controls-overlay">
                 <button

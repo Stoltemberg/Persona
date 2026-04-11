@@ -4,6 +4,7 @@ import { useAuth } from './hooks/useAuth';
 import React, { Suspense } from 'react';
 import { Layout } from './components/Layout';
 import { HelmetProvider } from 'react-helmet-async';
+import { AmbientBackground } from './components/AmbientBackground';
 
 // Lazy Load Pages
 // Lazy Load Pages (Core App)
@@ -25,7 +26,7 @@ const NotFound = React.lazy(() => import('./pages/NotFound'));
 
 // Loading Fallback
 const LoadingScreen = () => (
-  <div className="flex-center" style={{ minHeight: '100vh', width: '100%', flexDirection: 'column', gap: '1rem', padding: '2rem' }}>
+  <div className="flex-center app-loading-screen" style={{ minHeight: '100vh', width: '100%', flexDirection: 'column', gap: '1rem', padding: '2rem' }}>
     <div className="spinner" />
     <div style={{ display: 'grid', gap: '0.75rem', width: 'min(460px, 100%)' }}>
       <div className="glass-card" style={{ padding: '1rem', opacity: 0.7 }}>
@@ -68,11 +69,14 @@ const Home = () => {
 function App() {
   return (
     <HelmetProvider>
-      <Router>
-        <Suspense fallback={<LoadingScreen />}>
-          <AnimatedRoutes />
-        </Suspense>
-      </Router>
+      <div className="app-shell">
+        <AmbientBackground />
+        <Router>
+          <Suspense fallback={<LoadingScreen />}>
+            <AnimatedRoutes />
+          </Suspense>
+        </Router>
+      </div>
     </HelmetProvider>
   );
 }

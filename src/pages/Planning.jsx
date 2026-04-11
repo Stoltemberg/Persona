@@ -48,6 +48,72 @@ const pageVariants = {
     },
 };
 
+function PlanningBackdrop() {
+    const reducedMotion = useReducedMotion();
+
+    return (
+        <div
+            aria-hidden="true"
+            style={{
+                position: 'fixed',
+                inset: 0,
+                pointerEvents: 'none',
+                overflow: 'hidden',
+                zIndex: 0,
+            }}
+        >
+            <div
+                style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background:
+                        'radial-gradient(circle at 15% 18%, rgba(212, 175, 55, 0.12), transparent 28%), radial-gradient(circle at 82% 12%, rgba(92, 132, 255, 0.10), transparent 24%), radial-gradient(circle at 55% 88%, rgba(255, 255, 255, 0.05), transparent 24%)',
+                    opacity: 0.9,
+                }}
+            />
+            <motion.div
+                style={{
+                    position: 'absolute',
+                    top: '-10%',
+                    left: '-6%',
+                    width: '30vw',
+                    height: '30vw',
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, rgba(212, 175, 55, 0.16) 0%, rgba(212, 175, 55, 0.02) 66%, transparent 72%)',
+                    filter: 'blur(12px)',
+                }}
+                animate={reducedMotion ? {} : { x: [0, 28, 0], y: [0, 18, 0], scale: [1, 1.07, 1] }}
+                transition={reducedMotion ? {} : { duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.div
+                style={{
+                    position: 'absolute',
+                    right: '-10%',
+                    top: '18%',
+                    width: '26vw',
+                    height: '26vw',
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, rgba(92, 132, 255, 0.14) 0%, rgba(92, 132, 255, 0.02) 64%, transparent 72%)',
+                    filter: 'blur(14px)',
+                }}
+                animate={reducedMotion ? {} : { x: [0, -22, 0], y: [0, 16, 0], scale: [1, 1.05, 1] }}
+                transition={reducedMotion ? {} : { duration: 20, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+            />
+            <div
+                style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundImage:
+                        'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)',
+                    backgroundSize: '72px 72px',
+                    maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.75), transparent 86%)',
+                    opacity: 0.18,
+                }}
+            />
+        </div>
+    );
+}
+
 export default function Planning() {
     const [searchParams, setSearchParams] = useSearchParams();
     const reducedMotion = useReducedMotion();
@@ -120,21 +186,87 @@ export default function Planning() {
     return (
         <motion.div
             className="container app-page-shell"
-            style={{ paddingBottom: '80px' }}
+            style={{ paddingBottom: '96px', position: 'relative', isolation: 'isolate' }}
             variants={pageVariants}
             initial="hidden"
             animate="visible"
         >
-            <motion.div variants={sectionVariants}>
+            <PlanningBackdrop />
+
+            <motion.div variants={sectionVariants} style={{ position: 'relative', zIndex: 1 }}>
                 <PageHeader
                     title={<span>Planejamento <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>Financeiro</span></span>}
                     subtitle={activeConfig.subtitle}
                 />
             </motion.div>
 
-            <motion.div className="glass-card planning-tabs" variants={sectionVariants}>
+            <motion.section
+                variants={sectionVariants}
+                style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    display: 'grid',
+                    gridTemplateColumns: 'minmax(0, 1.1fr) minmax(260px, 0.9fr)',
+                    gap: '1rem',
+                    padding: '1.35rem',
+                    borderRadius: '28px',
+                    border: '1px solid var(--glass-border)',
+                    background: 'linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
+                    backdropFilter: 'blur(20px)',
+                    boxShadow: '0 18px 50px rgba(0, 0, 0, 0.18)',
+                }}
+            >
+                <div style={{ display: 'grid', gap: '0.75rem' }}>
+                    <span className="text-muted" style={{ letterSpacing: '0.18em', textTransform: 'uppercase', fontSize: '0.72rem' }}>
+                        Visao geral
+                    </span>
+                    <strong style={{ fontSize: 'clamp(1.55rem, 2.5vw, 2.25rem)', lineHeight: 1.05 }}>
+                        Planejamento em camadas, com a aba certa em foco.
+                    </strong>
+                    <p className="text-muted" style={{ margin: 0, maxWidth: '56ch' }}>
+                        Uma leitura curta para orientar o olhar antes de abrir os detalhes de analise, metas, orcamentos ou simulacao.
+                    </p>
+                </div>
+
+                <div
+                    style={{
+                        display: 'grid',
+                        gap: '0.75rem',
+                        alignContent: 'start',
+                        padding: '1rem',
+                        borderRadius: '22px',
+                        background: 'rgba(0, 0, 0, 0.14)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                    }}
+                >
+                    <span className="text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.16em', fontSize: '0.7rem' }}>
+                        Aba ativa
+                    </span>
+                    <strong style={{ fontSize: '1.2rem' }}>{activeConfig.label}</strong>
+                    <p className="text-muted" style={{ margin: 0, lineHeight: 1.6 }}>
+                        {activeConfig.subtitle}
+                    </p>
+                </div>
+            </motion.section>
+
+            <motion.div
+                className="planning-tabs"
+                variants={sectionVariants}
+                style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                    gap: '0.75rem',
+                    padding: '0.75rem',
+                    borderRadius: '24px',
+                    border: '1px solid var(--glass-border)',
+                    background: 'rgba(255,255,255,0.03)',
+                    backdropFilter: 'blur(14px)',
+                }}
+            >
                 {VALID_TABS.map((tab) => {
-                    const { icon: Icon, label } = TAB_CONFIG[tab];
+                    const { icon: Icon, label, subtitle } = TAB_CONFIG[tab];
                     const isActive = activeTab === tab;
 
                     return (
@@ -143,9 +275,22 @@ export default function Planning() {
                             type="button"
                             className={`planning-tab-button${isActive ? ' is-active' : ''}`}
                             onClick={() => handleTabChange(tab)}
-                            whileHover={{ y: -1, scale: 1.01 }}
+                            whileHover={{ y: -2, scale: 1.01 }}
                             whileTap={{ scale: 0.98 }}
                             transition={{ duration: 0.2 }}
+                            style={{
+                                minHeight: '108px',
+                                display: 'grid',
+                                gap: '0.35rem',
+                                justifyItems: 'start',
+                                alignContent: 'space-between',
+                                padding: '1rem',
+                                borderRadius: '18px',
+                                border: '1px solid transparent',
+                                background: isActive ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.04)',
+                                color: 'var(--text-main)',
+                                textAlign: 'left',
+                            }}
                         >
                             {isActive && (
                                 <motion.span
@@ -155,31 +300,48 @@ export default function Planning() {
                                 />
                             )}
                             <Icon size={16} />
-                            <span className="planning-tab-label">{label}</span>
+                            <span className="planning-tab-label" style={{ fontSize: '1rem' }}>{label}</span>
+                            <span className="text-muted" style={{ fontSize: '0.82rem', lineHeight: 1.45 }}>
+                                {subtitle}
+                            </span>
                         </motion.button>
                     );
                 })}
             </motion.div>
 
-            <AnimatePresence mode="wait" initial={false} custom={transitionDirection}>
-                <motion.div
-                    key={activeTab}
-                    className="planning-tab-panel"
-                    custom={transitionDirection}
-                    variants={tabPanelVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{
-                        duration: reducedMotion ? 0.16 : 0.34,
-                        ease: [0.22, 1, 0.36, 1],
-                    }}
-                >
-                    <Suspense fallback={<div className="app-empty-inline">Carregando aba...</div>}>
-                        {renderContent()}
-                    </Suspense>
-                </motion.div>
-            </AnimatePresence>
+            <motion.div
+                style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    marginTop: '1rem',
+                    padding: '1.25rem',
+                    borderRadius: '28px',
+                    border: '1px solid var(--glass-border)',
+                    background: 'rgba(255,255,255,0.03)',
+                    backdropFilter: 'blur(18px)',
+                    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.16)',
+                }}
+            >
+                <AnimatePresence mode="wait" initial={false} custom={transitionDirection}>
+                    <motion.div
+                        key={activeTab}
+                        className="planning-tab-panel"
+                        custom={transitionDirection}
+                        variants={tabPanelVariants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{
+                            duration: reducedMotion ? 0.16 : 0.34,
+                            ease: [0.22, 1, 0.36, 1],
+                        }}
+                    >
+                        <Suspense fallback={<div className="app-empty-inline">Carregando aba...</div>}>
+                            {renderContent()}
+                        </Suspense>
+                    </motion.div>
+                </AnimatePresence>
+            </motion.div>
         </motion.div>
     );
 }

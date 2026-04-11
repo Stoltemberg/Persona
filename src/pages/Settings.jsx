@@ -186,7 +186,7 @@ export default function Settings() {
         setLoading(true);
 
         try {
-            addToast('Preparando relatorio.', 'info');
+            addToast('Preparando relatorio completo em Excel.', 'info');
 
             const [
                 { data: allTransactions, error: transactionsError },
@@ -215,7 +215,7 @@ export default function Settings() {
                 allBudgets || [],
             );
 
-            addConfirmationCard('Relatorio exportado', 'O arquivo foi baixado no seu dispositivo.');
+            addConfirmationCard('Relatorio exportado', 'O arquivo Excel protegido foi baixado no seu dispositivo.');
         } catch (error) {
             addToast('Erro ao exportar dados.', 'error');
         } finally {
@@ -230,7 +230,7 @@ export default function Settings() {
                 subtitle="Centralize plano, perfil, modo casal e preferencias em uma tela mais organizada."
             >
                 <Button variant="ghost" icon={Download} onClick={handleExport} disabled={loading}>
-                    Exportar dados
+                    Exportar relatorio completo
                 </Button>
             </PageHeader>
 

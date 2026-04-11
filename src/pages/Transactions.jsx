@@ -396,7 +396,7 @@ export default function Transactions() {
         const { exportTransactionsToExcel } = await import('../lib/exportUtils');
         exportTransactionsToExcel(filteredTransactions);
         setIsExportModalOpen(false);
-        addToast('Planilha compativel gerada com sucesso.', 'success');
+        addToast('Arquivo Excel protegido gerado com sucesso.', 'success');
     };
 
     return (
@@ -591,7 +591,7 @@ export default function Transactions() {
                     <div className="surface-secondary" style={{ padding: '1rem', borderRadius: '12px' }}>
                         <strong style={{ display: 'block', color: 'var(--text-main)', marginBottom: '0.35rem' }}>Escolha o formato</strong>
                         <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                            CSV abre mais rapido em planilhas e mantem a exportacao leve. A planilha compativel abre no Excel sem carregar a dependencia pesada anterior.
+                            CSV abre mais rapido em planilhas e mantem a exportacao leve. O arquivo Excel protegido exporta em formato .xlsx para uso completo no Excel.
                         </p>
                     </div>
 
@@ -599,7 +599,7 @@ export default function Transactions() {
                         Exportar CSV rapido
                     </Button>
                     <Button type="button" variant="ghost" onClick={handleExportExcel} style={{ width: '100%', justifyContent: 'center' }}>
-                        Exportar planilha compativel
+                        Exportar arquivo Excel protegido
                     </Button>
                 </div>
             </Modal>

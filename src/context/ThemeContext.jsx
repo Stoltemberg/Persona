@@ -3,19 +3,25 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const ThemeContext = createContext();
 
 const lightVars = {
-    '--bg-deep': '#ffffff',
-    '--bg-card': '#f8f8f8',
-    '--color-brand': '#000000',
-    '--color-accent': '#e5e5e5',
-    '--glass-bg': '#ffffff',
-    '--glass-border': '#e5e5e5',
-    '--glass-border-highlight': '#d1d1d1',
-    '--glass-shadow': '0 2px 10px rgba(0, 0, 0, 0.05)',
-    '--glass-panel-bg': '#ffffff',
+    '--bg-deep': '#F2F2F7',
+    '--bg-card': '#FFFFFF',
+    '--color-brand': '#007AFF',
+    '--color-accent': '#E9F2FF',
+    '--glass-bg': 'rgba(255, 255, 255, 0.78)',
+    '--glass-border': 'rgba(60, 60, 67, 0.06)',
+    '--glass-border-highlight': 'rgba(60, 60, 67, 0.12)',
+    '--glass-shadow': '0 4px 18px rgba(0, 0, 0, 0.06)',
+    '--glass-panel-bg': '#FFFFFF',
     '--text-main': '#000000',
-    '--text-secondary': 'rgba(0, 0, 0, 0.6)',
-    '--text-muted': 'rgba(0, 0, 0, 0.4)',
-    '--input-bg': '#f5f5f5',
+    '--text-secondary': 'rgba(60, 60, 67, 0.6)',
+    '--text-muted': 'rgba(60, 60, 67, 0.3)',
+    '--btn-primary-bg': '#007AFF',
+    '--btn-primary-text': '#FFFFFF',
+    '--btn-primary-hover-bg': '#006AE0',
+    '--btn-ghost-bg': 'rgba(0, 0, 0, 0.04)',
+    '--btn-ghost-bg-hover': 'rgba(0, 0, 0, 0.08)',
+    '--btn-ghost-text': '#111111',
+    '--input-bg': 'rgba(118, 118, 128, 0.12)',
 };
 
 const darkVars = {
@@ -36,6 +42,12 @@ const darkVars = {
     '--text-main': '#F3EFEA',
     '--text-secondary': '#9E988F',
     '--text-muted': '#5C5853',
+    '--btn-primary-bg': '#D4AF37',
+    '--btn-primary-text': '#0A0A0A',
+    '--btn-primary-hover-bg': 'color-mix(in srgb, #D4AF37 88%, white 12%)',
+    '--btn-ghost-bg': 'rgba(255, 255, 255, 0.02)',
+    '--btn-ghost-bg-hover': 'rgba(212, 175, 55, 0.08)',
+    '--btn-ghost-text': '#F3EFEA',
     '--input-bg': 'rgba(255, 255, 255, 0.03)',
 };
 

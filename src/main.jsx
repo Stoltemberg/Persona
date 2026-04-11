@@ -6,7 +6,6 @@ import { AuthProvider } from './hooks/useAuth'
 import { ThemeProvider } from './context/ThemeContext'
 import { PrivacyProvider } from './context/PrivacyContext'
 import { ToastProvider } from './context/ToastContext'
-import { EventProvider } from './context/EventContext'
 
 async function clearLegacyServiceWorkers() {
   if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return
@@ -38,11 +37,9 @@ createRoot(document.getElementById('root')).render(
     <AuthProvider>
       <ThemeProvider>
         <ToastProvider>
-          <EventProvider>
-            <PrivacyProvider>
-              <App />
-            </PrivacyProvider>
-          </EventProvider>
+          <PrivacyProvider>
+            <App />
+          </PrivacyProvider>
         </ToastProvider>
       </ThemeProvider>
     </AuthProvider>

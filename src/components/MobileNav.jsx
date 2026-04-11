@@ -2,17 +2,15 @@ import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Eye, EyeOff, LayoutDashboard, LogOut, Menu as MenuIcon, Plane, Receipt, Repeat, Settings, Tag, Target, Wallet, X } from 'lucide-react';
+import { Eye, EyeOff, LayoutDashboard, LogOut, Menu as MenuIcon, Receipt, Repeat, Settings, Tag, Target, Wallet, X } from 'lucide-react';
 import { FAB } from './FAB';
 import { usePrivacy } from '../context/PrivacyContext';
-import { useEvent } from '../context/EventContext';
 import { useAuth } from '../hooks/useAuth';
 
 export function MobileNav() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
-    const { isEventMode, toggleEventMode } = useEvent();
     const { signOut } = useAuth();
 
     const barItemsLeft = [
@@ -130,10 +128,6 @@ export function MobileNav() {
                                             {isPrivacyMode ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                                         </div>
                                         <span>{isPrivacyMode ? 'Oculto' : 'Visivel'}</span>
-                                    </button>
-                                    <button onClick={() => toggleEventMode(!isEventMode)} className={`menu-toggle-btn ${isEventMode ? 'active' : ''}`} aria-label={isEventMode ? 'Sair do modo viagem' : 'Modo viagem'}>
-                                        <div className="toggle-icon-box"><Plane size={16} strokeWidth={1.5} /></div>
-                                        <span>Viagem</span>
                                     </button>
                                 </div>
 

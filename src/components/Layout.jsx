@@ -4,9 +4,7 @@ import { MobileNav } from './MobileNav';
 import { FAB } from './FAB';
 import { InstallPrompt } from './InstallPrompt';
 import { usePrivacy } from '../context/PrivacyContext';
-import { useEvent } from '../context/EventContext';
-import { Eye, EyeOff, Plane } from 'lucide-react';
-import clsx from 'clsx';
+import { Eye, EyeOff } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
@@ -31,7 +29,6 @@ export function Layout() {
     const outlet = useOutlet();
     const reducedMotion = useReducedMotion();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
-    const { isEventMode, toggleEventMode } = useEvent();
     const routeKey = location.pathname;
     const previousRouteRef = useRef(routeKey);
     const [transitionDirection, setTransitionDirection] = useState(1);
@@ -73,13 +70,6 @@ export function Layout() {
                     title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
                 >
                     {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-                <button
-                    onClick={() => toggleEventMode(!isEventMode)}
-                    className={clsx("control-btn", isEventMode && "active")}
-                    title={isEventMode ? "Sair do Modo Viagem" : "Modo Viagem"}
-                >
-                    <Plane size={18} />
                 </button>
             </div>
 

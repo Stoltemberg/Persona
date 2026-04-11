@@ -1,16 +1,14 @@
 import { createPortal } from 'react-dom';
 import { NavLink } from 'react-router-dom';
 import clsx from 'clsx';
-import { Eye, EyeOff, LayoutDashboard, LogOut, Plane, Receipt, Repeat, Settings, Tag, Target, Wallet } from 'lucide-react';
+import { Eye, EyeOff, LayoutDashboard, LogOut, Receipt, Repeat, Settings, Tag, Target, Wallet } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { usePrivacy } from '../context/PrivacyContext';
-import { useEvent } from '../context/EventContext';
 
 export function Sidebar() {
     const { signOut, role, hasNewPartnerUpdates } = useAuth();
     const { isPrivacyMode, togglePrivacy } = usePrivacy();
-    const { isEventMode, toggleEventMode } = useEvent();
 
     const navItems = [
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -39,15 +37,6 @@ export function Sidebar() {
                             aria-label={isPrivacyMode ? 'Mostrar valores monetarios' : 'Ocultar valores monetarios'}
                         >
                             {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                        <button
-                            onClick={() => toggleEventMode(!isEventMode)}
-                            className="sidebar-header-btn"
-                            style={{ color: isEventMode ? 'var(--text-main)' : undefined }}
-                            title={isEventMode ? 'Sair do modo viagem' : 'Modo viagem'}
-                            aria-label={isEventMode ? 'Sair do modo viagem' : 'Entrar no modo viagem'}
-                        >
-                            <Plane size={18} />
                         </button>
                     </div>
                     <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>

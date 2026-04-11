@@ -36,6 +36,19 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
         }
     }, []);
 
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen]);
+
     // Calculate position
     useEffect(() => {
         if (isOpen && containerRef.current) {
@@ -125,15 +138,13 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
         <div ref={containerRef} style={{ position: 'relative' }}>
             {/* Trigger Button (Glass Pill) */}
             <div
-                onClick={() => setIsOpen(!isOpen)}
                 className="glass-panel"
                 style={{
-                    display: 'flex',
+                    display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.4rem 0.8rem',
+                    gap: '0.35rem',
+                    padding: '0.4rem 0.55rem 0.4rem 0.8rem',
                     borderRadius: '20px', // Pill shape
-                    cursor: 'pointer',
                     fontSize: '0.85rem',
                     background: isOpen ? 'rgba(255,255,255,0.1)' : 'transparent',
                     border: '1px solid rgba(255,255,255,0.1)',
@@ -141,23 +152,52 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
                     whiteSpace: 'nowrap'
                 }}
             >
-                <CalendarIcon size={14} color="var(--text-muted)" />
-                <span style={{ color: (startDate || endDate) ? 'var(--text-main)' : 'var(--text-muted)' }}>
-                    {displayText()}
-                </span>
+                <motion.button
+                    type="button"
+                    onClick={() => setIsOpen(!isOpen)}
+                    aria-haspopup="dialog"
+                    aria-expanded={isOpen}
+                    aria-controls="date-range-dropdown"
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        cursor: 'pointer',
+                        border: 'none',
+                        background: 'transparent',
+                        padding: 0,
+                        fontSize: '0.85rem',
+                        color: 'inherit',
+                        minWidth: 0
+                    }}
+                >
+                    <CalendarIcon size={14} color="var(--text-muted)" />
+                    <span style={{ color: (startDate || endDate) ? 'var(--text-main)' : 'var(--text-muted)' }}>
+                        {displayText()}
+                    </span>
+                </motion.button>
                 {(startDate || endDate) && (
-                    <div
+                    <motion.button
+                        type="button"
                         onClick={handleClear}
+                        aria-label="Limpar filtro de datas"
                         style={{
                             marginLeft: '0.2rem',
                             display: 'flex',
                             alignItems: 'center',
+                            justifyContent: 'center',
                             cursor: 'pointer',
-                            opacity: 0.7
+                            opacity: 0.7,
+                            border: 'none',
+                            background: 'transparent',
+                            padding: '0.2rem',
+                            borderRadius: '999px',
+                            color: 'var(--text-muted)',
+                            lineHeight: 0
                         }}
                     >
-                        <X size={14} />
-                    </div>
+                        <X size={14} aria-hidden="true" />
+                    </motion.button>
                 )}
             </div>
 
@@ -167,6 +207,9 @@ export function DateRangePicker({ startDate, endDate, onChange }) {
                     {isOpen && (
                         <motion.div
                             id="date-range-dropdown"
+                            role="dialog"
+                            aria-label="Selecionar período"
+                            aria-modal="false"
                             initial={isMobileState ? mobileVariants.initial : desktopVariants.initial}
                             animate={isMobileState ? mobileVariants.animate : desktopVariants.animate}
                             exit={isMobileState ? mobileVariants.exit : desktopVariants.exit}

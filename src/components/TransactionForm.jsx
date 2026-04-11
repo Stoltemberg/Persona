@@ -35,6 +35,17 @@ export function TransactionForm({
         duration: 0.22,
         ease: 'easeOut',
     };
+    const visuallyHiddenLabel = {
+        position: 'absolute',
+        width: '1px',
+        height: '1px',
+        padding: 0,
+        margin: '-1px',
+        overflow: 'hidden',
+        clip: 'rect(0, 0, 0, 0)',
+        whiteSpace: 'nowrap',
+        border: 0,
+    };
 
     return (
         <form onSubmit={onSubmit} className={`fab-form-shell${compact ? ' is-compact' : ''}`}>
@@ -101,7 +112,11 @@ export function TransactionForm({
                 </div>
 
                 <div className="input-group" style={{ marginBottom: 0 }}>
+                    <label htmlFor="wallet-select" style={visuallyHiddenLabel}>
+                        Carteira
+                    </label>
                     <select
+                        id="wallet-select"
                         className="input-field"
                         value={selectedWalletId}
                         onChange={(event) => onWalletChange(event.target.value)}

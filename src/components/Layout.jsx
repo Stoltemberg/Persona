@@ -68,6 +68,7 @@ export function Layout() {
                     onClick={togglePrivacy}
                     className="control-btn"
                     title={isPrivacyMode ? "Mostrar valores" : "Esconder valores"}
+                    aria-label={isPrivacyMode ? 'Mostrar valores' : 'Esconder valores'}
                 >
                     {isPrivacyMode ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>

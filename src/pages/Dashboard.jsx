@@ -50,6 +50,21 @@ const itemVariants = {
 };
 
 const ThreeBackground = lazy(() => import('../components/ThreeBackground').then((module) => ({ default: module.ThreeBackground })));
+const RECURRING_CHECK_SESSION_KEY = 'persona-recurring-check';
+
+function shouldSkipRecurringCheck() {
+    if (typeof window === 'undefined') return false;
+
+    const lastRun = window.sessionStorage.getItem(RECURRING_CHECK_SESSION_KEY);
+    if (!lastRun) return false;
+
+    return Date.now() - Number(lastRun) < 5 * 60 * 1000;
+}
+
+function markRecurringCheckAttempt() {
+    if (typeof window === 'undefined') return;
+    window.sessionStorage.setItem(RECURRING_CHECK_SESSION_KEY, String(Date.now()));
+}
 
 export default function Dashboard() {
     const { user, profile, partnerProfile, incomingRequest, fetchProfile } = useAuth();
@@ -143,9 +158,16 @@ export default function Dashboard() {
     }, []);
 
     const checkRecurring = async () => {
+        if (shouldSkipRecurringCheck()) return;
+
         try {
+            const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+            if (userError || !currentUser) return;
+
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) return;
+            if (!session?.access_token) return;
+
+            markRecurringCheckAttempt();
 
             const { error } = await supabase.functions.invoke('process-recurring', {
                 headers: { Authorization: `Bearer ${session.access_token}` },
@@ -155,6 +177,12 @@ export default function Dashboard() {
 
             fetchTransactionsData();
         } catch (error) {
+            const status = error?.context?.status ?? error?.status;
+            if (status === 401 || status === 403) {
+                console.warn('Skipping recurring processing because the current session is not authorized yet.');
+                return;
+            }
+
             console.error('Error processing recurring:', error);
         }
     };

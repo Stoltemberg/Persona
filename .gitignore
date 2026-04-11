@@ -6,11 +6,6 @@
 node_modules
 dist
 dist-ssr
-Persona/node_modules/
-Persona/dist/
-Persona/dist-ssr/
-Persona/.agents/
-Persona/.git-persona-backup/
 
 # Logs
 logs
@@ -26,9 +21,6 @@ lerna-debug.log*
 .env
 .env.*
 !.env.example
-Persona/.env
-Persona/.env.*
-!Persona/.env.example
 .temp_skills
 
 # Editor directories and files

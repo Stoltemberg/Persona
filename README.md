@@ -1,56 +1,51 @@
 # Persona Repository
 
-Este repositório Git tem raiz em `C:\Users\tutor\OneDrive\Documentos\New project`.
+Este repositorio Git tem raiz nesta pasta do projeto.
 
 ## Estrutura oficial
 
-- `Persona/`: aplicação principal web em React + Vite
-- `Persona/src/`: frontend
-- `Persona/supabase/`: migrations e Edge Functions
-- `Persona/scripts/`: scripts operacionais
-- `.codex/`: configurações locais da ferramenta, fora do escopo do produto
+- `src/`: frontend em React + Vite
+- `public/`: assets publicos e arquivos PWA
+- `supabase/`: migrations e Edge Functions
+- `scripts/`: scripts operacionais
 
 ## Raiz de trabalho
 
-A raiz do repositório continua sendo esta pasta, mas a raiz operacional da aplicação é [Persona](C:\Users\tutor\OneDrive\Documentos\New project\Persona).
+Esta pasta e ao mesmo tempo a raiz do repositorio e a raiz operacional da aplicacao.
 
-Use esta convenção:
+Use esta convencao:
 
-- comandos de Git: executar na raiz do repositório
-- comandos de frontend: executar em `Persona/`
-- operações do Supabase deste projeto: executar em `Persona/`
+- comandos de Git: executar na raiz do repositorio
+- comandos de frontend: executar na raiz do repositorio
+- operacoes do Supabase deste projeto: executar na raiz do repositorio
 
 ## Fluxos comuns
 
-Instalar dependências do app:
+Instalar dependencias do app:
 
 ```powershell
-cd Persona
 npm install
 ```
 
 Rodar o frontend:
 
 ```powershell
-cd Persona
 npm run dev
 ```
 
 Build local:
 
 ```powershell
-cd Persona
 npm run build
 ```
 
 Lint:
 
 ```powershell
-cd Persona
 npm run lint
 ```
 
-## Documentação principal
+## Documentacao principal
 
-- visão geral do app: [Persona/README.md](C:\Users\tutor\OneDrive\Documentos\New project\Persona\README.md)
-- deploy e Edge Functions: [Persona/DEPLOY_INSTRUCTIONS.md](C:\Users\tutor\OneDrive\Documentos\New project\Persona\DEPLOY_INSTRUCTIONS.md)
+- visao geral do app: [README.md](C:/Users/tutor/OneDrive/Documentos/New%20project%202/Persona/README.md)
+- deploy e Edge Functions: [DEPLOY_INSTRUCTIONS.md](C:/Users/tutor/OneDrive/Documentos/New%20project%202/Persona/DEPLOY_INSTRUCTIONS.md)

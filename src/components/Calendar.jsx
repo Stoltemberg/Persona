@@ -44,13 +44,13 @@ export function Calendar({ startDate, endDate, onChange }) {
     const renderHeader = () => {
         return (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <Button onClick={prevMonth} variant="ghost" style={{ padding: '0.4rem' }}>
+                <Button onClick={prevMonth} variant="ghost" style={{ padding: '0.4rem' }} aria-label="Mês anterior">
                     <ChevronLeft size={20} />
                 </Button>
                 <div style={{ fontWeight: 600, textTransform: 'capitalize' }}>
                     {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
                 </div>
-                <Button onClick={nextMonth} variant="ghost" style={{ padding: '0.4rem' }}>
+                <Button onClick={nextMonth} variant="ghost" style={{ padding: '0.4rem' }} aria-label="Próximo mês">
                     <ChevronRight size={20} />
                 </Button>
             </div>
@@ -93,14 +93,31 @@ export function Calendar({ startDate, endDate, onChange }) {
                 formattedDate = format(day, 'd');
                 const cloneDay = day;
 
-                const isSelected = (startDate && isSameDay(day, startDate)) || (endDate && isSameDay(day, endDate));
+                const isStartSelected = startDate && isSameDay(day, startDate);
+                const isEndSelected = endDate && isSameDay(day, endDate);
+                const isSelected = isStartSelected || isEndSelected;
                 const isInRange = startDate && endDate && isWithinInterval(day, { start: startDate, end: endDate });
                 const isCurrentMonth = isSameMonth(day, monthStart);
+                const isToday = isSameDay(day, new Date());
+                const formattedAriaLabel = format(day, "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR });
+                const selectionLabel = isStartSelected && isEndSelected
+                    ? 'início e fim do intervalo selecionado'
+                    : isStartSelected
+                        ? 'início do intervalo selecionado'
+                        : isEndSelected
+                            ? 'fim do intervalo selecionado'
+                            : isInRange
+                                ? 'dentro do intervalo selecionado'
+                                : '';
 
                 days.push(
-                    <div
+                    <button
+                        type="button"
                         key={day}
                         onClick={() => onDateClick(cloneDay)}
+                        aria-label={`${formattedAriaLabel}${selectionLabel ? `, ${selectionLabel}` : ''}`}
+                        aria-pressed={isSelected}
+                        aria-current={isToday ? 'date' : undefined}
                         style={{
                             position: 'relative',
                             height: '2.5rem', // Fixed square size
@@ -110,11 +127,13 @@ export function Calendar({ startDate, endDate, onChange }) {
                             justifyContent: 'center',
                             cursor: 'pointer',
                             borderRadius: '50%', // Circle shape for selection
+                            border: isToday && !isSelected ? '1px solid var(--color-1)' : '1px solid transparent',
                             background: isSelected ? 'var(--color-1)' : (isInRange ? 'rgba(79, 41, 240, 0.15)' : 'transparent'),
                             color: isSelected ? 'white' : (isCurrentMonth ? 'var(--text-main)' : 'var(--text-muted)'),
                             opacity: isCurrentMonth ? 1 : 0.3,
                             fontWeight: isSelected ? 600 : 400,
-                            border: isSameDay(day, new Date()) && !isSelected ? '1px solid var(--color-1)' : 'none',
+                            padding: 0,
+                            appearance: 'none'
                         }}
                     >
                         {/* Connecting strip for range */}
@@ -131,7 +150,7 @@ export function Calendar({ startDate, endDate, onChange }) {
                             }} />
                         )}
                         {formattedDate}
-                    </div>
+                    </button>
                 );
                 day = addDays(day, 1);
             }

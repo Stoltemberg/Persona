@@ -74,6 +74,12 @@ function getExpectedAmount(intentAmount: number, tier: keyof typeof tierCatalog)
     return Number(intentAmount.toFixed(2))
 }
 
+function addDays(baseDate: Date, days: number) {
+    const nextDate = new Date(baseDate)
+    nextDate.setDate(nextDate.getDate() + days)
+    return nextDate
+}
+
 serve(async (req) => {
     try {
         const url = new URL(req.url)
@@ -186,8 +192,25 @@ serve(async (req) => {
             return new Response('Payment validation failed', { status: 400 })
         }
 
-        const nextMonth = new Date()
-        nextMonth.setDate(nextMonth.getDate() + 30)
+        const { data: existingSubscription, error: existingSubscriptionError } = await supabaseAdmin
+            .from('subscriptions')
+            .select('current_period_end')
+            .eq('user_id', userId)
+            .maybeSingle()
+
+        if (existingSubscriptionError) {
+            console.error('Error loading current subscription:', existingSubscriptionError)
+            return new Response('DB Error', { status: 500 })
+        }
+
+        const now = new Date()
+        const currentPeriodEnd = existingSubscription?.current_period_end
+            ? new Date(existingSubscription.current_period_end)
+            : null
+        const renewalBaseDate = currentPeriodEnd && !Number.isNaN(currentPeriodEnd.getTime()) && currentPeriodEnd > now
+            ? currentPeriodEnd
+            : now
+        const nextMonth = addDays(renewalBaseDate, 30)
 
         const { error: subscriptionError } = await supabaseAdmin
             .from('subscriptions')

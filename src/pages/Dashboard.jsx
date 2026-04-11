@@ -51,25 +51,6 @@ const itemVariants = {
 
 const ThreeBackground = lazy(() => import('../components/ThreeBackground').then((module) => ({ default: module.ThreeBackground })));
 
-const fetchRecurringTemplatesCompat = async (builderFactory) => {
-    const primaryResponse = await builderFactory(true);
-
-    if (primaryResponse.error?.code !== '42703') {
-        return primaryResponse;
-    }
-
-    const fallbackResponse = await builderFactory(false);
-
-    if (fallbackResponse.error) {
-        return fallbackResponse;
-    }
-
-    return {
-        data: (fallbackResponse.data || []).map((template) => ({ ...template, wallet_id: null })),
-        error: null,
-    };
-};
-
 export default function Dashboard() {
     const { user, profile, partnerProfile, incomingRequest, fetchProfile } = useAuth();
     const { isPrivacyMode } = usePrivacy();
@@ -163,57 +144,14 @@ export default function Dashboard() {
 
     const checkRecurring = async () => {
         try {
-            const now = new Date();
-            const { data: templates, error } = await fetchRecurringTemplatesCompat((includeWalletId) => {
-                const fields = includeWalletId
-                    ? 'id, description, amount, type, category, wallet_id, expense_type, frequency, next_due_date'
-                    : 'id, description, amount, type, category, expense_type, frequency, next_due_date';
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
 
-                return supabase
-                    .from('recurring_templates')
-                    .select(fields)
-                    .eq('active', true)
-                    .lte('next_due_date', now.toISOString());
+            const { error } = await supabase.functions.invoke('process-recurring', {
+                headers: { Authorization: `Bearer ${session.access_token}` },
             });
 
             if (error) throw error;
-
-            if (!templates?.length) return;
-
-            for (const template of templates) {
-                if (!template.wallet_id) {
-                    console.warn('Recurring template skipped because it has no wallet_id:', template.id);
-                    continue;
-                }
-
-                const { error: txError } = await supabase.from('transactions').insert([{
-                    description: template.description,
-                    amount: template.amount,
-                    type: template.type,
-                    category: template.category,
-                    wallet_id: template.wallet_id,
-                    expense_type: template.expense_type,
-                    date: new Date().toISOString(),
-                    profile_id: user.id,
-                }]);
-
-                if (txError) continue;
-
-                const nextDate = new Date(template.next_due_date);
-                if (template.frequency === 'monthly') {
-                    nextDate.setMonth(nextDate.getMonth() + 1);
-                } else if (template.frequency === 'weekly') {
-                    nextDate.setDate(nextDate.getDate() + 7);
-                }
-
-                await supabase
-                    .from('recurring_templates')
-                    .update({
-                        last_generated_date: new Date().toISOString(),
-                        next_due_date: nextDate.toISOString(),
-                    })
-                    .eq('id', template.id);
-            }
 
             fetchTransactionsData();
         } catch (error) {

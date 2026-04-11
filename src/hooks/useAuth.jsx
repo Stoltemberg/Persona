@@ -7,6 +7,14 @@ export const useAuth = () => useContext(AuthContext);
 
 const getPayloadProfileId = (payload, key = 'profile_id') => payload?.new?.[key] || payload?.old?.[key] || null;
 const REALTIME_DEDUP_WINDOW_MS = 750;
+const NICKNAME_GENERATION_ATTEMPTS = 5;
+
+const normalizeNickname = (value) => {
+    const normalized = (value || '').toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 15);
+    return normalized || `user${Math.floor(Math.random() * 1000)}`;
+};
+
+const buildDiscriminator = () => Math.floor(1000 + Math.random() * 9000).toString();
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -135,19 +143,36 @@ export function AuthProvider({ children }) {
                 // Auto-generate nickname and discriminator if not present
                 if (!data.nickname || !data.discriminator) {
                     const { data: { user } } = await supabase.auth.getUser();
-                    const baseNickname = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || `user${Math.floor(Math.random()*1000)}`;
-                    const newNickname = baseNickname.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 15);
-                    const newDiscriminator = Math.floor(1000 + Math.random() * 9000).toString();
-                    
-                    const { data: updated, error: updateErr } = await supabase
-                        .from('profiles')
-                        .update({ nickname: newNickname, discriminator: newDiscriminator })
-                        .eq('id', userId)
-                        .select()
-                        .single();
-                        
-                    if (!updateErr && updated) {
-                        finalData = updated;
+                    const baseNickname = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || '';
+                    const normalizedNickname = normalizeNickname(baseNickname);
+                    let updatedProfile = null;
+
+                    for (let attempt = 0; attempt < NICKNAME_GENERATION_ATTEMPTS; attempt += 1) {
+                        const { data: updated, error: updateErr } = await supabase
+                            .from('profiles')
+                            .update({
+                                nickname: normalizedNickname,
+                                discriminator: buildDiscriminator(),
+                            })
+                            .eq('id', userId)
+                            .select()
+                            .single();
+
+                        if (!updateErr && updated) {
+                            updatedProfile = updated;
+                            break;
+                        }
+
+                        if (updateErr?.code !== '23505') {
+                            console.error('Error generating profile identifier:', updateErr);
+                            break;
+                        }
+                    }
+
+                    if (updatedProfile) {
+                        finalData = updatedProfile;
+                    } else {
+                        console.error('Unable to generate unique nickname/discriminator for profile', { userId });
                     }
                 }
 

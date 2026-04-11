@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { AlertCircle, Calendar, Check, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import {
+    buildRecurringTransactionPayload,
+    getNextRecurringDueDate,
+    getRecurringTemplateSelectFields,
+} from '../lib/recurring';
 import { useAuth } from '../hooks/useAuth';
 import { formatCurrency } from '../utils/format';
 import { useToast } from '../context/ToastContext';
@@ -47,7 +52,7 @@ export function UpcomingBills() {
 
             const { data, error } = await supabase
                 .from('recurring_templates')
-                .select('id, description, amount, category, wallet_id, expense_type, next_due_date, frequency, type')
+                .select(getRecurringTemplateSelectFields({ includeWalletId: true }))
                 .eq('type', 'expense')
                 .eq('active', true)
                 .lte('next_due_date', nextWeek.toISOString())
@@ -56,7 +61,7 @@ export function UpcomingBills() {
             if (error?.code === '42703') {
                 const fallbackResponse = await supabase
                     .from('recurring_templates')
-                    .select('id, description, amount, category, expense_type, next_due_date, frequency, type')
+                    .select(getRecurringTemplateSelectFields({ includeWalletId: false }))
                     .eq('type', 'expense')
                     .eq('active', true)
                     .lte('next_due_date', nextWeek.toISOString())
@@ -97,28 +102,12 @@ export function UpcomingBills() {
 
             const { data: txData, error: txError } = await supabase
                 .from('transactions')
-                .insert([{
-                    description: bill.description,
-                    amount: bill.amount,
-                    type: 'expense',
-                    category: bill.category,
-                    wallet_id: bill.wallet_id,
-                    expense_type: bill.expense_type,
-                    date: new Date().toISOString(),
-                    profile_id: user.id,
-                }])
+                .insert([buildRecurringTransactionPayload(bill, user.id)])
                 .select();
 
             if (txError) throw txError;
 
-            const currentDueDate = new Date(bill.next_due_date);
-            const nextDate = new Date(currentDueDate);
-
-            if (bill.frequency === 'weekly') {
-                nextDate.setDate(nextDate.getDate() + 7);
-            } else {
-                nextDate.setMonth(nextDate.getMonth() + 1);
-            }
+            const nextDate = getNextRecurringDueDate(bill.next_due_date, bill.frequency);
 
             const { error: updateError } = await supabase
                 .from('recurring_templates')

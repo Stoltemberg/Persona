@@ -3588,6 +3588,15 @@ option {
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
 }
 
+.light .feedback-card,
+html.light .feedback-card {
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--feedback-accent) 12%, transparent), transparent 42%),
+    rgba(255, 255, 255, 0.94);
+  border: 1px solid color-mix(in srgb, var(--feedback-accent) 18%, rgba(60, 60, 67, 0.08));
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12);
+}
+
 .feedback-card-head,
 .feedback-card-actions {
   display: flex;
@@ -3623,6 +3632,18 @@ option {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.light .feedback-card-close,
+html.light .feedback-card-close {
+  background: rgba(0, 122, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+.light .feedback-card-close:hover,
+html.light .feedback-card-close:hover {
+  background: rgba(0, 122, 255, 0.14);
+  color: var(--text-main);
+}
+
 .feedback-card-body {
   display: grid;
   gap: 0.35rem;
@@ -3652,6 +3673,11 @@ option {
 
 .feedback-card-secondary {
   border-radius: 999px;
+}
+
+.light .feedback-card-secondary,
+html.light .feedback-card-secondary {
+  border-color: rgba(0, 122, 255, 0.12);
 }
 
 @media (max-width: 1023px) {
